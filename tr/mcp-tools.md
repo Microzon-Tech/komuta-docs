@@ -4,13 +4,6 @@ Komuta MCP sayesinde, Komuta üzerindeki işlerinizi artık panele girmeden, do�
 
 Kurulum için: [https://www.komuta.io/docs/mcp/mcp-setup](https://www.komuta.io/docs/mcp/mcp-setup)
 
-## Workflow Tools (2)
-
-| Tool | Açıklama |
-|---|---|
-| `komuta_select_workflow` | Kullanıcı niyetine göre aktif workflow'u seçer, izinli tool setini açar. |
-| `komuta_end_workflow` | Aktif workflow'u sonlandırır. |
-
 ## Project Tools (4)
 
 | Tool | Açıklama |

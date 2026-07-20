@@ -4,13 +4,6 @@ With Komuta MCP, you can handle your work on Komuta by simply asking your AI ass
 
 To set it up, visit: [https://www.komuta.io/docs/mcp/mcp-setup](https://www.komuta.io/docs/mcp/mcp-setup)
 
-## Workflow Tools (2)
-
-| Tool | Description |
-|---|---|
-| `komuta_select_workflow` | Selects the active workflow based on user intent and unlocks its allowed tool set. |
-| `komuta_end_workflow` | Ends the active workflow. |
-
 ## Project Tools (4)
 
 | Tool | Description |
