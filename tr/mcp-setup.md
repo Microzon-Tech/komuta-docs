@@ -9,9 +9,15 @@ Bu doküman, bir AI kodlama ajanının Komuta MCP sunucusuna nasıl bağlanacağ
 | URL | `https://mcp.komuta.io/mcp` |
 | Kimlik doğrulama | Bearer token |
 
-## Adım 1: Sunucu yapılandırmasının eklenmesi
+## Adım 1: API key alınması
 
-Aşağıdaki promptu, değiştirmeden AI kodlama ajanının chat'ine yapıştır. Agent, sunucuyu kendi standart yöntemiyle kaydedecek — bir CLI komutu, bir yapılandırma dosyası veya ayarlar arayüzü, hangisi geçerliyse. `<API_KEYIN>` ifadesini literal bir placeholder olarak koru; bu Adım 2'de değiştirilecek.
+[console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) adresinden API key oluştur ve güvenli bir yere kaydet. Adım 3'te kullanılacak.
+
+⚠️ Key yalnızca oluşturulduğu anda gösterilir. Sonradan tekrar görüntülenemez ya da geri çevrilemez — kaybedersen yeni bir key oluşturman gerekir.
+
+## Adım 2: Sunucu yapılandırmasının eklenmesi
+
+Aşağıdaki promptu, değiştirmeden AI kodlama ajanının chat'ine yapıştır. Agent, sunucuyu kendi standart yöntemiyle kaydedecek — bir CLI komutu, bir yapılandırma dosyası veya ayarlar arayüzü, hangisi geçerliyse. `<API_KEYIN>` ifadesini literal bir placeholder olarak koru; bu Adım 3'te değiştirilecek.
 
 ```
 Şu anda çalıştığın AI kodlama client'ına, kendi standart MCP sunucusu kaydetme yöntemini kullanarak Komuta MCP sunucusunu ekle.
@@ -26,11 +32,11 @@ Aşağıdaki promptu, değiştirmeden AI kodlama ajanının chat'ine yapıştır
 
 Chat arayüzü üzerinden prompt alamayan client'lar için (örneğin Claude Desktop veya claude.ai), sunucuyu manuel olarak ekle: connector veya MCP ayarlarını aç, yukarıdaki URL ile özel bir sunucu ekle, kimlik doğrulama alanını şimdilik boş bırak.
 
-## Adım 2: API key'in yapılandırılması
+## Adım 3: API key'in yapılandırılması
 
-Komuta hesap panelinden API key'i al, ardından Adım 1'de agent'ın `<API_KEYIN>`'i eklediğini raporladığı yere git ve placeholder'ı gerçek değerle değiştir.
+Adım 1'deki API key'i, Adım 2'de agent'ın `<API_KEYIN>`'i eklediğini raporladığı yere uygula — placeholder'ı gerçek değerle değiştir.
 
-## Adım 3: Bağlantının doğrulanması
+## Adım 4: Bağlantının doğrulanması
 
 Agent'a Komuta MCP sunucusunun bağlı olduğunu doğrulamasını veya mevcut araçlarını listelemesini söyle. `komuta` görünmeli.
 

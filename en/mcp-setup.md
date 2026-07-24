@@ -9,9 +9,15 @@ This document describes how to connect an AI coding agent to the Komuta MCP serv
 | URL | `https://mcp.komuta.io/mcp` |
 | Authentication | Bearer token |
 
-## Step 1: Add the server configuration
+## Step 1: Get an API key
 
-Paste the prompt below into your AI coding agent's chat, unmodified. The agent will register the server using its own standard method — a CLI command, a configuration file, or its settings interface, whichever applies. Keep `<YOUR_API_KEY>` as a literal placeholder; it is replaced in Step 2.
+Create an API key at [console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) and save it somewhere safe. You'll need it in Step 3.
+
+⚠️ The key is shown only once, at creation time. It is stored hashed, so it cannot be retrieved or displayed again afterward — if you lose it, you'll need to generate a new one.
+
+## Step 2: Add the server configuration
+
+Paste the prompt below into your AI coding agent's chat, unmodified. The agent will register the server using its own standard method — a CLI command, a configuration file, or its settings interface, whichever applies. Keep `<YOUR_API_KEY>` as a literal placeholder; it is replaced in Step 3.
 
 ```
 Add the Komuta MCP server to whatever AI coding client you are currently running in, using your standard method for registering an MCP server.
@@ -26,11 +32,11 @@ Keep <YOUR_API_KEY> as a literal placeholder — it is replaced separately. Afte
 
 For clients without a chat interface to prompt (for example Claude Desktop or claude.ai), add the server manually: open the connector or MCP settings, add a custom server with the URL above, and leave the authentication field empty for now.
 
-## Step 2: Configure the API key
+## Step 3: Configure the API key
 
-Retrieve the API key from the Komuta account dashboard, then apply it wherever the agent reported inserting `<YOUR_API_KEY>` in Step 1 — replacing the placeholder with the real value.
+Apply the API key from Step 1 wherever the agent reported inserting `<YOUR_API_KEY>` in Step 2 — replacing the placeholder with the real value.
 
-## Step 3: Verify the connection
+## Step 4: Verify the connection
 
 Ask the agent to confirm the Komuta MCP server is connected, or to list its available tools. `komuta` should appear.
 
