@@ -19,7 +19,7 @@ Create an API key at [console.komuta.io/account/api-keys](https://console.komuta
 
 Paste the prompt below into your AI coding agent's chat, unmodified. The agent will register the server using its own standard method — a CLI command, a configuration file, or its settings interface, whichever applies. Keep `<YOUR_API_KEY>` as a literal placeholder; it is replaced in Step 3.
 
-```
+```text copy
 Add the Komuta MCP server to whatever AI coding client you are currently running in, using your standard method for registering an MCP server.
 
 - Server name: komuta

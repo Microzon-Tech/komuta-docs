@@ -19,7 +19,7 @@ Bu doküman, bir AI kodlama ajanının Komuta MCP sunucusuna nasıl bağlanacağ
 
 Aşağıdaki promptu, değiştirmeden AI kodlama ajanının chat'ine yapıştır. Agent, sunucuyu kendi standart yöntemiyle kaydedecek — bir CLI komutu, bir yapılandırma dosyası veya ayarlar arayüzü, hangisi geçerliyse. `<API_KEYIN>` ifadesini literal bir placeholder olarak koru; bu Adım 3'te değiştirilecek.
 
-```
+```text copy
 Şu anda çalıştığın AI kodlama client'ına, kendi standart MCP sunucusu kaydetme yöntemini kullanarak Komuta MCP sunucusunu ekle.
 
 - Server adı: komuta
