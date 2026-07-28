@@ -9,6 +9,12 @@ This document describes how to connect an AI coding agent to the Komuta MCP serv
 | URL | `https://mcp.komuta.io/mcp` |
 | Authentication | Bearer token |
 
+## What can you do with the MCP?
+
+Before installing, you can browse what the MCP server offers: provision services from a git repository, assess service health with Service Doctor, create managed Postgres / RabbitMQ / Valkey addons, inspect logs and traces, and look up packages and pricing.
+
+Full list of tools and what they do: [Komuta MCP Tools](https://www.komuta.io/docs/mcp/mcp-tools)
+
 ## Step 1: Get an API key
 
 Create an API key at [console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) and save it somewhere safe. You'll need it in Step 3.

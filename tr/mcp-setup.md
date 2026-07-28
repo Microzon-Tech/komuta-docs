@@ -9,6 +9,12 @@ Bu doküman, bir AI kodlama ajanının Komuta MCP sunucusuna nasıl bağlanacağ
 | URL | `https://mcp.komuta.io/mcp` |
 | Kimlik doğrulama | Bearer token |
 
+## MCP ile neler yapabilirsin?
+
+Kuruluma geçmeden önce, MCP sunucusunun sunduğu araçlara göz atabilirsin: bir git deposundan servis provision etme, Service Doctor ile servis sağlığını değerlendirme, yönetilen Postgres / RabbitMQ / Valkey addon'ları oluşturma, log ve trace inceleme, paket ve fiyatlandırma bilgisi alma.
+
+Araçların tam listesi ve ne işe yaradıkları: [Komuta MCP Araçları](https://www.komuta.io/docs/mcp/mcp-tools)
+
 ## Adım 1: API key alınması
 
 [console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) adresinden API key oluştur ve güvenli bir yere kaydet. Adım 3'te kullanılacak.
