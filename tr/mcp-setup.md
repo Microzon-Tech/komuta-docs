@@ -1,13 +1,6 @@
 # Komuta MCP Sunucusunun Kurulumu
 
-Bu doküman, bir AI kodlama ajanının Komuta MCP sunucusuna nasıl bağlanacağını açıklar.
-
-| Özellik | Değer |
-|---|---|
-| Server adı | `komuta` |
-| Transport | HTTP |
-| URL | `https://mcp.komuta.io/mcp` |
-| Kimlik doğrulama | Bearer token |
+Bu doküman, Claude ve Codex'in Komuta MCP sunucusuna nasıl bağlanacağını açıklar.
 
 ## MCP ile neler yapabilirsin?
 
@@ -15,34 +8,46 @@ Kuruluma geçmeden önce, MCP sunucusunun sunduğu araçlara göz atabilirsin: b
 
 Araçların tam listesi ve ne işe yaradıkları: [Komuta MCP Araçları](https://www.komuta.io/docs/mcp/mcp-tools)
 
-## Adım 1: API key alınması
+## Claude için kurulum
 
-[console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) adresinden API key oluştur ve güvenli bir yere kaydet. Adım 3'te kullanılacak.
+### Claude Code (CLI)
 
-⚠️ Key yalnızca oluşturulduğu anda gösterilir. Sonradan tekrar görüntülenemez ya da geri çevrilemez — kaybedersen yeni bir key oluşturman gerekir.
-
-## Adım 2: Sunucu yapılandırmasının eklenmesi
-
-Aşağıdaki promptu, değiştirmeden AI kodlama ajanının chat'ine yapıştır. Agent, sunucuyu kendi standart yöntemiyle kaydedecek — bir CLI komutu, bir yapılandırma dosyası veya ayarlar arayüzü, hangisi geçerliyse. `<API_KEYIN>` ifadesini literal bir placeholder olarak koru; bu Adım 3'te değiştirilecek.
-
-```text copy
-Şu anda çalıştığın AI kodlama client'ına, kendi standart MCP sunucusu kaydetme yöntemini kullanarak Komuta MCP sunucusunu ekle.
-
-- Server adı: komuta
-- Transport: HTTP
-- URL: https://mcp.komuta.io/mcp
-- Auth: Bearer token, değer: <API_KEYIN>
-
-<API_KEYIN> ifadesini literal bir placeholder olarak koru — ayrı bir adımda değiştirilecek. Sunucuyu ekledikten sonra, <API_KEYIN>'in tam olarak nerede değiştirilmesi gerektiğini raporla (hangi dosya, ya da bir ayarlar ekranındaki hangi alan).
+```bash
+claude mcp add komuta http://mcp.komuta.io/mcp
 ```
 
-Chat arayüzü üzerinden prompt alamayan client'lar için (örneğin Claude Desktop veya claude.ai), sunucuyu manuel olarak ekle: connector veya MCP ayarlarını aç, yukarıdaki URL ile özel bir sunucu ekle, kimlik doğrulama alanını şimdilik boş bırak.
+### Claude Desktop
 
-## Adım 3: API key'in yapılandırılması
+`Settings` → `Connectors` → `Add` → `Custom Connector`
 
-Adım 1'deki API key'i, Adım 2'de agent'ın `<API_KEYIN>`'i eklediğini raporladığı yere uygula — placeholder'ı gerçek değerle değiştir.
+- **Name:** Komuta
+- **Remote MCP Server URL:** `http://mcp.komuta.io/mcp`
 
-## Adım 4: Bağlantının doğrulanması
+`Add` → `Connect`
+
+## Codex için kurulum
+
+1. Codex CLI'yi indir:
+
+   ```bash
+   npm install -g @openai/codex
+   ```
+
+2. `~/.codex/config.toml` dosyasına ekle (Windows'ta `C:\Users\<Kullanıcı_Adı>\.codex\config.toml`):
+
+   ```toml
+   [mcp_servers.komuta]
+   url = "http://mcp.komuta.io/mcp"
+   scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
+   ```
+
+3. Giriş yap:
+
+   ```bash
+   codex mcp login komuta
+   ```
+
+## Bağlantının doğrulanması
 
 Agent'a Komuta MCP sunucusunun bağlı olduğunu doğrulamasını veya mevcut araçlarını listelemesini söyle. `komuta` görünmeli.
 
@@ -50,6 +55,6 @@ Agent'a Komuta MCP sunucusunun bağlı olduğunu doğrulamasını veya mevcut ar
 
 | Belirti | Neden |
 |---|---|
-| `401 Unauthorized` | Key eksik, yanlış yazılmış veya süresi dolmuş. Komuta hesabından yenisini oluştur. |
-| Sunucu tanınmıyor | Agent'ın yapılandırmayı gerçekten uyguladığını doğrula — ne eklediğini göstermesini iste. |
-| Key ifşa riski | Key'i versiyon kontrolüne commit'leme veya düz metin olarak paylaşma; key doğrudan Komuta hesabına erişim sağlar. |
+| Tarayıcı üzerinden giriş açılmıyor veya tamamlanmıyor | `codex mcp login komuta` komutunu tekrar çalıştır; Claude Desktop'ta connector'ı kaldırıp yeniden ekle. |
+| Sunucu tanınmıyor | Yapılandırmanın doğru dosyaya (`~/.codex/config.toml`) veya doğru CLI komutuyla eklendiğini doğrula. |
+| `401 Unauthorized` / yetkilendirme hatası | Oturumun süresi dolmuş olabilir; giriş adımını tekrarla. |

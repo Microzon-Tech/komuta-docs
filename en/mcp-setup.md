@@ -1,13 +1,6 @@
 # Installing the Komuta MCP Server
 
-This document describes how to connect an AI coding agent to the Komuta MCP server.
-
-| Property | Value |
-|---|---|
-| Server name | `komuta` |
-| Transport | HTTP |
-| URL | `https://mcp.komuta.io/mcp` |
-| Authentication | Bearer token |
+This document describes how to connect Claude and Codex to the Komuta MCP server.
 
 ## What can you do with the MCP?
 
@@ -15,34 +8,46 @@ Before installing, you can browse what the MCP server offers: provision services
 
 Full list of tools and what they do: [Komuta MCP Tools](https://www.komuta.io/docs/mcp/mcp-tools)
 
-## Step 1: Get an API key
+## Install for Claude
 
-Create an API key at [console.komuta.io/account/api-keys](https://console.komuta.io/account/api-keys) and save it somewhere safe. You'll need it in Step 3.
+### Claude Code (CLI)
 
-⚠️ The key is shown only once, at creation time. It is stored hashed, so it cannot be retrieved or displayed again afterward — if you lose it, you'll need to generate a new one.
-
-## Step 2: Add the server configuration
-
-Paste the prompt below into your AI coding agent's chat, unmodified. The agent will register the server using its own standard method — a CLI command, a configuration file, or its settings interface, whichever applies. Keep `<YOUR_API_KEY>` as a literal placeholder; it is replaced in Step 3.
-
-```text copy
-Add the Komuta MCP server to whatever AI coding client you are currently running in, using your standard method for registering an MCP server.
-
-- Server name: komuta
-- Transport: HTTP
-- URL: https://mcp.komuta.io/mcp
-- Auth: Bearer token, value: <YOUR_API_KEY>
-
-Keep <YOUR_API_KEY> as a literal placeholder — it is replaced separately. After adding the server, report exactly where <YOUR_API_KEY> needs to be replaced (which file, or which field in a settings screen).
+```bash
+claude mcp add komuta http://mcp.komuta.io/mcp
 ```
 
-For clients without a chat interface to prompt (for example Claude Desktop or claude.ai), add the server manually: open the connector or MCP settings, add a custom server with the URL above, and leave the authentication field empty for now.
+### Claude Desktop
 
-## Step 3: Configure the API key
+`Settings` → `Connectors` → `Add` → `Custom Connector`
 
-Apply the API key from Step 1 wherever the agent reported inserting `<YOUR_API_KEY>` in Step 2 — replacing the placeholder with the real value.
+- **Name:** Komuta
+- **Remote MCP Server URL:** `http://mcp.komuta.io/mcp`
 
-## Step 4: Verify the connection
+`Add` → `Connect`
+
+## Install for Codex
+
+1. Install the Codex CLI:
+
+   ```bash
+   npm install -g @openai/codex
+   ```
+
+2. Add this to `~/.codex/config.toml` (on Windows: `C:\Users\<Username>\.codex\config.toml`):
+
+   ```toml
+   [mcp_servers.komuta]
+   url = "http://mcp.komuta.io/mcp"
+   scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
+   ```
+
+3. Log in:
+
+   ```bash
+   codex mcp login komuta
+   ```
+
+## Verify the connection
 
 Ask the agent to confirm the Komuta MCP server is connected, or to list its available tools. `komuta` should appear.
 
@@ -50,6 +55,6 @@ Ask the agent to confirm the Komuta MCP server is connected, or to list its avai
 
 | Symptom | Cause |
 |---|---|
-| `401 Unauthorized` | The key is missing, mistyped, or expired. Regenerate it from the Komuta account. |
-| Server not recognized | Confirm the agent actually applied the configuration — ask it to show what it added. |
-| Key exposure risk | Do not commit the key to version control or share it in plain text; it grants direct access to the Komuta account. |
+| Browser login doesn't open or complete | Re-run `codex mcp login komuta`; for Claude Desktop, remove and re-add the connector. |
+| Server not recognized | Confirm the configuration was added to the right file (`~/.codex/config.toml`) or via the correct CLI command. |
+| `401 Unauthorized` / auth error | The session may have expired; repeat the login step. |
