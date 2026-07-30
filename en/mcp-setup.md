@@ -13,17 +13,23 @@ Full list of tools and what they do: [Komuta MCP Tools](https://www.komuta.io/do
 ### Claude Code (CLI)
 
 ```bash
-claude mcp add komuta http://mcp.komuta.io/mcp
+claude mcp add --transport http komuta https://mcp.komuta.io/mcp -s user
+```
+
+Log in:
+
+```bash
+claude mcp login komuta
 ```
 
 ### Claude Desktop
 
-`Settings` → `Connectors` → `Add` → `Custom Connector`
-
-- **Name:** Komuta
-- **Remote MCP Server URL:** `http://mcp.komuta.io/mcp`
-
-`Add` → `Connect`
+1. Go to `Settings` → `Connectors` → `Add` → `Custom Connector`.
+2. Fill in:
+   - **Name:** Komuta
+   - **Remote MCP Server URL:** `https://mcp.komuta.io/mcp`
+3. Click `Add`.
+4. Click `Connect`.
 
 ## Install for Codex
 
@@ -37,7 +43,7 @@ claude mcp add komuta http://mcp.komuta.io/mcp
 
    ```toml
    [mcp_servers.komuta]
-   url = "http://mcp.komuta.io/mcp"
+   url = "https://mcp.komuta.io/mcp"
    scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
    ```
 
@@ -49,7 +55,7 @@ claude mcp add komuta http://mcp.komuta.io/mcp
 
 ## Verify the connection
 
-Ask the agent to confirm the Komuta MCP server is connected, or to list its available tools. `komuta` should appear.
+Ask the agent to confirm the Komuta MCP server is connected, or to list its available tools. `komuta` should appear. Or type `/mcp` to check yourself (if it doesn't appear, try closing and reopening the app).
 
 ## Troubleshooting
 

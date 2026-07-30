@@ -13,17 +13,23 @@ Araçların tam listesi ve ne işe yaradıkları: [Komuta MCP Araçları](https:
 ### Claude Code (CLI)
 
 ```bash
-claude mcp add komuta http://mcp.komuta.io/mcp
+claude mcp add --transport http komuta https://mcp.komuta.io/mcp -s user
+```
+
+Giriş yap:
+
+```bash
+claude mcp login komuta
 ```
 
 ### Claude Desktop
 
-`Settings` → `Connectors` → `Add` → `Custom Connector`
-
-- **Name:** Komuta
-- **Remote MCP Server URL:** `http://mcp.komuta.io/mcp`
-
-`Add` → `Connect`
+1. `Settings` → `Connectors` → `Add` → `Custom Connector` yoluna git.
+2. Şunları doldur:
+   - **Name:** Komuta
+   - **Remote MCP Server URL:** `https://mcp.komuta.io/mcp`
+3. `Add`'e tıkla.
+4. `Connect`'e tıkla.
 
 ## Codex için kurulum
 
@@ -37,7 +43,7 @@ claude mcp add komuta http://mcp.komuta.io/mcp
 
    ```toml
    [mcp_servers.komuta]
-   url = "http://mcp.komuta.io/mcp"
+   url = "https://mcp.komuta.io/mcp"
    scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
    ```
 
@@ -49,7 +55,7 @@ claude mcp add komuta http://mcp.komuta.io/mcp
 
 ## Bağlantının doğrulanması
 
-Agent'a Komuta MCP sunucusunun bağlı olduğunu doğrulamasını veya mevcut araçlarını listelemesini söyle. `komuta` görünmeli.
+Agent'a Komuta MCP sunucusunun bağlı olduğunu doğrulamasını veya mevcut araçlarını listelemesini söyle. `komuta` görünmeli. Dilersen `/mcp` yazarak bağlantıyı kendin de doğrulayabilirsin. Eğer `komuta` listede görünmüyorsa, uygulamayı tamamen kapatıp tekrar açmayı denemelisiniz.
 
 ## Sorun giderme
 
