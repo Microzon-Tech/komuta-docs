@@ -12,13 +12,13 @@ Araçların tam listesi ve ne işe yaradıkları: [Komuta MCP Araçları](https:
 
 ### Claude Code (CLI)
 
-```bash
+```bash copy
 claude mcp add --transport http komuta https://mcp.komuta.io/mcp -s user
 ```
 
 Giriş yap:
 
-```bash
+```bash copy
 claude mcp login komuta
 ```
 
@@ -35,13 +35,13 @@ claude mcp login komuta
 
 1. Codex CLI'yi indir:
 
-   ```bash
+   ```bash copy
    npm install -g @openai/codex
    ```
 
 2. `~/.codex/config.toml` dosyasına ekle (Windows'ta `C:\Users\<Kullanıcı_Adı>\.codex\config.toml`):
 
-   ```toml
+   ```toml copy
    [mcp_servers.komuta]
    url = "https://mcp.komuta.io/mcp"
    scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
@@ -49,7 +49,7 @@ claude mcp login komuta
 
 3. Giriş yap:
 
-   ```bash
+   ```bash copy
    codex mcp login komuta
    ```
 

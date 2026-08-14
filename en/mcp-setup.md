@@ -12,13 +12,13 @@ Full list of tools and what they do: [Komuta MCP Tools](https://www.komuta.io/do
 
 ### Claude Code (CLI)
 
-```bash
+```bash copy
 claude mcp add --transport http komuta https://mcp.komuta.io/mcp -s user
 ```
 
 Log in:
 
-```bash
+```bash copy
 claude mcp login komuta
 ```
 
@@ -35,13 +35,13 @@ claude mcp login komuta
 
 1. Install the Codex CLI:
 
-   ```bash
+   ```bash copy
    npm install -g @openai/codex
    ```
 
 2. Add this to `~/.codex/config.toml` (on Windows: `C:\Users\<Username>\.codex\config.toml`):
 
-   ```toml
+   ```toml copy
    [mcp_servers.komuta]
    url = "https://mcp.komuta.io/mcp"
    scopes = ["openid", "email", "profile", "offline_access", "komuta:mcp"]
@@ -49,7 +49,7 @@ claude mcp login komuta
 
 3. Log in:
 
-   ```bash
+   ```bash copy
    codex mcp login komuta
    ```
 
