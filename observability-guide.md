@@ -2,7 +2,7 @@
 
 Komuta Observability, bir serviste **ne olduğunu**, **nerede yavaşladığını** ve **hangi kanıta dayanarak karar verdiğinizi** tek çalışma alanında gösterir. Ekranlar yalnızca platformun gerçekten topladığı verileri sunar; veri gelmediyse boş bir grafik çizmek yerine kaynağın neden kullanılamadığını açıkça belirtir.
 
-Bu rehber teknik uzman olmayan kullanıcıların ekranları doğru yorumlamasına yardımcı olur. CPU ve bellek gibi Kubernetes kaynak kullanımları için [İzleme ve Log Yönetimi](monitoring-logs.md), çalışma zamanı tehditleri için [Çalışma Zamanı Koruması](runtime-security-guide.md) rehberini kullanın.
+Bu rehber teknik uzman olmayan kullanıcıların ekranları doğru yorumlamasına yardımcı olur. CPU ve bellek gibi Kubernetes kaynak kullanımları için [İzleme ve Log Yönetimi](https://www.komuta.io/docs/guides/monitoring-logs), çalışma zamanı tehditleri için [Çalışma Zamanı Koruması](https://www.komuta.io/docs/security/runtime-security-guide) rehberini kullanın.
 
 ---
 
@@ -283,9 +283,8 @@ Tahmin için yeterli geçmiş olmayabilir veya ilgili sorgu rotası kullanılam�
 
 ## İlgili Dokümanlar
 
-- [İzleme ve Log Yönetimi](monitoring-logs.md)
-- [Uyarı Yönetimi](alert-guide.md)
-- [Çalışma Zamanı Koruması](runtime-security-guide.md)
-- [Güvenlik Merkezi](security-center-guide.md)
-- [Erişim Kontrolü](access-control-guide.md)
-
+- [İzleme ve Log Yönetimi](https://www.komuta.io/docs/guides/monitoring-logs)
+- [Uyarı Yönetimi](https://www.komuta.io/docs/guides/alert-guide)
+- [Çalışma Zamanı Koruması](https://www.komuta.io/docs/security/runtime-security-guide)
+- [Güvenlik Merkezi](https://www.komuta.io/docs/security/security-center-guide)
+- [Erişim Kontrolü](https://www.komuta.io/docs/security/access-control-guide)
