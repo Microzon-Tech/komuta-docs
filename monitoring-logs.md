@@ -1,6 +1,6 @@
 # İzleme ve Log Yönetimi
 
-DevOpsZon, servislerinizin performansını ve sağlığını gerçek zamanlı olarak izlemenizi sağlar. **Komuta Metrics** ile metrik izleme ve **Komuta Logs** ile merkezi log yönetimi sayesinde uygulamalarınızı her açıdan gözlemleyebilirsiniz.
+Komuta, servislerinizin Kubernetes kaynak durumunu ve merkezi loglarını izlemenizi sağlar. İstek performansı, trace, endpoint, ağ bağımlılığı ve veri kapsamı için ayrıca [Observability Rehberi](observability-guide.md) kullanılmalıdır.
 
 ---
 
@@ -37,9 +37,9 @@ Dashboard üzerindeki özet kartlar:
 
 ---
 
-## Metrik İzleme
+## Kaynak İzleme
 
-DevOpsZon, **Komuta Metrics** altyapısı üzerinden servislerinizin metriklerini toplar ve izler.
+Servis ve cluster ekranları Kubernetes'in sağladığı kaynak durumunu gösterir. Bu bilgiler, Observability içindeki trace-türevli RED verisinden farklıdır.
 
 ### Temel Metrikler
 
@@ -47,10 +47,10 @@ DevOpsZon, **Komuta Metrics** altyapısı üzerinden servislerinizin metriklerin
 |--------|----------|-------|
 | **CPU Kullanımı** | Servisin tükettiği CPU kaynağı | mCPU / core |
 | **Bellek Kullanımı** | Servisin tükettiği RAM miktarı | MiB / GiB |
-| **Ağ Trafiği** | Gelen ve giden ağ trafiği | bytes/s |
-| **HTTP İstek Sayısı** | Saniyedeki istek sayısı | req/s |
-| **HTTP Hata Oranı** | 4xx ve 5xx yanıtların oranı | % |
-| **İstek Gecikme Süresi** | Yanıt süresi (latency) | ms |
+| **Replica Durumu** | İstenen, mevcut ve hazır pod sayısı | adet |
+| **HPA Durumu** | Minimum, maksimum ve güncel replica hedefi | adet |
+
+HTTP istek, hata ve gecikme ölçümleri için **Observability → Trace Türevli RED** ekranını kullanın. Ağ akışları byte veya paket sayısı taşımadığı için Observability flow sayıları bant genişliği olarak yorumlanmaz.
 
 ### Kaynak İzleme (Resources Sekmesi)
 
@@ -68,7 +68,7 @@ DevOpsZon, **Komuta Logs** altyapısı üzerinden tüm servis loglarını merkez
 
 ### Log Görüntüleme
 
-**Service Management** → **Logs** sekmesinden servisinizin loglarına erişin:
+**Service Management** → **Logs** veya **Observability → Log** ekranından servisinizin loglarına erişin:
 
 1. **Tarih aralığı:** Görmek istediğiniz zaman dilimini seçin
 2. **Arama:** Loglar içinde anahtar kelime arayın
@@ -158,3 +158,10 @@ Bu olaylar, sorun giderme sırasında ilk bakılacak kaynaklardır.
 - **Uyarılarla birlikte kullanın:** Metrik eşikleri için uyarı kuralları tanımlayarak proaktif izleme yapın
 - **Log seviyesi:** Uygulamanızda yapılandırılabilir log seviyesi (DEBUG, INFO, WARN, ERROR) kullanarak gereksiz log hacmini azaltın
 - **Zaman aralığı:** Log aramasında dar bir zaman aralığı seçerek sorgu performansını artırın
+- **Kanıt durumunu kontrol edin:** Boş sonuçları yorumlamadan önce Observability → Veri Sağlığı ekranında kaynağın ve kapsamın hazır olduğunu doğrulayın
+
+---
+
+## İlgili Doküman
+
+- [Observability Rehberi](observability-guide.md) — trace, RED, log, ağ bağımlılıkları, SLO, anomaliler ve veri sağlığı
