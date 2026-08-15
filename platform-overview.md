@@ -76,8 +76,8 @@ Tamamen izole ortamınızda çalışan Kubernetes platformuna DevOpsZon kurulumu
 |---------|----------|
 | **Gerçek zamanlı dashboard** | Pod durumu, trafik akışı ve kaynak tüketimi |
 | **Canlı trafik görselleştirmesi** | Ingress → Pod arası trafik akışını canlı izleyin |
-| **Komuta Metrics** | CPU, bellek, ağ kullanımı ve özel metrikler |
-| **Komuta Logs** | Merkezi log toplama ve arama |
+| **[Komuta Observability](observability-guide.md)** | Trace-türevli RED, endpoint, trace, ağ bağımlılığı, SLO, anomali ve kanıt kapsamı |
+| **Komuta Logs** | Merkezi log toplama, filtreleme, histogram ve trace ilişkilendirmesi |
 | **Komuta Alerts** | Metrik ve log tabanlı uyarı kuralları |
 | **Çoklu bildirim kanalı** | E-posta, Slack, Telegram, Teams, PagerDuty, SMS, WhatsApp |
 
@@ -117,14 +117,14 @@ Tamamen izole ortamınızda çalışan Kubernetes platformuna DevOpsZon kurulumu
     │          │          │          │
 ┌───▼────┐ ┌──▼────┐ ┌───▼────┐ ┌───▼────┐
 │ Komuta │ │Komuta │ │ Komuta │ │ Komuta │
-│Pipeline│ │Rollout│ │Metrics │ │Gateway │
+│Pipeline│ │Rollout│ │Observe │ │Gateway │
 │(CI/CD) │ │(Deploy│ │ + Logs │ │  + DNS │
 └────────┘ └───────┘ └────────┘ └────────┘
 ```
 
 - **Komuta Pipeline:** Kubernetes-native CI/CD pipeline'ları
 - **Komuta Rollout:** Gelişmiş deploy stratejileri (Canary, Blue/Green, Auto-Promote)
-- **Komuta Metrics + Logs:** Metrik toplama ve merkezi log yönetimi
+- **Komuta Observability + Logs:** Trace, endpoint RED, ağ akışları, veri sağlığı ve merkezi log yönetimi
 - **Komuta Gateway:** Trafik yönlendirme, DNS yönetimi ve otomatik hostname kayıtları
 - **Gerçek zamanlı güncelleme:** Bildirimler ve durum değişiklikleri anında panele yansır
 

@@ -90,3 +90,4 @@ DevOpsZon Console, sol menüdeki ana bölümlerle organize edilmiştir:
 - Deployment stratejilerini (Canary, Blue/Green) öğrenmek için **Deploy Stratejileri** bölümüne bakın
 - Yönetilen veritabanı veya mesaj kuyruğu için **Yönetilen Servisler** rehberine gidin
 - Uyarı ve bildirim kurmak için **Uyarı Yönetimi** bölümünü inceleyin
+- Servis performansını kanıt kapsamıyla birlikte incelemek için [Observability Rehberi](observability-guide.md) bölümüne gidin
