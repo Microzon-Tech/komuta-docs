@@ -27,11 +27,11 @@ Güvenlik Merkezi'nde dört ayrı kavram göreceksiniz. Aralarındaki fark önem
 | Kavram | Ne anlama gelir? | Nerede görünür? |
 |--------|------------------|-----------------|
 | **Gözlem (Observation)** | Audit modundaki bir serviste sensörün *gördüğü* ham davranış (henüz karar verilmemiş) | Servis detayı → Güvenlik → Gözlemler |
-| **İhlal (Violation)** | Bir koruma politikasına takılan davranışların canlı akışı | Güvenlik → İhlaller |
+| **İhlal (Violation)** | Bir koruma politikasına (Policy Guard) takılan davranış | Güvenlik → Bulgular (Kaynak: Çalışma-zamanı Koruması) |
 | **Bulgu (Finding)** | Tekilleştirilmiş, üzerinde karar alınabilir kalıcı güvenlik kaydı | Güvenlik → Bulgular |
 | **Kanıt (Evidence)** | Bir bulgu veya kararla ilişkili zaman damgalı olay geçmişi | Servis detayı → Güvenlik → Bulgular (zaman çizelgesi) |
 
-Kısaca: **gözlemler** öğrenme aşamasının ham verisidir, **ihlaller** "şu an ne tespit ediliyor" akışıdır, **bulgular** ise yönettiğiniz iş listesidir.
+Kısaca: **gözlemler** öğrenme aşamasının ham verisidir, **ihlaller** koruma politikasına takılan davranışın adıdır, **bulgular** ise yönettiğiniz iş listesidir. "İhlaller" artık kendi ekranı olan ayrı bir kavram değildir — bkz. [İhlaller (Violations)](#ihlaller-violations) notu.
 
 ---
 
@@ -110,10 +110,9 @@ Arama kutusu, kaynak filtresi (Çalışma-zamanı Koruması, Çalışma-zamanı 
 
 ## İhlaller (Violations)
 
-Koruma politikalarına takılan davranışların **canlı akışını** gösterir: hangi pod'da, hangi process, hangi aksiyonla (Engellendi / Denetlendi) yakalandı.
+> **Not:** "İhlaller" artık sol menüde ayrı bir sayfa değildir. Bu bölüm eski bir menü öğesini anlatıyordu; daha önce bu sayfaya kaydedilmiş bağlantılar ve üst menü çubuğundaki güvenlik göstergesi (kalkan simgesi), Çalışma-zamanı Koruması kaynağı önceden seçilmiş olarak **Bulgular** sayfasına sizi otomatik yönlendirir. Görülen liste, filtreler ve karar aksiyonları Bulgular ile tamamen aynıdır — iki ayrı ekranda aynı veriyi ikiye bölmemek için ekran birleştirilmiştir.
 
-- Bulgular ekranından farkı: ihlaller ham ve anlıktır; bulgular tekilleştirilmiş ve karar alınabilir kayıtlardır.
-- Sağ üstteki **zil rozeti** (tüm sayfalarda görünür) Critical + High ihlal sayacını canlı gösterir; kritik artışta anlık bildirim düşer.
+Koruma politikalarına (Policy Guard) takılan bir davranışı görmek istiyorsanız: **Bulgular** sayfasını açın ve Kaynak filtresinden **Çalışma-zamanı Koruması**'nı seçin. Üst menü çubuğundaki kalkan simgesi, kiracı genelindeki Kritik + Yüksek şiddetli açık bulgu sayısını canlı gösterir ve tıklandığında Bulgular ekranına götürür.
 
 ---
 
@@ -291,6 +290,24 @@ Hazır senaryolar arasında şüpheli process çalıştırma, hassas dizine yazm
 
 ---
 
+## Tedarik Zinciri (Supply Chain)
+
+Her build/pipeline çalıştırması için üç kanıt parçasını bir arada gösterir: build sürecinin ürettiği SBOM (yazılım envanteri) referansı, pushlanan imajın güvenlik açığı taraması ve şeffaflık günlüğüne kaydedilen imza. Bu sayfa çalışma zamanı gözlemine bağlı değildir — izole çalışma zamanı ortamlarında da tam çalışır, çünkü kanıtlar (SBOM, tarama, imza) build hattından gelir, çalışan iş yükünden değil.
+
+Her build artefaktının bir **dağıtım kabul kararı** vardır — imajın dağıtım zamanı imza/köken doğrulama kapısından geçip geçmediğini gösterir:
+
+| Karar | Anlamı |
+|-------|--------|
+| Admission not evaluated | Henüz dağıtım kapısına ulaşmadı |
+| Admission verified | Tüm kriptografik kanıtlar geçti |
+| Deploy blocked | Dağıtım engellendi |
+| Exception applied | Sınırlı bir istisna uygulanmış |
+| Audit-only cohort | Sadece denetim modunda değerlendirilen bir kohort |
+
+Bir imaj **Deploy blocked** durumundaysa ve yetkiniz varsa, riski/telafi edici kontrolü açıklayan en az 16 karakterlik bir gerekçe ile ve süreli (1, 4, 8 veya 24 saat) bir **risk kabul istisnası** kaydedebilirsiniz. İstisna yalnızca o servisi ve o değişmez imaj digest'ini, seçilen süre boyunca geçirir; dağıtım kabulünü genel olarak devre dışı bırakmaz. Tüm istisna kayıtları (oluşturma ve iptal) denetim zincirine yazılır.
+
+---
+
 ## Honey Path'ler (Tuzak Yollar)
 
 Bir servisinizde **tuzak dosya yolu** tanımlayın: meşru kodunuzun asla dokunmaması gereken bir yol (ör. sahte bir kimlik bilgisi dosyası). Bu yola yapılan **herhangi bir erişim** anında Critical bulgu üretir ve ilgili olay müdahale playbook'unu önerir.
@@ -318,9 +335,10 @@ Bu yapı; SOC 2, ISO 27001 ve PCI-DSS denetimlerindeki "denetim kaydı bütünl�
 
 | Sayfa | İçerik |
 |-------|--------|
-| **Çalışma Zamanı Yaptırımı** | Platform genelinde İzleme (Monitor) ↔ Yaptırım (Enforce) modu; mod değişimi gerekçe ister ve hazırlık kontrolünden geçer. Yöneticiler içindir. |
-| **Küme Sağlığı** | Altyapı katmanı sağlık bulguları (depolama, node bileşenleri). |
-| **Saklama Politikası** | Güvenlik verilerinin saklama süresi ve veri ikamet (residency) ayarları. Yönetici yetkisi gerektirir. |
+| **Çalışma Zamanı Uygulama** | Kiracı genelinde Sadece gözlem (Monitor) ↔ Aktif sonlandırma (Enforce) modu; aktif sonlandırmaya geçiş gerekçe ister ve bir hazırlık kontrolünden geçer. Yalnızca platform yöneticisi değiştirebilir. |
+| **Küme Sağlığı** | Altyapı katmanı sağlık bulguları (depolama, dosya sistemi, veri alım hızı). Yalnızca platform yöneticilerine görünür. |
+| **Saklama Politikası** | Güvenlik verilerinin saklama süresi ve veri ikamet (residency) ayarları. Görüntülemek için bile platform yöneticisi yetkisi gerekir. |
+| **Tedarik Zinciri** | Build/pipeline kanıtları (SBOM, tarama, imza) ve dağıtım kabul kararı — bkz. [Tedarik Zinciri](#tedarik-zinciri-supply-chain). |
 
 ---
 
@@ -330,7 +348,7 @@ Güvenlik Merkezi yetenekleri, **Erişim Kontrolü → Roller** üzerinden ayrı
 
 | Yetenek | Kim kullanmalı? |
 |---------|-----------------|
-| Güvenlik Merkezi okuma (genel bakış, bulgular, ihlaller) | Tüm geliştirici ekip |
+| Güvenlik Merkezi okuma (genel bakış, bulgular) | Tüm geliştirici ekip |
 | Bulgu kararları (Allow/Block/Resolve) | Güvenlik operatörü / takım lideri |
 | Bulgu kararları (Acknowledge/Dismiss) | Geliştirici |
 | Bildirim kanalı ve yönlendirme kuralı yönetimi | Güvenlik operatörü |
@@ -339,7 +357,7 @@ Güvenlik Merkezi yetenekleri, **Erişim Kontrolü → Roller** üzerinden ayrı
 | Uyumluluk görüntüleme / kanıt dışa aktarma | Denetçi (auditor) rolü |
 | Sentetik tatbikat tetikleme, honey path yönetimi | Güvenlik operatörü |
 | Denetim deposu görüntüleme | Denetçi / güvenlik operatörü |
-| Saklama politikası, yaptırım modu, arşiv yönetimi | Platform yöneticisi |
+| Saklama politikası, çalışma zamanı uygulama modu, arşiv yönetimi | Platform yöneticisi |
 
 En iyi uygulama: geliştiricilere okuma + acknowledge yetkisi verin; Allow/Block gibi kalıcı kararları ve kanal/istisna yönetimini güvenlik sorumlularıyla sınırlayın.
 
@@ -347,8 +365,8 @@ En iyi uygulama: geliştiricilere okuma + acknowledge yetkisi verin; Allow/Block
 
 ## Sık Sorulan Sorular
 
-**"Bulgular" ile "İhlaller" arasındaki fark ne?**
-İhlaller anlık ham akıştır; bulgular aynı olayın tekilleştirilmiş, karar alınabilir halidir. Günlük operasyonu Bulgular ekranından yürütün; İhlaller'i canlı gözlem için kullanın.
+**"İhlaller" sayfası nereye gitti?**
+Sol menüde ayrı bir sayfa değildir artık. Daha önce bu sayfaya kaydedilmiş bağlantılar ve üst menü çubuğundaki güvenlik göstergesi, Çalışma-zamanı Koruması kaynağı önceden seçilmiş olarak sizi Bulgular sayfasına yönlendirir — liste, filtreler ve karar aksiyonları tamamen aynıdır.
 
 **Risk skorum neden değişti?**
 Skor 5 dakikada bir yeniden hesaplanır. Yeni bir Critical bulgu, skoru hızla yükseltir; bulgu çözüldükçe ve zaman geçtikçe (tazelik eğrisi) skor düşer.
