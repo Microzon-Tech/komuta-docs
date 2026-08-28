@@ -1,6 +1,6 @@
 # Servis Dashboard
 
-Dashboard, bir servisi açtığınızda ilk gördüğünüz ekrandır: servisin o anki durumu, hangi plandan çalıştığı, hangi repo ve branch'ten deploy edildiği ve trafiğin ingress'ten pod'lara nasıl aktığı tek sayfada toplanır. Bilgi kartları aynı zamanda kısayoldur — strateji, plan ve branch değişikliklerini başka bir sekmeye gitmeden buradan yaparsınız.
+Dashboard, bir servisi açtığınızda ilk gördüğünüz ekrandır. Servisin o anki durumunu, çalıştığı planı, bağlı olduğu repo ve branch'i ve trafiğin pod'lara nasıl aktığını tek sayfada toplar. Aynı zamanda bir kontrol paneli gibi çalışır: strateji, plan ve branch değişikliklerini hızlıca yaparsınız.
 
 ![alt text](img/service-dashboard.png)
 
@@ -25,7 +25,7 @@ Rollout stratejisini, kartın üzerindeki ayarlar ikonundan değiştirebilirsini
 
 ## Plan / Paket
 
-Kart, servisin çalıştığı kaynak paketini, cluster tipini ve pakete tanımlı CPU ile bellek değerini gösterir.
+Kart, servisin çalıştığı kaynak planını, cluster tipini ve pakete tanımlı CPU ile bellek değerini gösterir.
 
 Servisiniz daha fazla kaynağa ihtiyaç duyduğunda kart üzerindeki **Yükselt** butonundan paketi değiştirebilirsiniz.
 
