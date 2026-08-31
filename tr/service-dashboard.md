@@ -2,7 +2,7 @@
 
 Dashboard, bir servisi açtığınızda ilk gördüğünüz ekrandır. Servisin o anki durumunu, çalıştığı planı, bağlı olduğu repo ve branch'i ve trafiğin pod'lara nasıl aktığını tek sayfada toplar. Aynı zamanda bir kontrol paneli gibi çalışır: strateji, plan ve branch değişikliklerini hızlıca yaparsınız.
 
-![alt text](img/service-dashboard.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/services-dashboard/service-dashboard.png)
 
 ---
 
@@ -20,7 +20,7 @@ Rollout stratejisini, kartın üzerindeki ayarlar ikonundan değiştirebilirsini
 
 > **Not:** Strateji değişikliği bir sonraki deploy'da geçerli olur. Devam eden bir rollout varsa etkilenmez, mevcut stratejisiyle tamamlanır.
 
-![alt text](img/rollout-strategies.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/rollout-strategies.png)
 ---
 
 ## Plan / Paket
@@ -31,7 +31,7 @@ Servisiniz daha fazla kaynağa ihtiyaç duyduğunda kart üzerindeki **Yükselt*
 
 > **İpucu:** Servisiniz sık sık yeniden başlıyor ya da bellek yetersizliğinden düşüyorsa ilk bakılacak yer bu karttır — buradaki CPU ve bellek değeri servisin kullanabileceği üst sınırdır.
 
-![Plan / paket kartı ve Kaynak Planı penceresindeki paket listesi](img/resource-prices.png)
+![Plan / paket kartı ve Kaynak Planı penceresindeki paket listesi](https://cdn.komuta.io/docs/tr/images/resources/resource-plan-prices.png)
 
 ---
 
@@ -39,7 +39,7 @@ Servisiniz daha fazla kaynağa ihtiyaç duyduğunda kart üzerindeki **Yükselt*
 
 Bir sonraki deploy'un farklı bir branch'ten gelmesini istiyorsanız, kart üzerindeki düzenleme ikonundan branch'i değiştirebilirsiniz. Değişiklikten sonra build'ler ve otomatik dağıtımlar yeni branch'i takip eder. Aynı pencerede yer alan **Yeni branch'ten hemen dağıt** anahtarı açıksa deploy anında başlar; kapalıysa değişiklik kaydedilir ve yeni branch'e yapılan ilk push dağıtımı tetikler.
 
-![Git deposu kartı ve branch değiştirme penceresi](img/change-branch.png)
+![Git deposu kartı ve branch değiştirme penceresi](https://cdn.komuta.io/docs/tr/images/branches/change-branch.png)
 
 ---
 
@@ -49,7 +49,7 @@ MCP ID, servisinizin Komuta üzerindeki kimlik değeridir. Bu değeri kod ajanı
 
 Değeri karttaki kopyalama ikonuyla alırsınız. Ajanınızı Komuta'ya ilk kez bağlıyorsanız MCP ID tek başına yeterli değildir; önce bağlantı kurulumunu tamamlayın — [MCP Kurulumu](mcp-setup.md).
 
-![MCP ID kartı — kimlik değeri ve kopyalama ikonu](img/mcp-id.png)
+![MCP ID kartı — kimlik değeri ve kopyalama ikonu](https://cdn.komuta.io/docs/tr/images/mcp/mcp-id-dashboard.png)
 
 ---
  
@@ -59,7 +59,7 @@ Servis Doktoru, sayfanın üst kısmındaki butondan açılır ve servisin opera
  
 Panelde sonucun yanında **dikkat gerektiren bulgular** (ne tespit edildi, neden önemli ve hangi kanıta dayanıyor), **ileriye dönük riskler** (henüz sorun değil ama yaklaşmakta olan durumlar) ve sonucun sağlıklıya dönmesi için nelerin değişmesi gerektiği yer alır. **Yeniden değerlendir** ile analizi istediğiniz an tekrar çalıştırabilirsiniz.
  
-![Servis Doktoru paneli — sonuç başlığı, kapsam ve güven göstergeleri, bulgular listesi](img/service-doctor.png)
+![Servis Doktoru paneli — sonuç başlığı, kapsam ve güven göstergeleri, bulgular listesi](https://cdn.komuta.io/docs/tr/images/service-doctor/service-doctor.png)
  
 ---
 
@@ -79,7 +79,7 @@ Dağıtım tetiklendikten sonra ilerleyişini Rollout durumu kartından ve topol
 
 Bilgi kartlarının altındaki durum kartı; uyku durumu, güvenlik taraması, deploy sağlığı ve servis sağlığı gibi servis durumlarını tek yerde görüntüler. Servisinizde ilgilenmeniz gereken bir şey olup olmadığını anlamak için bakacağınız ilk yer burasıdır — aktif bir uyarı ya da devam eden bir işlem varsa kart bunu öne çıkarır.
 
-![Durum kartı — "Her şey yolunda" durumu ve gezinme noktaları](img/smart-status-cards.png)
+![Durum kartı — "Her şey yolunda" durumu ve gezinme noktaları](https://cdn.komuta.io/docs/tr/images/deployments/smart-status-cards.png)
 
 ---
 
@@ -89,7 +89,7 @@ Sayfanın sağ tarafındaki topoloji, servisinize gelen trafiğin canlı haritas
 
 Asıl faydası bir sorunun *nerede* olduğunu bir bakışta göstermesidir: servis sağlıksız görünüyorsa hangi pod'un sorunlu olduğunu, hangi düğümün trafik almadığını doğrudan görürsünüz.
 
-![Topoloji haritası — HTTPRoute'tan pod'lara uzanan bağlantılar](img/topology.png)
+![Topoloji haritası — HTTPRoute'tan pod'lara uzanan bağlantılar](https://cdn.komuta.io/docs/tr/images/services-dashboard/topology.png)
 
 ### Haritadaki Düğümler
 
@@ -107,7 +107,7 @@ Düğümleri birleştiren çizgiler trafiği taşır. Canary veya Blue-Green rol
 
 Haritadaki bir pod'a tıkladığınızda o pod'un logları açılır — log sekmesine gidip pod aramanıza gerek kalmaz.
 
-![Topolojide bir pod'a tıklandığında açılan log penceresi](img/pod-logs.png)
+![Topolojide bir pod'a tıklandığında açılan log penceresi](https://cdn.komuta.io/docs/tr/images/logs/pod-logs.png)
 
 ### Servisi Yeniden Başlatma
 
