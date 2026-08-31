@@ -4,7 +4,7 @@ Sağlık kontrolleri, Komuta'nın servisinizin çalışır durumda olup olmadı�
 
 Kaydedilen ayarlar yaklaşık 30 saniye içinde servise uygulanır.
 
-![asd](img/services-health-controls.png)
+![asd](https://cdn.komuta.io/docs/tr/images/health-probes/services-health-controls.png)
 ---
 
 ## Kontrol Türleri
