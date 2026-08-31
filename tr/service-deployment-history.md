@@ -2,14 +2,14 @@
 
 Bu sayfa, servisin şu anda hangi sürümü çalıştırdığını ve daha önce hangi sürümlerin yayına alındığını gösterir. Bir dağıtım sorun çıkardığında sürüm buradan değiştirilir.
 
-![alt text](img/deployment-history-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-page.png)
 ---
 
 ## Mevcut Sürüm
 
 Sayfanın üstünde servisin canlıda çalışan sürümü yer alır: hangi imaj, kaçıncı revizyon, kaç replika ve hangi rollout stratejisiyle çalıştığı. Rollout stratejisi de buradan değiştirilir; değişiklik bir sonraki deploy'da geçerli olur.
 
-![alt text](img/deployment-history-current-version.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-current-version.png)
 ---
 
 ## Dağıtım Stratejileri
@@ -47,7 +47,7 @@ Her dağıtım kaydında **Geri al** işlemi bulunur. Onaylandığında servis o
 
 > **Uyarı:** Geri alma, devam eden bir rollout'u iptal eder. Canary dağıtımı sürerken geri alınırsa kademeli geçiş yarıda kalır ve trafik eski sürüme döner.
 
-![alt text](img/deployment-history-rollback.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-rollback.png)
 ---
 
 ## İlgili Dokümanlar
