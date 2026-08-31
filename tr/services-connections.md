@@ -2,7 +2,7 @@
 
 Bağlantılar, bir uygulamanın başka bir uygulamanıza özel ağ üzerinden erişmesini sağlar. Trafik internete çıkmaz, iki uygulama doğrudan birbirine ulaşır — bunun için public URL tanımlamaya gerek kalmaz.
 
-![alt text](img/services-connections.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/connections/services-connections.png)
 
 ---
 
@@ -12,7 +12,7 @@ Bağlantılar, bir uygulamanın başka bir uygulamanıza özel ağ üzerinden er
 
 Üretilen adresin kullanılabilmesi için uygulamanın bu adresi okuması gerekir. Listedeki **Ortam değişkeni olarak ekle** işlemi adresi servisin ortam değişkenlerine yazar.
 
-![alt text](img/services-connections-list.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/connections/services-connections-list.png)
 
 ---
 

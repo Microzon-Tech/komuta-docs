@@ -4,7 +4,7 @@ Ortam değişkenleri, uygulamanızın çalışırken okuduğu yapılandırma de�
 
 Değişken eklendikten, düzenlendikten veya silindikten sonra **Değişiklikleri Uygula** ile çalışma zamanına aktarılır.
 
-![alt text](img/services-enviroment-variables-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/enviroment-variables/services-enviroment-variables-page.png)
 ---
 
 ## Değişken Türleri
@@ -21,7 +21,7 @@ Her değişkenin bir türü vardır ve bu tür, değerin nerede görünür olaca
 
 > **Uyarı:** Build türündeki bir değer imaja, public önekli ise tarayıcı paketine de gömülür. Gizli kalması gereken bilgileri bu türde tanımlamayın.
 
-![alt text](img/services-enviroment-variables-types.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/enviroment-variables/services-enviroment-variables-types.png)
 
 ---
 

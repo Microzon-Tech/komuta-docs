@@ -2,7 +2,7 @@
 
 Pipeline, kodunuzun derlenip güvenlik taramasından geçirilerek servise dağıtılması sürecidir. Servisinizin tüm pipeline çalışmaları burada listelenir.
 
-![Pipeline'lar sekmesi](img/piplines-piplines-page.png)
+![Pipeline'lar sekmesi](https://cdn.komuta.io/docs/tr/images/piplines/piplines-piplines-page.png)
 
 ---
 
@@ -20,7 +20,7 @@ Bir çalışma satırından çalışan bir pipeline'ı **iptal edebilir**, logla
 
 Bir çalışmanın detayında, her görevin logları ayrı ayrı incelenir. Başarısız bir çalışmada hatayı bulmanın en hızlı yolu, kırmızı görevi açıp logun son satırlarına bakmaktır. Loglar çalışma sürerken canlı akar; filtreleyebilir, kopyalayabilir ya da indirebilirsiniz.
 
-![Pipeline detay sayfası](img/piplines-failed-warning.png)
+![Pipeline detay sayfası](https://cdn.komuta.io/docs/tr/images/piplines/piplines-failed-warning.png)
 
 ---
 
@@ -40,7 +40,7 @@ Başarısız bir çalışmada **AI ile Çöz**, hata loglarını toplayıp hazı
 
 Komuta MCP kurulu ise **MCP ile Çöz** daha ileri gider: ajanınız servisin kendisine bağlanır, logları okur ve düzeltmeyi uygulayabilir. Kurulum için [MCP Kurulumu](mcp-setup.md) sayfasına bakın.
 
-![AI ile Çöz menüsü](img/piplines-mcp-ai-solution.png)
+![AI ile Çöz menüsü](https://cdn.komuta.io/docs/tr/images/mcp/piplines-mcp-ai-solution.png)
 
 ---
 

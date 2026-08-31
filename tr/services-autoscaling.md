@@ -10,7 +10,7 @@ Düzenlenebilecek ayarlar:
   - **Yukarı ölçekleme penceresi** — replika ekledikten sonra bir sonraki artış için beklenen süre. Kısa tutulması ani yük artışlarına daha hızlı yanıt verir.
   - **Aşağı ölçekleme penceresi** — replika kaldırdıktan sonra bir sonraki azaltma için beklenen süre. Uzun tutulması, trafiği geçici düşen bir servisin kapasitesini erken kaybetmesini önler.
 
-![alt text](img/sercices-autoscaling.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-scaling/sercices-autoscaling.png)
 ---
 
 ## İlgili Dokümanlar

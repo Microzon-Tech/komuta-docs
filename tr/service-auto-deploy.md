@@ -4,7 +4,7 @@ Otomatik dağıtım açıkken, servisin takip ettiği branch'e her push geldiği
 
 Her push doğrudan deploy'a dönmez. Komuta önce aşağıdaki kurallara bakar; push bu kurallardan geçerse pipeline başlar, geçmezse atlanır ve nedeni kayda geçer.
 
-![alt text](img/service-auto-deploy-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-deploy/service-auto-deploy-page.png)
 ---
 
 ## Dahil Edilecek Yol Desenleri
@@ -64,7 +64,7 @@ Commit mesajı buradaki ifadelerden birini içeriyorsa push yok sayılır ve da�
 
 Gelen her push için verilen karar commit'iyle birlikte kaydedilir. Beklenen bir deploy başlamadıysa nedeni buradan görülür.
 
-![alt text](img/service-auto-deploy-recent-trigger-decisions.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-deploy/service-auto-deploy-recent-trigger-decisions.png)
 ---
 
 ## İlgili Dokümanlar
