@@ -70,7 +70,9 @@ Servisin hangi Dockerfile ile build edileceği **Yapılandırma dosyası** alan�
 
 ### Dockerfile Bulunamazsa
 
-Komuta yalnızca bir Dockerfile üzerinden build alır. Seçilen branch'te hiç Dockerfile yoksa yapay zekâ ile bir tane üretmesi önerilir; bu mümkün değilse repoyu dağıtabilmek için bir Dockerfile eklenmesi gerekir. Dockerfile'ı Komuta MCP ile de oluşturabilirsiniz — kurulum için [MCP kurulumu](https://www.komuta.io/docs/mcp/mcp-setup) sayfasına bakın.
+Komuta yalnızca bir Dockerfile üzerinden build alır. Seçilen branch'te hiç Dockerfile yoksa yapay zekâ ile bir tane üretmesi önerilir; bu mümkün değilse repoyu dağıtabilmek için bir Dockerfile eklenmesi gerekir.
+
+Dockerfile'ı Komuta MCP ile de oluşturabilirsiniz — kurulum için [MCP kurulumu](https://www.komuta.io/docs/mcp/mcp-setup) sayfasına bakın.
 
 > **Uyarı:** Dockerfile yapay zekâ ile üretildiğinde repoda bir pull request açılır ve bu pull request birleştirilmelidir. Birleştirilmediği sürece sonraki dağıtımlar Dockerfile'ı bulamaz ve başarısız olur.
 
@@ -110,10 +112,3 @@ Her servis için üç alarm, seçim yapılmadan kurulur: **pod yeniden başlatma
 
 ![Dağıtım öncesi özet paneli](https://cdn.komuta.io/docs/tr/images/create-service/create-service-third-step.png)
 
----
-
-## Sonraki Adımlar
-
-- **Servis detay sayfası** — dağıtım sonrası build durumu, loglar ve pod bilgileri buradan izlenir.
-- **Otomatik ölçekleme (HPA)** — servis tek bir kopya ile başlar; ölçekleme kuralları servis oluşturulduktan sonra servisin kendi sayfasından tanımlanır.
-- [Integrations](https://console.komuta.io/integrations) — git hesapları ve registry bağlantıları buradan yönetilir.
