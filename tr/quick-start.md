@@ -2,10 +2,10 @@
 
 Komuta'da kodunuzu yayına almaktan veritabanınızı ayağa kaldırmaya kadar ihtiyacınız olan her şey dört hizmette toplanır:
 
-- **[Servisler](service-guide.md)** — Git reponuzdaki uygulamaları build edip canlıya alır.
-- **Job ve CronJob'lar** — Tek seferlik ya da zamanlanmış işleri çalıştırır.
-- **Stack'ler** — Servis, kaynak ve domain'lerden oluşan bütün bir kurulumu tek dosyada tanımlar.
-- **[Yönetilen servisler](managed-addons.md)** — PostgreSQL, Valkey, RabbitMQ ve API Gateway'i kurulum gerektirmeden sunar.
+- **[Servisler](https://komuta.io/docs/services)** — Git reponuzdaki uygulamaları build edip canlıya alır.
+- **[Job ve CronJob'lar](https://komuta.io/docs/jobs)** — Tek seferlik ya da zamanlanmış işleri çalıştırır.
+- **[Stack'ler](https://komuta.io/docs/stacks)** — Servis, kaynak ve domain'lerden oluşan bütün bir kurulumu tek dosyada tanımlar.
+- **[Yönetilen servisler](https://komuta.io/docs/managed-services)** — PostgreSQL, Valkey, RabbitMQ ve API Gateway'i kurulum gerektirmeden sunar.
 
 ---
 
