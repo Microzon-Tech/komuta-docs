@@ -2,7 +2,7 @@
 
 A pipeline is the process of building your code, running it through a security scan, and deploying it to the service. All pipeline runs for your service are listed here.
 
-![Pipelines tab](img/piplines-piplines-page.png)
+![Pipelines tab](https://cdn.komuta.io/docs/tr/images/piplines/piplines-piplines-page.png)
 
 ---
 
@@ -20,7 +20,7 @@ From a run's row you can **cancel** a running pipeline, go to its logs, or delet
 
 In a run's details, each task's logs can be inspected separately. For a failed run, the fastest way to find the error is to open the red task and check the last lines of its log. Logs stream live while the run is in progress; you can filter, copy, or download them.
 
-![Pipeline detail page](img/piplines-failed-warning.png)
+![Pipeline detail page](https://cdn.komuta.io/docs/tr/images/piplines/piplines-failed-warning.png)
 
 ---
 
@@ -40,7 +40,7 @@ On a failed run, **Fix with AI** collects the error logs and generates a ready-m
 
 If Komuta MCP is set up, **Fix with MCP** goes further: your agent connects directly to the service, reads the logs, and can apply the fix. See [MCP Setup](mcp-setup.md) for setup instructions.
 
-![Fix with AI menu](img/piplines-mcp-ai-solution.png)
+![Fix with AI menu](https://cdn.komuta.io/docs/tr/images/mcp/piplines-mcp-ai-solution.png)
 
 ---
 

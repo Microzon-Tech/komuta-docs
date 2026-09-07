@@ -4,7 +4,7 @@ When auto deploy is on, every push to the branch the service tracks triggers Kom
 
 Not every push turns into a deploy directly. Komuta first checks the rules below; if the push passes them the pipeline starts, and if it doesn't, it's skipped and the reason is logged.
 
-![alt text](img/service-auto-deploy-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-deploy/service-auto-deploy-page.png)
 ---
 
 ## Include Path Patterns
@@ -64,7 +64,7 @@ Example directives:
 
 The decision made for every incoming push is logged along with its commit. If an expected deploy didn't start, you can see why here.
 
-![alt text](img/service-auto-deploy-recent-trigger-decisions.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-deploy/service-auto-deploy-recent-trigger-decisions.png)
 ---
 
 ## Related Documents

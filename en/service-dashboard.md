@@ -2,7 +2,7 @@
 
 The dashboard is the first screen you see when you open a service. It brings the service's current status, the plan it runs on, the repo and branch it's connected to, and how traffic flows to pods together on a single page. It also works like a control panel: you make strategy, plan, and branch changes quickly from here.
 
-![alt text](img/service-dashboard.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/services-dashboard/service-dashboard.png)
 
 ---
 
@@ -20,7 +20,7 @@ You can change the rollout strategy from the settings icon on the card.
 
 > **Note:** A strategy change takes effect on the next deploy. It doesn't affect a rollout already in progress — that one completes with its current strategy.
 
-![alt text](img/rollout-strategies.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/rollout-strategies.png)
 ---
 
 ## Plan / Package
@@ -31,7 +31,7 @@ When your service needs more resources, you can change the package from the **Up
 
 > **Tip:** If your service restarts frequently or crashes from out-of-memory errors, this card is the first place to check — the CPU and memory values here are the upper limit the service can use.
 
-![Plan / package card and the package list in the Resource Plan window](img/resource-prices.png)
+![Plan / package card and the package list in the Resource Plan window](https://cdn.komuta.io/docs/tr/images/resources/resource-plan-prices.png)
 
 ---
 
@@ -39,7 +39,7 @@ When your service needs more resources, you can change the package from the **Up
 
 If you want the next deploy to come from a different branch, you can change the branch from the edit icon on the card. After the change, builds and auto deploys track the new branch. If the **Deploy immediately from the new branch** toggle in the same window is on, the deploy starts right away; if it's off, the change is saved and the first push to the new branch triggers the deployment.
 
-![Git repository card and the change branch window](img/change-branch.png)
+![Git repository card and the change branch window](https://cdn.komuta.io/docs/tr/images/branches/change-branch.png)
 
 ---
 
@@ -49,7 +49,7 @@ The MCP ID is your service's identity value on Komuta. When you give this value 
 
 You get the value from the copy icon on the card. If this is the first time you're connecting your agent to Komuta, the MCP ID alone isn't enough — complete the connection setup first: [MCP Setup](mcp-setup.md).
 
-![MCP ID card — identity value and copy icon](img/mcp-id.png)
+![MCP ID card — identity value and copy icon](https://cdn.komuta.io/docs/tr/images/mcp/mcp-id-dashboard.png)
 
 ---
  
@@ -59,7 +59,7 @@ Service Doctor opens from the button at the top of the page and evaluates the se
  
 Alongside the verdict, the panel lists **findings that need attention** (what was detected, why it matters, and what evidence it's based on), **forward-looking risks** (not a problem yet, but a condition that's approaching one), and what needs to change for the verdict to turn healthy. Use **Re-evaluate** to run the analysis again at any time.
  
-![Service Doctor panel — verdict header, scope and confidence indicators, findings list](img/service-doctor.png)
+![Service Doctor panel — verdict header, scope and confidence indicators, findings list](https://cdn.komuta.io/docs/tr/images/service-doctor/service-doctor.png)
  
 ---
 
@@ -79,7 +79,7 @@ Once the deployment is triggered, you can watch its progress live from the Rollo
 
 Below the info cards, the status card shows service states such as sleep status, security scan, deploy health, and service health all in one place. This is the first place to check whether anything needs your attention — if there's an active alert or an ongoing operation, the card surfaces it.
 
-![Status card — "Everything is fine" state and navigation points](img/smart-status-cards.png)
+![Status card — "Everything is fine" state and navigation points](https://cdn.komuta.io/docs/tr/images/deployments/smart-status-cards.png)
 
 ---
 
@@ -89,7 +89,7 @@ The topology on the right side of the page is a live map of the traffic coming i
 
 Its main value is showing at a glance *where* a problem is: if the service looks unhealthy, you can see directly which pod is having trouble or which node isn't receiving traffic.
 
-![Topology map — connections from the HTTPRoute to the pods](img/topology.png)
+![Topology map — connections from the HTTPRoute to the pods](https://cdn.komuta.io/docs/tr/images/services-dashboard/topology.png)
 
 ### Nodes on the Map
 
@@ -107,7 +107,7 @@ The lines connecting the nodes carry traffic. During a Canary or Blue-Green roll
 
 Clicking a pod on the map opens that pod's logs — no need to go to the logs tab and search for the pod.
 
-![Log window that opens when a pod is clicked in the topology](img/pod-logs.png)
+![Log window that opens when a pod is clicked in the topology](https://cdn.komuta.io/docs/tr/images/logs/pod-logs.png)
 
 ### Restarting the Service
 
