@@ -10,7 +10,7 @@ Settings you can configure:
   - **Scale-up window** — the time to wait after adding a replica before the next increase. Keeping it short responds faster to sudden load spikes.
   - **Scale-down window** — the time to wait after removing a replica before the next decrease. Keeping it long prevents a service from prematurely losing capacity when traffic dips temporarily.
 
-![alt text](img/sercices-autoscaling.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/auto-scaling/sercices-autoscaling.png)
 ---
 
 ## Related Documents

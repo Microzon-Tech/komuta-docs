@@ -4,7 +4,7 @@ Health probes let Komuta periodically check whether your service is running prop
 
 Saved settings are applied to the service within about 30 seconds.
 
-![asd](img/services-health-controls.png)
+![asd](https://cdn.komuta.io/docs/tr/images/health-probes/services-health-controls.png)
 ---
 
 ## Probe Types

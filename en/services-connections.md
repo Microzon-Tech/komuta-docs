@@ -2,7 +2,7 @@
 
 Connections let one application reach another one of your applications over a private network. Traffic never goes out to the internet — the two applications reach each other directly, so there's no need to define a public URL for this.
 
-![alt text](img/services-connections.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/connections/services-connections.png)
 
 ---
 
@@ -12,7 +12,7 @@ Use **Connect app** to choose the application to reach. Once the connection is e
 
 For the generated address to be usable, your application needs to read it. The **Add as environment variable** action in the list writes the address into the service's environment variables.
 
-![alt text](img/services-connections-list.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/connections/services-connections-list.png)
 
 ---
 

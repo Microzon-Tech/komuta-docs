@@ -2,7 +2,7 @@
 
 Ports determine which door traffic enters your service through and which port inside the application it's routed to. If a service is going to receive requests from outside, at least one port must be defined.
 
-![alt text](img/services-ports-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/ports/services-ports-page.png)
 ---
 
 ## Port Definition
@@ -18,7 +18,7 @@ Values entered for each port record:
 
 Both port and target port take a value between 1 and 65535.
 
-![alt text](img/services-ports-add-port.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/ports/services-ports-add-port.png)
 
 ---
 
@@ -28,7 +28,7 @@ A service can be exposed to your other clusters over a private network. In this 
 
 Once enabled, the clusters that can reach it are listed; setting up the connection can take a few minutes.
 
-![alt text](img/services-ports-private-mesh.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/ports/services-ports-private-mesh.png)
 
 ---
 

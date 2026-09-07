@@ -4,7 +4,7 @@ Environment variables are configuration values your application reads at runtime
 
 After a variable is added, edited, or deleted, it's pushed to the runtime with **Apply Changes**.
 
-![alt text](img/services-enviroment-variables-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/enviroment-variables/services-enviroment-variables-page.png)
 ---
 
 ## Variable Types
@@ -21,7 +21,7 @@ The **Build** type is needed for variables that are read during the build. When 
 
 > **Warning:** A Build-type value gets baked into the image, and if it has a public prefix, into the browser bundle too. Don't define information that needs to stay secret with this type.
 
-![alt text](img/services-enviroment-variables-types.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/enviroment-variables/services-enviroment-variables-types.png)
 
 ---
 

@@ -2,14 +2,14 @@
 
 This page shows which version the service is currently running and which versions have been released before. When a deployment causes problems, this is where you switch versions.
 
-![alt text](img/deployment-history-page.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-page.jpeg)
 ---
 
 ## Current Version
 
 At the top of the page is the service's live version: which image, which revision number, how many replicas, and which rollout strategy it's running with. The rollout strategy can also be changed from here; the change takes effect on the next deploy.
 
-![alt text](img/deployment-history-current-version.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-current-version.jpeg)
 ---
 
 ## Deployment Strategies
@@ -47,7 +47,7 @@ Every deployment record has a **Rollback** action. Once confirmed, the service r
 
 > **Warning:** Rolling back cancels an ongoing rollout. If you roll back while a Canary deployment is in progress, the gradual rollout is left halfway and traffic returns to the old version.
 
-![alt text](img/deployment-history-rollback.png)
+![alt text](https://cdn.komuta.io/docs/tr/images/deployments/deployment-history-rollback.jpeg)
 ---
 
 ## Related Documents
