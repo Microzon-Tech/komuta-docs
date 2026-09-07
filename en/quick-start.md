@@ -2,10 +2,10 @@
 
 Everything you need on Komuta, from shipping your code to spinning up your database, comes down to four services:
 
-- **[Services](https://komuta.io/docs/services)** — Builds and deploys the apps in your Git repo.
-- **[Jobs and CronJobs](https://komuta.io/docs/jobs)** — Runs one-off or scheduled work.
-- **[Stacks](https://komuta.io/docs/stacks)** — Defines a whole setup of services, resources, and domains in a single file.
-- **[Managed services](https://komuta.io/docs/managed-services)** — Serves up PostgreSQL, Valkey, RabbitMQ, and API Gateway with no setup required.
+- **[Services](https://www.komuta.io/docs/services/new-service-guide)** — Builds and deploys the apps in your Git repo.
+- **Jobs and CronJobs** — Runs one-off or scheduled work.
+- **Stacks** — Defines a whole setup of services, resources, and domains in a single file.
+- **[Managed services](https://www.komuta.io/docs/managed-services/postgresql)** — Serves up PostgreSQL, Valkey, RabbitMQ, and API Gateway with no setup required.
 
 ---
 
