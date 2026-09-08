@@ -22,7 +22,7 @@ An instance can optionally be attached to a **project**.
 |---|---|
 | **Provisioning** | Setup is in progress; connection info isn't ready yet. |
 | **Active** | Running and accepting connections. |
-| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place (see [Suspending and resuming](#suspending-and-resuming)). |
+| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place. |
 | **Upgrading** | A plan change is being applied. |
 | **Upgrade Failed** | The plan change couldn't complete; the instance is **live** on its old plan and its data is intact. |
 | **Restoring** | A restore operation is in progress. |
@@ -293,22 +293,13 @@ If a plan change stalls halfway, the instance keeps running on its old plan and 
 
 ## Maintenance and Lifecycle
 
-Restarting, suspending, credential rotation, and deletion are all gathered on the **Operations** tab.
+Restarting, credential rotation, and deletion are all gathered on the **Operations** tab.
 
 ### Restarting
 
 **Restart** restarts servers one at a time; plans with a replica see no downtime. It's only available on instances that are running or whose upgrade has failed.
 
-### Suspending and Resuming
-
-There are two forms of suspension, with different recovery times:
-
-- **Soft suspend** drains client connections but keeps the servers running. Resuming takes seconds.
-- **Hard suspend** stops the servers entirely. **Resume** takes a few minutes because the cluster has to reschedule.
-
-In both cases the data stays in place. A suspended instance doesn't accept connections; the application gets a connection error.
-
-### Password and Backup Credential Rotation
+### Password Rotation
 
 **Rotate database password** generates a new password for the application user and **drops all existing connections.** The application gets errors until it reconnects with the new password.
 
@@ -317,8 +308,6 @@ In both cases the data stays in place. A suspended instance doesn't accept conne
 - The next rotation date is flagged as 90 days out; this is a reminder, not a requirement.
 
 This operation should be done during a maintenance window, with the new password ready to roll out.
-
-**Rotate backup credentials** renews the storage credentials used by the backup pipeline. This doesn't affect connections; the new credentials take effect on the next scheduled backup.
 
 ### Deletion
 

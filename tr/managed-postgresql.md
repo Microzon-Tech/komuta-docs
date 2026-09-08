@@ -22,7 +22,7 @@ Instance isteğe bağlı olarak bir **projeye** bağlanabilir.
 |---|---|
 | **Hazırlanıyor** | Kurulum sürüyor; bağlantı bilgisi henüz hazır değildir. |
 | **Aktif** | Çalışıyor ve bağlantı kabul ediyor. |
-| **Askıda** / **Tamamen Askıda** | Elle askıya alınmış; verisi yerindedir (bkz. [Askıya alma ve devam ettirme](#askya-alma-ve-devam-ettirme)). |
+| **Askıda** / **Tamamen Askıda** | Elle askıya alınmış; verisi yerindedir. |
 | **Yükseltiliyor** | Plan değişikliği uygulanıyor. |
 | **Yükseltme Başarısız** | Plan değişikliği tamamlanamadı; instance eski planıyla **canlıdır** ve verisi yerindedir. |
 | **Geri Yükleniyor** | Bir geri yükleme işlemi sürüyor. |
@@ -293,22 +293,13 @@ Plan değişikliği yarıda kalırsa instance eski planıyla çalışmaya devam 
 
 ## Bakım ve Yaşam Döngüsü
 
-Yeniden başlatma, askıya alma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde toplanır.
+Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde toplanır.
 
 ### Yeniden başlatma
 
 **Yeniden başlat**, sunucuları sırayla yeniden başlatır; replikası olan planlarda kesinti oluşmaz. Yalnız çalışır durumdaki ve yükseltmesi başarısız olmuş instance'larda kullanılabilir.
 
-### Askıya alma ve devam ettirme
-
-İki askıya alma biçimi vardır ve geri dönüş süreleri farklıdır:
-
-- **Soft askıya al** istemci bağlantılarını boşaltır, sunucuları çalışır tutar. Geri açma saniyeler sürer.
-- **Hard askıya al** sunucuları tamamen durdurur. **Devam et** ile geri açma, küme yeniden zamanlama yaptığı için birkaç dakika sürer.
-
-Her iki durumda da veri yerinde kalır. Askıdaki bir instance bağlantı kabul etmez; uygulama bağlantı hatası alır.
-
-### Parola ve yedek kimlik bilgisi yenileme
+### Parola yenileme
 
 **Veritabanı parolasını rotate et**, uygulama kullanıcısına yeni bir parola üretir ve **mevcut tüm bağlantıları koparır.** Uygulama yeni parolayla yeniden bağlanana kadar hata alır.
 
@@ -317,8 +308,6 @@ Her iki durumda da veri yerinde kalır. Askıdaki bir instance bağlantı kabul 
 - Bir sonraki yenileme tarihi 90 gün sonrası olarak işaretlenir; bu bir zorunluluk değil, hatırlatmadır.
 
 İşlem bakım penceresinde yapılmalı ve yeni parola dağıtılmaya hazır olunmalıdır.
-
-**Backup kimlik bilgisini rotate et** ise yedekleme hattının kullandığı depolama kimlik bilgilerini yeniler. Bu işlem bağlantıları etkilemez; yeni kimlik bilgisi bir sonraki planlı yedekte devreye girer.
 
 ### Silme
 
