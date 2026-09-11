@@ -276,7 +276,7 @@ Grafiklerde kararı değiştiren ölçüler şunlardır:
 | **Bağlantı ve kanal sayısı** | Açık istemci sayısı. Beklenmedik biçimde artması, bağlantıyı kapatmayan ya da her istekte yeni bağlantı açan bir istemciye işaret eder ve bağlantı sınırına götürür. |
 | **Bellek kullanımı** | Bellek eşiğine ne kadar yaklaşıldığı. Eşiğe varıldığında yayınlama durur. |
 
-[RESIM EKLE: İzleme sekmesi — kuyruk derinliği ve yayınlama grafikleri · dosya adı: rabbitmq/monitoring.png]
+![İzleme sekmesi — kuyruk derinliği ve yayınlama grafikleri](https://cdn.komuta.io/docs/tr/images/rabbitmq/monitoring.png)
 
 ---
 
