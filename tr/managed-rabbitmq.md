@@ -32,7 +32,7 @@ Bir instance oluşturulduğunda Komuta seçilen bölgede bir RabbitMQ kümesi ku
 
 ### Instance, plan ve bölge
 
-Bir **instance**, kendi belleği, kendi kimlik bilgisi ve kendi yedek zinciriyle çalışan bağımsız bir RabbitMQ brokerıdır. CPU, bellek, disk ve sunucu (düğüm) sayısı bağlı olduğu **plandan** gelir. Plandaki bellek yalnız bir fiyat farkı değil, brokerın yayıncıları ne zaman yavaşlatacağını belirleyen değerdir (bkz. [Broker Sınırları](#broker-snrlar)).
+Bir **instance**, kendi kimlik bilgisi ve yedek zinciriyle çalışan bağımsız bir RabbitMQ brokerıdır. CPU, bellek, disk ve düğüm sayısı bağlı olduğu **plandan** gelir; plandaki bellek aynı zamanda brokerın yayıncıları yavaşlatmaya başladığı eşiği belirler (bkz. [Broker Sınırları](#broker-snrlar)).
 
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance kurmaktır.
 
@@ -52,18 +52,13 @@ Bir **instance**, kendi belleği, kendi kimlik bilgisi ve kendi yedek zinciriyle
 | **Silinmeyi Bekliyor** | Silme planlanmış; süre dolmadan iptal edilebilir. |
 | **Hata** | Kurulum tamamlanamamış instance. Bu durumdaki instance'lar platform tarafından otomatik temizlenir; yedekleri saklama süresi boyunca yerinde kalır. |
 
-[RESIM EKLE: RabbitMQ instance listesi · dosya adı: rabbitmq/home-page.png]
-
 ---
 
 ## Bağlanma
 
 ### Bağlantı adresi ve TLS
 
-Her instance için bir hostname verilir ve bağlantılarda bu ad **olduğu gibi** kullanılmalıdır: trafiği doğru instance'a yönlendiren altyapı, TLS el sıkışmasının içindeki sunucu adına bakarak karar verir.
-
-- Adresi IP'ye çevirip bağlanmak çalışmaz. IP ile kurulan bağlantı doğru instance'a ulaşmaz; genellikle bağlantı kurulmuş gibi görünüp hemen düşer.
-- Sunucu adını (SNI) göndermeyen eski istemciler ve adresi IP'ye sabitleyen bağlantı havuzları aynı nedenle çalışmaz.
+Her instance için bir hostname verilir ve bağlantılarda bu ad **olduğu gibi** kullanılmalıdır. Adresin IP'ye çevrilmesi ya da bağlantı havuzunda bir IP'ye sabitlenmesi durumunda bağlantı kurulamaz.
 
 Bağlantılar TLS ile kurulur: şema `amqps`, port `5671`'dir.
 
@@ -94,7 +89,7 @@ Parolalar platform tarafında şifrelenmiş saklanır ve yalnız bağlantı bilg
 
 RabbitMQ'da kimlik bilgisi yenileme (rotate) işlemi bulunmaz; parolanın değişmesi gerekiyorsa destek talebi açılmalıdır.
 
-[RESIM EKLE: Genel Bakış sekmesi — bağlantı bilgisi ve yönetim arayüzü bölümü · dosya adı: rabbitmq/dashboard.png]
+![Genel Bakış sekmesi — bağlantı bilgisi ve yönetim arayüzü bölümü](https://cdn.komuta.io/docs/tr/images/rabbitmq/dashboard.png)
 
 ---
 
@@ -169,7 +164,7 @@ Bu mod her kümede kullanılamaz: bazı kümelerde ağ geçidi gerçek kaynak ad
 
 > **Not:** PostgreSQL ve Valkey'de bulunan yalnızca özel ağ modu RabbitMQ'da yoktur. RabbitMQ'nun özel adresi yalnız broker kümesinin içinde çözülür, uygulamaların çalıştığı yerde çözülmez; genel yolun kapatılması instance'ı hiçbir yerden erişilemez hâle getirirdi.
 
-[RESIM EKLE: Ağ erişimi kartı — IP listesi modu seçili · dosya adı: rabbitmq/network-access.png]
+![Ağ erişimi kartı — IP listesi modu seçili](https://cdn.komuta.io/docs/tr/images/rabbitmq/network-access.png)
 
 ---
 
@@ -209,7 +204,7 @@ Bunların dışındaki hiçbir yol yedeklere dokunmaz. Instance hata durumuna d�
 
 > **Not:** Yedeğin durması, geri yüklemenin arayüzden yapılabileceği anlamına gelmez. Tanımların geri yüklenmesi için destek talebi açılması gerekir. Yönetim arayüzünden dışa aktarılan tanım dosyası, bu bekleme olmadan yeniden kurmayı mümkün kılan kopyadır.
 
-[RESIM EKLE: Yedekler sekmesi — zamanlama ve saklama süresi · dosya adı: rabbitmq/backup-page.png]
+![Yedekler sekmesi — zamanlama ve saklama süresi](https://cdn.komuta.io/docs/tr/images/rabbitmq/backup-page.png)
 
 ---
 
@@ -238,7 +233,7 @@ Her iki durumda da uygulamanın bağlantı kopmasına dayanıklı olması gereki
 
 Plan değişikliği yarıda kalırsa instance eski planıyla çalışmaya devam eder ve **Yükseltme Başarısız** durumuna geçer. Bu durumdaki bir instance canlıdır, verisi yerindedir ve aynı değişiklik yeniden denenebilir. Sorun tekrarlıyorsa destek talebi açılmalıdır.
 
-[RESIM EKLE: Plan değiştir paneli — etki önizlemesi · dosya adı: rabbitmq/change-plan.png]
+![Plan değiştir paneli — etki önizlemesi](https://cdn.komuta.io/docs/tr/images/rabbitmq/change-plan.png)
 
 ---
 
