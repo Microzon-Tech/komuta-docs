@@ -17,8 +17,6 @@ Each section has separate read and management permissions. Reading a section doe
 | **Protection** | Network policies, posture and drift, runtime mode and workload hardening | Rule target and application state |
 | **Findings** | Service findings, applicable runtime observations and event timeline | Source, event time and affected operation |
 
-Advanced links can open capabilities, writable paths, root permission or runtime observation review in the same service context. Legacy Observations links lead to the appropriate subsection of Findings.
-
 ## Overview
 
 Read summaries and next-step guidance alongside source coverage. A count of observations awaiting review is not a count of failed posture checks or new attacks. Low risk and an empty findings list do not establish sensor health or effective protection.

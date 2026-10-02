@@ -32,8 +32,6 @@ The **Security** menu has four groups. Permissions or runtime applicability can 
 | Verify | **Synthetic attacks** (`/security/synthetic-attacks`) | Review eligible scenarios, permitted drills and detection results. |
 | Verify | **Supply chain** (`/security/supply-chain`) | Inspect build and image scans, artifact evidence and exceptions. |
 
-The former standalone **Violations** address redirects to Findings with the relevant filters. Notification channels, rules, history and silences belong to **Alerts**.
-
 ## Observations, findings and evidence
 
 | Term | Meaning |
@@ -170,12 +168,6 @@ Platform operators use these pages under **Security**, subject to their permissi
 | **Runtime protection controls** | Manage configured enforcement, eligibility and platform controls |
 | **Audit storage administration** | Manage archive configuration and verification for the selected scope |
 | **Security scenario catalogue** | Manage platform-wide scenario availability and source readiness |
-
-### What does security signal coverage measure?
-
-The screen formerly presented as **Compliance Coverage** is now **Security signal coverage** in AdminUI. It maps recorded security sources to framework controls in the displayed platform host or organization scope.
-
-It is **not a service or cluster assessment**. Source mapping does not establish that a control is operating, protection is effective or an organization is certified. Confirm framework, scope and assessment time; an audit also needs evidence of the control's actual operation. Evaluation and evidence export are separately permitted actions from viewing.
 
 ## Page help with the Komuta mascot
 

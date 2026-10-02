@@ -32,8 +32,6 @@ AdminUI, platform operatör konsoludur. Müşteri kuruluşunda yönetici olmak, 
 | Doğrula | **Sentetik saldırılar** (`/security/synthetic-attacks`) | Uygun senaryoları, izinli tatbikatları ve tespit sonuçlarını inceleyin. |
 | Doğrula | **Tedarik zinciri** (`/security/supply-chain`) | Build ve imaj taramalarını, çıktı kanıtlarını ve istisnaları inceleyin. |
 
-Önceden ayrı kullanılan **İhlaller** adresi, ilgili filtreleriyle Bulgular görünümüne yönlendirilir. Bildirim kanalları, kurallar, geçmiş ve susturmalar **Alarmlar** bölümündedir.
-
 ## Gözlem, bulgu ve kanıt arasındaki fark
 
 | Kavram | Anlamı |
@@ -170,12 +168,6 @@ Platform operatörleri, aşağıdaki ekranları **Güvenlik** başlığı altın
 | **Çalışma zamanı koruma yönetimi** | Yapılandırılmış yaptırım, uygunluk ve platform kontrollerini yönetme |
 | **Denetim depolama yönetimi** | Seçili kapsamın arşiv yapılandırması ve doğrulamasını yönetme |
 | **Güvenlik senaryo kataloğu** | Platform genelindeki senaryo kullanılabilirliğini ve kaynak hazırlığını yönetme |
-
-### Güvenlik sinyali kapsamı neyi ölçer?
-
-Daha önce **Uyumluluk Kapsama** olarak görülen ekran, AdminUI'daki **Güvenlik sinyali kapsamı**dır. Ekranda belirtilen platform Host veya kuruluş kapsamında, kayıtlı güvenlik kaynaklarının çerçeve kontrolleriyle eşleşmesini gösterir.
-
-Bu ekran bir **servis veya cluster değerlendirmesi değildir**. Kaynak eşlemesi; kontrolün işletildiği, korumanın etkili olduğu veya kuruluşun sertifikalı olduğu anlamına gelmez. Çerçeve, kapsam ve değerlendirme zamanını doğrulayın; bir denetim için kontrolün gerçek uygulamasına ait ayrıca kanıt gerekir. Değerlendirme ve kanıt dışa aktarma, görüntüleme yetkisinden ayrı izinli işlemlerdir.
 
 ## Komuta maskotu ile sayfa yardımı
 

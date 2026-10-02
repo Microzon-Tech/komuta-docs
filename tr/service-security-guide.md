@@ -17,8 +17,6 @@ Her bölümün okuma ve yönetim izinleri ayrıdır. Bir bölümü okuyabilmek, 
 | **Koruma** | Ağ politikaları, duruş ve sapma, çalışma zamanı modu ve iş yükü sıkılaştırması | Kural hedefi ve uygulama durumu |
 | **Bulgular** | Servise ait bulgular, uygun çalışma zamanı gözlemleri ve olay zaman çizelgesi | Kaynak, olay zamanı ve ilgili işlem |
 
-İleri kontrollerin bağlantıları, aynı servis bağlamında capability, yazılabilir yollar, root izni veya çalışma zamanı gözlem incelemesini açabilir. Eski Gözlemler bağlantısı, uygun Bulgular alt bölümüne yönlendirilir.
-
 ## Genel bakış
 
 Özet ve sonraki adım önerilerini, kaynak kapsamıyla birlikte okuyun. İnceleme bekleyen gözlem sayısı, başarısız duruş kontrolü veya yeni saldırı sayısı değildir. Düşük risk ve boş bulgu listesi, bütün sensörlerin sağlıklı veya korumanın etkili olduğunu kanıtlamaz.
