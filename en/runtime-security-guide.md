@@ -1,126 +1,100 @@
-# Runtime Protection
+# Runtime Security
 
-Komuta provides a kernel-level protection layer to protect your applications against **runtime attacks**: **Runtime Protection**. This layer observes behaviors *inside* your containers — which process is running, which file is being accessed, which network connection is being opened — and blocks out-of-policy behaviors.
+Runtime security examines a running workload's behavior and protection state. Komuta combines network policies, workload hardening and behavior sensors in applicable environments. Each layer has its own scope; the presence of one does not establish that the others are effective.
 
-This document explains the concepts of the protection layer. For screen usage, see [Service Security Workspace](service-security-guide.md) and [Security Center](security-center-guide.md).
+For screen usage, read [Security Center](https://komuta.io/docs/services/security-center-guide) and [Service Security](https://komuta.io/docs/services/service-security-guide).
 
----
+## Protection layers
 
-## Protection Layers
+| Layer | Observed or restricted area | What to check |
+|---|---|---|
+| **Network policies** | Traffic between workloads and to external destinations | Target, direction, application state and relevant traffic outcome |
+| **Workload hardening** | Root permission, Linux capabilities and writable paths | Desired settings, applied deployment and live posture |
+| **Host runtime protection** | Process, file and capability behavior in supported workloads | Runtime eligibility, sensor state, rule and event evidence |
+| **Runtime monitoring** | Behavior telemetry and related evidence in supported environments | Source access, freshness and target match |
+| **Platform host protection** | Platform node and infrastructure security | Operator scope, source health and platform evidence |
 
-Security in Komuta is enforced across multiple layers; each layer closes off a different attack surface:
+Build and image scans provide separate **supply-chain** evidence. A clean build scan does not inspect every behavior of a running workload.
 
-| Layer | Scope |
-|--------|--------|
-| **Network Policy** | Traffic between services, DNS — restricts communication *between pods* |
-| **L7 Rate Limiting** | HTTP request rate limiting |
-| **Runtime Protection** | Process / file / capability behaviors *inside the container* |
-| **Host Protection** | Critical files and processes on the node itself |
-| **Runtime Monitoring** | Advanced behavior telemetry (process lineage tree, system calls) |
+## Host runtime and Kata eligibility
 
-Runtime Protection can block the following behaviors:
+Host sensors can observe eligible container behavior that shares the host kernel. Workloads using a separate guest kernel, such as Kata, do not offer the same internal process and file visibility to host sensors.
 
-- **Process execution**: running binaries like `apt-get`, `curl`, `nmap` inside the container
-- **File access**: reading/writing sensitive files, making the service account credential file read-only
-- **Network access**: which processes can open network connections
-- **Linux capabilities**: use of dangerous kernel privileges (raw socket, system administration, etc.)
+Host behavior protection can therefore be **not applicable** or **unavailable**. Assess network policies, build scans and workload hardening separately. A listed sensor name does not establish that the sensor observes internal behavior of the selected service.
 
----
+When runtime or source support is unknown, do not conclude that the workload is supported, unprotected or safe. Confirm the target service and source scope with a platform operator.
 
-## Automatic Setup and Platform Baselines
+## Policy action versus runtime mode
 
-The protection layer is installed **automatically** on clusters managed by Komuta — you don't need to do anything:
+Do not interpret settings of different protection engines as one mode.
 
-1. During cluster setup, the protection components are installed as the **first add-on** (security is prioritized).
-2. The **host baseline policy** protects the node's critical directories (cluster certificates, credential files, user management tools).
-3. The **cluster baseline policy** blocks known attack tools (package managers, network scanning tools) on user workloads.
-4. Areas where **platform system components** such as CNI, storage, observability, and GitOps run are **automatically excluded** — conflicts between critical infrastructure and the protection layer have been prevented based on field experience.
+| Setting | Meaning |
+|---|---|
+| **Audit policy action** | Intended to observe and record matching behavior; this rule has no blocking intent. |
+| **Block policy action** | Intended to reject matching behavior in a supported, applied protection layer. |
+| **Off / Shadow / Audit / Enforce runtime mode** | Desired or observed mode of the relevant runtime mechanism. It is not equivalent to a similarly named policy action. |
+| **Monitor / Enforce administration setting** | Configuration of the relevant operator protection control. Target application and effective behavior outcomes need separate verification. |
 
-### Service Baseline Policy
+Selecting Audit does not remove blocking from other layers. Selecting Block does not reject every process, file or connection; results depend on rule matching and engine support.
 
-The deployment pipeline automatically generates a **runtime baseline policy** for each service. This policy:
+## Configuration, application and outcome
 
-- Blocks package managers and attack tools (`apt`, `yum`, `wget`, `nc`, `nmap`, etc.)
-- Handles `curl` / `wget` **intelligently**: allows them if used in your health probes, blocks them if not
-- Blocks dangerous Linux capabilities (raw socket, system administration, kernel module, process tracing)
-- Makes the service account credential file **read-only**
+Answer three separate questions for protection:
 
-Baseline policies are **managed by the platform** and are protected against manual editing. For per-service fine-tuning (adding capabilities, writable directories, additional restrictions), use the service's [Security → Policies](service-security-guide.md#politikalar) tab.
+1. **What was requested?** Inspect the saved rule for the intended service, paths, programs, direction and behavior.
+2. **What was applied?** Check deployment outcome, observed mode and any application errors.
+3. **What happened?** Inspect event, blocking or allowed-outcome evidence for the relevant target and time window.
 
----
+A queued deployment, successful API request or healthy heartbeat does not answer the third question. Evidence for an older configuration does not verify a new rule. Missing or failed measurements are not safe results.
 
-## Policy Actions
+## Baselines and service policies
 
-### Block (Recommended — Production Target)
+Platform baselines and runtime administration are the responsibility of authorized operators. In the Customer Console, review eligible policies for your workloads and service protection state, and manage supported service settings with their separate permissions.
 
-An out-of-policy operation is **denied at the kernel level**: the system call fails, the process cannot execute the binary. Even if an attacker gets inside the container, the operation never actually happens.
+Review service target, paths and YAML before selecting Audit or Block in the policy wizard. Accepted file paths do not prove that those paths exist in the container or that the rule is active. Restricting execution from temporary directories is different from blocking all writes there or every script invoked through an interpreter.
 
-```
-$ apt-get update
-bash: /usr/bin/apt-get: Permission denied
-```
+Block can disrupt startup, health checks, maintenance or scheduled work. Evaluate observations and normal workflows in a suitable environment first; apply a permitted change with limited scope and a recovery plan. Do not assume every service has the same initial mode.
 
-### Audit (Observation Mode)
+## Observation and finding review
 
-The violation is **logged but not blocked** — the application continues to run normally. Used to learn the actual behavior before putting a new service into production. Observations accumulated in Audit mode are processed in the [Observations tab](service-security-guide.md#g%C3%B6zlemler) and converted into a baseline.
+The Service Security **Findings** tab includes applicable runtime observations and existing decision history. Organization-wide Findings helps prioritize records by service, source, severity and time.
 
-### Allow (Advanced — Whitelist)
+An observation summary counts pending reviews at calculation time. Do not present it as an attack counter, current queue size or posture test result. Review underlying records and source evidence separately.
 
-Only explicitly permitted operations run; everything else is denied. Provides maximum security but requires extensive testing.
+Allow or Block on a finding does not establish actual policy application. Baseline observation administration, protection promotion and platform controls belong to AdminUI. Actual response has separate permissions and outcome checks.
 
-> Recommended path: **Start with Audit → process observations → upgrade to Block.** For the detailed flow, see [Service Security → Practical Flows](service-security-guide.md#pratik-ak%C4%B1%C5%9Flar).
+## Exceptions and recovery
 
----
+Confirm target, reason, duration and policy impact when accepting an exception or suggestion. Pending approval is different from an applied exception. A rollback request does not prove that recovery is complete.
 
-## Violation Tracking
+If a protection change disrupts the application, compare the last deployment, observed mode and behavior evidence. Choose the narrowest correction with the authorized owner; evaluate the required behavior instead of disabling broad protection or allowing every finding.
 
-Every event captured by the protection layer flows to the following surfaces:
+## Controlled verification
 
-- **Security Center → Violations**: the live violation feed across the tenant
-- **Security Center → Findings**: deduplicated, actionable records
-- **Service detail → Security**: service-specific findings and live statistics (Blocked / Critical counts for the last 1 hour in the top strip)
-- **Top bar badge**: the Critical + High violation counter is visible on every screen; an instant notification drops on a critical spike
-- **Alert rules**: ready-made alert rules for high violation rate, critical block, host violation, and sensor health are defined together with cluster setup; these are routed to your [notification channels](notification-guide.md)
+A drill or protection test is a separate operational action. Require an approved target, applicable runtime, expected signal, possible impact and recovery plan before running one. Do not probe protected or decoy files indiscriminately.
 
----
-
-## Policy Recommendations and Exceptions
-
-- **Recommended Policies**: The platform automatically generates policy recommendations from observed behaviors ("this access was blocked 47 times on this service — a permanent rule is recommended"). You review the recommendations and apply them with a single click.
-- **Policy Exceptions**: For a legitimate workflow that gets caught by policy, you can define a **justified, approval-flow** exception for **up to 90 days**.
-
-Both are managed under [Security Center → Policies](security-center-guide.md#politikalar) and every transition is recorded in an immutable audit trail.
-
----
+Assess success by matching the test record to expected source evidence for the same target and time window. A detected scenario does not establish prevention of every attack. Keep detection evidence separate from blocking evidence.
 
 ## Troubleshooting
 
-### The pod went into "CrashLoopBackOff" and there's a "Permission denied" error
+| Situation | Investigation step |
+|---|---|
+| **Permission denied or startup failure** | Compare the relevant process/path, last protection change and deployment; select an authorized narrow correction. |
+| **Mode changed but no result** | Check desired/observed mode, deployment and event evidence separately. |
+| **No findings are visible** | Verify time filters, permissions, runtime eligibility and source freshness. |
+| **Policy application failed** | Inspect the reported error and target; check the existing policy before creating duplicates. |
+| **A Kata workload has no host card** | Check layer applicability and assess other layers through their own evidence. |
 
-A legitimate behavior of your application was likely blocked in Block mode:
+Source health, platform host and cluster-wide settings require the operator console. An empty customer Security Center result does not establish infrastructure health.
 
-1. Review the recent Blocked records in the service's **Security → Findings** tab — which process, which path?
-2. If it's a write block, add an **extra writable directory**; if it's a permission block, add a **Linux capability** (Policies tab).
-3. In a complex case, temporarily switch the service to **Audit** mode, collect observations, then **upgrade back to Block**.
+## Mascot guidance
 
-### A "high violation rate" alert came in
+**Explain this screen** provides static Turkish/English help for the current security page or service tab. It remains available when the AI provider is disabled and does not query data or execute protection actions.
 
-1. Filter the relevant service in **Security Center → Violations**.
-2. Find which process/policy triggered it.
-3. If it's legitimate usage: make an **Allow** decision on the finding or define a policy exception.
-4. If it's suspicious: follow the matching [incident response playbook](security-center-guide.md#olay-m%C3%BCdahale-playbooklar%C4%B1-ir-playbooks).
+Guidance and separate AI recommendations do not replace current application and behavior evidence. Use the page's own authorization and confirmation flow for changes, then verify the outcomes.
 
-### The new policy was not applied to the cluster
+## Related documents
 
-- Make sure the policy is **active** (disabled policies are not deployed).
-- Check the deployment status field in the policy list; if there's an error, the details appear there.
-- If there appears to be a cluster connectivity issue, verify the cluster status from **Security Center → Overview → Cluster Security Matrix**.
-
----
-
-## Related Documents
-
-- [Security Center](security-center-guide.md) — findings, policies, compliance, SIEM, drills
-- [Service Security Workspace](service-security-guide.md) — modes, observations, capabilities, writable directories
-- [Notification Management](notification-guide.md) — routing alerts to channels
-- [Access Control](access-control-guide.md) — security permissions
+- [Security Center](https://komuta.io/docs/services/security-center-guide)
+- [Service Security Workbench](https://komuta.io/docs/services/service-security-guide)
+- [Service access protection](https://komuta.io/docs/services/service-access-protection)
