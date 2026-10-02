@@ -9,11 +9,11 @@ Every deploy in Komuta starts with a build. Builds run on shared build capacity;
 These rules decide whether a build starts now or waits:
 
 - **Builds of the same service run one after another.** A new build does not start until the service's previous build has finished.
-- **Your plan has a concurrent build limit.** How many builds your account can run at once depends on your plan; when the limit is reached, a new build waits for a slot.
+- **Your account tier has a concurrent build limit.** How many builds your account can run at once depends on its tier; when the limit is reached, a new build waits for a slot. Your tier, and how to reach the next one, is shown under **Account → Wallet**.
 - **The queue is fair across accounts.** While one account has many builds queued, another account's single build can still move ahead; no account can hold the whole queue.
 - **Build capacity is measured, not guessed.** A build starts only when there is room for it.
 
-| Plan | Concurrent builds | Queued at most |
+| Account tier | Concurrent builds | Queued at most |
 |------|-------------------|----------------|
 | Starter | 1 | 5 |
 | Verified | 1 | 10 |
@@ -30,7 +30,7 @@ Every queued build shows why it is waiting:
 | Reason | What it means |
 |--------|---------------|
 | Waiting for this service's previous build to finish | Another build of the same service is still running. This one starts when it finishes. |
-| Waiting for a build slot of your plan | Your account's concurrent build limit is reached. It starts when one of your builds finishes; upgrade your plan for more concurrent builds. |
+| Waiting for a build slot of your plan | Your account's concurrent build limit is reached. It starts when one of your builds finishes; reach a higher account tier for more concurrent builds. |
 | Waiting for build capacity to free up | The platform's build capacity is full right now. It starts when capacity frees up. |
 | Waiting for a free build slot | The platform-wide concurrent build limit is reached. |
 | Build capacity cannot be read right now, builds start one at a time | Capacity cannot be measured for a moment; builds start one at a time meanwhile. |
@@ -51,7 +51,7 @@ For queued builds Komuta estimates when they will start ("Expected to start in a
 
 - The typical duration of the service's recent successful builds.
 - The remaining time of your account's running builds.
-- Your plan's concurrent build limit and your position in the queue.
+- Your account tier's concurrent build limit and your position in the queue.
 
 No estimate is shown while a build waits for platform capacity; its start then depends on other accounts' builds and no reliable time can be given.
 
@@ -88,5 +88,5 @@ Time spent in the queue is not billed. Build minutes are counted from the moment
 ## Related Documents
 
 - [Pipelines](service-pipeline-guide.md) — Build stages and logs.
-- [Auto Deploy](service-auto-deploy.md) — Rules for triggering builds on push.
+- [Auto-deploy](service-auto-deploy.md) — Rules for triggering builds on push.
 - [Deploying from CI](ci-deploy.md) — Calling Komuta from your own CI pipeline.
