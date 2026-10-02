@@ -123,6 +123,8 @@ Authorization: Bearer kmtd_...
 | `cancelled` | The deploy was cancelled. | Fail the job. |
 | `superseded` | A newer deploy of the same service replaced this one. `supersededBy` points to it. | Usually treated as passed. |
 
+Deploy records are kept for 180 days; the `statusUrl` of an older deploy returns `404`.
+
 To cancel a queued or running deploy:
 
 ```http

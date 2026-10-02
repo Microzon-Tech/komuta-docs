@@ -123,6 +123,8 @@ Authorization: Bearer kmtd_...
 | `cancelled` | Deploy iptal edildi. | İşi başarısız bitir. |
 | `superseded` | Aynı servis için daha yeni bir deploy bunun yerini aldı. `supersededBy` yeni deploy'u gösterir. | Genellikle başarılı sayılır. |
 
+Deploy kayıtları 180 gün saklanır; bundan eski bir deploy'un `statusUrl`'i `404` döner.
+
 Kuyruktaki ya da çalışan bir deploy'u iptal etmek için:
 
 ```http
