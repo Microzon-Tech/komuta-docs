@@ -69,6 +69,16 @@ Sonucu bekleyen tam sürümü **CI/CD entegrasyonu** sekmesinden kopyalayın.
 
 ---
 
+## Hazır Araçlar
+
+Kod parçalarını kopyalamak yerine resmi aracı da kullanabilirsiniz ([Microzon-Tech/komuta-deploy-action](https://github.com/Microzon-Tech/komuta-deploy-action)):
+
+- **GitHub Actions:** `uses: Microzon-Tech/komuta-deploy-action@v1` (`token` ve `service-id` girdileriyle; `token` boş bırakılırsa OIDC kullanılır).
+- **GitLab CI:** depodaki `gitlab/komuta-deploy.gitlab-ci.yml` şablonunu `include` edip `.komuta-deploy` işini genişletin.
+- **Herhangi bir CI:** `komuta-deploy.sh --service <SERVIS_ID> --ref main --wait`. `bash`, `curl` ve `jq` ister; deploy başarısız olursa sıfırdan farklı bir kodla çıkar.
+
+---
+
 ## Deploy İsteği
 
 ```http

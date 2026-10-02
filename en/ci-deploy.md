@@ -69,6 +69,16 @@ Copy the full version that waits for the result from the **CI/CD integration** t
 
 ---
 
+## Ready-made Tools
+
+Instead of copying a snippet you can use the official tool ([Microzon-Tech/komuta-deploy-action](https://github.com/Microzon-Tech/komuta-deploy-action)):
+
+- **GitHub Actions:** `uses: Microzon-Tech/komuta-deploy-action@v1` with the `token` and `service-id` inputs; leave `token` empty to use OIDC.
+- **GitLab CI:** `include` the repository's `gitlab/komuta-deploy.gitlab-ci.yml` template and extend the `.komuta-deploy` job.
+- **Any CI:** `komuta-deploy.sh --service <SERVICE_ID> --ref main --wait`. It needs `bash`, `curl` and `jq`, and exits non-zero when the deploy fails.
+
+---
+
 ## Deploy Request
 
 ```http
