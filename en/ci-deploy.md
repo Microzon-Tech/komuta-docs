@@ -30,7 +30,7 @@ If you use GitHub Actions or GitLab CI, you can deploy without storing any secre
 
 1. In **Create token**, pick **GitHub Actions OIDC** or **GitLab CI OIDC** under **How your CI signs in**.
 2. Enter the repository: `owner/repo` for GitHub, `group/project` for GitLab. Optionally add an **environment** (for example `production`); then only jobs that use that environment can deploy.
-3. Allowed actions, branches, image repositories and the IP allowlist apply as they do for secret tokens. If you set branch patterns, the branch the job runs on must match them as well.
+3. Allowed actions, branches, image repositories and the IP allowlist apply as they do for secret tokens. The branch the job runs on follows the same rule: without branch patterns only jobs running on the service's branch can deploy; with patterns, jobs on matching branches can.
 4. Switch the snippets to **OIDC (no secret)**.
 
 The GitHub Actions job needs `permissions: id-token: write`; the GitLab CI job declares a `KOMUTA_ID_TOKEN` under `id_tokens` with `aud: https://api.komuta.io`. In this mode there is no secret to store, leak or rotate.

@@ -30,7 +30,7 @@ GitHub Actions ve GitLab CI kullanıyorsanız CI'nızda hiç sır saklamadan da�
 
 1. **Token oluştur**'da **CI'nız nasıl giriş yapacak** alanından **GitHub Actions OIDC** ya da **GitLab CI OIDC**'yi seçin.
 2. Depoyu girin: GitHub için `sahip/depo`, GitLab için `grup/proje`. İsterseniz bir **ortam** (ör. `production`) ekleyin; o zaman yalnızca bu ortamı kullanan işler dağıtım yapabilir.
-3. İzin verilen işlemler, dallar, imaj depoları ve IP listesi gizli token'larda olduğu gibi uygulanır. Dal desenleri girdiyseniz işin çalıştığı dal da bu desenlere uymalıdır.
+3. İzin verilen işlemler, dallar, imaj depoları ve IP listesi gizli token'larda olduğu gibi uygulanır. İşin çalıştığı dal da bu kurala tabidir: dal deseni girmediyseniz yalnızca servisin dalında çalışan işler, girdiyseniz desenlere uyan dallarda çalışan işler dağıtım yapabilir.
 4. Kod parçalarında **OIDC (sırsız)** seçeneğini açın.
 
 GitHub Actions işi `permissions: id-token: write` ister; GitLab CI işinde `id_tokens` altında `aud: https://api.komuta.io` olan bir `KOMUTA_ID_TOKEN` tanımlanır. Bu modda saklanacak, sızabilecek ya da yenilenmesi gereken bir sır yoktur.
