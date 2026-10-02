@@ -32,7 +32,14 @@ Once enabled, the clusters that can reach it are listed; setting up the connecti
 
 ---
 
+## Access Protection
+
+The **Access protection** card on the Ports page decides who can open the service's public URL: visitors can be asked to sign in with Komuta, access can be limited to specific IP addresses, or both. See [Service Access Protection](service-access-protection.md) for details.
+
+---
+
 ## Related Documents
 
 - [Ingress and Domains](ingress-domains.md) — Managing addresses exposed to the outside world.
 - [Service Dashboard](service-dashboard.md) — Traffic flow from ingress to pods.
+- [Service Access Protection](service-access-protection.md) — Protecting the service's public URL with sign-in and an IP allow-list.

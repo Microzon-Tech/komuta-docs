@@ -32,7 +32,14 @@ Açıldıktan sonra hangi cluster'ların erişebildiği listelenir; bağlantı k
 
 ---
 
+## Erişim Koruması
+
+Portlar sayfasındaki **Erişim koruması** kartı, servisin genel URL'ini kimlerin açabileceğini belirler: ziyaretçilerden Komuta ile giriş istenebilir, erişim belirli IP adresleriyle sınırlanabilir ya da ikisi birlikte kullanılabilir. Ayrıntılar için [Servis Erişim Koruması](service-access-protection.md) dokümanına bakın.
+
+---
+
 ## İlgili Dokümanlar
 
 - [Ingress ve Domainler](ingress-domains.md) — Dış dünyaya açılan adreslerin yönetimi.
 - [Servis Dashboard](service-dashboard.md) — Trafiğin ingress'ten pod'lara akışı.
+- [Servis Erişim Koruması](service-access-protection.md) — Servisin genel URL'ini giriş ve IP izin listesiyle korumak.
