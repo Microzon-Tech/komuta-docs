@@ -1,170 +1,131 @@
-# Service Security Workspace (Service Security)
+# Service Security Workbench
 
-The **Security** tab on each service's detail page is that service's dedicated security workspace: you manage the protection mode, review runtime observations, catch drifts, and track service-specific findings all in one place.
+A service's **Security** section brings together traffic, protection, findings and evidence for the workload currently open. Use [Security Center](https://komuta.io/docs/services/security-center-guide) for organization-wide prioritization; return to the relevant service when investigating a record.
 
-For the tenant-wide view, see [Security Center](security-center-guide.md).
+## Before you start
 
----
+Confirm the service name and current organization. Check the displayed runtime, source eligibility and data timestamps. An undeployed service, unsupported source, loading error or stale data is not a clean security result.
 
-## Protection Modes
+Each section has separate read and management permissions. Reading a section does not grant finding decisions, isolation, capability changes or protection mode administration.
 
-Every service runs in a **runtime protection mode**:
+## Tabs and scope
 
-| Mode | Behavior | When to use |
-|-----|----------|----------------------|
-| **Off** | Protection layer is inactive | Not recommended; special cases only |
-| **Shadow** | Policy is prepared but not enforced | Transition preparation |
-| **Audit** | Behavior is **observed and logged**, nothing is blocked | Onboarding a new service, learning the baseline |
-| **Block** | Out-of-policy behavior is **rejected at the kernel level** | Target mode for production |
+| Tab | Content | First check |
+|---|---|---|
+| **Overview** | Service posture, source coverage, highlighted findings and suggested investigation steps | Intended service and current evidence |
+| **Traffic** | Flows, network incidents, drops, DNS and available traffic detail | Time window and source availability |
+| **Protection** | Network policies, posture and drift, runtime mode and workload hardening | Rule target and application state |
+| **Findings** | Service findings, applicable runtime observations and event timeline | Source, event time and affected operation |
 
-Recommended lifecycle:
+## Overview
 
-```
-New service → Observe in Audit mode → Process observations → Upgrade to Block
-```
+Read summaries and next-step guidance alongside source coverage. A count of observations awaiting review is not a count of failed posture checks or new attacks. Low risk and an empty findings list do not establish sensor health or effective protection.
 
-In Audit mode, your service's real behavior is learned; once you approve the legitimate behaviors and select **Upgrade to Block**, protection kicks in without breaking your application.
+When following a suggestion to another tab, check that the service and time window still match your investigation. Investigate applicability and data flow with a platform operator when a source is unknown, stale or missing.
 
----
+## Traffic
 
-## Top Info Bar (Security Summary)
+Select the relevant subsection and time window. Compare connection source, destination, direction, port and reported outcome with the service's network policies.
 
-In every view of the Security tab, a summary bar fixed at the top shows:
+A dropped-traffic record reports the outcome of that connection; it does not mean all connections are blocked. DNS or application-layer detail is available only when the relevant source and service scope support it. Missing telemetry is not zero traffic.
 
-- **Mode badge** — e.g. *"Runtime Protection: Audit"*. Hover over it to see the full description of the mode (Audit: "observes, logs, does not block"; Block: "out-of-policy operations are rejected at the kernel level").
-- **Drift badge** — a red badge appears if the running pod's security posture has diverged from the defined baseline. Clicking it takes you to the details.
-- **Three live stats** — Number of pending observations · Number of blocked operations · Number of Critical findings in the last hour.
-- **Next-step suggestion** — a one-click prompt based on your current situation: *"Review observations"*, *"Review posture"*, or *"Upgrade to Block"*.
+## Protection
 
-### What does the "Live posture has drifted from baseline" warning mean?
+### Network policies and live posture
 
-The platform continuously compares your service's **running state** (live pods) against the defined security baseline. Types of drift it detects:
+Compare ingress and egress rules with the application's needs. Use the posture card to investigate differences between expected baseline and reported state of the running workload.
 
-| Drift | Meaning | Action |
-|-------|--------|-----------|
-| Baseline signature mismatch | The running configuration differs from the expected baseline version | Redeploy the service |
-| Running as root | The service is running as the root user but no exemption is defined for it | Make the image non-root or define an exemption |
-| Missing network policy | The expected network policy was not found in the cluster | Redeploy / support |
-| Missing protection policy | The runtime protection policy was not found in the cluster | Redeploy / support |
-| Still in Audit mode | The baseline requires Block but the policy remains in Audit | Complete the "Upgrade to Block" flow |
-| Cluster query failed | The cluster could not be reached momentarily (may be temporary) | Check the cluster connection |
+Assess application state, current deployment and source timestamps together when a drift or query error appears. A queued redeployment does not prove that the baseline has been restored.
 
----
+### Runtime mode
 
-## Tabs
+In supported environments, the **Runtime protection mode** card displays **desired mode**, **observed mode** and deployment state separately. Off, Shadow, Audit and Enforce are values of a runtime mode; they are not the same state field as another protection engine's Audit/Block action.
 
-### Overview
+- **Pending / queued**: the change may not have reached the target.
+- **Failed**: application is unverified even if the desired setting was saved.
+- **Observed mode**: the reported current state; effective blocking of the relevant behavior still needs evidence.
+- **Unknown / unavailable**: active enforcement cannot be established.
 
-A summary of the service's security status:
+Read protection state in the customer view. Baseline evaluation, reset, Block/Enforce promotion and platform-wide administration belong to **AdminUI → Service baseline administration / Runtime protection controls**, with their respective permissions. [Runtime Security](https://komuta.io/docs/services/runtime-security-guide) explains the layers.
 
-- **Critical findings** feed (Critical + High)
-- **Most dropped traffic** — a summary of traffic blocked by network policies in the last hour (clicking it goes to the Network tab)
-- **Active network incidents** — ongoing network security incidents
-- If everything is fine, a mode-aware "clean" status line is shown
+### Linux capabilities
 
-> If the service is not connected to a cluster, this tab first directs you to deploy it.
+Review default capability hardening and the permitted narrow allowlist. Adding or removing a capability needed by an image requires the dedicated management permission. Use only the capabilities the application needs.
 
-### Network
+A saved value does not by itself prove that a running pod changed. Verify the applied deployment and application health.
 
-The service's network security view, with sub-tabs:
+### Writable paths
 
-- **Flows** — the service's actual network traffic flow
-- **Drops** — connections blocked by the network policy (who, where to, which port)
-- **Incidents** — incident records generated from suspicious network activity
-- **Policies** — network policy rules applied to the service (inbound/outbound rule counts)
+Define directories the application actually needs to write to on top of the read-only root filesystem. Check path and storage rules, framework needs and persistence expectations. Server-side restrictions apply to sensitive system paths.
 
-> Detailed application-layer (L7 — HTTP path/method level) traffic visibility is part of the **Service Insights** subscription; see [Billing and Plans](billing-plans.md).
+Adding a path requires its own management permission. Verify deployment after saving. Do not test by reading or writing protected files; use an appropriate verification plan.
 
-### Policies
+### Permission to run as root
 
-The tab where you manage the service's security posture. It contains three main cards:
+Consider this override only if the image requires root permission. Granting it does not prove which user a live process runs as. Check the dedicated permission, applied deployment and runtime posture.
 
-**1. Baseline Posture** — live posture + drift summary. If there is drift, a red dot appears in the tab title.
+### Preview
 
-**2. Linux Capabilities** — By default, your services run with the strictest permission set (all capabilities dropped). The platform defines a small, safe default set so that common applications start up without issues:
+Review target, rules and changes in any policy or baseline preview. A preview describes intended content; it is not a save, application or effective protection result.
 
-| Capability | Typical need |
-|---------|---------------|
-| `CHOWN` | Adjusting file ownership at startup (e.g. web servers, cache directory preparation) |
-| `NET_BIND_SERVICE` | Binding to privileged ports such as 80/443 |
-| `FSETID` / `FOWNER` | File permission management |
-| `KILL` | Process signaling |
+## Findings and evidence
 
-- You can **narrow** this set (tightening is always allowed) or make controlled additions from the list.
-- Confirmation is required when adding, **a justification is mandatory**, and the change is recorded in the immutable audit chain.
-- A capability that is not on the list (one the platform does not consider safe) cannot be added.
+Service findings and event timeline can require different read permissions. One being unavailable does not mean the other is empty or clean.
 
-**3. Baseline Overrides** — fine-tuning under a read-only root filesystem:
+Review source, severity, first and last seen, recurrence and affected operation in finding detail. Compare the event timeline before and after the event under investigation. Account for loaded records and time filters.
 
-- **Extra writable directories**: Define the paths your application needs to write to when the root filesystem is read-only (e.g. `/app/uploads`). Sensitive system paths (`/etc`, `/proc`, `/sys`, the service account credential directory) are **rejected** by the platform.
-- **Framework automatic paths**: Based on the detected framework, the platform automatically adds the required write paths (e.g. `/app/App_Data` for .NET) — these appear with a read-only badge, so you don't need to add them yourself.
-- **Framework key persistence**: By default, the framework write area is ephemeral (it is erased when the pod restarts). If you enable the persistence toggle, this area is moved to persistent, shared storage across replicas — e.g. so that .NET session/anti-forgery keys are preserved across restarts.
-- **Additional blocked paths / blocked execution paths**: Add your own restrictions on top of the baseline.
-- **YAML preview**: View the full content of the policy that will be applied before making the change.
+### Runtime observation review
 
-### Observations
+For applicable services, the runtime observation section inside Findings shows recorded behavior and existing decision history. Filter pending, allowed, blocked or closed observations.
 
-A queue of all behaviors captured by the sensor while the service is **in Audit mode**: which process, which file/network operation, how many times.
+An observation is not automatically an attack or a blocking policy. The customer view supports record review; baseline observation administration belongs to the operator screen. Respond to actionable security findings through the authorized Findings response flow.
 
-Workflow:
+### Decisions and response
 
-1. Run the service in Audit mode under normal load (recommended: a few days, so all business scenarios run).
-2. Process the observations one by one: **Allow** (legitimate behavior) / **Block** (unwanted) / **Ignore**.
-3. Once no pending observations remain, enable protection with the **Upgrade to Block** step in the top bar.
+Acknowledge, Allow, Block, Dismiss and Resolve decisions are separate from actual policy application or isolation. An Allow record is not a directly applied allow rule; Block is not direct kernel enforcement. See [Security Center](https://komuta.io/docs/services/security-center-guide) for details.
 
-The badge in the tab title shows the number of pending observations.
+## Workload isolation
 
-### Findings
+Isolation is a response that restricts workload network access. Availability depends on runtime eligibility and a dedicated isolation permission. Confirm target, reason, expected impact and recovery plan before acting.
 
-Security findings belonging to this service (the service-filtered view of the tenant-wide list) + an **evidence timeline**: the event history from the last 7 days, related to findings and decisions. For details on finding decisions, see [Security Center → Findings](security-center-guide.md#bulgular-findings).
+An accepted isolation request does not establish measured network containment. A release request also does not prove a healthy application recovery. Check reported state and relevant network and application evidence afterwards.
 
----
+## Runtime eligibility
 
-## Practical Workflows
+A host sensor cannot observe every behavior inside a workload with a separate guest kernel, such as Kata. Some host runtime cards can therefore be not applicable or hidden. That alone does not establish that the workload is unsafe or fully protected.
 
-### Safely onboarding a new service
+Assess networking, workload hardening, build scans and isolation using their own eligibility. Do not treat an unknown source as supported or healthy.
 
-1. Deploy the service — protection starts in **Audit** mode, nothing is blocked.
-2. Run it with normal traffic for a few days; make sure all workflows (cron, reporting, backup, etc.) run at least once.
-3. Process the backlog in the **Observations** tab: Allow the legitimate ones.
-4. If needed, add writable directories/capabilities from the **Policies** tab.
-5. **Upgrade to Block** from the top bar — from now on, every out-of-policy behavior is blocked and generates a finding.
+## Help with the mascot
 
-### The pod is giving a "Permission denied" error / went into CrashLoopBackOff
+Select **Explain this screen** from the mascot menu on the relevant tab. Guidance provides contextual next steps for Overview, Traffic, Protection, Findings and supported advanced sections.
 
-A legitimate behavior was likely blocked in Block mode:
+Static help is available in Turkish and English without enabling an AI provider or the decorative mascot. Reading help does not query service records, send data to AI or make changes. Actual actions still use the page's own authorization and confirmation flow.
 
-1. Check the latest Blocked records in the **Findings** tab — which process, which path?
-2. If it's a write error: add the relevant path to **Policies → Extra writable directories**.
-3. If it's a permission error: add the required capability from **Policies → Linux Capabilities**.
-4. If the behavior is caught by the policy: give an **Allow** decision on the finding, or define a time-limited [policy exception](security-center-guide.md#politika-istisnalar%C4%B1-policy-exceptions).
-5. If you cannot isolate the problem, temporarily switch the service to **Audit** mode, collect observations, and upgrade to Block again.
+## Practical flows
 
-### I saw a suspicious finding
+### Investigate a suspicious finding
 
-1. Open the finding's details — process, path, repeat count, first/last seen.
-2. Follow the matching [incident response playbook](security-center-guide.md#olay-m%C3%BCdahale-playbooklar%C4%B1-ir-playbooks).
-3. Review the context of the event (before/after) from the evidence timeline.
-4. Make your decision (Block/Acknowledge) — the decision is recorded in the audit chain along with your justification.
+1. Confirm the intended service and organization.
+2. Read the finding's source, time and evidence.
+3. Compare traffic and event timeline over the same window.
+4. Read the relevant playbook and execute only a permitted response.
+5. Verify the recorded decision separately from the actual response outcome.
 
----
+### An application stops working after a protection change
 
-## Permissions
+1. Compare the last deployment, desired/observed mode and error record.
+2. Inspect evidence for the relevant process, path or connection.
+3. Consider required capability or writable path changes with the narrowest scope.
+4. Involve the authorized owner for baseline mode or exceptions; blanket Allow decisions are not a remedy.
+5. Verify application health and protection outcome after the permitted change.
 
-| Action | Required permission |
-|-------|---------------|
-| Viewing the Security tab | View security posture |
-| Processing observations, upgrading to Block | Manage security baseline |
-| Adding/removing Linux capabilities | Manage capabilities |
-| Managing writable directories | Manage writable directories |
-| Deciding on service findings | Manage findings |
+### Protection evidence is missing
 
-Permissions are assigned from the **Access Control → Roles** screen; see [Access Control](access-control-guide.md).
+Check runtime support, source access, timestamps and page permissions. Do not report an empty list as a safe result. Escalate source health or platform configuration problems to an operator.
 
----
+## Related documents
 
-## Related Documents
-
-- [Security Center](security-center-guide.md) — tenant-wide security console
-- [Runtime Protection](runtime-security-guide.md) — protection modes and policy concepts
-- [Service Management](service-guide.md) — service lifecycle
+- [Security Center](https://komuta.io/docs/services/security-center-guide)
+- [Runtime Security](https://komuta.io/docs/services/runtime-security-guide)
+- [Service access protection](https://komuta.io/docs/services/service-access-protection)

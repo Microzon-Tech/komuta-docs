@@ -1,369 +1,196 @@
 # Security Center
 
-Komuta Security Center lets you monitor and manage the security posture across all your clusters and services **from a single console**. It is built on runtime telemetry: it observes at the kernel level what actually happens inside your workloads (which process ran, which file was accessed, which network connection was established), turns that into findings, and lets you take action.
+Komuta Security Center brings together your organization's workload security findings, protection state and event evidence. Start from the **Security** menu; move to a service's **Security** workbench when investigating one workload.
 
-Access it by clicking **Security** in the left menu.
+The pages and actions available to you depend on your account's permissions, the current organization and the workload runtime. Check scope, source and timestamps first. An empty result or a low risk score does not establish that a workload is safe.
 
----
+## Which scope does each screen use?
 
-## How Does Security Center Work?
+| Screen | Scope | Purpose |
+|---|---|---|
+| Customer Console → Security | Workloads and records available to your account in the current organization | Organization-wide prioritization, investigation and permitted response |
+| Service → Security | The service currently open | Investigate traffic, protection, findings and event timeline in one service context |
+| AdminUI → Security | The displayed scope available to an authorized platform operator | Platform operations, cross-organization investigation and infrastructure security administration |
 
-```
-Runtime Sensors  →  Telemetry Collection  →  Finding Generation  →  Action
-(Runtime Protection,  (Komuta Telemetry     (deduplication,        (decision, notification,
- Runtime Monitoring,   Engine)               risk scoring)          SIEM, compliance)
- Network Flow Observation, Posture)
-```
+AdminUI is the platform operator console. Being an administrator within a customer organization does not provide platform operator access. In AdminUI, **platform host scope** differs from **selected organization scope**; selecting a target on one page does not automatically select the target on another.
 
-1. **Runtime sensors** deployed to your clusters collect in-container behavior (process, file, network) and posture information.
-2. Events are **deduplicated**: when the same logical event recurs, no new record is opened — the counter and "last seen" time of the existing finding are updated instead.
-3. A **risk score between 0–100** is calculated for each service and updated every 5 minutes.
-4. Findings automatically flow to notification channels, your SIEM system, and the compliance dashboard.
+## Customer Console pages
 
-### Core Concepts
+The **Security** menu has four groups. Permissions or runtime applicability can hide some pages.
 
-You'll see four distinct concepts in Security Center. The difference between them matters:
+| Group | Page | Where to start |
+|---|---|---|
+| Watch | **Overview** (`/security`) | Check scope, risk, open findings and evidence availability. |
+| Watch | **Findings** (`/security/findings`) | Investigate using service, source, severity and time filters. |
+| Record | **Audit Log** (`/security/audit`) | Compare recorded actions, actor and outcome. |
+| Record | **Login Activity** (`/security/login-activity`) | Investigate organization sign-in activity and unexpected outcomes. |
+| Record | **Audit record protection** (`/security/audit-storage`) | Read archive assurance and current verification for your own scope. |
+| Protect | **Policies** (`/security/policies`) | Review workload policies and suggestions with their targets. |
+| Protect | **Blocks** (`/security/blocks`) | Inspect existing blocks, affected services and evidence. |
+| Protect | **Honey paths** (`/security/honey-paths`) | Review decoy paths and detection records for supported services. |
+| Protect | **IR Playbooks** (`/security/playbooks`) | Follow investigation and response instructions. |
+| Verify | **Synthetic attacks** (`/security/synthetic-attacks`) | Review eligible scenarios, permitted drills and detection results. |
+| Verify | **Supply chain** (`/security/supply-chain`) | Inspect build and image scans, artifact evidence and exceptions. |
 
-| Concept | What does it mean? | Where does it appear? |
-|--------|------------------|-----------------|
-| **Observation** | The raw behavior *seen* by the sensor on a service in Audit mode (not yet decided upon) | Service detail → Security → Observations |
-| **Violation** | The live stream of behaviors that trip a protection policy | Security → Violations |
-| **Finding** | A deduplicated, permanent, actionable security record | Security → Findings |
-| **Evidence** | The timestamped event history associated with a finding or decision | Service detail → Security → Findings (timeline) |
+## Observations, findings and evidence
 
-In short: **observations** are the raw data of the learning phase, **violations** are the "what's being detected right now" stream, and **findings** are the work list you manage.
+| Term | Meaning |
+|---|---|
+| **Observation** | Behavior or state recorded by a source. It does not yet establish an attack or a persistent blocking decision. |
+| **Violation** | Recorded behavior associated with a protection rule. Audit indicates observation; Block indicates the reported blocking outcome. |
+| **Finding** | A security record with an investigation lifecycle. Assess its source, severity, service context and evidence. |
+| **Recurrence** | Another occurrence of the same logical finding. Count and last-seen time do not replace an individual event identifier. |
+| **Observation summary** | An aggregate count of observations awaiting review at calculation time. It is not a new attack, failed posture check or current queue size. |
+| **Evidence** | Source, time, target and outcome information that explains a finding or action. It must be current and match the relevant scope. |
 
----
+Posture score, pending observation count and event recurrence count are separate measurements. Closing an observation summary does not review its underlying observations or change protection.
+
+## How to interpret protection state
+
+| Displayed state | Meaning | Next check |
+|---|---|---|
+| **Configured / desired mode** | A rule or setting was saved. | Does it target the intended service and scope? |
+| **Pending / queued** | Application has not finished. | What is the deployment outcome and observed mode? |
+| **Applied / observed mode** | The platform reports application state at the target. | Is the data current, and does the relevant behavior have the expected outcome? |
+| **Effect verified** | Outcome evidence exists for a particular target, behavior and time window. | Does the evidence match current configuration and runtime? |
+| **Unknown / unavailable / stale** | The result cannot be verified. | Investigate source access, applicability and freshness. |
+
+A saved Block or Enforce setting, a queued change or a healthy sensor heartbeat does not by itself prove effective workload enforcement. Missing findings do not establish that sources observe every behavior.
+
+Host sensors and runtimes with a separate guest kernel, such as Kata, have different visibility. Host runtime protection can be **not applicable** or **unavailable** in unsupported environments; assess network, posture and supply-chain features using their own eligibility. See [Runtime Security](https://komuta.io/docs/services/runtime-security-guide).
 
 ## Overview
 
-The landing page of Security Center summarizes the security posture across the tenant.
+Overview helps prioritize risks and workloads for investigation in your organization. Read the risk card alongside open findings; compare source coverage, time window, evidence freshness and the service's protection state.
 
-### Risk Score (0–100)
-
-The risk card at the top left shows the combined risk level of all your services. The score is **explainable** — it's not a black box; the contribution of each component can be tracked individually:
-
-- **Finding severity**: Critical findings carry the highest weight, Info the lowest.
-- **Source reliability**: Kernel-level observations are evaluated with a higher confidence coefficient than posture checks.
-- **Freshness**: The impact of older findings decreases over time (a 24-hour half-life curve).
-- **Blast radius**: The service's tier (criticality level), internet-facing endpoints, and use of privileged identities increase the score.
-- **Recurrence factor**: The number of times the same finding recurs is added to the score logarithmically.
-
-A service with no findings is not considered "risky" just because it's internet-facing — the score is designed not to produce noise.
-
-### Other Overview Cards
-
-| Card | Content |
-|------|------|
-| **Open Findings** | Total number of open findings + critical/high breakdown |
-| **Clusters / Services** | Number of connected clusters and sync status |
-| **Critical Findings** | Live list of open findings with Critical and High severity |
-| **Riskiest Services** | List of services sorted by risk score; clicking goes to the service's security page |
-| **Cluster Security Matrix** | Per-cluster version, node status, platform protection layers (Baseline badges), and online status |
-| **Service Hardening** | The percentage of the 8 protection layers applied for each service |
-
-**Service hardening layers**: Network Policy, Rate Limit, Runtime Protection, TLS, Resource Quota, Limit Range, Service Account hardening, and Non-root execution. Hover over each point to see which layer is missing.
-
-The **"Near real-time · telemetry-based"** badge at the top right of the page indicates that the data comes from a live telemetry stream.
-
----
+Check filters when moving from a summary card to Findings or a service. Risk scores and hardening indicators support operational prioritization; they are not compliance certification or a guarantee that all attacks are prevented.
 
 ## Findings
 
-The main screen where all security findings across the tenant are managed.
+1. Narrow the time window, service, source, severity and status.
+2. Read first and last seen, recurrences, affected operation and evidence in the detail view.
+3. Compare traffic, protection state and event timeline in the service workbench.
+4. Select only a decision or response permitted for your account; confirm its target and required reason.
+5. Check the recorded decision separately from any deployment or response outcome.
 
-### Severity Levels
+### Finding decisions and actual response
 
-| Level | Meaning |
-|--------|--------|
-| **Critical** | A finding requiring immediate response, which may indicate active exploitation |
-| **High** | An important risk that needs to be addressed quickly |
-| **Medium** | A risk to be remediated in a planned manner |
-| **Low / Info** | A low-priority record for awareness purposes |
+| Decision | Meaning |
+|---|---|
+| **Acknowledge** | The finding is under review. |
+| **Allow** | The behavior is considered legitimate; record the required reason. |
+| **Block** | A decision that the behavior should be blocked is recorded. |
+| **Dismiss** | The finding is considered invalid or out of scope. |
+| **Resolve** | Investigation is concluded; confirm the closure reason. |
 
-### Finding Lifecycle
+These decisions are separate from **creating a runtime block policy**, **applying a policy exception** and **isolating a workload**. A Block decision does not prove kernel enforcement; Allow does not prove an automatically applied allow rule. Actual response requires additional permissions, runtime eligibility, explicit confirmation and outcome checks.
 
-```
-Open ──► Acknowledged ──► Allowed / Blocked / Dismissed ──► Resolved (closure)
-```
-
-| Decision | What does it do? |
-|-------|-----------|
-| **Acknowledge** | Marks "seen, investigating" — the finding stays open |
-| **Allow** | The behavior is deemed legitimate; **a justification is required** |
-| **Block** | Decides the behavior must be blocked; **a justification is required** |
-| **Dismiss** | Closes the finding as invalid/unimportant |
-| **Resolve** | Permanent closure (cannot be reopened; if the same behavior recurs, a new finding is created) |
-
-Key points:
-
-- Decisions can be made **individually or in bulk** (up to 200 findings at a time).
-- Allow/Block decisions are available only to authorized roles; the **developer role** can only perform Acknowledge and Dismiss.
-- Every decision is recorded, along with who made it and the justification, in an **immutable audit chain** (see [Audit Storage](#audit-storage)).
-- When the same logical finding is detected again, no new row is opened; the **Recurrence count** increases and **Last seen** is updated. This way, an event that repeats 400,000 times is managed in a single row.
-
-### Filtering
-
-You can narrow the findings list using the search box, the source filter (Runtime Protection, Runtime Monitoring, Network Flow Observation, Posture, Identity, Cluster Health), and the severity filter. The statistic chips at the top (Total / Open / Critical / High) show the current status at a glance.
-
----
-
-## Violations
-
-Shows the **live stream** of behaviors that trip protection policies: which pod, which process, and with which action (Blocked / Audited) it was caught.
-
-- Difference from the Findings screen: violations are raw and instantaneous; findings are deduplicated, actionable records.
-- The **bell badge** at the top right (visible on all pages) shows a live counter of Critical + High violations; an instant notification drops on a critical spike.
-
----
+Isolation can affect application network access. Before releasing it, confirm the intended target, recorded isolation state and recovery outcome.
 
 ## Policies
 
-A unified view of security policies across all your clusters.
+Assess workload protection rules and **Suggestions** separately on the Policies page. Host runtime rules and network policies depend on different sources and eligibility. Platform-wide and cluster-wide administration belongs to AdminUI.
 
-### Policy Types
+The protection policy wizard helps select an eligible service and prepare rules for shell execution, sensitive file access, specific programs or execution from temporary directories. Cluster and namespace come from the selected service. Review target, paths, Audit/Block behavior and YAML preview before creating a policy.
 
-| Type | Scope | Status |
-|-----|--------|-------|
-| **Runtime Protection** | In-container process/file/network behavior rules | Active |
-| **Network Policy** | Rules for traffic between services | Coming soon to this screen |
-| **Runtime Monitoring** | Advanced behavior observation rules | Coming soon to this screen |
-
-Each policy row shows the service/cluster information, application status, and action (Block/Audit); you can inspect the rule content from the detail panel. For details on policy concepts, see [Runtime Security](runtime-security-guide.md).
+A service appearing in the wizard is not a live sensor health or effective protection check. The platform can apply a created record; check application state and evidence from an authorized test afterwards. Block can disrupt startup, health checks or maintenance.
 
 ### Suggested Policies
 
-The platform analyzes the actual behavior of your services and generates **policy suggestions**. Example justification: *"Sensitive file read attempts on this service were blocked 47 times in the last 24 hours — a permanent rule is suggested."*
-
-Suggestion lifecycle: **Pending → Accepted → Applied**. Pending suggestions can be rejected or automatically expire after 30 days. An applied suggestion can be rolled back when needed. All transitions are written to the audit chain.
+Review the target, supporting observations, confidence and rule changes. Track acceptance, application and rollback outcomes separately. Failed application or a pending deployment must not be interpreted as active protection. The actions available to your account require their own suggestion-management permission.
 
 ### Policy Exceptions
 
-You can define a **time-limited exception** for a legitimate workflow that trips a policy (e.g., a maintenance window, a known behavior of a third-party tool):
+An exception can relax protection for a defined reason and duration. Review scope, approval state, expiry and impact on the current policy. Filing a request, approving it or recording Allow on a finding does not establish that the exception is effectively applied to the workload.
 
-- Exceptions go through an approval flow: **Pending → Approved → Active → Expired / Cancelled**.
-- The maximum exception duration is **90 days** — a permanent hole cannot be opened.
-- Every exception is justified and recorded in the audit chain.
+## Blocks and honey paths
 
----
+On **Blocks**, check the affected service and supporting evidence. Removing a block is a separately permitted action; distinguish an accepted request from a healthy recovered workload.
 
-## Audit Log
+**Honey paths** monitor service paths that legitimate application behavior should not touch. Verify the target service, runtime support and installation state. An enabled setting is not detection evidence. Do not read, write or probe a decoy file to test it; use only an explicitly approved drill and target.
 
-A unified timeline of events on the platform management plane: who did what, when, and what the result was (success / error).
+## Audit Log and Login Activity
 
-- Filter using source chips: Identity, Runtime Protection, Network Flow Observation, Posture, Audit, etc.
-- A minimum severity and a date window can be selected.
-- API calls and authentication server requests (including 4xx/5xx errors) are tracked on this screen.
+**Audit Log** supports investigation of authorized security activity by source, time, actor and outcome. Grouped view summarizes repeated events; raw view helps inspect individual records. Check CSV scope against the selected raw or grouped view and loaded records.
 
----
+**Login Activity** shows organization sign-in activity. Your personal account security log and active sessions are separate account screens. Verify the affected account, timestamp, result and evidence when investigating an unexpected login.
 
-## Login Activity
+Login Activity filters, counters and CSV cover **loaded events**. Check the loaded/total indicator; loading older events extends the investigation range. A loading error does not mean no activity occurred.
 
-A record of identity events on your account:
+## IR Playbooks
 
-- Successful / failed logins, logouts, account lockouts
-- Each record includes the IP address, browser/client information, and timestamp
-- You can report on records via **CSV export**
-- From a suspicious login, you can jump via a **forensic investigation link** to other security events in the same time window
+Playbooks provide ordered investigation and response instructions. Review built-in guidance and, when permitted, manage a copy or a custom playbook for your team's process.
 
-This screen is the first place to check for "who logged in at this time?" and "were there any failed login attempts?"
+Check each step's prerequisites and expected evidence. Opening a guide does not automatically isolate workloads, rotate credentials or send notifications. Execute supported response only through separate authorized page controls and verify the result.
 
----
+## Synthetic attacks
 
-## Incident Response Playbooks (IR Playbooks)
+Drills help evaluate the detection pipeline for a selected target and scenario. A visible or enabled scenario has not necessarily run. Execution requires a separate permission and an explicit action.
 
-These are ready-made response guides that describe **step by step what you need to do** when you encounter a security finding. They are automatically matched to the finding's severity, type, and source.
+Confirm the target service, runtime, expected signal source, scenario effects and recovery plan first. Compare the run record, expected finding and detection timing afterwards. Detecting one scenario does not prove that every attack class is prevented or that blocking is effective. Platform-wide scenario availability is administered in the AdminUI catalogue.
 
-Ready-made playbooks that ship with the platform:
+## Supply chain
 
-| Playbook | Trigger | Recommended steps |
-|----------|------------|------------------|
-| **Sensitive file read** | Critical runtime finding | Open incident → Isolate pod → Page service owner → Prepare forensic package |
-| **Service account token + external traffic** | Critical runtime finding | Open incident → Isolate pod → Rotate credentials → Suggest network block → Page owner |
-| **Post-deploy shell execution** | Medium finding | Verify health probe → Flag for review |
-| **Package manager at runtime** | High finding | Open incident → Suggest block rule → Flag for review |
-| **Cloud metadata access** | High network finding | Open incident → Suggest network block → Rotate credentials → Page owner |
+Review the scanned artifact, scan time, severity and available evidence when assessing build and image security. Match any SBOM, vulnerability scan or signature information to the relevant build and image; do not rely on evidence for another artifact.
 
-- Ready-made playbooks cannot be edited; however, you **can clone them and customize them for your own process**.
-- Playbook steps are currently **guidance only** — your team executes the steps; automated execution is on the roadmap.
+Missing, stale or failed scans are not clean results. Review the reason, scope and expiry of any exception. Accepting a risk does not fix a vulnerability; a signature record does not prove that every build is signed or that its signature was independently verified.
 
----
+## Audit record protection
 
-## Compliance
+The customer view provides **archive protection assurance for your own scope**. Review retention, legal hold, inherited platform settings, external immutability status and current verification together.
 
-Your security findings and protection layers **automatically provide evidence** for industry-standard compliance controls. You don't need to set up a separate scanning tool.
+A configured archive is separate from **verification of the current configuration**. Pending, catching-up, failed, unknown or unavailable verification is not current immutability evidence. Check the last successful verification timestamp.
 
-### Supported Frameworks
+Append-only audit records and a cryptographic chain are different guarantees from external **WORM / Object Lock** storage. Storage immutability and any signature verification depend on actual configuration and relevant proof. Operational controls such as bucket, archive destination, legal hold administration and cross-organization selection belong to AdminUI.
 
-| Framework | Example controls |
-|---------|------------------|
-| **CIS Kubernetes** | Existence of network policy, privileged pod audit |
-| **NIST 800-53** | Access control (AC-3), audit events (AU-2, AU-9), system monitoring (SI-4) |
-| **SOC 2** | Logical access (CC6.1), system monitoring (CC7.2) |
-| **ISO 27001** | Monitoring activities (A.8.16), network security (A.8.34) |
-| **PCI-DSS** | Audit logging (10.2.1), change detection (11.5.1) |
+## Alerts, notifications and export
 
-### Coverage Statuses
+Follow security notifications through **Alerts → Rules, Channels, History, Silences and Templates**. Rule matching, channel configuration and actual message delivery are distinct outcomes. Silencing an alert does not resolve a finding or remove its underlying security risk.
 
-The status for each control is calculated based on the most recent quarterly evidence window:
+Permitted **CSV/JSON finding exports** are prepared server-side using filters and the time window, beyond the current on-screen page. A file contains at most **50,000 rows**; scan limits can also narrow results. Do not treat a capped export as a complete set of all matches; narrow the time window or service scope. Check loaded-record scope separately for Audit Log and Login Activity CSV. Verify file scope, timestamps and records against your investigation purpose.
 
-- **Met** — sufficient evidence exists for the control
-- **Partially Met** — evidence exists but is incomplete
-- **Missing Signal** — no data source has been connected for this control yet
-- **Not Applicable / Not Assessed**
+An exported file is not proof of automated SIEM transfer or notification delivery. If your organization uses an integration, verify its destination, schema, access and delivery evidence separately. This guide does not promise automatic SIEM delivery for every organization or a fixed delivery interval.
 
-### Actions
+## Operator pages in AdminUI
 
-- **Export Evidence**: Download an evidence package in JSON or CSV format to present to your auditor.
-- **Reassess**: Reassess a framework instantly, outside of schedule (e.g., before an audit).
+Platform operators use these pages under **Security**, subject to their permissions and the displayed scope. The Customer Console organization view does not replace these administration screens.
 
----
+| Page | Operator responsibility |
+|---|---|
+| **Security Findings** | Review permitted cross-organization finding, forensic and telemetry tabs |
+| **Observations** | Inspect baseline observations across organizations |
+| **Network Incidents** | Inspect permitted cross-organization network incidents |
+| **Audit Logs** | Review API audit summaries across organizations |
+| **Security signal coverage** | Review source mappings to framework controls in the displayed scope |
+| **Service baseline administration** | Manage baseline observations, protection mode and operations for an explicitly selected service |
+| **Infrastructure health findings** | Inspect infrastructure findings in platform host scope |
+| **Security retention policy** | Manage retention windows and legal hold policy for the displayed scope |
+| **Runtime protection controls** | Manage configured enforcement, eligibility and platform controls |
+| **Audit storage administration** | Manage archive configuration and verification for the selected scope |
+| **Security scenario catalogue** | Manage platform-wide scenario availability and source readiness |
 
-## Notifications and Routing Rules
+## Page help with the Komuta mascot
 
-Here you configure how security findings reach your team.
+In the Customer Console, select **Explain this screen** from the mascot menu. Guidance explains the current security page or service tab, where to start and its limits in Turkish or English. Relevant alert and account security screens also have contextual explanations.
 
-### Notification Channels
+The AI provider does not need to be enabled for this explanation. Page guidance is also available when the decorative mascot is disabled. Static help does not read security records, send data to AI or perform an action. It explains when access is still loading or your permission for the page has not been verified.
 
-| Channel | Description |
-|-------|----------|
-| **In-app** | Instant notification within the console |
-| **Email** | Email to defined addresses |
-| **Slack** | Slack webhook integration |
-| **Microsoft Teams** | Teams channel card |
-| **PagerDuty** | On-call triggering |
-| **Webhook** | HTTPS POST to your own system |
+In AdminUI, the mascot icon opens **Komuta page guide**, which describes the supported security screen's purpose, prerequisites, next step and limits. This operator guide is not an automatically acting chat or an animated response system.
 
-Channel configurations (webhook address, token, etc.) are stored encrypted and are not shown to read-only users.
+Keep secrets out of the separate AI chat. AI explanations and recommendations do not replace recorded action results, current authorization, effective protection or compliance evidence. Security changes still require the page's own permissions, confirmations and outcome checks.
 
-### Routing Rules
+## A practical investigation flow
 
-You determine which finding goes to which channel using rules:
+1. Confirm the current organization and service under investigation.
+2. Check source coverage and data freshness on Overview.
+3. Narrow Findings by service, source and time.
+4. Compare traffic, protection and evidence in Service Security.
+5. Use a playbook and **Explain this screen** when needed.
+6. Explicitly execute only an authorized response; verify its record and actual outcome.
+7. Escalate infrastructure, source health, retention or archive issues to a platform operator.
 
-- **Severity threshold**: e.g., High and above only
-- **Source / cluster / service / owning team** filters
-- **Business hours window**: limit notifications to your working hours (default 09:00–18:00, local time)
-- **Escalation**: If a finding is not resolved within a defined period (up to 24 hours), a second notification goes to the escalation channels
-- **Deduplication**: The same finding does not repeatedly trigger notifications
+## Related documents
 
----
-
-## SIEM Export
-
-Automatically export your security findings to your own SIEM / log platform. Designed for integration with your existing security operations center (SOC).
-
-| Schema | Example compatible destinations |
-|------|------------------------|
-| **OCSF** | Splunk, AWS Security Hub, Snowflake |
-| **Elastic ECS** | Elasticsearch / Kibana |
-| **OpenTelemetry** | OTel Collector, Honeycomb |
-
-How it works and security guarantees:
-
-- Findings are sent to your destination **incrementally every 5 minutes** (resuming where it left off).
-- The destination address **requires HTTPS**; the authentication token is stored encrypted and is never shown back in the interface.
-- After **5 consecutive failures**, the export is automatically disabled and a notification is generated.
-- All configuration changes are recorded in the audit chain.
-
----
-
-## Synthetic Attacks
-
-**Prove that your security monitoring actually works.** The platform triggers a controlled, harmless "attack signal" on your own workload and measures whether the detection pipeline catches it, and **how long it takes to catch it**.
-
-### What is it for?
-
-In classic security tools, "no alarm" can mean two things: either everything is fine, or the monitoring is broken. Synthetic attacks eliminate this ambiguity — you find **detection coverage gaps** before an attacker does.
-
-### Scenario Catalog
-
-Ready-made scenarios include running a suspicious process, writing to a sensitive directory, external traffic from a restricted workload, and a privileged pod attempt. Each scenario has a **detection SLA** (e.g., 60 seconds).
-
-### Running an Exercise
-
-1. Select a scenario from the **Synthetic Attacks** page and specify your target service.
-2. Click **Trigger Exercise**.
-3. Watch the results dashboard: **Detected** (within SLA) / **Not Detected** (coverage gap!).
-
-The metric cards at the top show the total number of exercises, detection rate, SLA compliance rate, and average detection time.
-
-> Exercise records are kept **isolated** from real findings: they do not pollute your risk score, your SIEM stream, or your compliance evidence.
-
----
-
-## Honey Paths
-
-Define a **decoy file path** on one of your services: a path your legitimate code should never touch (e.g., a fake credentials file). **Any access** to this path immediately generates a Critical finding and suggests the relevant incident response playbook.
-
-- Service selector → add a decoy path (e.g., `/app/config/.fake-credentials`).
-- Track which decoys have caught traffic via the **Last triggered** and **Trigger count** columns.
-- Honey paths are a low-cost, high-signal method for catching internal lateral movement and automated scanning behavior.
-
----
-
-## Audit Storage
-
-Every security-related operator decision (finding decisions, policy suggestion transitions, exceptions, SIEM configurations, exercise triggers, capability/writable directory changes) is written to an **immutable audit chain**.
-
-- **Append-only**: Records cannot be updated or deleted.
-- **Cryptographic chain**: Each record contains the hash of the previous record; if a single past record is altered, the rest of the chain becomes invalid and the verifier detects it. You give your auditor the guarantee that "these records have not been tampered with."
-- **Legal Hold**: Prevent records from being deleted during a legal process, even if their retention period has expired (toggle on/off with justification).
-- **Archive destination**: The storage destination and retention period for a long-term archive copy of the records can be configured.
-
-This structure is designed to directly satisfy the "audit log integrity" requirements in SOC 2, ISO 27001, and PCI-DSS audits.
-
----
-
-## Other Pages
-
-| Page | Content |
-|-------|------|
-| **Runtime Enforcement** | Platform-wide Monitor ↔ Enforce mode; changing modes requires a justification and passes a readiness check. For administrators. |
-| **Cluster Health** | Infrastructure-layer health findings (storage, node components). |
-| **Retention Policy** | Retention period and data residency settings for security data. Requires administrator privileges. |
-
----
-
-## Permissions
-
-Security Center capabilities are authorized individually via **Access Control → Roles**:
-
-| Capability | Who should use it? |
-|---------|-----------------|
-| Security Center read access (overview, findings, violations) | Entire development team |
-| Finding decisions (Allow/Block/Resolve) | Security operator / team lead |
-| Finding decisions (Acknowledge/Dismiss) | Developer |
-| Notification channel and routing rule management | Security operator |
-| Policy exception and suggested policy management | Security operator |
-| SIEM export configuration | Security operator |
-| Compliance viewing / evidence export | Auditor role |
-| Triggering synthetic exercises, honey path management | Security operator |
-| Audit storage viewing | Auditor / security operator |
-| Retention policy, enforcement mode, archive management | Platform administrator |
-
-Best practice: give developers read + acknowledge access; limit permanent decisions like Allow/Block, and channel/exception management, to security officers.
-
----
-
-## Frequently Asked Questions
-
-**What's the difference between "Findings" and "Violations"?**
-Violations are the instantaneous raw stream; findings are the deduplicated, actionable state of the same event. Run your daily operations from the Findings screen; use Violations for live observation.
-
-**Why did my risk score change?**
-The score is recalculated every 5 minutes. A new Critical finding raises the score quickly; as findings are resolved and time passes (the freshness curve), the score decreases.
-
-**I accidentally Resolved a finding — can I undo it?**
-No — Resolve is permanent. If the same behavior is detected again, a new finding is created. Use Acknowledge when you're not sure.
-
-**I'm not receiving notifications.**
-Check in order: (1) Does the routing rule's severity threshold and filters match the finding? (2) Are you outside the business hours window? (3) Did the channel test succeed? (4) If a notification was already sent for the same finding, deduplication is in effect.
-
----
-
-## Related Documents
-
-- [Service Security Workspace](service-security-guide.md) — security management for a single service
-- [Runtime Security](runtime-security-guide.md) — protection modes and policy concepts
-- [Access Control](access-control-guide.md) — role and permission management
-- [Notification Management](notification-guide.md) — platform-wide notification channels
+- [Service Security Workbench](https://komuta.io/docs/services/service-security-guide)
+- [Runtime Security](https://komuta.io/docs/services/runtime-security-guide)
+- [Service access protection](https://komuta.io/docs/services/service-access-protection)
