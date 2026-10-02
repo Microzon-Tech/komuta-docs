@@ -24,6 +24,19 @@ Token'lar `kmtd_` ile başlar. Bir serviste aynı anda en fazla 10 aktif token o
 
 ---
 
+## Sırsız Dağıtım (OIDC)
+
+GitHub Actions ve GitLab CI kullanıyorsanız CI'nızda hiç sır saklamadan dağıtım yapabilirsiniz. İş, CI sağlayıcısının imzaladığı kısa ömürlü bir kimlik token'ı (OIDC) sunar; Komuta imzayı sağlayıcının açık anahtarlarıyla doğrular ve isteği yalnızca güvendiğiniz depodan geliyorsa kabul eder.
+
+1. **Token oluştur**'da **CI'nız nasıl giriş yapacak** alanından **GitHub Actions OIDC** ya da **GitLab CI OIDC**'yi seçin.
+2. Depoyu girin: GitHub için `sahip/depo`, GitLab için `grup/proje`. İsterseniz bir **ortam** (ör. `production`) ekleyin; o zaman yalnızca bu ortamı kullanan işler dağıtım yapabilir.
+3. İzin verilen işlemler, dallar, imaj depoları ve IP listesi gizli token'larda olduğu gibi uygulanır. Dal desenleri girdiyseniz işin çalıştığı dal da bu desenlere uymalıdır.
+4. Kod parçalarında **OIDC (sırsız)** seçeneğini açın.
+
+GitHub Actions işi `permissions: id-token: write` ister; GitLab CI işinde `id_tokens` altında `aud: https://api.komuta.io` olan bir `KOMUTA_ID_TOKEN` tanımlanır. Bu modda saklanacak, sızabilecek ya da yenilenmesi gereken bir sır yoktur.
+
+---
+
 ## Hazır Kod Parçaları
 
 **CI/CD entegrasyonu** sekmesi GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines ve `curl` için servisinize göre doldurulmuş, kopyalanmaya hazır örnekler verir. Her örnek deploy'u başlatır, sonucu bekler ve deploy başarısız olursa CI işini başarısız sayar. Sekmenin üstündeki **Derleyip dağıt / Hazır imaj dağıt** seçimiyle örnekler hazır imaj moduna geçer; bu modda betik, push ettiğiniz imajı digest ile `IMAGE` değişkeninden okur.

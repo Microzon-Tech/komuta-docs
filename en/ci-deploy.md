@@ -24,6 +24,19 @@ Tokens start with `kmtd_`. A service can have at most 10 active tokens at a time
 
 ---
 
+## Deploying Without a Secret (OIDC)
+
+If you use GitHub Actions or GitLab CI, you can deploy without storing any secret in your CI. The job presents a short-lived identity token (OIDC) signed by the CI provider; Komuta verifies the signature with the provider's public keys and accepts the request only when it comes from the repository you trust.
+
+1. In **Create token**, pick **GitHub Actions OIDC** or **GitLab CI OIDC** under **How your CI signs in**.
+2. Enter the repository: `owner/repo` for GitHub, `group/project` for GitLab. Optionally add an **environment** (for example `production`); then only jobs that use that environment can deploy.
+3. Allowed actions, branches, image repositories and the IP allowlist apply as they do for secret tokens. If you set branch patterns, the branch the job runs on must match them as well.
+4. Switch the snippets to **OIDC (no secret)**.
+
+The GitHub Actions job needs `permissions: id-token: write`; the GitLab CI job declares a `KOMUTA_ID_TOKEN` under `id_tokens` with `aud: https://api.komuta.io`. In this mode there is no secret to store, leak or rotate.
+
+---
+
 ## Ready-made Snippets
 
 The **CI/CD integration** tab provides copy-ready examples filled in for your service, for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines and `curl`. Each one starts the deploy, waits for the result, and fails the CI job if the deploy fails. The **Build and deploy / Deploy a ready-made image** switch above the snippets turns them into image mode; there the script reads the image you pushed, pinned by digest, from the `IMAGE` variable.
