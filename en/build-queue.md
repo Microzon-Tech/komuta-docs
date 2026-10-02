@@ -1,6 +1,6 @@
 # Build Queue
 
-Every deploy in Komuta starts with a build. Builds run on shared build capacity; a build that cannot start right away is not lost. It enters the **build queue** and starts on its own when its turn comes. A queued build only leaves the queue when you cancel it.
+Every deploy in Komuta starts with a build. Builds run on shared build capacity; a build that cannot start right away is not lost. It enters the **build queue** and starts on its own when its turn comes. Nothing in the queue is ever cancelled for you.
 
 ---
 
@@ -8,7 +8,7 @@ Every deploy in Komuta starts with a build. Builds run on shared build capacity;
 
 These rules decide whether a build starts now or waits:
 
-- **Builds of the same service never run at the same time.** While the service's previous build is running, a new build either waits in the queue or replaces the older one, depending on the service's setting (see "When a New Build Arrives" below).
+- **Builds of the same service run one after another.** A new build does not start until the service's previous build has finished.
 - **Your account tier has a concurrent build limit.** How many builds your account can run at once depends on its tier; when the limit is reached, a new build waits for a slot. Your tier, and how to reach the next one, is shown under **Account → Wallet**.
 - **The queue is fair across accounts.** While one account has many builds queued, another account's single build can still move ahead; no account can hold the whole queue.
 - **Build capacity is measured, not guessed.** A build starts only when there is room for it.
@@ -36,19 +36,6 @@ Every queued build shows why it is waiting:
 | Build capacity cannot be read right now, builds start one at a time | Capacity cannot be measured for a moment; builds start one at a time meanwhile. |
 
 A previous build that is only cleaning up, or that has passed the time limit, no longer holds the service; the new build can start without waiting for it.
-
----
-
-## When a New Build Arrives
-
-What happens when a new build of the same branch arrives while one is running is set by **When a new build arrives** on the service's **Auto-deploy** page. It applies to every build: pushes, CI and manual triggers.
-
-| Option | What happens |
-|--------|--------------|
-| **Latest wins** (default) | The older running build is cancelled gracefully and the new one starts right away. The latest commit reaches production sooner and you never wait for a build whose output nobody will use. |
-| **One after another** | Every build runs to completion; the new build waits in the queue until the previous one finishes. |
-
-"Latest wins" only cancels builds **on the same branch that started before the new build was queued**. Builds of other branches and ready-made image deploys are not affected. A cancelled build is billed only up to the moment it was cancelled and is recorded in the audit log. A CI deploy replaced this way ends with status `superseded` (see [Deploying from CI](ci-deploy.md)).
 
 ---
 

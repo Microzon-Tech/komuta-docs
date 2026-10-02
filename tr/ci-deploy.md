@@ -134,7 +134,7 @@ Authorization: Bearer kmtd_...
 | `succeeded` | Yeni sürüm yayında. | İşi başarılı bitir. |
 | `failed` | Build ya da yayın başarısız. `failureReason` nedeni taşır. | İşi başarısız bitir. |
 | `cancelled` | Deploy iptal edildi. | İşi başarısız bitir. |
-| `superseded` | Aynı servis için daha yeni bir build bunun yerini aldı (kuyrukta birleşti ya da "En yenisi kazanır" ayarıyla çalışan build iptal edildi). `supersededBy`, yerini alan deploy CI'dan geldiyse onu gösterir. | Genellikle başarılı sayılır. |
+| `superseded` | Aynı servis için daha yeni bir deploy bunun yerini aldı. `supersededBy` yeni deploy'u gösterir. | Genellikle başarılı sayılır. |
 
 Deploy kayıtları 180 gün saklanır; bundan eski bir deploy'un `statusUrl`'i `404` döner.
 
