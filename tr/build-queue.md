@@ -1,6 +1,6 @@
 # Build Kuyruğu
 
-Komuta'da her deploy önce bir build ile başlar. Build'ler paylaşılan derleme kapasitesinde çalışır; o an başlayamayan build kaybolmaz, **build kuyruğuna** girer ve sırası gelince kendiliğinden başlar. Kuyrukta bekleyen hiçbir build iptal edilmez.
+Komuta'da her deploy önce bir build ile başlar. Build'ler paylaşılan derleme kapasitesinde çalışır; o an başlayamayan build kaybolmaz, **build kuyruğuna** girer ve sırası gelince kendiliğinden başlar. Kuyrukta bekleyen bir build, siz iptal etmedikçe kuyruktan çıkarılmaz.
 
 ---
 
@@ -8,7 +8,7 @@ Komuta'da her deploy önce bir build ile başlar. Build'ler paylaşılan derleme
 
 Bir build'in hemen başlayıp başlamayacağına şu kurallar karar verir:
 
-- **Aynı servisin build'leri sırayla çalışır.** Bir servisin önceki build'i bitmeden yenisi başlamaz.
+- **Aynı servisin build'leri aynı anda çalışmaz.** Servisin önceki build'i sürerken yeni build kuyrukta bekler ya da servisin ayarına göre eskisinin yerini alır (aşağıda "Yeni Bir Build Geldiğinde").
 - **Hesap seviyenizin eşzamanlı build sınırı vardır.** Hesabınızda aynı anda çalışabilen build sayısı hesap seviyenize bağlıdır; sınır doluysa yeni build bir slotun boşalmasını bekler. Seviyeniz ve bir üst seviyeye nasıl geçeceğiniz **Hesap → Cüzdan** sayfasında görünür.
 - **Kiracılar arasında adil sıra uygulanır.** Bir hesabın çok sayıda build'i kuyruktayken başka bir hesabın tek build'i öne geçebilir; hiçbir hesap kuyruğu tek başına tutamaz.
 - **Derleme kapasitesi gerçek ölçüme göre açılır.** Build ancak onu taşıyabilecek boş kapasite olduğunda başlar.
@@ -36,6 +36,19 @@ Kuyruktaki her build, neden beklediğini gösterir:
 | Build kapasitesi şu an okunamıyor, build'ler tek tek başlatılıyor | Kapasite geçici olarak ölçülemiyor; bu sürede build'ler tek tek başlatılır. |
 
 Önceki build yalnızca temizlik adımındaysa ya da süre sınırını aştıysa servisi artık tutmaz; yeni build onu beklemeden başlayabilir.
+
+---
+
+## Yeni Bir Build Geldiğinde
+
+Servisin bir build'i çalışırken aynı branch için yeni bir build gelirse ne olacağını servisin **Otomatik dağıtım** sayfasındaki **Yeni bir build geldiğinde** ayarı belirler. Ayar push, CI ve elle tetiklenen tüm build'ler için geçerlidir.
+
+| Seçenek | Ne olur |
+|---------|---------|
+| **En yenisi kazanır** (varsayılan) | Çalışan eski build nazikçe iptal edilir ve yeni build hemen başlar. En son commit daha erken yayına çıkar; artık işe yaramayacak bir build için beklenmez. |
+| **Sırayla** | Her build sonuna kadar çalışır; yeni build, öncekisi bitene kadar kuyrukta bekler. |
+
+"En yenisi kazanır" yalnızca **aynı branch'teki, yeni build kuyruğa girmeden önce başlamış** build'leri iptal eder. Başka bir branch'in build'i ve hazır imaj dağıtımları etkilenmez. İptal edilen build, iptal anına kadar geçen süre kadar faturalanır ve denetim kaydına geçer. CI'dan tetiklenmiş bir deploy bu şekilde yerini yenisine bırakırsa durumu `superseded` olur (bkz. [CI'dan Deploy Tetikleme](ci-deploy.md)).
 
 ---
 

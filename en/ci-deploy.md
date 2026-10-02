@@ -121,7 +121,7 @@ Authorization: Bearer kmtd_...
 | `succeeded` | The new version is live. | Pass the job. |
 | `failed` | The build or the release failed. `failureReason` says why. | Fail the job. |
 | `cancelled` | The deploy was cancelled. | Fail the job. |
-| `superseded` | A newer deploy of the same service replaced this one. `supersededBy` points to it. | Usually treated as passed. |
+| `superseded` | A newer build of the same service replaced this one (merged in the queue, or the running build was cancelled under "Latest wins"). `supersededBy` points to the replacing deploy when it came from CI. | Usually treated as passed. |
 
 Deploy records are kept for 180 days; the `statusUrl` of an older deploy returns `404`.
 
