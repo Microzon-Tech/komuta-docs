@@ -87,7 +87,7 @@ Yalnızca o posta kutusunu okuyabilen biri girebilir ve her girişte yeni bir ko
 
 ### Erişimin kaldırılması
 
-Bir paylaşımı kaldırdığınızda ya da korumayı kapattığınızda, açık oturumlar dahil erişim yaklaşık 30 saniye içinde sona erer.
+Bir paylaşımı kaldırdığınızda, o paylaşımla giren kişilerin erişimi açık oturumlar dahil yaklaşık 30 saniye içinde sona erer. Korumayı kapatmak ise tersini yapar: servis yeniden herkese açılır.
 
 Korumayı kapatmak paylaşımları silmez; korumayı tekrar açtığınızda aynı paylaşımlar yeniden geçerli olur.
 

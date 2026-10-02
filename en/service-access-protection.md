@@ -87,7 +87,7 @@ If it is turned off, these shares can't be added; existing ones are suspended an
 
 ### Removing access
 
-When you remove a share or turn protection off, access ends within about 30 seconds, including sessions that are already open.
+When you remove a share, the people it covered lose access within about 30 seconds, including sessions that are already open. Turning protection off does the opposite: the service becomes reachable by everyone again.
 
 Turning protection off does not delete your shares; if you turn protection back on, the same shares apply again.
 
