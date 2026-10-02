@@ -28,7 +28,7 @@ Token'lar `kmtd_` ile başlar. Bir serviste aynı anda en fazla 10 aktif token o
 
 **CI/CD entegrasyonu** sekmesi GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines ve `curl` için servisinize göre doldurulmuş, kopyalanmaya hazır örnekler verir. Her örnek deploy'u başlatır, sonucu bekler ve deploy başarısız olursa CI işini başarısız sayar. Sekmenin üstündeki **Derleyip dağıt / Hazır imaj dağıt** seçimiyle örnekler hazır imaj moduna geçer; bu modda betik, push ettiğiniz imajı digest ile `IMAGE` değişkeninden okur.
 
-GitHub Actions için en kısa örnek:
+GitHub Actions için en kısa örnek. Bu örnek deploy'u yalnızca **başlatır**, sonucunu beklemez; Komuta isteği kabul ettiği anda CI işi başarılı biter:
 
 ```yaml copy
 name: Deploy to Komuta

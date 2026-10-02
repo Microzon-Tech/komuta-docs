@@ -8,7 +8,7 @@ This works with a **deploy token**. A deploy token is bound to a single service,
 
 ## Creating a Deploy Token
 
-1. Open the service's **Auto Deploy** page and switch to the **CI/CD integration** tab.
+1. Open the service's **Auto-deploy** page and switch to the **CI/CD integration** tab.
 2. Click **Create token** and set it up:
    - **Name:** where the token is used (for example `github-actions-main`).
    - **Allowed actions:** build and deploy, deploy a ready-made image, or both.
@@ -28,7 +28,7 @@ Tokens start with `kmtd_`. A service can have at most 10 active tokens at a time
 
 The **CI/CD integration** tab provides copy-ready examples filled in for your service, for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines and `curl`. Each one starts the deploy, waits for the result, and fails the CI job if the deploy fails. The **Build and deploy / Deploy a ready-made image** switch above the snippets turns them into image mode; there the script reads the image you pushed, pinned by digest, from the `IMAGE` variable.
 
-The shortest GitHub Actions example:
+The shortest GitHub Actions example. It only **starts** the deploy and does not wait for the result, so the CI job passes as soon as Komuta accepts the request:
 
 ```yaml copy
 name: Deploy to Komuta
@@ -160,6 +160,6 @@ Rate limits: per token, 30 deploys and 300 status reads per minute; per service,
 
 ## Related Documents
 
-- [Auto Deploy](service-auto-deploy.md) — Rules for push auto-deploy.
+- [Auto-deploy](service-auto-deploy.md) — Rules for push auto-deploy.
 - [Build Queue](build-queue.md) — When the deploy will start.
 - [Pipelines](service-pipeline-guide.md) — Build stages and logs.
