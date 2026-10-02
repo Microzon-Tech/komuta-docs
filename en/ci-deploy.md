@@ -134,6 +134,18 @@ Authorization: Bearer kmtd_...
 
 ---
 
+## Requiring Signed Images
+
+If you deploy ready-made images (`image` mode), you can require that only images **signed with your key** are deployed to the service. It is off by default.
+
+1. Create a key pair: `cosign generate-key-pair`. Keep the private key (`cosign.key`) in your CI's secrets; **never** give it to Komuta.
+2. In CI, after pushing the image, sign its digest: `cosign sign --key cosign.key registry.example.com/app@sha256:...`
+3. On the service's **Auto-deploy → CI/CD integration** tab, paste the public key (`cosign.pub`, starting with `-----BEGIN PUBLIC KEY-----`) into the **Signed images** card and turn it on.
+
+While it is on, Komuta verifies the signature of every `image` mode request. An unsigned image, or one signed with another key, is rejected with `403` and recorded in the audit log. If the signature cannot be verified right now (for example the registry is unreachable) the request returns `503`; try again shortly. ECDSA keys (the cosign default) and RSA keys of at least 2048 bits are accepted.
+
+---
+
 ## Error Codes
 
 | HTTP | When |
@@ -141,7 +153,7 @@ Authorization: Bearer kmtd_...
 | `400` | The request is invalid (missing field, image by tag, `commitSha` while pinning is off). |
 | `401` | The token is invalid, revoked or expired. |
 | `402` | The account's billing is suspended. |
-| `403` | The action, branch, image repository or IP address is outside the token's permissions. |
+| `403` | The action, branch, image repository or IP address is outside the token's permissions, or signed images are required and the image is not signed with your key. |
 | `404` | The service does not belong to this token, or the deploy was not found. |
 | `409` | The same `clientRequestId` was sent with a different body, or the deploy can no longer be cancelled. |
 | `429` | A rate limit was hit. Wait for the `Retry-After` header and try again. |
