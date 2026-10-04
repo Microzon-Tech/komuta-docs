@@ -17,7 +17,7 @@ To access the service management panel, click a service's name from the project 
 | **Ingress Management** | Ingress rules, hostname and traffic configuration |
 | **HPA** | Automatic scaling (Horizontal Pod Autoscaler) settings |
 | **Resources** | CPU and memory resource limits |
-| **Ports** | Service port configuration |
+| **Access & ports** | Access protection and service port configuration |
 | **Storage** | Longhorn-backed persistent disk (PVC) management |
 | **Health Probes** | Health check (Liveness/Readiness) settings |
 | **Alert Management** | Service-specific alert rules |

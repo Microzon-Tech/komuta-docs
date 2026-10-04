@@ -27,4 +27,4 @@ The list shows both directions separately: the applications this service **conne
 ## Related Documents
 
 - [Environment Variables](environment-variables.md) — Defining a connection address as a variable.
-- [Ports](ports.md) — The ports a service listens on and the private network setting.
+- [Access & Ports](services-ports.md) — The ports a service listens on and the private network setting.

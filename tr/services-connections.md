@@ -27,4 +27,4 @@ Liste iki yönü ayrı gösterir: bu servisin **bağlandığı** uygulamalar ve 
 ## İlgili Dokümanlar
 
 - [Ortam Değişkenleri](environment-variables.md) — Bağlantı adresinin değişken olarak tanımlanması.
-- [Portlar](ports.md) — Servisin dinlediği portlar ve özel ağ ayarı.
+- [Erişim ve Portlar](services-ports.md) — Servisin dinlediği portlar ve özel ağ ayarı.
