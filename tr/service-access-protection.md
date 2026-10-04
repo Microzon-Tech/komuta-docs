@@ -7,7 +7,7 @@ Erişim koruması her planda bulunur. İki yerden yönetilir:
 - **Servis Detay → Yapılandırma → Erişim ve portlar** sayfasındaki **Erişim koruması** kartı — tüm ayarlar burada.
 - Servis genel bakışındaki koruma kartından açılan **Servis koruması** sihirbazı — korumayı adım adım kurmak ya da düzenlemek için (bkz. [Servis koruması sihirbazı](#servis-koruması-sihirbazı)).
 
-Koruma kapalıyken kartta yalnızca açma anahtarı görünür (sayfanın üstündeki **Erişim korumasını kur** düğmesi de bu karta götürür). Giriş, IP izin listesi, yol kuralları ve paylaşım ayarları koruma açıldığında görünür, kapatıldığında yeniden gizlenir. Kartı değiştirmek için servisi düzenleme yetkiniz olmalıdır; bu yetki yoksa kart salt okunur görünür.
+Koruma kapalıyken kartta yalnızca açma anahtarı görünür. Servis herkese açıkken sayfanın üstündeki **Genel erişim** özetinde bulunan **Erişim korumasını kur** düğmesi kartı **Komuta girişi iste** seçili olarak açar. Giriş, IP izin listesi, yol kuralları ve paylaşım ayarları koruma açıldığında görünür, kapatıldığında yeniden gizlenir. Kartı değiştirmek için servisi düzenleme yetkiniz olmalıdır; bu yetki yoksa kart salt okunur görünür.
 
 ---
 
@@ -18,17 +18,17 @@ Kartın **Kimler girebilir** bölümünde sitenin tamamına uygulanan iki kontro
 | Kontrol | Ne yapar |
 |---|---|
 | **Komuta girişi iste** | Ziyaretçi önce Komuta'ya giriş yapmaya yönlendirilir. Yalnızca **Paylaşılanlar** listesindeki bir paylaşımla eşleşen hesaplar içeri girer. |
-| **IP izin listesi** | Servise yalnızca listedeki genel adreslerden ulaşılabilir. Diğer adreslerden gelenler **Erişim kısıtlı** sayfasını görür (HTTP 403). |
+| **IP izin listesi** | Servise yalnızca listedeki genel adreslerden ulaşılabilir. **Biri yeterli** seçilmediyse diğer adreslerden gelenler **Erişim kısıtlı** sayfasını görür (HTTP 403). |
 
 Kontrollerin birlikte nasıl çalıştığı:
 
 - **İkisi birlikte açık** — kartta **Giriş ve IP izin listesi nasıl birleşsin?** sorusu çıkar:
   - **İkisi birden gereksin** (varsayılan) — ziyaretçinin listedeki bir adresten gelmesi **ve** giriş yapıp bir paylaşımla eşleşmesi gerekir. Listede olmayan adresler 403 alır.
-  - **Biri yeterli** — listedeki adreslerden gelenler giriş yapmadan girer; diğer adreslerden gelenler 403 almaz, Komuta giriş sayfasına yönlendirilir ve bir paylaşımla eşleşirlerse girer. Ofis ağından girişsiz, dışarıdan girişle erişim için kullanılır.
+  - **Biri yeterli** — listedeki adreslerden gelenler giriş yapmadan girer; diğer adreslerden gelenler 403 almaz, Komuta giriş sayfasına yönlendirilir; bir paylaşımla eşleşen hesaplar girer. Ofis ağından girişsiz, dışarıdan girişle erişim için kullanılır.
 - **Yalnızca IP izin listesi** — listedeki adreslerden gelenler giriş yapmadan girer, diğer herkes 403 alır.
 - **Yalnızca Komuta girişi** — adresi ne olursa olsun, paylaşımla eşleşen her hesap girer.
-- **İkisi de kapalı, yol kuralı var** — sitenin kendisi herkese açık kalır, yalnızca yol kurallarındaki yollar korunur (kart: "Belirli yollar korunuyor").
-- **İkisi de kapalı, yol kuralı yok** — korunacak bir şey yoktur; uygulamak korumayı kapatır ve servis herkese açılır.
+- **İkisi de kapalı, yol kuralı var** — sitenin kendisi herkese açık kalır, yalnızca yol kurallarındaki yollar korunur (sayfanın üstündeki **Genel erişim** özeti "Belirli yollar korunuyor" gösterir).
+- **İkisi de kapalı, yol kuralı yok** — korunacak bir şey yoktur; **Erişim koruması kapatılsın mı?** onayından sonra uygulamak korumayı kapatır ve servis herkese açılır.
 
 Ayarlar **Korumayı uygula** düğmesiyle kaydedilir.
 
@@ -56,13 +56,13 @@ Dışarıda kaldıysanız **Erişim kısıtlı** sayfası servisin gördüğü a
 
 ### Cloudflare gereksinimi
 
-IP izin listesi (site için ya da bir yol kuralında), servise gelen isteklerin Cloudflare üzerinden (proxied) geçmesini gerektirir. Komuta'nın ürettiği `*.komuta.app` adresleri ve **Alan Adları** altında eklenen özel domainler bu şekilde çalışır. IP izin listesi açıkken Cloudflare üzerinden gelmeyen istekler reddedilir.
+IP izin listesi (site için ya da bir yol kuralında), servise gelen isteklerin Cloudflare üzerinden (proxied) geçmesini gerektirir. Komuta'nın ürettiği `*.komuta.app` adresleri ve **Alan Adları** altında eklenen özel domainler bu şekilde çalışır. IP izin listesi açıkken Cloudflare üzerinden gelmeyen istekler reddedilir (**Biri yeterli** seçiliyse bunun yerine giriş sayfasına yönlendirilir).
 
 ---
 
 ## Yol Kuralları
 
-Yol kuralları, sitenin geri kalanına dokunmadan belirli yolları korur: örneğin site herkese açıkken `/admin`'i yalnızca giriş yapan ekibinize açmak, `/internal`'ı tamamen kapatmak ya da `/ops`'u ofis ağına sınırlamak. Kart üzerindeki **Yol kuralları** bölümünden **Yol kuralı ekle** ile eklenir ve **Korumayı uygula** ile kaydedilir.
+Yol kuralları, sitenin geri kalanına dokunmadan belirli yolları korur: örneğin site herkese açıkken `/admin`'i yalnızca giriş yapan ekibinize açmak, `/internal`'ı tamamen kapatmak ya da `/ops`'u ofis ağına sınırlamak. Karttaki **Yol kuralları** bölümünden **Yol kuralı ekle** ile eklenir ve **Korumayı uygula** ile kaydedilir.
 
 Her kural bir **Yol** ve bir **Koruma** türünden oluşur:
 
@@ -86,18 +86,18 @@ Bir istek hem sitenin kontrollerini **hem de** yoluyla eşleşen her kuralı ge�
 - Bir kural, yolun kendisiyle ve altındaki yollarla eşleşir: `/admin` kuralı `/admin` ve `/admin/ayarlar` ile eşleşir, `/administrator` ile eşleşmez.
 - Büyük/küçük harf fark etmez; `/Admin/` yazarsanız `/admin` olarak kaydedilir.
 - Sorgu dizesi (`?x=1`) eşleşmeyi etkilemez.
-- Kodlanmış karakterler (`%61dmin`), `//`, `/./`, `/../`, `;parametre` ve `\` gibi yazımlar kuralı atlatmak için kullanılamaz; Komuta isteği sunucunuzun okuyabileceği tüm biçimlerde kontrol eder. Okunamayacak kadar karmaşık ya da denetim karakteri içeren istekler HTTP 400 ile reddedilir.
+- Kodlanmış karakterler (`%61dmin`), `//`, `/./`, `/../`, `;parametre` ve `\` gibi yazımlar kuralı atlatmak için kullanılamaz; Komuta isteği sunucunuzun okuyabileceği tüm biçimlerde kontrol eder. Yol kuralı olan bir serviste yolu 1024 karakterden uzun, okunamayacak kadar karmaşık ya da kontrol karakteri içeren istekler HTTP 400 ile reddedilir.
 
 ### Yol yazım kuralları ve sınırlar
 
-- Yol `/` ile başlamalıdır ve yalnızca küçük harf, rakam ve `- . _ ~ ! $ & ' ( ) * + , = : @ /` içerebilir. Türkçe karakterler ve boşluk kullanılamaz.
+- Yol `/` ile başlamalıdır ve yalnızca küçük harf, rakam ve `- . _ ~ ! $ & ' ( ) * + , = : @ /` içerebilir. ASCII dışı karakterler (ör. Türkçe harfler) ve boşluk kullanılamaz.
 - Boş segment (`//`), `.` ve `..` segmentleri ile `.` ile biten segmentler kullanılamaz.
 - `/` tek başına kural olamaz; sitenin tamamı için yukarıdaki **Kimler girebilir** ayarlarını kullanın.
 - `/.komuta-access` ile başlayan yollar Komuta'ya ayrılmıştır.
-- Bir yol en fazla 256 karakter olabilir; aynı yol için tek kural tutulur.
+- Bir yol en fazla 256 karakter olabilir; her yol için yalnızca bir kural olabilir.
 - Bir serviste en fazla 50 yol kuralı olabilir.
 
-Kart hatalı bir kuralı yazarken gösterir ve kural düzeltilene kadar **Korumayı uygula** düğmesi kapalı kalır.
+Kart, hatalı bir kuralı siz yazarken işaretler ve kural düzeltilene kadar **Korumayı uygula** düğmesi kapalı kalır.
 
 ---
 
@@ -117,7 +117,7 @@ Kimlerin girebileceği kartın altındaki **Paylaşılanlar** listesinden **Payl
 Dikkat edilecekler:
 
 - Paylaşım eklemek için önce erişim korumasını açmanız gerekir.
-- Paylaşımlar yalnızca giriş isteyen bir ayar varken geçerlidir: **Komuta girişi iste**, **Biri yeterli** seçeneği ya da **Komuta girişi** içeren bir yol kuralı.
+- Paylaşımlar yalnızca giriş isteyen bir ayar varken geçerlidir: **Komuta girişi iste** ya da **Komuta girişi** içeren bir yol kuralı.
 - Giriş açık ama hiç paylaşım yoksa kimse girişten geçemez.
 - Her paylaşıma isteğe bağlı bir **Erişim bitişi** verilebilir. Boş bırakılırsa erişim siz kaldırana kadar sürer. Bitiş tarihi listedeki kalem simgesiyle sonradan değiştirilebilir; süresi dolan paylaşım **Süresi doldu** etiketiyle görünür.
 - Bir serviste en fazla 200 paylaşım olabilir.
@@ -153,13 +153,13 @@ Korumayı kapatmak paylaşımları silmez; korumayı tekrar açtığınızda ayn
 | IP izin listesindeki bir adresten gelmiyor (**İkisi birden gereksin** ya da yalnızca IP listesi) | **Erişim kısıtlı** sayfası (HTTP 403). |
 | IP izin listesindeki bir adresten gelmiyor (**Biri yeterli**) | Komuta giriş sayfası; giriş yapıp bir paylaşımla eşleşirse servis açılır. |
 | **Tamamen engelle** kuralındaki bir yolu açıyor | HTTP 403, "access denied". |
-| IP listesi isteyen bir yolu, listede olmayan bir adresten açıyor | **Erişim kısıtlı** sayfası (HTTP 403). |
+| IP listesi isteyen bir yolu, listede olmayan bir adresten açıyor (kural **Biri yeterli** kullanmıyorsa) | **Erişim kısıtlı** sayfası (HTTP 403). |
 
 **Erişiminiz yok** sayfası oturum açılan hesabı ve organizasyonu gösterir. Ziyaretçi buradan e-posta koduyla doğrulama yapabilir, **Başka bir organizasyonla devam et** ile üyesi olduğu başka bir organizasyona geçebilir ya da **Başka bir hesapla giriş yap** seçebilir.
 
 **Erişim kısıtlı** sayfası, servisin yalnızca izin verilen ağlardan açılabildiğini söyler ve servisin gördüğü adresi kopyalanabilir şekilde gösterir. Bu sayfada giriş seçeneği sunulmaz; adres listede değilse giriş yapmak da erişim sağlamaz. **Biri yeterli** seçiliyse bu sayfa yerine giriş sayfası gelir.
 
-Tarayıcı dışı istemciler için: giriş isteyen bir servise oturumsuz gelen `GET`/`HEAD` dışındaki istekler (örneğin bir API'ye `POST`) giriş sayfasına yönlendirilmez, HTTP 401 alır. Makineden makineye erişim gereken servislerde IP izin listesi daha uygundur.
+Tarayıcı dışı istemciler için: giriş isteyen bir servise ya da yola oturumsuz gelen `GET`/`HEAD` dışındaki istekler (örneğin bir API'ye `POST`) giriş sayfasına yönlendirilmez, HTTP 401 alır. Makineden makineye erişim gereken servislerde IP izin listesi daha uygundur.
 
 ---
 
@@ -183,13 +183,13 @@ Bu bölümdeki diğer düğmeler:
 
 ## Servis koruması sihirbazı
 
-Servis genel bakışındaki koruma kartında **Korumayı ayarla** (koruma açıksa **Korumayı düzenle**) düğmesi **Servis koruması** sihirbazını açar. Sihirbaz, karttaki ayarların aynısını adım adım sorar; gözden geçirip uygulayana kadar hiçbir ayar değişmez.
+Servis genel bakışında **Servis koruması** kartına tıklayın (**Korumayı ayarla**; koruma açıksa **Korumayı yönet**). Açılan pencere mevcut korumayı gösterir; buradaki **Korumayı ayarla** (koruma açıksa **Korumayı düzenle**) düğmesi sihirbazı başlatır. Sihirbaz, karttaki ayarların aynısını adım adım sorar; gözden geçirip uygulayana kadar hiçbir ayar değişmez.
 
-1. **Koruma yöntemi** — **Komuta ile oturum açma**, **Belirli IP adresleri**, **Oturum açma ve belirli IP’ler** (burada **İkisi birden gereksin** ya da **Biri yeterli** seçilir), **Yalnızca yol kuralları** ya da **Herkese aç**.
+1. **Koruma yöntemi** — **Komuta ile oturum açma**, **Belirli IP adresleri**, **Oturum açma ve belirli IP’ler** (burada **İkisi birden gereksin** ya da **Biri yeterli** seçilir) ya da **Yalnızca yol kuralları** (yol kuralları kullanılabildiğinde).
 2. **İzin verilen adresler** — IP kullanan yöntemlerde.
 3. **Yol kuralları** — isteğe bağlı; **Yalnızca yol kuralları** seçildiyse en az bir kural gerekir.
 4. **Kimler oturum açabilir?** — site ya da bir yol kuralı giriş istiyorsa; paylaşımlar burada eklenir.
-5. **Süre** — koruma bitişi.
+5. **Süre** — koruma bitişi ve bitiş geldiğinde ne olacağı (**Koruma kurallarını sürdür** ya da **Herkese aç**).
 6. **Değişiklikleri gözden geçir** — **Korumayı uygula** ile kaydedilir.
 
 ---

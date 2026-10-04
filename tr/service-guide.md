@@ -17,7 +17,7 @@ Servis yönetimi paneline erişmek için proje listesinden bir servisin adına t
 | **Ingress Management** | Giriş kuralları, hostname ve trafik yapılandırması |
 | **HPA** | Otomatik ölçekleme (Horizontal Pod Autoscaler) ayarları |
 | **Resources** | CPU ve bellek kaynak limitleri |
-| **Ports** | Servis port yapılandırması |
+| **Erişim ve portlar** | Erişim koruması ve servis port yapılandırması |
 | **Storage** | Longhorn destekli kalıcı disk (PVC) yönetimi |
 | **Health Probes** | Sağlık kontrol (Liveness/Readiness) ayarları |
 | **Alert Management** | Servise özel uyarı kuralları |

@@ -7,7 +7,7 @@ Access protection is included in every plan. It is managed in two places:
 - The **Access protection** card on the **Service Detail → Configuration → Access & ports** page — every setting is here.
 - The **Service protection** wizard, opened from the protection card on the service overview — to set up or edit protection step by step (see [Service protection wizard](#service-protection-wizard)).
 
-While protection is off, the card only shows its on/off switch (the **Set up access protection** button at the top of the page leads to the same card). Sign-in, the IP allow-list, path rules and share settings appear when protection is turned on and are hidden again when it is turned off. You need permission to edit the service to change the card; without it, the card is read-only.
+While protection is off, the card only shows its on/off switch. While the service is open to everyone, the **Set up access protection** button in the **Public exposure** summary at the top of the page turns the card on with **Require Komuta sign-in** already selected. Sign-in, the IP allow-list, path rules and share settings appear when protection is turned on and are hidden again when it is turned off. You need permission to edit the service to change the card; without it, the card is read-only.
 
 ---
 
@@ -18,17 +18,17 @@ The **Who can get in** section of the card has two controls that apply to the wh
 | Control | What it does |
 |---|---|
 | **Require Komuta sign-in** | Visitors are sent to Komuta to sign in first. Only accounts matching a share in the **Shared with** list get in. |
-| **IP allow-list** | The service can only be reached from the public addresses in the list. Visitors from other addresses see the **Access restricted** page (HTTP 403). |
+| **IP allow-list** | The service can only be reached from the public addresses in the list. Visitors from other addresses see the **Access restricted** page (HTTP 403), unless **Either is enough** is chosen. |
 
 How the controls combine:
 
-- **Both on** — the card asks **How should sign-in and the IP allow-list combine?**:
+- **Both on** — the card asks how they combine (**How should sign-in and the IP allow-list combine?**).
   - **Require both** (default) — the visitor must come from a listed address **and** sign in with an account that matches a share. Other addresses get 403.
   - **Either is enough** — visitors from listed addresses get in without signing in; visitors from other addresses don't get 403, they are sent to Komuta sign-in and get in if they match a share. Use it for sign-in-free access from the office network and sign-in from anywhere else.
 - **IP allow-list only** — visitors from listed addresses get in without signing in; everyone else gets 403.
 - **Komuta sign-in only** — every account that matches a share gets in, from any address.
-- **Both off, with path rules** — the site itself stays open to everyone; only the paths in your path rules are protected (card: "Specific paths are protected").
-- **Both off, no path rules** — there is nothing to protect; applying turns protection off and the service opens to everyone.
+- **Both off, with path rules** — the site itself stays open to everyone; only the paths in your path rules are protected (the **Public exposure** summary at the top of the page shows "Specific paths are protected").
+- **Both off, no path rules** — there is nothing to protect; after a **Turn off access protection?** confirmation, applying turns protection off and the service opens to everyone.
 
 Settings are saved with the **Apply protection** button.
 
@@ -56,7 +56,7 @@ If you are locked out, the **Access restricted** page shows the address the serv
 
 ### Cloudflare requirement
 
-The IP allow-list (for the site or in a path rule) requires requests to the service to go through Cloudflare (proxied). Komuta-generated `*.komuta.app` hosts and custom domains added under **Domains** work this way. While the IP allow-list is on, requests that don't come through Cloudflare are refused.
+The IP allow-list (for the site or in a path rule) requires requests to the service to go through Cloudflare (proxied). Komuta-generated `*.komuta.app` hosts and custom domains added under **Domains** work this way. While the IP allow-list is on, requests that don't come through Cloudflare are refused (with **Either is enough** they are sent to sign-in instead).
 
 ---
 
@@ -86,7 +86,7 @@ A request must pass the site's controls **and** every rule that matches its path
 - A rule matches the path itself and the paths under it: a `/admin` rule matches `/admin` and `/admin/settings`, not `/administrator`.
 - Matching is case-insensitive; if you type `/Admin/` it is saved as `/admin`.
 - The query string (`?x=1`) doesn't affect matching.
-- Encoded characters (`%61dmin`), `//`, `/./`, `/../`, `;parameters` and `\` can't be used to get around a rule; Komuta checks the request in every form your server could read it. Requests too convoluted to read, or containing control characters, are refused with HTTP 400.
+- Encoded characters (`%61dmin`), `//`, `/./`, `/../`, `;parameters` and `\` can't be used to get around a rule; Komuta checks the request in every form your server could read it. On a service with path rules, requests whose path is longer than 1024 characters, too convoluted to read, or containing control characters are refused with HTTP 400.
 
 ### Path format and limits
 
@@ -117,7 +117,7 @@ Who can get in is set with **Add share** in the **Shared with** list at the bott
 Things to keep in mind:
 
 - You need to turn on access protection before you can add shares.
-- Shares only apply while something requires sign-in: **Require Komuta sign-in**, the **Either is enough** option, or a path rule that includes **Komuta sign-in**.
+- Shares only apply while something requires sign-in: **Require Komuta sign-in**, or a path rule that includes **Komuta sign-in**.
 - If sign-in is on but there are no shares, nobody can get past sign-in.
 - Each share can have an optional **Access ends** date. Leave it empty to keep access until you remove it. You can change the date later with the pencil icon in the list; an expired share is shown with the **Expired** label.
 - A service can have at most 200 shares.
@@ -153,13 +153,13 @@ Turning protection off does not delete your shares; if you turn protection back 
 | Not coming from an address in the IP allow-list (**Require both**, or IP allow-list only) | The **Access restricted** page (HTTP 403). |
 | Not coming from an address in the IP allow-list (**Either is enough**) | The Komuta sign-in page; the service opens if they sign in and match a share. |
 | Opening a path with a **Block completely** rule | HTTP 403, "access denied". |
-| Opening a path that requires an IP list from an address not in it | The **Access restricted** page (HTTP 403). |
+| Opening a path that requires an IP list from an address not in it (unless the rule uses **Either is enough**) | The **Access restricted** page (HTTP 403). |
 
 The **You don't have access** page shows the signed-in account and organization. From there the visitor can verify with an email code, choose **Continue with another organization** to switch to another organization they belong to, or choose **Sign in with another account**.
 
 The **Access restricted** page says the service can only be opened from allowed networks and shows the address the service saw, with a copy button. No sign-in option is offered on this page; if the address is not in the list, signing in does not grant access either. With **Either is enough**, the sign-in page appears instead of this page.
 
-For non-browser clients: on a service that requires sign-in, requests without a session that are not `GET`/`HEAD` (for example a `POST` to an API) are not redirected to sign-in; they receive HTTP 401. For services that need machine-to-machine access, the IP allow-list is a better fit.
+For non-browser clients: on a service (or a path) that requires sign-in, requests without a session that are not `GET`/`HEAD` (for example a `POST` to an API) are not redirected to sign-in; they receive HTTP 401. For services that need machine-to-machine access, the IP allow-list is a better fit.
 
 ---
 
@@ -183,13 +183,13 @@ Other buttons in this section:
 
 ## Service protection wizard
 
-On the service overview, the protection card's **Set up protection** button (**Edit protection** if protection is on) opens the **Service protection** wizard. It asks for the same settings as the card, step by step; nothing changes until you review and apply.
+On the service overview, click the **Service protection** card (**Set up protection**, or **Manage protection** when protection is on). The window shows the current protection; **Set up protection** (**Edit protection** when protection is on) starts the wizard. It asks for the same settings as the card, step by step; nothing changes until you review and apply.
 
-1. **Protection method** — **Komuta sign-in**, **Specific IP addresses**, **Sign-in and specific IPs** (choose **Require both** or **Either is enough** here), **Path rules only**, or **Open to everyone**.
+1. **Protection method** — **Komuta sign-in**, **Specific IP addresses**, **Sign-in and specific IPs** (choose **Require both** or **Either is enough** here), or **Path rules only** (offered when path rules are available).
 2. **Allowed addresses** — for methods that use IPs.
 3. **Path rules** — optional; at least one rule is required with **Path rules only**.
 4. **Who can sign in?** — when the site or a path rule requires sign-in; shares are added here.
-5. **Duration** — the protection end date.
+5. **Duration** — the protection end date and what happens when it is reached (**Keep the protection rules** or **Open to everyone**).
 6. **Review changes** — saved with **Apply protection**.
 
 ---
