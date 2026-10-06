@@ -130,7 +130,7 @@ Korumayı servis genel bakışındaki **Servis koruması** kartından da adım a
 |---|---|---|
 | **Kapalı** | Koruma yok; servis herkese açık. | Hayır |
 | **Hazırlanıyor** | Ayarlarınız ağ geçidine yazılıyor. | Hayır |
-| **Uygulanıyor** | Kontrol devrede; pod kilidi ve önbellek temizliği tamamlanıyor. | Evet |
+| **Uygulanıyor** | Kontrol devrede; pod kilidi ve önbellek temizliği tamamlanıyor. | Evet (ilk saniyelerde rotalar yenilenirken kısa bir gecikme olabilir) |
 | **Korunuyor** | Koruma tamamen yerinde. | Evet |
 | **Kapatılıyor** | Koruma kaldırılıyor; bitince URL'e sahip herkes servisi açabilir. | Son adıma kadar evet |
 
@@ -150,11 +150,11 @@ Kutu başlığı: "Bu düzeltilene kadar koruma tamamlanamaz."
 
 | Kod | Mesaj (ilk cümle) | Ne yapmalı |
 |---|---|---|
-| `service_not_deployed` | Bu servis henüz dağıtılmadı. Koruma, ilk başarılı dağıtımdan sonra uygulanır. | Servisi dağıtın. |
-| `no_hosts` | Bu servisin korunabilecek genel bir adresi yok. Önce genel URL'ini açın. | **Ağ** sekmesinden **Genel URL**'i açın. |
+| `service_not_deployed` | Bu servis henüz dağıtılmadı. | Servisi dağıtın. |
+| `no_hosts` | Bu servisin korunabilecek genel bir adresi yok. | **Ağ** sekmesinden **Genel URL**'i açın. |
 | `too_many_hosts` | Bu servisin domain sayısı tek bir koruma politikasının kapsayabileceğinden fazla. | Kullanmadığınız özel alan adlarını kaldırın (sınır: 50 adres). |
 | `host_invalid` | Bu servisin yönlendirme host adlarından biri geçerli bir domain adı değil. | Alan adını düzeltin ya da kaldırın. |
-| `host_not_owned` | Bu servis, kendi doğrulanmış domainlerinden olmayan bir domaini yönlendiriyor. | Alan adını bu servis için doğrulayın ya da kaldırın. |
+| `host_not_owned` | Bu servis, kendi doğrulanmış domainlerinden olmayan bir domaini yönlendiriyor; bu yüzden koruma onu kapsayamaz. | Alan adını bu servis için doğrulayın ya da kaldırın. |
 | `host_claimed_elsewhere` | Bu servisin domainlerinden biri zaten başka bir servis tarafından korunuyor. | Alan adını iki servisten birinden kaldırın. |
 | `host_not_public` | Bu servisin domainlerinden biri özel ya da ayrılmış bir adresi işaret ediyor. | DNS kaydını Komuta'ya yönlendirin ya da kaldırın. |
 | `host_dns_unresolved` | Bu servisin domainlerinden biri DNS'te henüz çözümlenmiyor. | DNS kaydını kontrol edin; çözümlendiğinde koruma kendiliğinden devam eder. |
@@ -211,7 +211,7 @@ Servis genel bakışında (dashboard) **Servis koruması** kartı korumanın dur
 1. **Koruma yöntemi** — **Komuta ile oturum açma**, **Belirli IP adresleri**, **Oturum açma ve belirli IP’ler** (burada **İkisi birden gereksin** ya da **Biri yeterli** seçilir) ya da **Yalnızca yol kuralları**.
 2. **İzin verilen adresler** — IP kullanan yöntemlerde.
 3. **Yol kuralları** — isteğe bağlı; **Yalnızca yol kuralları** seçildiyse en az bir kural gerekir.
-4. **Kimler oturum açabilir?** — giriş gerekiyorsa; paylaşımlar burada eklenir. Siz listeye otomatik eklenirsiniz ("(siz)"); erişiminiz olmaması gerekiyorsa kendinizi kaldırabilirsiniz.
+4. **Kimler oturum açabilir?** — giriş gerekiyorsa ve paylaşımları yönetme izniniz varsa; paylaşımlar burada eklenir. Siz listeye otomatik eklenirsiniz ("(siz)"); erişiminiz olmaması gerekiyorsa kendinizi kaldırabilirsiniz.
 5. **Süre** — koruma bitişi ve tarih geldiğinde ne olacağı (**Koruma kurallarını sürdür** ya da **Herkese aç**).
 6. **Değişiklikleri gözden geçir** — mevcut ve yeni ayarlar yan yana; **Korumayı uygula** ile kaydedilir.
 

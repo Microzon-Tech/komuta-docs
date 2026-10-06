@@ -25,12 +25,12 @@ Başarılı bir girişten sonra ziyaretçinin tarayıcısına servisin kendi adr
 - Komuta'nın çerezleri isteğe uygulamanıza ulaşmadan önce çıkarılır; uygulamanız bu çerezleri görmez ve etkilenmez.
 - Girişin yaklaşık 10 dakika içinde tamamlanması gerekir. Ziyaretçi daha uzun beklerse konsol **Bu giriş bağlantısı geçersiz** der ya da servis kısa bir `sign-in link is invalid or expired` yanıtı verir; korunan sayfayı yeniden açması yeterlidir.
 
-Oturumlar servis başına tek bir sayaçla yönetilir. Aşağıdaki durumlardan biri olduğunda, yalnızca ilgili kişinin değil **bu servisteki tüm ziyaretçilerin** açık oturumları yaklaşık 30 saniye içinde sona erer. Erişimi devam edenler bir sonraki sayfa açılışında yeniden giriş yapar: Komuta'ya zaten giriş yapmış olanlar için bu otomatik bir yönlendirmedir, e-posta paylaşımıyla girenler yeni bir kod ister. Bu arada tarayıcı dışı istekler (örneğin bir tek sayfa uygulamasının `POST` istekleri) sayfa yenilenene kadar `401` alabilir.
+Komuta tek bir kişinin oturumunu ayrıca kapatamaz. Aşağıdaki durumlardan biri olduğunda, yalnızca ilgili kişinin değil **bu servisteki tüm ziyaretçilerin** açık oturumları yaklaşık 30 saniye içinde sona erer. Erişimi devam edenler bir sonraki sayfa açılışında yeniden giriş yapar: Komuta'ya zaten giriş yapmış olanlar için bu otomatik bir yönlendirmedir, e-posta paylaşımıyla girenler yeni bir kod ister. Bu arada tarayıcı dışı istekler (örneğin bir tek sayfa uygulamasının `POST` istekleri) sayfa yenilenene kadar `401` alabilir.
 
-- Bir paylaşımı kaldırdığınızda ya da bitiş tarihini öne çektiğinizde.
-- Paylaşımın sayfa kapsamını daralttığınızda.
-- Organizasyonunuz dış paylaşımı kapattığında (bağlı organizasyon ve e-posta paylaşımlarıyla girenler için).
-- Ziyaretçinin Komuta hesabında güvenlikle ilgili bir değişiklik olduğunda: hesap silindiğinde, kilitlendiğinde ya da devre dışı bırakıldığında, giriş bilgileri veya iki adımlı doğrulama değiştiğinde, e-posta adresi artık doğrulanmış olmadığında, hesap bağlantısı kaldırıldığında ya da organizasyonu askıya alındığında.
+- Bir paylaşımı kaldırdığınızda, bitiş tarihini öne çektiğinizde ya da bitişi olmayan bir paylaşıma bitiş eklediğinizde.
+- Sayfa sınırlı bir paylaşımın sayfa listesini değiştirdiğinizde (sayfa eklemek dahil; **Tüm site**'ye geçmek hariç).
+- Organizasyonunuz dış paylaşımı kapattığında (dış paylaşımı olan servislerde; dış paylaşımla girenler erişimini kaybeder, diğerleri bir kez yeniden giriş yapar).
+- Ziyaretçinin Komuta hesabında güvenlikle ilgili bir değişiklik olduğunda: hesap silindiğinde, kilitlendiğinde ya da devre dışı bırakıldığında, giriş bilgileri veya iki adımlı doğrulama değiştiğinde, e-posta adresi artık doğrulanmış olmadığında, hesap bağlantısı kaldırıldığında ya da organizasyonu askıya alındığında (bu durumda bir dakikayı biraz aşabilir).
 
 ### Giriş yapamayanlar
 
@@ -55,7 +55,7 @@ Giriş isteyen bir sayfaya oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayf
 | **Tamamen engelle** kuralındaki bir yolu açtı | `403`, düz metin `access denied`. |
 | Servis artık giriş istemiyor ama ziyaretçi eski bir giriş bağlantısıyla geldi | **Bu servis Komuta girişi istemiyor**. |
 | Giriş şu an kontrol edilemiyor | **Giriş şu anda kullanılamıyor** ve **Tekrar dene** düğmesi. |
-| Komuta'nın erişim kontrolü geçici olarak yanıt veremiyor | `503`, düz metin `access policy unavailable` ya da `sign-in unavailable`. Servis bu sırada kimseye açılmaz; kısa süre sonra tekrar deneyin. |
+| Komuta'nın erişim kontrolü geçici olarak yanıt veremiyor | `503`, düz metin `access policy unavailable` ya da `sign-in unavailable`. `access policy unavailable` olduğunda servis kimseye açılmaz; `sign-in unavailable` yalnızca giriş isteyen sayfaları etkiler. Kısa süre sonra tekrar deneyin. |
 
 Servisinizin içinde gösterilen **Erişim kısıtlı** ve **Bu sayfaya erişiminiz yok** sayfaları, ziyaretçinin tarayıcı dili Türkçe ise Türkçe, değilse İngilizce görünür. `GET`/`HEAD` dışındaki istekler (tarayıcıdan ya da programdan) bu sayfalar yerine kısa düz metin alır: `access restricted to allowed networks` ya da `this path is not shared with you`.
 
@@ -108,7 +108,7 @@ Her satırda paylaşımın adı, varsa sayfa sınırı ("Yalnızca: /a, /b") ve 
 - **Askıda** — dış paylaşım kapatıldığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
 - **Süresi doldu** — bitiş zamanı geçmiş paylaşım. Listede kalır; kalem simgesiyle yeni bir bitiş verilebilir.
 
-Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak açık oturumları etkilemez. Bitişi öne çekmek ya da sayfa sınırını daraltmak bu servisteki tüm açık oturumları sonlandırır; herkes bir kez yeniden giriş yapar (bkz. [Oturum](#oturum)).
+Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak, bitişi kaldırmak ya da paylaşımı **Tüm site**'ye açmak açık oturumları etkilemez. Bitiş eklemek, bitişi öne çekmek ya da sayfa listesini değiştirmek bu servisteki tüm açık oturumları sonlandırır; herkes bir kez yeniden giriş yapar (bkz. [Oturum](#oturum)).
 
 ### Paylaşımı kaldırma
 
@@ -137,7 +137,7 @@ E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması ge
 Kurallar:
 
 - Kod yalnızca isteyen Komuta hesabında çalışır ve tek kullanımlıktır. Her girişte yeni kod gerekir; e-posta paylaşımıyla açılan oturum da en fazla 12 saat sürer.
-- Bir kod 5 hatalı denemeden sonra geçersiz olur.
+- Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez.
 - Kod isteme sınırları: bir kullanıcı saatte en fazla 20 kod, aynı adres için saatte en fazla 5 kod isteyebilir. Aynı Komuta hesabıyla, aynı servis için bir adrese saatte en fazla 3 kod gönderilir; tarayıcı ya da cihaz değiştirmek bunu sıfırlamaz ve sınırdan sonra ekran yine "kod gönderdik" dese de e-posta gitmez. Yeniden göndermeden önce 30, 60 ve 120 saniye beklenir.
 - Ekran, adresin erişimi olsa da olmasa da aynı cevabı verir ("{adres} adresinin bu sayfaya erişimi varsa, adrese {uzunluk} haneli bir kod gönderdik."); böylece hangi adreslerle paylaşım yapıldığı tahmin edilemez.
 - Giriş bağlantısının süresi kodun süresinden önce doluyorsa ekran "Bu giriş bağlantısının süresi, kodun süresinden önce doluyor." der; korunan sayfayı yeniden açıp hemen kod istemek gerekir. Kodu istedikten sonra beklemeden girin: giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 10 dakika içinde tamamlanmalıdır.
@@ -159,7 +159,7 @@ Kurallar:
 İzni kapatırsanız:
 
 - Organizasyonun tüm korunan servislerindeki bağlı organizasyon ve e-posta paylaşımları **Askıda** olur.
-- Bu paylaşımlarla giriş yapmış kişilerin erişimi hemen sona erer.
+- Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer; bu servislerdeki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 - Yeni dış paylaşım eklenemez.
 
 İzni yeniden açarsanız e-posta paylaşımları geri gelir; bağlı organizasyon paylaşımları ise iki organizasyon arasındaki bağ hâlâ sürüyorsa geri gelir. Komuta bağı 5 dakikada bir denetler; bağ koptuysa (iki organizasyon arasında birbirine bağlı ve aktif hiçbir kullanıcı hesabı kalmadıysa) bağlı organizasyon paylaşımı askıya alınır.

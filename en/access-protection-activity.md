@@ -19,7 +19,7 @@ The log is kept while access protection is on. While protection is off the tab s
 What is **not** recorded:
 
 - **File requests.** Only `GET` requests whose last path segment has no dot count as page views. Requests such as `/app.js`, `/logo.png` or `/style.css` aren't recorded, so the log shows real page openings.
-- **Visits where sign-in isn't needed.** Page views are recorded only on pages that need sign-in, for signed-in visitors and tokens. Nobody is recorded on paths open to everyone or on pages passed without sign-in thanks to the IP list, even if the visitor has signed in.
+- **Visits where sign-in isn't needed.** Page views are recorded only on pages that need sign-in, for signed-in visitors and tokens. Nobody is recorded on unprotected paths (paths with no check at all; webhook paths excepted) or on pages passed without sign-in thanks to the IP list, even if the visitor has signed in.
 - **Redirects to sign-in.** Sending a visitor who hasn't signed in to the sign-in page, and the `401` returned to programs without a session, are not refusals and don't appear in the log.
 - **Platform-side problems.** A response that couldn't be given because of a temporary fault on Komuta's side doesn't count as a visitor refusal.
 - **Komuta's signed test sign-in.** To confirm protection works, Komuta sends a test request that acts as signed in; it isn't written to the log. The anonymous checks made while protection is being turned on may, however, show up as a few **Not signed in** refusals on services with an IP list or a **Block completely** rule.

@@ -36,7 +36,7 @@ Access protection guides:
 | Email code requests | 20 per user per hour; 5 per user and address per hour; 3 sends per hour per Komuta account, service and address (30/60/120 s waits) |
 | Request path (on a service with path rules or page limits) | At most 1024 bytes; longer gets `400` |
 | Access log | Kept 30 days; 15 s batches; 500 rows per service per hour (sign-ins excluded); 50 records per page |
-| Access ending after a share is removed | About 30 seconds (all sessions of the service are renewed) |
+| Access ending after a share is removed | About 30 seconds (every session of the service ends; everyone signs in again) |
 | Identity JWT | Valid 5 minutes; `nbf` = `iat` − 30 s |
 
 ---
@@ -47,7 +47,7 @@ Access protection guides:
 |---|---|---|---|
 | `Disabled` | Off | Kapalı | No |
 | `Preparing` | Preparing | Hazırlanıyor | No |
-| `Enforcing` | Applying | Uygulanıyor | Yes |
+| `Enforcing` | Applying | Uygulanıyor | Yes (a short delay is possible in the first seconds) |
 | `Protected` | Protected | Korunuyor | Yes |
 | `Disabling` | Turning off | Kapatılıyor | Until the last step |
 
@@ -233,7 +233,7 @@ If you use Komuta sign-in, yes. Creating an account is free and takes seconds wi
 The `OPTIONS` preflight request a browser sends carries no cookies, so it gets `401` on a path that requires sign-in. `OPTIONS` can't be chosen on webhook paths either. Keep endpoints that a browser must call from another site outside protection (turn site-wide protection off and protect only the other paths with path rules), or make the request from your server instead.
 
 **I turned protection on, but the site still opens without sign-in.**
-Check the status badge: during **Preparing** the check isn't active yet. If it shows **Applying** or **Protected**, your browser may have opened the page from its cache; reload the page. If the problem persists, check the card for a warning.
+Check the status badge: during **Preparing** the check isn't active yet. In the first seconds of **Applying** the routes may still be refreshing; wait a moment and reload. If it shows **Protected**, your browser may have served the page from its cache; reload the page. If the problem persists, check the card for a warning.
 
 **I locked myself out.**
 The Komuta console isn't affected by protection. In the console, go to the **Rules** tab and add your new address to the IP list (you can see your address on the **Access to this service is restricted** page), or remove protection with **Settings → Open to everyone now**.
@@ -245,7 +245,7 @@ Protection applies while it sleeps too. Only a visitor who passes the checks can
 Yes, within about 30 seconds, including their open sessions. The other visitors of the service sign in once more too.
 
 **Can I sign out one person individually?**
-There is no per-person sign-out. Removing a share or bringing its end date forward cuts that person's access, but also ends **every** open session of this service: everyone signs in again on their next page load (automatic for people already signed in to Komuta; people who came in through an email share request a new code). To remove a single person who came in through an organization share, remove them from the organization.
+There is no per-person sign-out. Removing a share or bringing its end date forward (or adding an end date, or changing the page list) cuts that person's access, but also ends **every** open session of this service: everyone signs in again on their next page load (automatic for people already signed in to Komuta; people who came in through an email share request a new code). To remove a single person who came in through an organization share, remove them from the organization.
 
 **Can I export the access log?**
 Not at the moment. The log is visible in the console for 30 days.

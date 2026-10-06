@@ -36,7 +36,7 @@ Erişim koruması rehberleri:
 | E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
 | Erişim kaydı | 30 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
-| Paylaşım kaldırıldıktan sonra erişimin kesilmesi | Yaklaşık 30 saniye (servisteki tüm oturumlar yenilenir) |
+| Paylaşım kaldırıldıktan sonra erişimin kesilmesi | Yaklaşık 30 saniye (servisteki tüm oturumlar sona erer; herkes yeniden giriş yapar) |
 | Kimlik JWT'si | 5 dakika geçerli; `nbf` = `iat` − 30 sn |
 
 ---
@@ -47,7 +47,7 @@ Erişim koruması rehberleri:
 |---|---|---|---|
 | `Disabled` | Kapalı | Off | Hayır |
 | `Preparing` | Hazırlanıyor | Preparing | Hayır |
-| `Enforcing` | Uygulanıyor | Applying | Evet |
+| `Enforcing` | Uygulanıyor | Applying | Evet (ilk saniyelerde kısa bir gecikme olabilir) |
 | `Protected` | Korunuyor | Protected | Evet |
 | `Disabling` | Kapatılıyor | Turning off | Son adıma kadar |
 
@@ -233,7 +233,7 @@ Giriş gerektiren bir yola oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayf
 Tarayıcının gönderdiği `OPTIONS` ön uçuş isteği çerez taşımaz; giriş gerektiren bir yolda `401` alır. Webhook yollarında da `OPTIONS` seçilemez. Başka bir siteden tarayıcıyla çağrılması gereken uç noktaları korumanın dışında tutmak için o yolları korumasız bırakın (site korumasını kapatıp yalnızca diğer yolları yol kurallarıyla koruyarak) ya da isteği sunucu tarafından yapın.
 
 **Korumayı açtım ama hâlâ giriş istemeden açılıyor.**
-Durum etiketine bakın: **Hazırlanıyor** sırasında kontrol henüz devrede değildir. **Uygulanıyor** ya da **Korunuyor** görünüyorsa tarayıcınızda önbellekten açılmış olabilir; sayfayı yenileyin. Sorun sürüyorsa kartta bir uyarı olup olmadığına bakın.
+Durum etiketine bakın: **Hazırlanıyor** sırasında kontrol henüz devrede değildir. **Uygulanıyor**'un ilk saniyelerinde yönlendirmeler henüz yenileniyor olabilir; biraz bekleyip sayfayı yenileyin. **Korunuyor** görünüyorsa tarayıcınız sayfayı önbellekten açmış olabilir; sayfayı yenileyin. Sorun sürüyorsa kartta bir uyarı olup olmadığına bakın.
 
 **Kendimi dışarıda bıraktım.**
 Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP listesine yeni adresinizi ekleyin (adresinizi **Erişim kısıtlı** sayfasında görebilirsiniz) ya da **Ayarlar → Şimdi herkese aç** ile korumayı kaldırın.
@@ -245,7 +245,7 @@ Koruma uyurken de geçerlidir. Servisi ancak kontrolleri geçen bir ziyaretçi u
 Evet, açık oturumları dahil yaklaşık 30 saniye içinde. Servisteki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 
 **Bir kişiyi tek tek oturumdan çıkarabilir miyim?**
-Kişi bazında oturum kapatma yoktur. Bir paylaşımı kaldırmak ya da bitişini öne çekmek o kişinin erişimini keser, ancak bu servisteki **tüm** açık oturumları da sonlandırır: herkes bir sonraki sayfa açılışında yeniden giriş yapar (Komuta'ya zaten giriş yapmış olanlar için bu otomatiktir; e-posta paylaşımıyla girenler yeni kod ister). Organizasyon paylaşımıyla giren tek bir kişiyi çıkarmak için o kişiyi organizasyondan çıkarın.
+Kişi bazında oturum kapatma yoktur. Bir paylaşımı kaldırmak ya da bitişini öne çekmek (ya da bitiş eklemek, sayfa listesini değiştirmek) o kişinin erişimini keser, ancak bu servisteki **tüm** açık oturumları da sonlandırır: herkes bir sonraki sayfa açılışında yeniden giriş yapar (Komuta'ya zaten giriş yapmış olanlar için bu otomatiktir; e-posta paylaşımıyla girenler yeni kod ister). Organizasyon paylaşımıyla giren tek bir kişiyi çıkarmak için o kişiyi organizasyondan çıkarın.
 
 **Erişim kaydını dışa aktarabilir miyim?**
 Şu an hayır. Kayıt konsolda 30 gün görünür.

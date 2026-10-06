@@ -19,7 +19,7 @@ Kayıt, erişim koruması açıkken tutulur. Koruma kapalıyken sekme "Erişim k
 Neler **kaydedilmez**:
 
 - **Dosya istekleri.** Sayfa görüntüleme olarak yalnızca `GET` istekleri ve son bölümünde nokta olmayan yollar sayılır. `/app.js`, `/logo.png`, `/style.css` gibi istekler kaydedilmez; böylece kayıt gerçek sayfa açılışlarını gösterir.
-- **Girişin gerekmediği yerlerdeki ziyaretler.** Sayfa açılışları yalnızca girişin gerektiği sayfalarda, giriş yapmış ziyaretçiler ve token'lar için kaydedilir. Herkese açık yollarda ve IP listesiyle girişsiz geçilen sayfalarda kimse kaydedilmez; ziyaretçi giriş yapmış olsa bile.
+- **Girişin gerekmediği yerlerdeki ziyaretler.** Sayfa açılışları yalnızca girişin gerektiği sayfalarda, giriş yapmış ziyaretçiler ve token'lar için kaydedilir. Korumasız yollarda (hiçbir kontrolün uygulanmadığı yollar; webhook yolları hariç) ve IP listesiyle girişsiz geçilen sayfalarda kimse kaydedilmez; ziyaretçi giriş yapmış olsa bile.
 - **Giriş sayfasına yönlendirmeler.** Giriş yapmamış bir ziyaretçinin giriş sayfasına gönderilmesi ve oturumsuz program isteklerine dönen `401` ret sayılmaz; kayıtta görünmez.
 - **Platform kaynaklı sorunlar.** Komuta tarafındaki geçici bir arıza yüzünden verilemeyen cevaplar ziyaretçi retti sayılmaz.
 - **Komuta'nın imzalı test girişi.** Komuta, korumanın çalıştığını doğrulamak için giriş yapmış gibi bir test isteği gönderir; bu kayda yazılmaz. Koruma açılırken yapılan anonim kontroller ise IP listesi ya da **Tamamen engelle** kuralı olan servislerde birkaç **Giriş yapmamış** reddi olarak görünebilir.

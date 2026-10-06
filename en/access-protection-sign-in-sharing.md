@@ -25,12 +25,12 @@ After a successful sign-in, a session cookie for the service's own address is st
 - Komuta's cookies are removed from the request before it reaches your application; your application never sees or is affected by them.
 - Sign-in must be completed within about 10 minutes. If the visitor waits longer, the console says **This sign-in link isn't valid** or the service answers with a short `sign-in link is invalid or expired`; opening the protected page again is enough.
 
-Sessions are managed with a single counter per service. When one of the following happens, the open sessions of **every visitor of this service** end within about 30 seconds, not only those of the person concerned. People who still have access sign in again on their next page load: for those already signed in to Komuta this is an automatic redirect, while people who came in through an email share request a new code. Meanwhile non-browser requests (for example the `POST` calls of a single-page app) may get `401` until the page is reloaded.
+Komuta can't sign out one person on their own. When one of the following happens, the open sessions of **every visitor of this service** end within about 30 seconds, not only those of the person concerned. People who still have access sign in again on their next page load: for those already signed in to Komuta this is an automatic redirect, while people who came in through an email share request a new code. Meanwhile non-browser requests (for example the `POST` calls of a single-page app) may get `401` until the page is reloaded.
 
-- You remove a share or bring its end date forward.
-- You narrow the share's page scope.
-- Your organization turns off external sharing (for people who came in through linked organization or email shares).
-- Something security-related changes on the visitor's Komuta account: the account is deleted, locked or deactivated, its sign-in credentials or two-factor authentication change, its email address is no longer verified, an account link is removed, or its organization is suspended.
+- You remove a share, bring its end date forward, or give an end date to a share that had none.
+- You change the page list of a page-limited share (adding pages included; switching to **Whole site** excepted).
+- Your organization turns off external sharing (on services that have an external share; people who came in through it lose access, everyone else signs in once more).
+- Something security-related changes on the visitor's Komuta account: the account is deleted, locked or deactivated, its sign-in credentials or two-factor authentication change, its email address is no longer verified, an account link is removed, or its organization is suspended (this can take a little over a minute).
 
 ### Who can't sign in
 
@@ -55,7 +55,7 @@ These can't sign in to a protected service: impersonation sessions (acting as an
 | Opened a path under a **Block completely** rule | `403`, plain text `access denied`. |
 | The service no longer asks for sign-in but the visitor came with an old sign-in link | **This service doesn't use Komuta sign-in**. |
 | Sign-in can't be checked right now | **Sign-in is unavailable right now** with a **Try again** button. |
-| Komuta's access check temporarily can't answer | `503`, plain text `access policy unavailable` or `sign-in unavailable`. The service isn't opened to anyone meanwhile; try again shortly. |
+| Komuta's access check temporarily can't answer | `503`, plain text `access policy unavailable` or `sign-in unavailable`. With `access policy unavailable` the service opens to nobody; `sign-in unavailable` affects only pages that need sign-in. Try again shortly. |
 
 The **Access to this service is restricted** and **This page is not shared with you** pages shown on your service appear in Turkish if the visitor's browser language is Turkish, otherwise in English. Requests with methods other than `GET`/`HEAD` (from a browser or a program) get a short plain-text body instead: `access restricted to allowed networks` or `this path is not shared with you`.
 
@@ -108,7 +108,7 @@ Each row shows the share's name, any page limit ("Only: /a, /b") and its end ("U
 - **Suspended** — a share suspended because external sharing was turned off. Nobody gets in with it.
 - **Expired** — a share whose end time has passed. It stays in the list; give it a new end date with the pencil icon.
 
-The pencil icon edits a share: the type and person can't be changed; the page limit and end date can. Extending the end doesn't affect open sessions. Bringing the end forward or narrowing the page limit ends every open session of this service; everyone signs in once more (see [Session](#session)).
+The pencil icon edits a share: the type and person can't be changed; the page limit and end date can. Extending or removing the end date, or opening the share to the **Whole site**, doesn't affect open sessions. Adding or bringing forward an end date, or changing the page list, ends every open session of this service; everyone signs in once more (see [Session](#session)).
 
 ### Removing a share
 
@@ -137,7 +137,7 @@ The person an email address is shared with doesn't need a Komuta account with th
 Rules:
 
 - The code works only for the Komuta account that asked for it and only once. A new code is needed for every sign-in; a session opened through an email share also lasts at most 12 hours.
-- A code stops working after 5 wrong attempts.
+- A code stops working after 5 wrong attempts. After 50 wrong attempts in 24 hours for the same account, service and address, no new codes are sent.
 - Code request limits: a user can request at most 20 codes per hour, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address for the same Komuta account and service; switching browser or device doesn't reset this, and beyond it the screen still says a code was sent but no email goes out. Resending waits 30, 60 and 120 seconds.
 - The screen gives the same answer whether or not the address has access ("If {email} has access to this page, we've emailed it a {length}-digit code."), so nobody can guess which addresses a service is shared with.
 - If the sign-in link expires before the code would, the screen says "This sign-in link expires before a code would."; open the protected page again and request a code right away. Enter the code without waiting: sign-in must be completed within about 10 minutes of being sent from the protected page.
@@ -159,7 +159,7 @@ While it is off, these two types can't be chosen in the **Add share** window and
 If you turn it off:
 
 - Linked organization and email shares on all of the organization's protected services become **Suspended**.
-- People who signed in through these shares lose access right away.
+- People who came in through these shares lose access within about 30 seconds; the other visitors of these services sign in once more too.
 - New external shares can't be added.
 
 If you turn it back on, email shares come back; linked organization shares come back if the link between the two organizations still exists. Komuta checks the link every 5 minutes; if it is broken (no pair of linked, active user accounts remains between the two organizations), the linked organization share is suspended.

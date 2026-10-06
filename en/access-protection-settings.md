@@ -73,10 +73,13 @@ While this setting is on, Komuta passes who the signed-in visitor is to your app
 - **It is off by default.**
 - It needs Komuta sign-in to be required somewhere (on the site or in a path rule). If sign-in isn't required, the switch stays off and the section says "Turn on Komuta sign-in under Rules first; without sign-in nobody is known."
 - If the section isn't visible, the feature isn't turned on on your platform yet.
+- If you remove sign-in on the Rules tab, the setting switches off and doesn't come back when you turn sign-in on again. Turning protection off keeps it: when you turn protection back on with Komuta sign-in, visitor details are sent again.
+
+> **For now, take care:** change this setting only while the whole site requires Komuta sign-in (**Rules → Require Komuta sign-in** on). On services that ask for sign-in only in a path rule, changing it can turn protection off because of a known bug; this note will be removed once the fix ships.
 
 ### Turning it on
 
-Turn the switch on; the setting is saved immediately ("The visitor will be named to your application"). Komuta updates the service's routing; meanwhile the section says "Getting ready: the service's routes are being updated. Until then your application receives the headers empty." This usually takes a few minutes. If it takes long, the section says "Deploying the service again updates them."; deploying the service again is enough.
+Turn the switch on; the setting is saved immediately ("The visitor will be named to your application"). Komuta updates the service's routing; meanwhile the section says "Getting ready: the service's routes are being updated. Until then your application receives the headers empty." (Komuta's values arrive empty; a visitor may still send these headers themselves, see below) This usually takes a few minutes. If it takes long, the section says "Deploying the service again updates them."; deploying the service again is enough.
 
 ### Headers your application receives
 
@@ -95,7 +98,7 @@ Things to know:
 
 ### Which header to trust
 
-Your other services on the same cluster can reach your pods directly, without passing Komuta, so they could send these headers themselves. If that matters to you, trust only the **signed `x-komuta-identity` header**, not the plain headers, and verify it on every request. The plain headers are a convenience.
+Your services on the same cluster, and the services you chose for the private mesh on the **Machines** tab, can reach your pods without passing Komuta, so they could send these headers themselves. If that matters to you, trust only the **signed `x-komuta-identity` header**, not the plain headers, and verify it on every request. The plain headers are a convenience.
 
 ### Proof of identity (JWT)
 

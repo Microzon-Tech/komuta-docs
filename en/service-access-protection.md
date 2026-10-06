@@ -130,7 +130,7 @@ The header of the card on the **Rules** tab shows a status badge (no badge is sh
 |---|---|---|
 | **Off** | No protection; the service is open to everyone. | No |
 | **Preparing** | Your settings are being written to the gateway. | No |
-| **Applying** | The check is active; the pod lock and cache purge are being completed. | Yes |
+| **Applying** | The check is active; the pod lock and cache purge are being completed. | Yes (a short delay is possible in the first seconds while routes refresh) |
 | **Protected** | Protection is fully in place. | Yes |
 | **Turning off** | Protection is being removed; once done, anyone with the URL can open the service. | Yes, until the last step |
 
@@ -150,11 +150,11 @@ Box title: "Protection can't be completed until this is fixed."
 
 | Code | Message (first sentence) | What to do |
 |---|---|---|
-| `service_not_deployed` | This service has not been deployed yet. Protection is applied after its first successful deployment. | Deploy the service. |
-| `no_hosts` | This service has no public address that can be protected. Turn on its public URL first. | Turn on **Public URL** on the **Network** tab. |
+| `service_not_deployed` | This service has not been deployed yet. | Deploy the service. |
+| `no_hosts` | This service has no public address that can be protected. | Turn on **Public URL** on the **Network** tab. |
 | `too_many_hosts` | This service has more domains than one protection policy can cover. | Remove custom domains you no longer need (limit: 50 addresses). |
 | `host_invalid` | One of this service's route hostnames is not a valid domain name. | Fix or remove the domain. |
-| `host_not_owned` | This service routes a domain that isn't one of its verified domains. | Verify the domain for this service, or remove it. |
+| `host_not_owned` | This service routes a domain that isn't one of its verified domains, so protection cannot include it. | Verify the domain for this service, or remove it. |
 | `host_claimed_elsewhere` | One of this service's domains is already protected by another service. | Remove the domain from one of the two services. |
 | `host_not_public` | One of this service's domains points to a private or reserved address. | Point the DNS record to Komuta, or remove it. |
 | `host_dns_unresolved` | One of this service's domains does not resolve in DNS yet. | Check the DNS record; protection continues on its own once it resolves. |
@@ -211,7 +211,7 @@ On the service overview (dashboard), the **Service protection** card shows the p
 1. **Protection method** — **Komuta sign-in**, **Specific IP addresses**, **Sign-in and specific IPs** (where you choose **Require both** or **Either is enough**) or **Path rules only**.
 2. **Allowed addresses** — for methods that use IPs.
 3. **Path rules** — optional; at least one rule is needed if you chose **Path rules only**.
-4. **Who can sign in?** — when sign-in is needed; shares are added here. You are added to the list automatically ("(you)"); remove yourself if you shouldn't have access.
+4. **Who can sign in?** — when sign-in is needed and you can manage shares; shares are added here. You are added to the list automatically ("(you)"); remove yourself if you shouldn't have access.
 5. **Duration** — the protection end date and what happens when it is reached (**Keep the protection rules** or **Open to everyone**).
 6. **Review changes** — current and new settings side by side; save with **Apply protection**.
 

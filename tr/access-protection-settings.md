@@ -73,10 +73,13 @@ Bu ayar açıkken Komuta, giriş yapmış ziyaretçinin kim olduğunu her istekt
 - **Varsayılan olarak kapalıdır.**
 - Komuta girişinin bir yerde gerekli olmasını ister (sitede ya da bir yol kuralında). Giriş istenmiyorsa anahtar kapalı kalır ve "Önce Kurallar sekmesinde Komuta girişini açın; giriş olmadan kim olduğu bilinmez." yazar.
 - Bölüm görünmüyorsa özellik platformunuzda henüz açık değildir.
+- Kurallarda girişi kaldırırsanız ayar kapanır; girişi yeniden açtığınızda kendiliğinden açılmaz. Korumayı kapatmak ise ayarı korur: korumayı Komuta girişiyle yeniden açtığınızda ziyaretçi bilgileri yeniden iletilmeye başlar.
+
+> **Şimdilik dikkat:** Bu ayarı yalnızca sitenin tamamı Komuta girişi isterken (**Kurallar → Komuta girişi iste** açık) değiştirin. Girişi yalnızca bir yol kuralında isteyen servislerde ayarı değiştirmek, bilinen bir hata nedeniyle korumayı kapatabilir; düzeltme yayınlanınca bu not kaldırılacaktır.
 
 ### Açma
 
-Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der. Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
+Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der (Komuta'nın değerleri boş gelir; ziyaretçi bu başlıkları kendisi gönderirse dolu görünebilir, bkz. aşağı). Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
 
 ### Uygulamanızın aldığı başlıklar
 
@@ -95,7 +98,7 @@ Bilmeniz gerekenler:
 
 ### Hangi başlığa güvenmeli
 
-Aynı kümedeki diğer servisleriniz pod'larınıza Komuta'dan geçmeden doğrudan ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir.
+Aynı kümedeki servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir.
 
 ### Kimlik kanıtı (JWT)
 

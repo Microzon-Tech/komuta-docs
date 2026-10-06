@@ -36,7 +36,7 @@ Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnı
 - **Giriş istenmez.** Seçili yöntemlerle gelen istekler Komuta girişi olmadan geçer.
 - **Yalnızca seçili yöntemler açıktır.** Başka bir yöntemle gelen istek, açık yol yokmuş gibi değerlendirilir; yani sitenin normal korumasından geçmesi gerekir.
 - **Sitenin IP listesi ve üst yol kuralları uygulanmaz.** Açık yolda tek adres kontrolü, yolun kendi **Gönderici adresleri** listesidir.
-- **Engelleme kuralları yine geçerlidir.** Açık yolun altına yalnızca **Tamamen engelle** kuralı konabilir; örneğin `/webhooks` açıkken `/webhooks/eski` engellenebilir. Açık yolun altına giriş, IP ya da kişi kuralı konamaz. Webhook penceresi, mevcut bir kuralla çakışan yolu "Bu yol {other} kuralıyla çakışıyor. Açık yol başka bir kuralla aynı yeri paylaşamaz." uyarısıyla engeller; **Kurallar** sekmesinde bir açık yolun altına kural kaydetmeye çalışırsanız "… açık yolunun altında" hatası görürsünüz.
+- **Engelleme kuralları yine geçerlidir.** Açık yolun altına yalnızca **Tamamen engelle** kuralı konabilir; örneğin `/webhooks` açıkken `/webhooks/eski` engellenebilir. Açık yolun altına giriş, IP ya da kişi kuralı konamaz. Webhook penceresi, mevcut bir kuralla çakışan yolu "Bu yol /admin kuralıyla çakışıyor. Açık yol başka bir kuralla aynı yeri paylaşamaz." (örnekte `/admin`) uyarısıyla engeller; **Kurallar** sekmesinde bir açık yolun altına kural kaydetmeye çalışırsanız "… açık yolunun altında" hatası görürsünüz.
 - **Yol eşleşmesi büyük/küçük harf duyarsızdır.** `/HOOKS/x` isteği `/hooks` yolunun altındadır. Bir istek ancak yolunun okunabileceği her biçim açık yolun altında kalıyorsa açılır; `%2f`, `..` ya da benzeri hilelerle açık yoldan başka bir yola kaçılamaz.
 - **Açık yollar iç içe olamaz.** Bir açık yolun altına ya da aynı yola ikinci bir açık yol açılamaz.
 - **Yöntem değiştirme başlıkları dikkate alınmaz.** Komuta isteğin gerçek yöntemine bakar. Uygulamanız bu yollarda `X-HTTP-Method-Override` ya da `X-HTTP-Method` gibi başlıkları kabul etmemelidir; aksi halde yalnızca `POST` açtığınız bir yola `DELETE` gibi davranan istekler gönderilebilir.
@@ -82,7 +82,7 @@ Token'ın biçimi `kst_<32 onaltılık karakter>_<43 karakter>` şeklindedir. De
 - **IP kurallarını aşamaz.** Site ya da yol bir IP listesi istiyorsa, token taşıyan istek de listedeki bir adresten gelmelidir. İstisna: kural **Biri yeterli** birleşimini kullanıyorsa token giriş yerine geçer ve adres aranmaz.
 - **Seçilen kişiler kurallarını aşamaz.** Yalnızca belirli kişilere açılan bir yol, token'la açılmaz.
 - **Başlık varsa tek başına karar verir.** İstekte `x-komuta-service-token` başlığı varsa sonuç yalnızca token'a göre belirlenir: geçersiz bir token, tarayıcıda geçerli bir oturum olsa bile reddedilir.
-- **Girişin gerekmediği yerlerde okunmaz.** Herkese açık yollarda ve IP listesiyle girişsiz geçilen yerlerde token'a bakılmaz; geçersiz bir token olsa bile istek geçer.
+- **Girişin gerekmediği yerlerde okunmaz.** Korumasız yollarda ve IP listesiyle girişsiz geçilen yerlerde token'a bakılmaz; geçersiz bir token olsa bile istek geçer.
 - **Uygulamanıza ulaşmaz.** Komuta başlığı kontrol ettikten sonra istekten siler; token değeri uygulamanızın loglarına düşmez.
 - **Komuta girişi gerekir.** Token'lar yalnızca koruma Komuta girişi isterken (sitede ya da bir yol kuralında) çalışır. Giriş istenmiyorsa bölüm "Servis token'ları yalnızca Komuta girişi gerekirken çalışır." der ve yeni token oluşturulamaz.
 
