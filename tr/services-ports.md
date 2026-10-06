@@ -36,7 +36,7 @@ Açıldıktan sonra hangi cluster'ların erişebildiği listelenir; bağlantı k
 
 ## Erişim Koruması
 
-Bu sayfadaki **Erişim koruması** kartı, servisin genel URL'ini kimlerin açabileceğini belirler: ziyaretçilerden Komuta ile giriş istenebilir, erişim belirli IP adresleriyle sınırlanabilir, ikisi birlikte (ikisi birden ya da biri yeterli) kullanılabilir ve belirli yollar ayrıca korunabilir ya da tamamen kapatılabilir. Ayrıntılar için [Servis Erişim Koruması](service-access-protection.md) dokümanına bakın.
+Sayfanın **Kurallar**, **Kişiler**, **Makineler**, **Etkinlik** ve **Ayarlar** sekmeleri erişim korumasını yönetir: ziyaretçilerden Komuta ile giriş istenebilir, erişim belirli IP adreslerine sınırlanabilir, belirli yollar ayrıca korunabilir ya da kapatılabilir, webhook'lar ve CI araçları için ayrı izinler verilebilir. Portlar, genel URL ve özel ağ **Ağ** sekmesindedir. Ayrıntılar için [Erişim Koruması](service-access-protection.md) dokümanına bakın.
 
 ---
 
