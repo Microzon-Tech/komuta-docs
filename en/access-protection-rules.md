@@ -42,7 +42,7 @@ Rules:
 
 The card marks invalid lines as you type ("Line {n}"), and **Apply protection** stays disabled until they are fixed.
 
-#### Add my IP
+### Add my IP
 
 The **Add my IP** button adds the public address the Komuta console sees to the list (to the draft only; you still need **Apply protection** to save it):
 
@@ -51,9 +51,9 @@ The **Add my IP** button adds the public address the Komuta console sees to the 
 - If your address is already listed, the card says "Your address ({entry}) is already in the list."
 - If no public address can be determined for your connection, nothing is added.
 
-> **Don't lock yourself out.** The added address is the one the console sees. Your browser may reach the service over a different connection (for example IPv6 to the console, IPv4 to the service), in which case the service sees another address. Check it before applying; if needed, add both your IPv4 and IPv6 addresses. If you do get locked out, the **Access restricted** page shows the address the service sees; copy it and add it to the list.
+> **Don't lock yourself out.** The added address is the one the console sees. Your browser may reach the service over a different connection (for example IPv6 to the console, IPv4 to the service), in which case the service sees another address. Check it before applying; if needed, add both your IPv4 and IPv6 addresses. If you do get locked out, the **Access to this service is restricted** page shows the address the service sees; copy it and add it to the list.
 
-#### How the address is determined
+### How the address is determined
 
 Komuta takes the visitor's address only from what Cloudflare writes, and separately verifies that the request really came through Cloudflare. Headers the visitor sends themselves, such as `X-Forwarded-For`, `X-Real-IP`, `True-Client-IP` or `Forwarded`, are ignored; nobody can get onto the list by faking an address.
 
@@ -112,7 +112,7 @@ If a path must open without sign-in (a webhook, for example), use a [webhook pat
 
 ### Path syntax
 
-- A path starts with `/` and may contain only lowercase letters, digits and `- . _ ~ ! $ & ' ( ) * + , = : @ /`. Non-ASCII characters and spaces can't be used.
+- A path starts with `/` and may contain only lowercase letters, digits and `- . _ ~ ! $ & ' ( ) * + , = : @ /`. Non-ASCII characters (for example Turkish letters) and spaces can't be used.
 - Empty segments (`//`), `.` and `..` segments, and segments ending in `.` aren't allowed.
 - `/` on its own can't be a rule ("“/” covers the whole site. Use the site settings above for that.").
 - Paths starting with `/.komuta-access` are reserved for Komuta.
@@ -136,7 +136,7 @@ Things to know:
 - If nobody is chosen, the card warns "Nobody is chosen yet. If you apply now, nobody can open this path."; the rule is valid and nobody can open the path.
 - The time window is checked on every request. When it starts, the person can open the path without signing in again; when it ends, the path closes within a few seconds, including for open sessions.
 - When you add someone to a rule later and they already signed in before, they may be sent to sign-in once on their first try; this adds the new access to their session.
-- If a share chosen for the rule is removed later, the rule says "# chosen people are no longer shared with."; clean it up with **Remove from this rule**.
+- When you remove a share chosen for the rule, the person is removed from the rule automatically. If the share is removed elsewhere while you are editing the rule, the card says "# chosen people are no longer shared with."; clean up the draft with **Remove from this rule**.
 - This type can't have an IP list, and **service tokens can't open these paths**.
 - At most 200 people per rule. If you choose someone whose share is limited to certain pages, the path is added to the pages they can open; a share can't exceed 50 pages in total.
 

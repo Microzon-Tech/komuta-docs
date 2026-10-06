@@ -10,7 +10,7 @@ Erişim koruması bu tür istekler için üç yol sunar:
 | **Servis token'ı** | Sizin kontrol ettiğiniz programlar (CI işleri, izleme araçları, betikler) | **Makineler** sekmesi → **Servis token'ları** |
 | **Özel ağdan gelebilecek servisler** | Diğer kümelerinizdeki Komuta servislerinizin bu servise doğrudan ulaşması | **Makineler** sekmesi → **Özel ağdan doğrudan gelebilecek servisler** (özel ağın kendisi **Ağ** sekmesinde) |
 
-Webhook ve servis token'ı bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, listeyi korumayı açmadan önce de hazırlayabilirsiniz.
+Webhook ve servis token'ı bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, **Kurallar** sekmesinde korumayı açmaya başladığınızda (kaydetmeden önce) liste görünür ve doldurulabilir.
 
 ---
 
@@ -36,9 +36,9 @@ Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnı
 - **Giriş istenmez.** Seçili yöntemlerle gelen istekler Komuta girişi olmadan geçer.
 - **Yalnızca seçili yöntemler açıktır.** Başka bir yöntemle gelen istek, açık yol yokmuş gibi değerlendirilir; yani sitenin normal korumasından geçmesi gerekir.
 - **Sitenin IP listesi ve üst yol kuralları uygulanmaz.** Açık yolda tek adres kontrolü, yolun kendi **Gönderici adresleri** listesidir.
-- **Engelleme kuralları yine geçerlidir.** Açık yolun altına yalnızca **Tamamen engelle** kuralı konabilir; örneğin `/webhooks` açıkken `/webhooks/eski` engellenebilir. Açık yolun altına giriş, IP ya da kişi kuralı konamaz; arayüz bunu "Bu yol {kural} kuralıyla çakışıyor" uyarısıyla engeller.
+- **Engelleme kuralları yine geçerlidir.** Açık yolun altına yalnızca **Tamamen engelle** kuralı konabilir; örneğin `/webhooks` açıkken `/webhooks/eski` engellenebilir. Açık yolun altına giriş, IP ya da kişi kuralı konamaz. Webhook penceresi, mevcut bir kuralla çakışan yolu "Bu yol {other} kuralıyla çakışıyor. Açık yol başka bir kuralla aynı yeri paylaşamaz." uyarısıyla engeller; **Kurallar** sekmesinde bir açık yolun altına kural kaydetmeye çalışırsanız "… açık yolunun altında" hatası görürsünüz.
 - **Yol eşleşmesi büyük/küçük harf duyarsızdır.** `/HOOKS/x` isteği `/hooks` yolunun altındadır. Bir istek ancak yolunun okunabileceği her biçim açık yolun altında kalıyorsa açılır; `%2f`, `..` ya da benzeri hilelerle açık yoldan başka bir yola kaçılamaz.
-- **Birden fazla açık yol bir isteği kapsıyorsa en özgül olan karar verir.**
+- **Açık yollar iç içe olamaz.** Bir açık yolun altına ya da aynı yola ikinci bir açık yol açılamaz.
 - **Yöntem değiştirme başlıkları dikkate alınmaz.** Komuta isteğin gerçek yöntemine bakar. Uygulamanız bu yollarda `X-HTTP-Method-Override` ya da `X-HTTP-Method` gibi başlıkları kabul etmemelidir; aksi halde yalnızca `POST` açtığınız bir yola `DELETE` gibi davranan istekler gönderilebilir.
 - **CORS ön uçuş istekleri (`OPTIONS`) açık yoldan geçmez.** Seçilebilen yöntemler arasında `OPTIONS` yoktur. Tarayıcıdan başka bir siteden çağrılması gereken uç noktalar için webhook yolu uygun değildir.
 - **Erişim kaydı** açık yola gelen her teslimatı **Açık yol isteği** / **Açık yola teslim edildi** olarak, tam yol yerine açık yolun önekiyle kaydeder.
@@ -49,6 +49,7 @@ Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnı
 - `/` (sitenin tamamı) ve Komuta'nın kendi giriş yolu (`/.komuta-access` ile başlayanlar) açılamaz.
 - Yol, [yol kurallarıyla](access-protection-rules.md#yol-yazım-kuralları) aynı yazım kurallarına uyar (en fazla 256 karakter). Pencere hatalı her yol için aynı mesajı gösterir: "/webhooks/github gibi bir yol girin. Sitenin tamamı açılamaz."
 - Gönderici listesi en fazla 100 girdi alır ve yalnızca genel internet adreslerini kabul eder. Listede geçersiz bir satır varsa **Yolu aç** düğmesi devre dışı kalır.
+- Webhook yolu açmak ve kapatmak için **Servis erişim korumasını yönet** izni gerekir; diğerleri listeyi yalnızca görür.
 - Yalnızca açık yollardan oluşan bir koruma bir şey korumaz; webhook yolu, site ya da en az bir yol başka bir koruma altındayken anlamlıdır.
 
 ---
@@ -81,7 +82,7 @@ Token'ın biçimi `kst_<32 onaltılık karakter>_<43 karakter>` şeklindedir. De
 - **IP kurallarını aşamaz.** Site ya da yol bir IP listesi istiyorsa, token taşıyan istek de listedeki bir adresten gelmelidir. İstisna: kural **Biri yeterli** birleşimini kullanıyorsa token giriş yerine geçer ve adres aranmaz.
 - **Seçilen kişiler kurallarını aşamaz.** Yalnızca belirli kişilere açılan bir yol, token'la açılmaz.
 - **Başlık varsa tek başına karar verir.** İstekte `x-komuta-service-token` başlığı varsa sonuç yalnızca token'a göre belirlenir: geçersiz bir token, tarayıcıda geçerli bir oturum olsa bile reddedilir.
-- **Herkese açık yollarda okunmaz.** Zaten herkese açık bir yolda token'a bakılmaz.
+- **Girişin gerekmediği yerlerde okunmaz.** Herkese açık yollarda ve IP listesiyle girişsiz geçilen yerlerde token'a bakılmaz; geçersiz bir token olsa bile istek geçer.
 - **Uygulamanıza ulaşmaz.** Komuta başlığı kontrol ettikten sonra istekten siler; token değeri uygulamanızın loglarına düşmez.
 - **Komuta girişi gerekir.** Token'lar yalnızca koruma Komuta girişi isterken (sitede ya da bir yol kuralında) çalışır. Giriş istenmiyorsa bölüm "Servis token'ları yalnızca Komuta girişi gerekirken çalışır." der ve yeni token oluşturulamaz.
 
@@ -107,7 +108,7 @@ Bir serviste ilk token oluşturulduğunda Komuta, başlığın uygulamaya giden 
 
 - Bir serviste en fazla **20** servis token'ı olabilir.
 - Token oluşturmak ve silmek için **Korunan servisin paylaşımlarını yönet** izni gerekir (paylaşımlarla aynı izin).
-- Erişim kaydında token'la yapılan istekler **Servis token'ı: {ad}** olarak görünür.
+- Erişim kaydında token'la açılan sayfalar (yalnızca `GET` ve dosya olmayan yollar) **Servis token'ı: {ad}** olarak görünür; token'la yapılan `POST` gibi diğer istekler kaydedilmez. Reddedilen token istekleri her yöntem için kaydedilir.
 
 ---
 

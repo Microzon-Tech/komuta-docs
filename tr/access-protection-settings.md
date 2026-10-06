@@ -6,7 +6,7 @@
 - **Giriş yapanı uygulamama bildir** — giriş yapan ziyaretçinin kim olduğunun uygulamanıza iletilmesi.
 - **Korumayı hemen kaldır** — **Şimdi herkese aç** düğmesi.
 
-Bu bölümler koruma uygulandıktan sonra görünür. Koruma kapalıyken sekmede **Erişim koruması kapalı** notu görünür. Ayarları değiştirmek için **Servis erişim korumasını yönet** izni gerekir; bu izni olmayanlar yalnızca özet cümlesini görür.
+Bu bölümler korumayı açıp kaydettikten sonra görünür (**Hazırlanıyor** sırasında da). Koruma kapalıyken sekmede **Erişim koruması kapalı** notu görünür. Ayarları değiştirmek için **Servis erişim korumasını yönet** izni gerekir; bu izni olmayanlar yalnızca özet cümlesini görür.
 
 ---
 
@@ -35,7 +35,7 @@ Bölümün başındaki cümle mevcut durumu özetler:
 Kurallar:
 
 - Bitiş gelecekte olmalı ve en fazla **365 gün** sonrası olabilir.
-- Bitiş tarihi yalnızca koruma uygulandıktan sonra konabilir. **Kurallar** sekmesinde yaptığınız kayıtlar mevcut bitiş tarihini değiştirmez.
+- Bitiş tarihi koruma açıkken (kaydedildikten sonra) konabilir. **Kurallar** sekmesinde yaptığınız kayıtlar mevcut bitiş tarihini değiştirmez.
 - **Kalıcı yap** düğmesi bitiş tarihini kaldırır (**Koruma kalıcı yapılsın mı?** onayıyla). Alanı temizleyip kaydetmek de aynı onayı açar.
 - Servisin genel URL'i kapalıysa ya da henüz genel adresi yoksa bitişi yalnızca ileri alabilir, servisi kilitli tutabilir ya da korumayı kalıcı yapabilirsiniz; erişimi genişletecek değişiklikler (bitişi öne çekmek, olmayan bir bitiş eklemek, "herkese açılsın" seçmek) yapılamaz.
 
@@ -56,9 +56,9 @@ Bitiş tarihi olan bir korumada Komuta üç e-posta gönderir:
 | Bitişten 1 saat önce | Aynı |
 | Bitiş zamanında | "{servis} erişim koruması bitti; servis hâlâ kilitli" ya da "{servis} erişim koruması bitti; servis artık herkese açık" |
 
-- **Alıcılar:** servisi düzenleme yetkisi olan ve **Servis erişim korumasını yönet** iznine sahip, e-postası doğrulanmış aktif kullanıcılar. Böyle biri yoksa bu izne sahip organizasyon yöneticileri. En fazla 50 kişi.
+- **Alıcılar:** servise kişisel olarak düzenleme yetkisi verilmiş ve **Servis erişim korumasını yönet** iznine sahip, e-postası doğrulanmış aktif kullanıcılar. Böyle biri yoksa bu izne sahip organizasyon yöneticileri. En fazla 50 kişi.
 - **Dil:** organizasyonun varsayılan dili Türkçe ise Türkçe, değilse İngilizce. E-postadaki tarihler UTC olarak yazılır.
-- Bitişi 24 saatten (ya da 1 saatten) daha yakın bir zamana koyarsanız, zamanı geçmiş hatırlatmalar gönderilmez. Tarihi ya da **Bittiğinde** seçimini değiştirirseniz hatırlatmalar yeni zamana göre yeniden kurulur.
+- Bitişi 24 saatten (ya da 1 saatten) daha yakın bir zamana koyarsanız, zamanı geçmiş hatırlatmalar gönderilmez. Bitiş tarihini değiştirirseniz hatırlatmalar yeni zamana göre yeniden kurulur; yalnızca **Bittiğinde** seçimini değiştirmek gönderilmiş hatırlatmaları yeniden göndermez (sonrakiler yeni seçimle gider).
 - Bitiş e-postası yalnızca bitişten sonraki 7 gün içinde gönderilir.
 - Yaklaşan bitiş ve "hâlâ kilitli" e-postalarında üç bağlantı vardır: **Şimdi herkese aç**, **Süreyi uzat** ve **Kalıcı yap**. Bağlantılar konsolda **Ayarlar** sekmesini açar; işlem orada sizin onayınızla yapılır (**Şimdi herkese aç** ve **Kalıcı yap** onay penceresini açar, **Süreyi uzat** imleci tarih alanına koyar). Bağlantı bir kez çalışır ve yalnızca **Servis erişim korumasını yönet** izni olanlar için etkilidir.
 
@@ -89,9 +89,9 @@ Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulam
 Bilmeniz gerekenler:
 
 - **Başlıklar yalnızca girişin gerektiği isteklerde dolu gelir.** Sitenin herkese açık kısımlarında, IP listesiyle girişsiz geçilen yerlerde ve webhook yollarında, ziyaretçi giriş yapmış olsa bile başlıklar boş gelir.
-- **Servis token'ıyla gelen isteklerde** yalnızca `x-komuta-identity` dolu gelir; içinde `kind` değeri `service_token`, `sub` değeri token'ın kimliğidir. Diğer iki başlık boştur.
+- **Servis token'ıyla gelen isteklerde** yalnızca `x-komuta-identity` dolu gelir; içinde `kind` değeri `service_token`, `sub` değeri token'ın kimliğidir: token değerindeki `kst_` sonrasındaki 32 onaltılık karakterin tireli GUID biçimi. Diğer iki başlık boştur.
 - **Ayarı açmadan önce giriş yapmış ziyaretçiler** yeniden giriş yapana kadar (en fazla 12 saat) e-postasız bildirilir: `x-komuta-user-email` boş gelir ve JWT'de `email` alanı olmaz.
-- Ziyaretçinin kendi gönderdiği aynı adlı başlıklar Komuta'dan geçerken her zaman silinir ve doğru değerle (ya da boş) yeniden yazılır; internetten gelen biri bu başlıkları taklit edemez.
+- Bölüm "Hazırlanıyor" ya da "rotaları henüz güncellenmedi" demiyorsa, ziyaretçinin kendi gönderdiği aynı adlı başlıklar Komuta'dan geçerken silinir ve doğru değerle (ya da boş) yeniden yazılır; internetten gelen biri bu başlıkları taklit edemez. Hazırlık sürerken düz başlıklara güvenmeyin; imzalı `x-komuta-identity` her zaman doğrulanabilir.
 
 ### Hangi başlığa güvenmeli
 

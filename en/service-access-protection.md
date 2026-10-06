@@ -28,7 +28,7 @@ Every request to a protected service passes a check at the Komuta gateway before
 2. Komuta checks the request against your rules: is the IP address on the list, does the visitor have a valid session for this service, is there a special rule for this path?
 3. If the rules are met, the request is passed to your application. If sign-in is needed, the visitor is sent to the Komuta sign-in page. If access is not allowed, the visitor sees an explanatory page and the request never reaches your application.
 
-The check can't be bypassed. When protection is turned on, Komuta also locks your service's pods: they accept only requests that come from the gateway, having passed the check. A request that tries to skip the gateway and reach a pod directly is refused. (Your own services on the same cluster keep reaching your pods as before.)
+The check can't be bypassed. When protection is turned on, Komuta also locks your service's pods: they accept only requests that come from the gateway, having passed the check. A request that tries to skip the gateway and reach a pod directly is refused. (Your own services on the same cluster, and the services you chose for the private mesh on the **Machines** tab, keep reaching your pods directly.)
 
 Protection applies to all public addresses of the service together: the `*.komuta.app` address Komuta gives you, custom domains you added under **Domains**, and the preview address of a blue-green deployment.
 
@@ -41,7 +41,7 @@ These recipes cover the most common setups. All settings are on **Service Detail
 ### Only my team can open it
 
 1. On the **Rules** tab, turn on the **Access protection** switch. **Require Komuta sign-in** comes selected.
-2. Press **Apply protection**. You are added to the share list automatically.
+2. Press **Apply protection**. If you have permission to manage shares, you are added to the share list automatically.
 3. On the **People** tab, choose **Add share → Your organization**.
 
 Every member of your organization can sign in with their Komuta account and open the service; everyone else stays at the sign-in page.
@@ -60,11 +60,11 @@ The customer signs in with any Komuta account (created in seconds with Google or
 2. Type your office's public IP address or range into the **IP allow-list** (use **Add my IP** if you are connecting from there).
 3. Press **Apply protection**.
 
-Visitors from the listed addresses get in without signing in; everyone else sees the **Access restricted** page.
+Visitors from the listed addresses get in without signing in; everyone else sees the **Access to this service is restricted** page.
 
 ### No sign-in from the office, sign-in from outside
 
-Turn on both **Require Komuta sign-in** and the **IP allow-list**, and choose **Either is enough** for "How should sign-in and the IP allow-list combine?".
+Turn on **Require Komuta sign-in**, enter your office addresses in the **IP allow-list**, and choose **Either is enough** for "How should sign-in and the IP allow-list combine?".
 
 ### Keep the site open, protect only the admin panel
 
@@ -94,9 +94,9 @@ Access protection is managed in tabs on **Service Detail → Configuration → A
 
 The tab is kept in the URL as `?tab=` (`rules`, `people`, `machines`, `activity`, `network`, `settings`), so you can share a link to a tab.
 
-The **Public exposure** card on the **Overview** tab states the situation in one line: **Open to everyone**, **Protection is being applied**, **Protected**, **Specific paths are protected**, **Protection is being removed**, **Protection can't finish** or **Not on the internet**. Below it, the active settings are listed as short chips (for example "Komuta sign-in", "3 allowed addresses", "2 path rules", "5 shares", "Until …"). While the service is open to everyone, **Set up access protection** takes you to the **Rules** tab and starts turning protection on. If something is wrong, a **Needs attention** badge appears next to the headline.
+The **Public exposure** card on the **Overview** tab states the situation in one line: **Open to everyone**, **Protection is being applied**, **Protected**, **Specific paths are protected**, **Protection is being removed**, **Protection can't finish** (the private mesh is on and skips the access check), **Not on the internet**, **Private mesh only** (no public address; the service is reached only over the private mesh) or **Access status unavailable**. Below it, the active settings are listed as short chips (for example "Komuta sign-in", "3 allowed addresses", "2 path rules", "5 shares", "Until …"). While the service is open to everyone, **Set up access protection** takes you to the **Rules** tab and starts turning protection on. If there is any warning (including ones you need to fix), a **Needs attention** badge appears next to the headline.
 
-If access protection is turned off for your organization, or you can't view the service's protection, only the **Overview** and **Network** tabs are shown.
+If you can't view the service's protection, only the **Overview** and **Network** tabs are shown. If access protection is turned off for your organization, services that aren't protected also show only these two tabs; services that are already protected stay protected and can still be managed.
 
 ---
 
@@ -105,7 +105,7 @@ If access protection is turned off for your organization, or you can't view the 
 1. On the **Rules** tab, turn on the switch in the header of the **Access protection** card. This doesn't save anything yet; the settings open with **Require Komuta sign-in** selected.
 2. Choose the checks you want: Komuta sign-in, the IP allow-list, path rules or a combination (see [Rules](access-protection-rules.md)). At least one is needed.
 3. Press **Apply protection** ("Access protection is being applied").
-4. If you chose Komuta sign-in, share the service on the **People** tab. The first time you make sign-in required, you are added automatically.
+4. If you chose Komuta sign-in, share the service on the **People** tab. When a save makes sign-in required, you are added automatically if you have permission to manage shares.
 
 To back out, press **Cancel** or turn the switch off; the unsaved draft is discarded.
 
@@ -116,15 +116,15 @@ You can also set protection up step by step from the **Service protection** card
 ## How long it takes
 
 - **Turning it on the first time** usually takes a minute or two. Komuta refreshes the service's routing and applies the pod lock; this may show up as a deployment, but nothing is rebuilt.
-- The check takes effect as soon as protection reaches **Applying**. During **Preparing** the service still runs as before (open to everyone).
+- The check takes effect shortly after protection reaches **Applying**, once the service's routing has been refreshed. During **Preparing** the service still runs as before (open to everyone).
 - **On a protected service**, changes to rules, the IP list and shares usually take effect within a few seconds to half a minute. Meanwhile the card says "Your latest change is being rolled out."
-- **Turning it off** also finishes within a few seconds to a couple of minutes; protection lasts until **Turning off** is done.
+- **Turning it off** also finishes within a few seconds to a couple of minutes; the check is removed in the last step of **Turning off**.
 
 ---
 
 ## Status
 
-The header of the card on the **Rules** tab shows a status badge:
+The header of the card on the **Rules** tab shows a status badge (no badge is shown while protection is off; the switch is just off):
 
 | Badge | Meaning | Check active? |
 |---|---|---|
@@ -134,7 +134,7 @@ The header of the card on the **Rules** tab shows a status badge:
 | **Protected** | Protection is fully in place. | Yes |
 | **Turning off** | Protection is being removed; once done, anyone with the URL can open the service. | Yes, until the last step |
 
-While protection is being turned on, the card shows a 5-step progress bar ("{done} of {total} steps completed"). The steps are, in order: preparation, enabling the gateway check, the pod lock, the cache purge and verifying protection. In the last step Komuta tests protection itself: it confirms that a request without sign-in is really refused and that protected responses are not cached.
+While protection is being turned on, the card shows a 5-step progress bar ("{done} of {total} steps completed"). The steps are, in order: preparation, the gateway check, the pod lock, the cache purge and protected; the bar disappears once protection is complete. Along the way Komuta tests protection itself: it confirms that a request without sign-in is really refused, that a signed-in request gets through and that protected responses are not cached.
 
 If someone changed the same protection before you (in another tab, or a teammate), the card loads the latest settings and says "Access protection was changed elsewhere. The latest settings are loaded — make your change again." This way nobody overwrites someone else's change without knowing.
 
@@ -148,7 +148,7 @@ If protection can't be completed or something goes wrong, a warning box appears 
 
 Box title: "Protection can't be completed until this is fixed."
 
-| Code | Message | What to do |
+| Code | Message (first sentence) | What to do |
 |---|---|---|
 | `service_not_deployed` | This service has not been deployed yet. Protection is applied after its first successful deployment. | Deploy the service. |
 | `no_hosts` | This service has no public address that can be protected. Turn on its public URL first. | Turn on **Public URL** on the **Network** tab. |
@@ -167,11 +167,11 @@ Box title: "Protection can't be completed until this is fixed."
 - **`drift_mesh_peers`** — The private mesh still lets in more services than you chose; this clears on its own within a few minutes.
 - **Other codes** — "A platform-side problem stopped protection from being applied. Nothing is needed from you."
 
-In these cases the card on the **Overview** tab shows a **Needs attention** badge.
+In these cases, as in the cases you need to fix above, the card on the **Overview** tab shows a **Needs attention** badge.
 
 ### When it can't be turned on
 
-| The card says | Why | What to do |
+| Message on screen | Why | What to do |
 |---|---|---|
 | "Access protection works through the public URL. Turn on the public URL first." | The service's public URL is off. | Turn on **Public URL** on the **Network** tab. |
 | "This service has no public address yet. You can turn on access protection after its first deployment." | The service has never been deployed. | Deploy the service. |
@@ -189,7 +189,7 @@ There are two ways, with the same result:
 - **Open to everyone now** — in the **Remove protection now** section at the bottom of the **Settings** tab. Turning off the switch on the **Rules** tab opens the same confirmation. Confirmation: **Open this service to everyone?** ("The service is being opened to everyone").
 - **Removing every rule** — if you remove sign-in, the IP list and all path rules on the **Rules** tab, the button turns into a red **Turn off protection** and asks **Turn off access protection?**.
 
-Once **Turning off** finishes, anyone with the URL can open the service.
+The check is removed in the last step of **Turning off**; after that, anyone with the URL can open the service.
 
 **What is kept, what is not:**
 
@@ -198,10 +198,9 @@ Once **Turning off** finishes, anyone with the URL can open the service.
 | Shares (including suspended ones) | The Komuta sign-in choice |
 | Service tokens | The IP allow-list |
 | The list of services that may come in over the private mesh | Path rules and webhook paths |
-| | The protection end date |
-| | Telling your application who signed in |
+| Telling your application who signed in (comes back on by itself when you turn protection on again with Komuta sign-in; switched off if the new protection doesn't ask for sign-in) | The protection end date |
 
-The access log is not kept while protection is off; earlier records are deleted after 30 days.
+The access log is not kept, and can't be viewed, while protection is off; earlier records are kept for 30 days and show up on the **Activity** tab again if you turn protection back on.
 
 ---
 
@@ -239,7 +238,7 @@ The wizard doesn't let you set up protection while the service's private mesh is
 - The service needs a public URL and at least one public address.
 - The service must run on Komuta's shared hosting clusters.
 - Wherever an IP list is used, requests must come through Cloudflare; Komuta addresses and custom domains added to Komuta work this way.
-- Access protection is on by default for organizations. If it has been turned off for your organization, you see "Access protection is turned off for this organization. Contact Komuta support to turn it on."
+- Access protection is on by default for organizations. If it has been turned off for your organization, no new protection or share can be added ("Access protection is turned off for this organization. Contact Komuta support to turn it on."); existing protections keep working.
 
 | Permission | What it allows |
 |---|---|

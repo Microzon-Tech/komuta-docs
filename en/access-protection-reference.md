@@ -30,13 +30,13 @@ Access protection guides:
 | Protection end date | In the future, at most 365 days away |
 | Protected addresses (hosts) | At most 50 per service |
 | Visitor session | At most 12 hours; never past the share end or an "open to everyone" end |
-| Sign-in link | 15 minutes (the sign-in page in the console) |
+| Sign-in link | About 10 minutes (sign-in must be completed within this time) |
 | Sign-in attempts | 30 per user per minute |
 | Email verification code | 8 digits, valid 10 minutes, invalid after 5 wrong attempts |
-| Email code requests | 20 per user per hour; 5 per user and address per hour; 3 per address per hour from the same browser (30/60/120 s waits) |
+| Email code requests | 20 per user per hour; 5 per user and address per hour; 3 sends per hour per Komuta account, service and address (30/60/120 s waits) |
 | Request path (on a service with path rules or page limits) | At most 1024 bytes; longer gets `400` |
 | Access log | Kept 30 days; 15 s batches; 500 rows per service per hour (sign-ins excluded); 50 records per page |
-| Access ending after a share is removed | About 30 seconds |
+| Access ending after a share is removed | About 30 seconds (all sessions of the service are renewed) |
 | Identity JWT | Valid 5 minutes; `nbf` = `iat` − 30 s |
 
 ---
@@ -51,7 +51,7 @@ Access protection guides:
 | `Protected` | Protected | Korunuyor | Yes |
 | `Disabling` | Turning off | Kapatılıyor | Until the last step |
 
-Steps during `Enforcing` (`RouteFilter` → `PodTokenLock` → `CachePurge`): adding the gateway check to every route, the pod lock, purging the Cloudflare cache. The console doesn't show the step names; it says "{done} of {total} steps completed" (5 steps: preparation, the three enforcing steps, verification). `Disabling` runs in reverse: first the pod lock, then the gateway check is removed.
+Steps during `Enforcing` (`RouteFilter` → `PodTokenLock` → `CachePurge`): adding the gateway check to every route, the pod lock, purging the Cloudflare cache. The console doesn't show the step names; it says "{done} of {total} steps completed" (5 steps: preparation, the three enforcing steps, protected). `Disabling` runs in reverse: first the pod lock, then the gateway check is removed.
 
 Expiry action (`ExpiryAction`): `KeepLocked` = **Then keep it locked** (default), `OpenToEveryone` = **Then open it to everyone**.
 
@@ -74,7 +74,8 @@ The meanings of warning codes (`lastError`) are in [Access Protection → Warnin
 | The same, other methods | `403` | `this path is not shared with you` |
 | IP not on the list (or not verified as coming through Cloudflare), `GET`/`HEAD` | `403` | "Access to this service is restricted" HTML page; the address is shown only for a verified address that isn't on the list |
 | The same, other methods | `403` | `access restricted to allowed networks` |
-| **Block completely** rule | `403` | `access denied` |
+| **Block completely** rule (or while protection is being set up and the address isn't recognised yet) | `403` | `access denied` |
+| Sign-in return link invalid, expired or already used | `403` | `sign-in link is invalid or expired` (open the protected page again) |
 | Invalid service token | `401` | `invalid service token`, `WWW-Authenticate: KomutaServiceToken realm="komuta"` |
 | Valid token, page out of scope | `403` | `this service token cannot open this path` |
 | Unreadable path or longer than 1024 bytes (on a service with path rules/page limits) | `400` | `bad request` |
@@ -100,7 +101,7 @@ Every refusal carries `Cache-Control: no-store`. HTML pages appear in Turkish or
 | `__Host-komuta_state` | Cookie | A short-lived cookie used during sign-in (10 minutes). Not passed to the application. |
 | `/.komuta-access/callback` | Path | Where sign-in returns to. Paths starting with `/.komuta-access` are reserved for Komuta; no rule or webhook path can be defined for them. |
 
-Visitor identity headers can't be faked by a visitor: they are removed and rewritten on every allowed request that passes Komuta. For JWT claims and verification rules see [End Date and Visitor Identity](access-protection-settings.md#proof-of-identity-jwt).
+Once visitor identity is active (the "Getting ready" note on Settings is gone), these headers can't be faked by a visitor: they are removed and rewritten on every allowed request that passes Komuta. The signed `x-komuta-identity` can always be verified. For JWT claims and verification rules see [End Date and Visitor Identity](access-protection-settings.md#proof-of-identity-jwt).
 
 **Public keys (JWKS):** `https://api.komuta.io/api/devopszon/access-protection/identity-keys` — anonymous, may be cached for 5 minutes.
 
@@ -124,7 +125,6 @@ Technical codes in the access log and their console text:
 | `code_rejected` | Refusal | Komuta refused the sign-in |
 | `token_invalid` | Refusal | Sent an unknown or expired service token |
 | `token_not_allowed` | Refusal | The service token cannot open this page |
-| `login_required` | Refusal | Needed to sign in |
 | `overflow` | Total | More visits this hour, grouped together |
 
 ---
@@ -236,16 +236,16 @@ The `OPTIONS` preflight request a browser sends carries no cookies, so it gets `
 Check the status badge: during **Preparing** the check isn't active yet. If it shows **Applying** or **Protected**, your browser may have opened the page from its cache; reload the page. If the problem persists, check the card for a warning.
 
 **I locked myself out.**
-The Komuta console isn't affected by protection. In the console, go to the **Rules** tab and add your new address to the IP list (you can see your address on the **Access restricted** page), or remove protection with **Settings → Open to everyone now**.
+The Komuta console isn't affected by protection. In the console, go to the **Rules** tab and add your new address to the IP list (you can see your address on the **Access to this service is restricted** page), or remove protection with **Settings → Open to everyone now**.
 
 **What happens to a sleeping service?**
 Protection applies while it sleeps too. Only a visitor who passes the checks can wake the service; someone who hasn't signed in or comes from an address that isn't allowed can't.
 
 **I removed a share; is the person out immediately?**
-Yes, within about 30 seconds, including their open sessions.
+Yes, within about 30 seconds, including their open sessions. The other visitors of the service sign in once more too.
 
 **Can I sign out one person individually?**
-There is no per-person sign-out. Removing the person's share or bringing its end date forward ends the sessions opened through that share. To remove a single person who came in through an organization share, remove them from the organization.
+There is no per-person sign-out. Removing a share or bringing its end date forward cuts that person's access, but also ends **every** open session of this service: everyone signs in again on their next page load (automatic for people already signed in to Komuta; people who came in through an email share request a new code). To remove a single person who came in through an organization share, remove them from the organization.
 
 **Can I export the access log?**
 Not at the moment. The log is visible in the console for 30 days.

@@ -30,13 +30,13 @@ Erişim koruması rehberleri:
 | Koruma bitişi | Gelecekte, en fazla 365 gün sonra |
 | Korunan adres (host) sayısı | Servis başına en fazla 50 |
 | Ziyaretçi oturumu | En fazla 12 saat; paylaşımın ve "herkese açılsın" bitişinin ötesine geçmez |
-| Giriş bağlantısı | 15 dakika (konsoldaki giriş sayfası) |
+| Giriş bağlantısı | Yaklaşık 10 dakika (girişin bu sürede tamamlanması gerekir) |
 | Giriş denemesi | Kullanıcı başına dakikada 30 |
 | E-posta doğrulama kodu | 8 hane, 10 dakika geçerli, 5 hatalı denemede geçersiz |
-| E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı tarayıcıdan adres başına saatte 3 (30/60/120 sn bekleme) |
+| E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
 | Erişim kaydı | 30 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
-| Paylaşımdan sonra erişimin kesilmesi | Yaklaşık 30 saniye |
+| Paylaşım kaldırıldıktan sonra erişimin kesilmesi | Yaklaşık 30 saniye (servisteki tüm oturumlar yenilenir) |
 | Kimlik JWT'si | 5 dakika geçerli; `nbf` = `iat` − 30 sn |
 
 ---
@@ -51,7 +51,7 @@ Erişim koruması rehberleri:
 | `Protected` | Korunuyor | Protected | Evet |
 | `Disabling` | Kapatılıyor | Turning off | Son adıma kadar |
 
-`Enforcing` sırasındaki adımlar (`RouteFilter` → `PodTokenLock` → `CachePurge`): ağ geçidi kontrolünün tüm rotalara eklenmesi, pod kilidi, Cloudflare önbelleğinin temizlenmesi. Arayüz adımların adını göstermez, "{toplam} adımın {n} tanesi tamamlandı" der (5 adım: hazırlık, üç uygulama adımı, doğrulama). `Disabling` ters sırada çalışır: önce pod kilidi, sonra ağ geçidi kontrolü kalkar.
+`Enforcing` sırasındaki adımlar (`RouteFilter` → `PodTokenLock` → `CachePurge`): ağ geçidi kontrolünün tüm rotalara eklenmesi, pod kilidi, Cloudflare önbelleğinin temizlenmesi. Arayüz adımların adını göstermez, "{toplam} adımın {n} tanesi tamamlandı" der (5 adım: hazırlık, üç uygulama adımı, korunuyor). `Disabling` ters sırada çalışır: önce pod kilidi, sonra ağ geçidi kontrolü kalkar.
 
 Bitiş davranışı (`ExpiryAction`): `KeepLocked` = **Sonra kilitli kalsın** (varsayılan), `OpenToEveryone` = **Sonra herkese açılsın**.
 
@@ -74,7 +74,8 @@ Uyarı kodlarının (`lastError`) anlamları [Erişim Koruması → Uyarılar ve
 | Aynısı, diğer yöntemler | `403` | `this path is not shared with you` |
 | IP listede değil (ya da Cloudflare üzerinden geldiği doğrulanamadı), `GET`/`HEAD` | `403` | "Bu servise erişim kısıtlı" HTML sayfası; adres yalnızca doğrulanmış ve listede olmayan bir adres için gösterilir |
 | Aynısı, diğer yöntemler | `403` | `access restricted to allowed networks` |
-| **Tamamen engelle** kuralı | `403` | `access denied` |
+| **Tamamen engelle** kuralı (ya da koruma kurulurken adres henüz tanınmadığında) | `403` | `access denied` |
+| Girişten dönüş bağlantısı geçersiz, süresi dolmuş ya da daha önce kullanılmış | `403` | `sign-in link is invalid or expired` (korunan sayfayı yeniden açın) |
 | Geçersiz servis token'ı | `401` | `invalid service token`, `WWW-Authenticate: KomutaServiceToken realm="komuta"` |
 | Geçerli token, kapsam dışı sayfa | `403` | `this service token cannot open this path` |
 | Okunamayan ya da 1024 bayttan uzun yol (yol kuralı/sayfa sınırı olan serviste) | `400` | `bad request` |
@@ -100,7 +101,7 @@ Tüm ret yanıtları `Cache-Control: no-store` taşır. HTML sayfalar ziyaretçi
 | `__Host-komuta_state` | Çerez | Giriş sürerken kullanılan kısa ömürlü çerez (10 dakika). Uygulamaya iletilmez. |
 | `/.komuta-access/callback` | Yol | Girişten dönüş adresi. `/.komuta-access` ile başlayan yollar Komuta'ya ayrılmıştır; kural ya da webhook yolu tanımlanamaz. |
 
-Kimlik bildirme başlıkları ziyaretçi tarafından taklit edilemez: Komuta'dan geçen her izinli istekte silinip yeniden yazılır. JWT alanları ve doğrulama kuralları için bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#kimlik-kanıtı-jwt).
+Kimlik bildirme etkinleştikten sonra (Ayarlar'daki "Hazırlanıyor" notu kalktığında) bu başlıklar ziyaretçi tarafından taklit edilemez: Komuta'dan geçen her izinli istekte silinip yeniden yazılır. İmzalı `x-komuta-identity` her zaman doğrulanabilir. JWT alanları ve doğrulama kuralları için bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#kimlik-kanıtı-jwt).
 
 **Açık anahtarlar (JWKS):** `https://api.komuta.io/api/devopszon/access-protection/identity-keys` — anonim, 5 dakika önbelleklenebilir.
 
@@ -124,7 +125,6 @@ Erişim kaydındaki teknik kodlar ve arayüzdeki karşılıkları:
 | `code_rejected` | Ret | Komuta girişi reddetti |
 | `token_invalid` | Ret | Bilinmeyen ya da süresi dolmuş bir servis token'ı gönderdi |
 | `token_not_allowed` | Ret | Servis token'ı bu sayfayı açamaz |
-| `login_required` | Ret | Giriş yapması gerekiyordu |
 | `overflow` | Toplam | Bu saatteki diğer ziyaretler, birlikte gruplandı |
 
 ---
@@ -242,10 +242,10 @@ Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP l
 Koruma uyurken de geçerlidir. Servisi ancak kontrolleri geçen bir ziyaretçi uyandırabilir; giriş yapmamış ya da izinli olmayan bir adresten gelen biri uyandıramaz.
 
 **Bir paylaşımı kaldırdım, kişi hemen çıkar mı?**
-Evet, açık oturumları dahil yaklaşık 30 saniye içinde.
+Evet, açık oturumları dahil yaklaşık 30 saniye içinde. Servisteki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 
 **Bir kişiyi tek tek oturumdan çıkarabilir miyim?**
-Kişi bazında oturum kapatma yoktur. Kişinin paylaşımını kaldırmak ya da bitişini öne çekmek o paylaşımla açılmış oturumları sonlandırır. Organizasyon paylaşımıyla giren tek bir kişiyi çıkarmak için o kişiyi organizasyondan çıkarın.
+Kişi bazında oturum kapatma yoktur. Bir paylaşımı kaldırmak ya da bitişini öne çekmek o kişinin erişimini keser, ancak bu servisteki **tüm** açık oturumları da sonlandırır: herkes bir sonraki sayfa açılışında yeniden giriş yapar (Komuta'ya zaten giriş yapmış olanlar için bu otomatiktir; e-posta paylaşımıyla girenler yeni kod ister). Organizasyon paylaşımıyla giren tek bir kişiyi çıkarmak için o kişiyi organizasyondan çıkarın.
 
 **Erişim kaydını dışa aktarabilir miyim?**
 Şu an hayır. Kayıt konsolda 30 gün görünür.

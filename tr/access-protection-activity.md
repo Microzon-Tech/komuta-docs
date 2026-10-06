@@ -12,16 +12,17 @@ Kayıt, erişim koruması açıkken tutulur. Koruma kapalıyken sekme "Erişim k
 |---|---|---|
 | **Giriş** | Bir ziyaretçi Komuta ile giriş yapıp servise döndüğünde | **Giriş yaptı** |
 | **Sayfa görüntüleme** | Giriş yapmış bir ziyaretçi bir sayfa açtığında | **Sayfayı açtı** |
-| **Token ile erişim** | Bir program servis token'ıyla bir sayfa açtığında | **Sayfayı servis token'ıyla açtı** |
+| **Token ile erişim** | Bir program servis token'ıyla bir sayfa açtığında (`GET`, dosya olmayan yollar) | **Sayfayı servis token'ıyla açtı** |
 | **Webhook teslimatı** | Bir açık yola istek geldiğinde | **Açık yola teslim edildi** |
 | **Ret** | Bir ziyaretçi kurallarınız yüzünden geri çevrildiğinde | Rettin nedeni (aşağıdaki tablo) |
 
 Neler **kaydedilmez**:
 
 - **Dosya istekleri.** Sayfa görüntüleme olarak yalnızca `GET` istekleri ve son bölümünde nokta olmayan yollar sayılır. `/app.js`, `/logo.png`, `/style.css` gibi istekler kaydedilmez; böylece kayıt gerçek sayfa açılışlarını gösterir.
-- **IP listesiyle girişsiz geçen ziyaretler.** Giriş yapmadan, izinli bir adresten gelen ziyaretçilerin sayfa açılışları kaydedilmez (yalnızca giriş yapmış ziyaretçilerin sayfa görüntülemeleri kaydedilir).
+- **Girişin gerekmediği yerlerdeki ziyaretler.** Sayfa açılışları yalnızca girişin gerektiği sayfalarda, giriş yapmış ziyaretçiler ve token'lar için kaydedilir. Herkese açık yollarda ve IP listesiyle girişsiz geçilen sayfalarda kimse kaydedilmez; ziyaretçi giriş yapmış olsa bile.
+- **Giriş sayfasına yönlendirmeler.** Giriş yapmamış bir ziyaretçinin giriş sayfasına gönderilmesi ve oturumsuz program isteklerine dönen `401` ret sayılmaz; kayıtta görünmez.
 - **Platform kaynaklı sorunlar.** Komuta tarafındaki geçici bir arıza yüzünden verilemeyen cevaplar ziyaretçi retti sayılmaz.
-- **Komuta'nın kendi koruma kontrolü.** Komuta, korumanın çalıştığını doğrulamak için servisinize kendi test isteklerini gönderir; bunlar kayda yazılmaz.
+- **Komuta'nın imzalı test girişi.** Komuta, korumanın çalıştığını doğrulamak için giriş yapmış gibi bir test isteği gönderir; bu kayda yazılmaz. Koruma açılırken yapılan anonim kontroller ise IP listesi ya da **Tamamen engelle** kuralı olan servislerde birkaç **Giriş yapmamış** reddi olarak görünebilir.
 
 ---
 
@@ -31,7 +32,7 @@ Kayıtlar güne göre gruplanır; her günün başında uzun tarih yazar. Sütun
 
 | Sütun | İçerik |
 |---|---|
-| **Saat** | Olayın son görüldüğü saat (yerel saatinizle). |
+| **Saat** | Olayın son görüldüğü saat (hesabınızda seçtiğiniz saat diliminde). |
 | **Kim** | Ziyaretçinin adı (ve e-postası), ya da aşağıdaki etiketlerden biri. |
 | **Ne oldu** | Olay ya da ret nedeni. |
 | **Sayfa** | HTTP yöntemi ve yol, örneğin `GET /raporlar`. Sorgu dizesi (`?…`) kaydedilmez; yol 256 karakterden sonra kesilir. |
@@ -80,7 +81,6 @@ Ziyaretçinin adresi, istek Cloudflare üzerinden doğrulanabildiğinde görün�
 | **Komuta girişi reddetti** | Giriş bağlantısı Komuta tarafından reddedildi (örneğin daha önce kullanılmış). |
 | **Bilinmeyen ya da süresi dolmuş bir servis token'ı gönderdi** | Geçersiz token. |
 | **Servis token'ı bu sayfayı açamaz** | Token geçerli ama bu sayfa kapsamında değil. |
-| **Giriş yapması gerekiyordu** | Giriş gerektiren bir sayfaya oturumsuz bir program isteği geldi (tarayıcı dışı istek, `401`). |
 | **Bu saatteki diğer ziyaretler, birlikte gruplandı** | Kayda sığmayan olayların toplamı. |
 | **Reddedildi ({kod})** | Arayüzün tanımadığı bir neden; parantez içinde teknik kod yazar. |
 
@@ -93,7 +93,7 @@ Kayıt her isteği ayrı satır olarak tutmaz:
 - **15 saniyelik paketler.** Aynı olay (aynı kişi, aynı sonuç, aynı neden, aynı yöntem, aynı yol, aynı adres) 15 saniye içinde birden çok kez olursa tek olay olarak, sayısıyla birlikte gönderilir.
 - **Saatlik satırlar.** Aynı olaylar bir saat boyunca tek satırda toplanır; **Adet** sütunu artar ve **Saat** son görüldüğü zamanı gösterir.
 - **Saat başına sınır.** Bir servis için bir saatte en fazla 500 farklı satır tutulur (girişler bu sınıra dahil değildir). Fazlası **Diğer ziyaretçiler** / **Bu saatteki diğer ziyaretler, birlikte gruplandı** satırında toplanır.
-- **Yoğun anlar.** Çok yoğun bir saldırı ya da tarama anında, diğer servislerin ve girişlerin kaydı bozulmasın diye bir servis için 15 saniyede kaydedilebilecek sayfa görüntüleme ve ret sayısı sınırlıdır. Bu yüzden kayıt bir güvenlik denetim kaydı değil, "kim geldi, kim geri çevrildi" görünümüdür.
+- **Yoğun anlar.** Çok yoğun bir saldırı ya da tarama anında, diğer servislerin ve girişlerin kaydı bozulmasın diye bir servis için 15 saniyede kaydedilebilecek sayfa görüntüleme ve ret sayısı sınırlıdır. Bu sınırı aşan olaylar kayda hiç yazılmaz; **Diğer ziyaretçiler** satırında da sayılmaz. Bu yüzden kayıt bir güvenlik denetim kaydı değil, "kim geldi, kim geri çevrildi" görünümüdür.
 
 Kayıtlar listede birkaç saniye ile yaklaşık yarım dakika arasında bir gecikmeyle görünür.
 

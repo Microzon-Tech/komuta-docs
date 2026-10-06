@@ -12,16 +12,17 @@ The log is kept while access protection is on. While protection is off the tab s
 |---|---|---|
 | **Sign-in** | A visitor signs in with Komuta and returns to the service | **Signed in** |
 | **Page view** | A signed-in visitor opens a page | **Opened the page** |
-| **Access with a token** | A program opens a page with a service token | **Opened the page with a service token** |
+| **Access with a token** | A program opens a page with a service token (`GET`, paths that aren't files) | **Opened the page with a service token** |
 | **Webhook delivery** | A request arrives on an open path | **Delivered to an open path** |
 | **Refusal** | A visitor is turned away by your rules | The reason for the refusal (table below) |
 
 What is **not** recorded:
 
 - **File requests.** Only `GET` requests whose last path segment has no dot count as page views. Requests such as `/app.js`, `/logo.png` or `/style.css` aren't recorded, so the log shows real page openings.
-- **Visits let in by the IP list without sign-in.** Page views of visitors who come from an allowed address without signing in aren't recorded (only signed-in visitors' page views are).
+- **Visits where sign-in isn't needed.** Page views are recorded only on pages that need sign-in, for signed-in visitors and tokens. Nobody is recorded on paths open to everyone or on pages passed without sign-in thanks to the IP list, even if the visitor has signed in.
+- **Redirects to sign-in.** Sending a visitor who hasn't signed in to the sign-in page, and the `401` returned to programs without a session, are not refusals and don't appear in the log.
 - **Platform-side problems.** A response that couldn't be given because of a temporary fault on Komuta's side doesn't count as a visitor refusal.
-- **Komuta's own protection check.** Komuta sends its own test requests to your service to confirm protection works; these aren't written to the log.
+- **Komuta's signed test sign-in.** To confirm protection works, Komuta sends a test request that acts as signed in; it isn't written to the log. The anonymous checks made while protection is being turned on may, however, show up as a few **Not signed in** refusals on services with an IP list or a **Block completely** rule.
 
 ---
 
@@ -31,7 +32,7 @@ Records are grouped by day; each day starts with the full date. Columns:
 
 | Column | Contents |
 |---|---|
-| **Time** | When the event was last seen (in your local time). |
+| **Time** | When the event was last seen (in the time zone chosen in your account). |
 | **Who** | The visitor's name (and email), or one of the labels below. |
 | **What happened** | The event or the reason for a refusal. |
 | **Page** | The HTTP method and path, for example `GET /reports`. The query string (`?…`) isn't recorded; paths are cut after 256 characters. |
@@ -80,7 +81,6 @@ A visitor's address is shown when the request could be verified as coming throug
 | **Komuta refused the sign-in** | Komuta refused the sign-in link (for example, it had already been used). |
 | **Sent an unknown or expired service token** | Invalid token. |
 | **The service token cannot open this page** | The token is valid but this page is outside its scope. |
-| **Needed to sign in** | A program request without a session reached a page that requires sign-in (a non-browser request, `401`). |
 | **More visits this hour, grouped together** | The total of events that didn't fit into the log. |
 | **Refused ({code})** | A reason the console doesn't recognise; the technical code is shown in brackets. |
 
@@ -93,7 +93,7 @@ The log doesn't keep every request as a separate row:
 - **15-second batches.** If the same event (same person, same outcome, same reason, same method, same path, same address) happens several times within 15 seconds, it is sent as one event with a count.
 - **Hourly rows.** The same events are gathered into one row for each hour; the **Times** column grows and **Time** shows when it was last seen.
 - **Hourly limit.** At most 500 different rows are kept per service per hour (sign-ins don't count towards this). The rest is gathered in the **Other visitors** / **More visits this hour, grouped together** row.
-- **Busy moments.** During a very heavy attack or scan, the number of page views and refusals that can be recorded for one service per 15 seconds is limited, so that other services and sign-ins aren't crowded out. That's why the log is a "who came, who was refused" view, not a security audit log.
+- **Busy moments.** During a very heavy attack or scan, the number of page views and refusals that can be recorded for one service per 15 seconds is limited, so that other services and sign-ins aren't crowded out. Events above this cap are not recorded at all, not even in the **Other visitors** row. That's why the log is a "who came, who was refused" view, not a security audit log.
 
 Records appear in the list with a delay of a few seconds up to about half a minute.
 

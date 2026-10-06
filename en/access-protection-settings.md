@@ -6,7 +6,7 @@ The **Settings** tab of the **Access & ports** page has three sections:
 - **Tell my application who signed in** — passing who the signed-in visitor is to your application.
 - **Remove protection now** — the **Open to everyone now** button.
 
-These sections appear once protection has been applied. While protection is off, the tab shows the **Access protection is off** notice. Changing the settings needs the **Manage service access protection** permission; people without it only see the summary sentence.
+These sections appear once protection has been turned on and saved (also while it is **Preparing**). While protection is off, the tab shows the **Access protection is off** notice. Changing the settings needs the **Manage service access protection** permission; people without it only see the summary sentence.
 
 ---
 
@@ -35,7 +35,7 @@ The sentence at the top of the section summarises the current situation:
 Rules:
 
 - The end must be in the future and at most **365 days** away.
-- An end date can only be set after protection has been applied. Saving on the **Rules** tab doesn't change the existing end date.
+- An end date can be set while protection is on (once it has been saved). Saving on the **Rules** tab doesn't change the existing end date.
 - **Make permanent** removes the end date (after the **Make protection permanent?** confirmation). Clearing the field and saving opens the same confirmation.
 - If the service's public URL is off, or it has no public address yet, you can only move the end date later, keep the service locked, or make protection permanent; changes that would widen access (moving the end earlier, adding an end where there was none, choosing "open it to everyone") aren't possible.
 
@@ -56,9 +56,9 @@ For protection with an end date, Komuta sends three emails:
 | 1 hour before the end | The same |
 | At the end | "Access protection for {service} has ended; the service is still locked" or "Access protection for {service} has ended; the service is now open to everyone" |
 
-- **Recipients:** active users with a verified email who have edit access to the service and the **Manage service access protection** permission. If there are none, the organization admins with that permission. At most 50 people.
+- **Recipients:** active users with a verified email who have been given edit access to the service itself and the **Manage service access protection** permission. If there are none, the organization admins with that permission. At most 50 people.
 - **Language:** Turkish if the organization's default language is Turkish, otherwise English. Dates in the emails are written in UTC.
-- If you set the end closer than 24 hours (or 1 hour) away, reminders whose time has already passed aren't sent. If you change the date or the **When it ends** choice, the reminders are set up again for the new time.
+- If you set the end closer than 24 hours (or 1 hour) away, reminders whose time has already passed aren't sent. If you change the end date, the reminders are set up again for the new time; changing only the **When it ends** choice doesn't re-send reminders already sent (later ones go out with the new choice).
 - The end email is sent only within 7 days after the end.
 - The upcoming-end and "still locked" emails contain three links: **Open to everyone now**, **Extend** and **Make permanent**. The links open the **Settings** tab in the console; the action is taken there with your confirmation (**Open to everyone now** and **Make permanent** open the confirmation dialog, **Extend** puts the cursor in the date field). A link acts once, and only for people with the **Manage service access protection** permission.
 
@@ -89,9 +89,9 @@ Turn the switch on; the setting is saved immediately ("The visitor will be named
 Things to know:
 
 - **The headers are filled only on requests that need sign-in.** On the open parts of the site, where the IP list lets visitors in without sign-in, and on webhook paths, the headers are empty even if the visitor has signed in.
-- **On requests with a service token** only `x-komuta-identity` is filled; its `kind` is `service_token` and its `sub` is the token's id. The other two headers are empty.
+- **On requests with a service token** only `x-komuta-identity` is filled; its `kind` is `service_token` and its `sub` is the token's id: the 32 hex characters after `kst_` in the token value, written as a dashed GUID. The other two headers are empty.
 - **Visitors who signed in before you turned this on** are named without their email until they sign in again (at most 12 hours): `x-komuta-user-email` is empty and the JWT has no `email` claim.
-- Headers with the same names that a visitor sends themselves are always removed while passing through Komuta and rewritten with the right value (or empty); nobody on the internet can fake these headers.
+- Unless the section says "Getting ready" or that the routes haven't been updated yet, headers with the same names that a visitor sends themselves are removed while passing through Komuta and rewritten with the right value (or empty); nobody on the internet can fake these headers. While it is getting ready, don't trust the plain headers; the signed `x-komuta-identity` can always be verified.
 
 ### Which header to trust
 

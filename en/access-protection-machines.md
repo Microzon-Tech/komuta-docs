@@ -10,7 +10,7 @@ Access protection offers three ways for such requests:
 | **Service token** | Programs you control (CI jobs, monitoring tools, scripts) | **Machines** tab → **Service tokens** |
 | **Services that may come in over the private mesh** | Your Komuta services on other clusters reaching this service directly | **Machines** tab → **Services that may come in over the private mesh** (the private mesh itself is on the **Network** tab) |
 
-The webhook and service token sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, you can prepare the list before turning protection on.
+The webhook and service token sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, the list appears and can be filled in as soon as you start turning protection on on the **Rules** tab (before saving).
 
 ---
 
@@ -36,9 +36,9 @@ The list shows each open path with its methods, its sender list ("Only from: …
 - **No sign-in is asked.** Requests with the chosen methods pass without Komuta sign-in.
 - **Only the chosen methods are open.** A request with another method is decided as if there were no open path, so it has to pass the site's normal protection.
 - **The site's IP list and parent path rules don't apply.** On an open path, the only address check is the path's own **Sender addresses** list.
-- **Block rules still apply.** Only a **Block completely** rule can sit under an open path; for example, with `/webhooks` open, `/webhooks/old` can still be blocked. Sign-in, IP or people rules can't go under an open path; the window prevents this with "This path overlaps the rule for {other}…".
+- **Block rules still apply.** Only a **Block completely** rule can sit under an open path; for example, with `/webhooks` open, `/webhooks/old` can still be blocked. Sign-in, IP or people rules can't go under an open path. The webhook window refuses a path that overlaps an existing rule with "This path overlaps the rule for {other}. An open path can't share its place with another rule."; if you try to save a rule under an open path on the **Rules** tab, you get a "… sits under the open path …" error.
 - **Path matching is case-insensitive.** A request to `/HOOKS/x` is under `/hooks`. A request is opened only when every way its path can be read stays under the open path; `%2f`, `..` and similar tricks can't be used to escape from an open path to another path.
-- **When several open paths cover a request, the most specific one decides.**
+- **Open paths can't be nested.** A second open path can't be opened on, or under, an existing open path.
 - **Method-override headers are ignored.** Komuta looks at the request's real method. Your application shouldn't honour headers such as `X-HTTP-Method-Override` or `X-HTTP-Method` on these paths; otherwise requests that act like `DELETE` could be sent to a path you opened only for `POST`.
 - **CORS preflight requests (`OPTIONS`) don't pass an open path.** `OPTIONS` isn't one of the methods you can choose. A webhook path isn't suitable for endpoints that a browser must call from another site.
 - **The access log** records every delivery to an open path as **Request on an open path** / **Delivered to an open path**, under the open path's prefix rather than the full path.
@@ -49,6 +49,7 @@ The list shows each open path with its methods, its sender list ("Only from: …
 - `/` (the whole site) and Komuta's own sign-in path (anything starting with `/.komuta-access`) can't be opened.
 - The path follows the same [syntax as path rules](access-protection-rules.md#path-syntax) (at most 256 characters). The window shows the same message for every invalid path: "Enter a path like /webhooks/github. The whole site can't be opened."
 - The sender list takes at most 100 entries and only public internet addresses. If the list has an invalid line, **Open the path** stays disabled.
+- Opening and closing webhook paths needs the **Manage service access protection** permission; others only see the list.
 - Protection made up only of open paths protects nothing; a webhook path makes sense while the site, or at least one path, is under some other protection.
 
 ---
@@ -81,7 +82,7 @@ A token looks like `kst_<32 hex characters>_<43 characters>`. Send the value as 
 - **It can't get past IP rules.** If the site or path requires an IP list, a request with a token must also come from a listed address. Exception: if the rule uses the **Either is enough** combination, the token stands in for sign-in and no address is needed.
 - **It can't get past Only chosen people rules.** A path open only to chosen people doesn't open with a token.
 - **When the header is present, it decides alone.** If a request has an `x-komuta-service-token` header, the result depends only on the token: an invalid token is refused even if the browser has a valid session.
-- **It isn't read on paths open to everyone.** Komuta doesn't look at the token on a path that is already open to everyone.
+- **It isn't read where sign-in isn't needed.** On paths open to everyone and on places passed without sign-in thanks to the IP list, Komuta doesn't look at the token; the request passes even with an invalid token.
 - **It never reaches your application.** Komuta removes the header after checking it; the token value doesn't end up in your application's logs.
 - **It needs Komuta sign-in.** Tokens work only while protection requires Komuta sign-in (on the site or in a path rule). If sign-in isn't required, the section says "Service tokens work only while Komuta sign-in is required." and no new token can be created.
 
@@ -107,7 +108,7 @@ When the first token of a service is created, Komuta refreshes the service's rou
 
 - A service can have at most **20** service tokens.
 - Creating and deleting tokens needs the **Manage who a protected service is shared with** permission (the same as shares).
-- In the access log, requests made with a token appear as **Service token: {name}**.
+- In the access log, pages opened with a token (only `GET` and paths that aren't files) appear as **Service token: {name}**; other requests made with a token, such as `POST`, aren't recorded. Refused token requests are recorded for every method.
 
 ---
 

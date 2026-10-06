@@ -42,7 +42,7 @@ Kurallar:
 
 Kart hatalı satırları siz yazarken "Satır {n}" diye işaretler ve hata düzelene kadar **Korumayı uygula** düğmesi kapalı kalır.
 
-#### Kendi IP'mi ekle
+### Kendi IP'mi ekle
 
 **Kendi IP'mi ekle** düğmesi, Komuta konsolunun gördüğü genel adresinizi listeye ekler (yalnızca taslağa; kaydetmek için **Korumayı uygula** gerekir):
 
@@ -53,7 +53,7 @@ Kart hatalı satırları siz yazarken "Satır {n}" diye işaretler ve hata düze
 
 > **Kendinizi dışarıda bırakmayın.** Eklenen adres, konsolun gördüğü adrestir. Tarayıcınız servise farklı bir bağlantıyla ulaşıyor olabilir (örneğin konsola IPv6, servise IPv4); bu durumda servis başka bir adres görür. Uygulamadan önce kontrol edin; gerekirse hem IPv4 hem IPv6 adresinizi ekleyin. Yine de dışarıda kalırsanız **Erişim kısıtlı** sayfası servisin gördüğü adresi gösterir; bu adresi kopyalayıp listeye ekleyebilirsiniz.
 
-#### Adres nasıl belirlenir
+### Adres nasıl belirlenir
 
 Komuta ziyaretçinin adresini yalnızca Cloudflare'in yazdığı bilgiden alır ve isteğin gerçekten Cloudflare üzerinden geldiğini ayrıca doğrular. Ziyaretçinin kendi gönderdiği `X-Forwarded-For`, `X-Real-IP`, `True-Client-IP` ya da `Forwarded` gibi başlıklar dikkate alınmaz; adres taklit edilerek listeye girilemez.
 
@@ -136,7 +136,7 @@ Bilmeniz gerekenler:
 - Hiç kimse seçilmezse "Henüz kimse seçilmedi. Şimdi uygularsanız bu yolu kimse açamaz." uyarısı çıkar; kural geçerlidir ve yolu kimse açamaz.
 - Saat aralığı her istekte yeniden kontrol edilir. Aralık başladığında kişi yeniden giriş yapmadan yolu açabilir; aralık bitince yol, açık oturumlar dahil birkaç saniye içinde kapanır.
 - Bir kişiyi kurala sonradan eklediğinizde, o kişi daha önce giriş yapmışsa ilk denemesinde bir kez yeniden giriş sayfasına yönlendirilebilir; bu, yeni yetkinin oturumuna eklenmesi içindir.
-- Kurala seçilen bir paylaşım sonradan kaldırılırsa kural "Seçilen # kişiyle servis artık paylaşılmıyor." der; **Bu kuraldan kaldır** ile temizleyebilirsiniz.
+- Kurala seçilen bir paylaşımı kaldırdığınızda kişi kuraldan da otomatik çıkarılır. Siz kuralı düzenlerken paylaşım başka bir yerde kaldırılırsa kart "Seçilen # kişiyle servis artık paylaşılmıyor." der; **Bu kuraldan kaldır** ile taslağı temizleyin.
 - Bu türde IP listesi kullanılamaz ve **servis token'ları bu yolları açamaz**.
 - Bir kurala en fazla 200 kişi seçilebilir. Paylaşımı belirli sayfalarla sınırlı bir kişiyi bir yol için seçerseniz o yol da kişinin açabileceği sayfalara eklenir; bir paylaşımın toplam sayfa sayısı 50'yi geçemez.
 

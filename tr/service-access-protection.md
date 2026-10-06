@@ -28,7 +28,7 @@ Korumalı bir servise gelen her istek, uygulamanıza ulaşmadan önce Komuta'nı
 2. Komuta isteği kurallarınıza göre değerlendirir: IP adresi listede mi, ziyaretçinin bu servis için geçerli bir oturumu var mı, açılan yol için özel bir kural var mı?
 3. Kurallar sağlanıyorsa istek uygulamanıza iletilir. Giriş gerekiyorsa ziyaretçi Komuta giriş sayfasına yönlendirilir. İzin yoksa ziyaretçi açıklayıcı bir sayfa görür ve istek uygulamanıza hiç ulaşmaz.
 
-Bu kontrolün etrafından dolaşılamaz. Koruma açıldığında Komuta servisinizin pod'larını da kilitler: pod'lar yalnızca ağ geçidinden, kontrolü geçmiş olarak gelen istekleri kabul eder. Biri ağ geçidini atlayıp doğrudan pod'a ulaşmaya çalışırsa istek reddedilir. (Aynı kümedeki kendi servisleriniz pod'larınıza eskisi gibi ulaşmaya devam eder.)
+Bu kontrolün etrafından dolaşılamaz. Koruma açıldığında Komuta servisinizin pod'larını da kilitler: pod'lar yalnızca ağ geçidinden, kontrolü geçmiş olarak gelen istekleri kabul eder. Biri ağ geçidini atlayıp doğrudan pod'a ulaşmaya çalışırsa istek reddedilir. (Aynı kümedeki kendi servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza doğrudan ulaşmaya devam eder.)
 
 Koruma servisinizin tüm genel adresleri için birlikte geçerlidir: Komuta'nın verdiği `*.komuta.app` adresi, **Alan adları** altında eklediğiniz özel alan adları ve mavi-yeşil dağıtımın önizleme adresi.
 
@@ -41,7 +41,7 @@ Aşağıdaki tarifler en sık kullanılan kurulumlardır. Tüm ayarlar **Servis 
 ### Yalnızca ekibim açabilsin
 
 1. **Kurallar** sekmesinde **Erişim koruması** anahtarını açın. **Komuta girişi iste** seçili gelir.
-2. **Korumayı uygula**'ya basın. Siz otomatik olarak paylaşım listesine eklenirsiniz.
+2. **Korumayı uygula**'ya basın. Paylaşımları yönetme izniniz varsa siz otomatik olarak paylaşım listesine eklenirsiniz.
 3. **Kişiler** sekmesinde **Paylaşım ekle → Organizasyonunuz** seçin.
 
 Organizasyonunuzun tüm üyeleri Komuta hesaplarıyla giriş yapıp servisi açabilir; diğer herkes giriş sayfasında kalır.
@@ -64,7 +64,7 @@ Listedeki adreslerden gelenler giriş yapmadan girer; diğer herkes **Erişim k�
 
 ### Ofisten girişsiz, dışarıdan girişle
 
-Hem **Komuta girişi iste**'yi hem **IP izin listesi**'ni açın ve "Giriş ve IP izin listesi nasıl birleşsin?" sorusunda **Biri yeterli**'yi seçin.
+**Komuta girişi iste**'yi açın, **IP izin listesi**'ne ofis adreslerinizi yazın ve "Giriş ve IP izin listesi nasıl birleşsin?" sorusunda **Biri yeterli**'yi seçin.
 
 ### Site açık kalsın, yalnızca yönetim paneli korunsun
 
@@ -94,9 +94,9 @@ Erişim koruması **Servis Detay → Yapılandırma → Erişim ve portlar** say
 
 Sekme adresi URL'de `?tab=` ile tutulur (`rules`, `people`, `machines`, `activity`, `network`, `settings`); bir sekmenin bağlantısını paylaşabilirsiniz.
 
-**Genel bakış** sekmesindeki **Genel erişim** kartı durumu tek cümleyle söyler: **Herkese açık**, **Koruma uygulanıyor**, **Korunuyor**, **Belirli yollar korunuyor**, **Koruma kaldırılıyor**, **Koruma tamamlanamıyor**, **İnternete açık değil**. Altında etkin ayarlar kısa etiketlerle sıralanır (ör. "Komuta girişi", "3 izinli adres", "2 yol kuralı", "5 paylaşım", "… tarihine kadar"). Servis herkese açıkken **Erişim korumasını kur** düğmesi sizi **Kurallar** sekmesine götürür ve korumayı açmaya başlatır. Bir sorun varsa başlığın yanında **Dikkat gerekiyor** etiketi görünür.
+**Genel bakış** sekmesindeki **Genel erişim** kartı durumu tek cümleyle söyler: **Herkese açık**, **Koruma uygulanıyor**, **Korunuyor**, **Belirli yollar korunuyor**, **Koruma kaldırılıyor**, **Koruma tamamlanamıyor** (özel ağ açık ve erişim kontrolünü atlıyor), **İnternete açık değil**, **Yalnızca özel ağ** (genel adres yok, servise yalnızca özel ağdan ulaşılıyor) ya da **Erişim durumu alınamadı**. Altında etkin ayarlar kısa etiketlerle sıralanır (ör. "Komuta girişi", "3 izinli adres", "2 yol kuralı", "5 paylaşım", "… tarihine kadar"). Servis herkese açıkken **Erişim korumasını kur** düğmesi sizi **Kurallar** sekmesine götürür ve korumayı açmaya başlatır. Herhangi bir uyarı varsa (sizin düzeltmeniz gerekenler dahil) başlığın yanında **Dikkat gerekiyor** etiketi görünür.
 
-Organizasyonunuzda erişim koruması kapatılmışsa ya da servisin korumasını görme yetkiniz yoksa yalnızca **Genel bakış** ve **Ağ** sekmeleri görünür.
+Servisin korumasını görme yetkiniz yoksa yalnızca **Genel bakış** ve **Ağ** sekmeleri görünür. Organizasyonunuzda erişim koruması kapatılmışsa korunmayan servislerde de yalnızca bu iki sekme görünür; zaten korunan servisler korunmaya devam eder ve yönetilebilir.
 
 ---
 
@@ -105,7 +105,7 @@ Organizasyonunuzda erişim koruması kapatılmışsa ya da servisin korumasını
 1. **Kurallar** sekmesinde **Erişim koruması** kartının başlığındaki anahtarı açın. Bu henüz bir şey kaydetmez; **Komuta girişi iste** seçili olarak ayarlar açılır.
 2. İstediğiniz kontrolleri seçin: Komuta girişi, IP izin listesi, yol kuralları ya da bunların birleşimi (bkz. [Kurallar](access-protection-rules.md)). En az biri gerekir.
 3. **Korumayı uygula**'ya basın ("Erişim koruması uygulanıyor").
-4. Komuta girişi seçtiyseniz **Kişiler** sekmesinden servisi paylaşın. Girişi ilk kez zorunlu kıldığınızda siz otomatik olarak eklenirsiniz.
+4. Komuta girişi seçtiyseniz **Kişiler** sekmesinden servisi paylaşın. Girişi zorunlu hale getiren kayıtta, paylaşımları yönetme izniniz varsa siz otomatik olarak eklenirsiniz.
 
 Vazgeçmek için **İptal**'e basın ya da anahtarı kapatın; kaydedilmemiş taslak silinir.
 
@@ -116,15 +116,15 @@ Korumayı servis genel bakışındaki **Servis koruması** kartından da adım a
 ## Ne kadar sürer
 
 - **İlk açılış** genellikle bir iki dakika sürer. Komuta servisinizin yönlendirme ayarlarını yeniler ve pod kilidini uygular; bu bir dağıtım olarak görünebilir ama yeni bir build yapılmaz.
-- Koruma **Uygulanıyor** durumuna geçtiği anda kontrol devreye girer. **Hazırlanıyor** sırasında servis hâlâ eski haliyle (herkese açık) çalışır.
+- Kontrol, koruma **Uygulanıyor** durumuna geçtikten kısa süre sonra, servisin yönlendirmeleri yenilenince devreye girer. **Hazırlanıyor** sırasında servis hâlâ eski haliyle (herkese açık) çalışır.
 - **Açık bir korumada** kural, IP listesi ve paylaşım değişiklikleri genellikle birkaç saniye ile yarım dakika arasında geçerli olur. Bu sırada kart "Son değişikliğiniz uygulanıyor." der.
-- **Kapatma** da birkaç saniye ile bir iki dakika arasında tamamlanır; koruma **Kapatılıyor** durumu bitene kadar sürer.
+- **Kapatma** da birkaç saniye ile bir iki dakika arasında tamamlanır; kontrol **Kapatılıyor** durumunun son adımında kalkar.
 
 ---
 
 ## Durumlar
 
-**Kurallar** sekmesindeki kartın başlığında bir durum etiketi bulunur:
+**Kurallar** sekmesindeki kartın başlığında bir durum etiketi bulunur (koruma kapalıyken etiket görünmez, yalnızca anahtar kapalıdır):
 
 | Etiket | Anlamı | Kontrol devrede mi? |
 |---|---|---|
@@ -134,7 +134,7 @@ Korumayı servis genel bakışındaki **Servis koruması** kartından da adım a
 | **Korunuyor** | Koruma tamamen yerinde. | Evet |
 | **Kapatılıyor** | Koruma kaldırılıyor; bitince URL'e sahip herkes servisi açabilir. | Son adıma kadar evet |
 
-Koruma açılırken kartta "{toplam} adımın {n} tanesi tamamlandı" yazan 5 adımlı bir ilerleme çubuğu görünür. Adımlar sırasıyla: hazırlık, ağ geçidi kontrolünün etkinleşmesi, pod kilidi, önbellek temizliği ve korumanın doğrulanması. Komuta son adımda korumayı kendisi dener: giriş yapmamış bir isteğin gerçekten reddedildiğini ve korunan yanıtların önbelleğe alınmadığını doğrular.
+Koruma açılırken kartta "{toplam} adımın {n} tanesi tamamlandı" yazan 5 adımlı bir ilerleme çubuğu görünür. Adımlar sırasıyla: hazırlık, ağ geçidi kontrolü, pod kilidi, önbellek temizliği ve korunuyor; çubuk koruma tamamlanınca kaybolur. Bu sırada Komuta korumayı kendisi dener: giriş yapmamış bir isteğin gerçekten reddedildiğini, giriş yapmış bir isteğin geçtiğini ve korunan yanıtların önbelleğe alınmadığını doğrular.
 
 Aynı korumayı başka bir sekmede ya da bir ekip arkadaşınız sizden önce değiştirdiyse kart en güncel ayarları yükler ve "Erişim koruması başka bir yerde değiştirildi. En güncel ayarlar yüklendi — değişikliğinizi yeniden yapın." der. Böylece kimse farkında olmadan bir başkasının değişikliğini ezemez.
 
@@ -148,7 +148,7 @@ Koruma tamamlanamazsa ya da bir sorun oluşursa **Kurallar** sekmesinde (ve diğ
 
 Kutu başlığı: "Bu düzeltilene kadar koruma tamamlanamaz."
 
-| Kod | Mesaj | Ne yapmalı |
+| Kod | Mesaj (ilk cümle) | Ne yapmalı |
 |---|---|---|
 | `service_not_deployed` | Bu servis henüz dağıtılmadı. Koruma, ilk başarılı dağıtımdan sonra uygulanır. | Servisi dağıtın. |
 | `no_hosts` | Bu servisin korunabilecek genel bir adresi yok. Önce genel URL'ini açın. | **Ağ** sekmesinden **Genel URL**'i açın. |
@@ -167,11 +167,11 @@ Kutu başlığı: "Bu düzeltilene kadar koruma tamamlanamaz."
 - **`drift_mesh_peers`** — Özel ağ hâlâ seçtiğinizden fazla servisi içeri alıyor; birkaç dakika içinde kendiliğinden düzelir.
 - **Diğer kodlar** — "Platform tarafındaki bir sorun nedeniyle koruma henüz uygulanamadı. Sizin bir şey yapmanız gerekmiyor."
 
-Bu durumlarda **Genel bakış** sekmesindeki kartta **Dikkat gerekiyor** etiketi görünür.
+Bu durumlarda da, yukarıdaki düzeltmeniz gereken durumlarda da **Genel bakış** sekmesindeki kartta **Dikkat gerekiyor** etiketi görünür.
 
 ### Açılamadığı durumlar
 
-| Kart ne diyor | Neden | Ne yapmalı |
+| Ekranda çıkan mesaj | Neden | Ne yapmalı |
 |---|---|---|
 | "Erişim koruması genel URL üzerinden çalışır. Önce genel URL'i açın." | Servisin genel URL'i kapalı. | **Ağ** sekmesinden **Genel URL**'i açın. |
 | "Servisin henüz genel adresi yok; ilk dağıtımdan sonra erişim korumasını açabilirsiniz." | Servis hiç dağıtılmamış. | Servisi dağıtın. |
@@ -189,7 +189,7 @@ Bu durumlarda **Genel bakış** sekmesindeki kartta **Dikkat gerekiyor** etiketi
 - **Şimdi herkese aç** — **Ayarlar** sekmesinin altındaki **Korumayı hemen kaldır** bölümünde. **Kurallar** sekmesindeki anahtarı kapatmak da aynı onayı açar. Onay: **Bu servis herkese açılsın mı?** ("Servis herkese açılıyor").
 - **Tüm kuralları kaldırmak** — **Kurallar** sekmesinde giriş, IP listesi ve yol kurallarının hepsini kaldırırsanız düğme kırmızı **Korumayı kapat** olur ve **Erişim koruması kapatılsın mı?** onayı istenir.
 
-Koruma **Kapatılıyor** durumu bittiğinde URL'e sahip herkes servisi açabilir.
+Kontrol **Kapatılıyor** durumunun son adımında kalkar; bundan sonra URL'e sahip herkes servisi açabilir.
 
 **Ne saklanır, ne silinir:**
 
@@ -198,10 +198,9 @@ Koruma **Kapatılıyor** durumu bittiğinde URL'e sahip herkes servisi açabilir
 | Paylaşımlar (askıdakiler dahil) | Komuta girişi seçimi |
 | Servis token'ları | IP izin listesi |
 | Özel ağdan gelebilecek servisler listesi | Yol kuralları ve webhook yolları |
-| | Koruma bitiş tarihi |
-| | Uygulamaya kimlik bildirme ayarı |
+| Uygulamaya kimlik bildirme ayarı (korumayı Komuta girişiyle yeniden açarsanız kendiliğinden yeniden devreye girer; giriş istemeyen bir korumada kapanır) | Koruma bitiş tarihi |
 
-Erişim kaydı koruma kapalıyken tutulmaz; daha önceki kayıtlar 30 gün sonra silinir.
+Erişim kaydı koruma kapalıyken tutulmaz ve görüntülenemez; daha önceki kayıtlar 30 gün saklanır ve korumayı yeniden açarsanız **Etkinlik** sekmesinde yine görünür.
 
 ---
 
@@ -239,7 +238,7 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - Servisin genel bir URL'i ve en az bir genel adresi olmalıdır.
 - Servis, Komuta'nın paylaşımlı barındırma kümelerinde çalışmalıdır.
 - IP listesi kullanılan yerlerde isteklerin Cloudflare üzerinden gelmesi gerekir; Komuta adresleri ve Komuta'ya eklenen özel alan adları bu şekilde çalışır.
-- Erişim koruması organizasyonlarda varsayılan olarak açıktır. Organizasyonunuz için kapatılmışsa "Erişim koruması bu organizasyon için kapatılmış. Açtırmak için Komuta desteğiyle iletişime geçin." yazar.
+- Erişim koruması organizasyonlarda varsayılan olarak açıktır. Organizasyonunuz için kapatılmışsa yeni koruma ve yeni paylaşım eklenemez ("Erişim koruması bu organizasyon için kapatılmış. Açtırmak için Komuta desteğiyle iletişime geçin."); mevcut korumalar çalışmaya devam eder.
 
 | İzin | Ne sağlar |
 |---|---|
