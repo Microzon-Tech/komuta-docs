@@ -36,7 +36,7 @@ Once enabled, the clusters that can reach it are listed; setting up the connecti
 
 ## Access Protection
 
-The **Access protection** card on this page decides who can open the service's public URL: visitors can be asked to sign in with Komuta, access can be limited to specific IP addresses, the two can be combined (require both or either is enough), and specific paths can be protected further or closed completely. See [Service Access Protection](service-access-protection.md) for details.
+The page's **Rules**, **People**, **Machines**, **Activity** and **Settings** tabs manage access protection: visitors can be asked to sign in with Komuta, access can be limited to specific IP addresses, specific paths can be protected further or closed, and webhooks and CI tools can be let in separately. Ports, the public URL and the private mesh are on the **Network** tab. See [Access Protection](service-access-protection.md) for details.
 
 ---
 
