@@ -5,6 +5,7 @@ Bu sayfa erişim korumasının kesin değerlerini tek yerde toplar: sınırlar, 
 Erişim koruması rehberleri:
 
 - [Erişim Koruması](service-access-protection.md) — genel bakış, açma ve kapatma, durumlar.
+- [Kurulum Rehberi](access-protection-tutorial.md) — hızlı başlangıçtan ileri senaryolara adım adım kurulum.
 - [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) — Komuta girişi, **Kişiler** sekmesi, ziyaretçinin gördükleri.
 - [Kurallar](access-protection-rules.md) — IP izin listesi, yol kuralları, erişim önizlemesi.
 - [Makineler ve Özel Ağ](access-protection-machines.md) — webhook yolları, servis token'ları, özel ağ.

@@ -36,7 +36,7 @@ Protection applies to all public addresses of the service together: the `*.komut
 
 ## Quick start
 
-These recipes cover the most common setups. All settings are on **Service Detail → Configuration → Access & ports**.
+These recipes cover the most common setups. All settings are on **Service Detail → Configuration → Access & ports**. For a step-by-step walkthrough that explains why each step is done and what it changes, up to the most advanced scenario, see the [Setup Guide](access-protection-tutorial.md).
 
 ### Only my team can open it
 
@@ -251,6 +251,7 @@ Both also need edit access to the service. People without the permission see the
 
 ## Access protection guides
 
+- [Setup Guide](access-protection-tutorial.md) — step-by-step setup from quick start to the most advanced scenario.
 - [Rules](access-protection-rules.md) — Komuta sign-in, the IP allow-list, path rules, the access preview.
 - [Sign-in and Sharing](access-protection-sign-in-sharing.md) — shares, email shares, external sharing, what visitors see.
 - [Machines and Private Mesh](access-protection-machines.md) — webhook paths, service tokens, the private mesh.

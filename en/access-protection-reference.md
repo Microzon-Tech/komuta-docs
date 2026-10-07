@@ -5,6 +5,7 @@ This page collects the exact values of access protection in one place: limits, s
 Access protection guides:
 
 - [Access Protection](service-access-protection.md) — overview, turning on and off, status.
+- [Setup Guide](access-protection-tutorial.md) — step-by-step setup from quick start to advanced scenarios.
 - [Sign-in and Sharing](access-protection-sign-in-sharing.md) — Komuta sign-in, the **People** tab, what visitors see.
 - [Rules](access-protection-rules.md) — IP allow-list, path rules, access preview.
 - [Machines and Private Mesh](access-protection-machines.md) — webhook paths, service tokens, private mesh.

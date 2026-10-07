@@ -160,7 +160,7 @@ Each row shows a green check (gets in) or a red cross (refused) and the reason:
 | Reason | Meaning |
 |---|---|
 | **Open to everyone** | No protection on this path. |
-| **Gets in through an open path; the app checks the signature** | A webhook path lets this request through without sign-in. |
+| **Gets in through an open path; the app checks the signature** | A webhook path lets this request through without sign-in. The preview works out `GET` requests only, so this row appears only for open paths that accept `GET`. |
 | **Gets in from an allowed network** | Gets in without signing in from an address on the IP list. |
 | **Gets in after signing in** | Gets in after signing in with Komuta. |
 | **Gets in after signing in from an allowed network** | Needs both an allowed address and sign-in. |
