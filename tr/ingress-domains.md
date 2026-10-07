@@ -65,60 +65,64 @@ myapp.devopszon.com
 
 ---
 
-## Özel Domain Bağlama
+## Özel Alan Adı Bağlama
 
-Kendi alan adınızı DevOpsZon'daki bir servise bağlayarak profesyonel bir erişim adresi oluşturabilirsiniz.
+Servisinizi, Komuta'nın verdiği adresin yanında kendi alan adınızdan da (ör. `api.sirketim.com`) yayınlayabilirsiniz.
 
-### Adımlar
+### Başlamadan Önce
 
-**1. Domain Ekleme**
+- Alan adı, HTTP trafiği sunan bir servise bağlanmalıdır. Worker, Job ve CronJob'lara özel alan adı bağlanamaz.
+- Alt alan adıyla başlayın (`www.sirketim.com`, `api.sirketim.com`). Kök alan adı (`sirketim.com`) için DNS sağlayıcınızın kök kayıtta CNAME flattening, ALIAS veya ANAME desteklemesi gerekir.
+- Wildcard alan adları (`*.sirketim.com`) desteklenmez. Her alt alan adını ayrı ekleyin.
 
-- Sol menüden **Domains** sayfasına gidin
-- **Yeni Domain Ekle** butonuna tıklayın
-- Alan adınızı girin (ör: `api.mycompany.com`)
-- Bağlanacak servisi seçin
+### 1. Alan Adını Ekleyin
 
-**2. DNS Doğrulama**
+1. Sol menüden **Alan Adları** sayfasını açın.
+2. **Alan adı ekle**'ye tıklayın.
+3. Alan adını girin ve **Hedef Uygulama**'yı seçin.
 
-DevOpsZon, domain sahipliğinizi doğrulamak için bir DNS kaydı oluşturmanızı isteyecektir:
+### 2. DNS Kayıtlarını Ekleyin
 
-| Kayıt Tipi | Host | Değer |
-|------------|------|-------|
-| **CNAME** | `api.mycompany.com` | DevOpsZon tarafından verilen hedef adres |
+Alan adının detayındaki **Eklenecek DNS Kayıtları** bölümü gerekli kayıtları listeler. Hepsini DNS sağlayıcınızda gösterildiği gibi oluşturun:
 
-veya
+| Amaç | Tip | Ad | Değer |
+|------|-----|----|-------|
+| Trafik yönlendirme | CNAME | `api.sirketim.com` | `origin.komuta.app` |
+| Sahiplik doğrulama | TXT | `_cf-custom-hostname.api.sirketim.com` | Konsolda gösterilen kod |
+| Sertifika doğrulama | CNAME | `_acme-challenge.api.sirketim.com` | `api.sirketim.com.<id>.dcv.cloudflare.com` (konsolda gösterilir) |
 
-| Kayıt Tipi | Host | Değer |
-|------------|------|-------|
-| **TXT** | `_devopszon.api.mycompany.com` | Doğrulama kodu |
+- Değerleri yanlarındaki kopyalama düğmesiyle alın. Sahiplik kodu ve sertifika doğrulama hedefi alan adınıza özeldir.
+- Sertifika doğrulama kaydını bir kez eklersiniz. Sertifikalar bundan sonra otomatik yenilenir; DNS'e tekrar dokunmanız gerekmez.
+- DNS'iniz Cloudflare'deyse bu kayıtları **DNS only** (gri bulut) yapın. Kendi Cloudflare hesabınızda proxy'lenen (turuncu bulut) bir kayıt doğrulanamaz ve erişim koruması onu kapsayamaz.
+- Daha önce eklenen alan adları `origin.edge-1.komuta.app` gibi bir adrese yönleniyor olabilir. Bunlar çalışmaya devam eder; değiştirmeniz gerekmez.
 
 > DNS değişikliklerinin yayılması birkaç dakika ile 48 saat arasında sürebilir.
 
-**3. Doğrulama Kontrolü**
+### 3. Etkinleşmesini Bekleyin
 
-DNS kaydını oluşturduktan sonra **Doğrula** butonuna tıklayın. DevOpsZon, DNS kaydınızı kontrol edecektir.
+Her kaydın yanında Komuta'nın kaydı görüp görmediği yazar. Sahiplik doğrulaması ve sertifika tamamlandığında alan adının durumu **Aktif** olur ve servisinize `https://api.sirketim.com` üzerinden erişilir.
 
-- **Başarılı:** Domain aktif edilir ve servisinize bağlanır
-- **Başarısız:** DNS kaydınızı kontrol edin ve tekrar deneyin
+- Durumu hemen kontrol etmek için **Doğrulamayı Yenile**'ye tıklayın.
+- 14 gün içinde etkinleşmeyen bir alan adı otomatik olarak kaldırılır. İstediğiniz zaman yeniden ekleyebilirsiniz.
+- Aktif bir alan adı dikkat gerektiriyor diye işaretlenirse (ör. DNS kaydı artık Komuta'yı göstermiyorsa) yukarıdaki kayıtları kontrol edin.
 
-**4. TLS Sertifikası**
+### Alan Adını Kaldırma
 
-Domain doğrulandıktan sonra TLS sertifikası otomatik olarak oluşturulur. Servisinize `https://api.mycompany.com` üzerinden güvenli erişim sağlanır.
+Alan adını seçip **Kaldır**'a tıklayın. Bir servisi silmek, ona bağlı özel alan adlarını da kaldırır.
 
 ---
 
 ## Cloudflare Entegrasyonu
 
-DevOpsZon, SaaS modunda Cloudflare ile entegre çalışır:
+Özel alan adları Cloudflare üzerinden sunulur:
 
 | Özellik | Açıklama |
 |---------|----------|
-| **DNS yönetimi** | Otomatik DNS kayıt oluşturma ve güncelleme |
 | **CDN** | Statik içerik önbellekleme ile hızlı erişim |
 | **DDoS koruması** | Otomatik saldırı engelleme |
-| **SSL/TLS** | Full (strict) TLS modu |
+| **SSL/TLS** | Sertifikalar otomatik oluşturulur ve yenilenir |
 
-Ingress Management sekmesinde her hostname'in Cloudflare durumunu görebilirsiniz.
+Her alan adının durumunu **Alan Adları** sayfasında görebilirsiniz.
 
 ---
 
@@ -155,6 +159,5 @@ Bu adresler SNI (Server Name Indication) routing ile çalışır ve her instance
 
 ## İpuçları
 
-- **Wildcard domain:** `*.mycompany.com` şeklinde wildcard CNAME kaydı oluşturarak tüm alt domainleri yönlendirebilirsiniz
-- **DNS yayılım süresi:** Doğrulama başarısız olursa birkaç dakika bekleyip tekrar deneyin
+- **DNS yayılım süresi:** Bir kayıt hâlâ görünmüyorsa birkaç dakika bekleyip **Doğrulamayı Yenile**'ye tıklayın
 - **HTTPS zorunluluğu:** Tüm servisler varsayılan olarak HTTPS üzerinden sunulur; HTTP istekleri otomatik yönlendirilir

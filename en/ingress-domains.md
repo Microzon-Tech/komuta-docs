@@ -67,58 +67,62 @@ myapp.devopszon.com
 
 ## Connecting a Custom Domain
 
-You can create a professional access address by connecting your own domain to a service on DevOpsZon.
+In addition to the address Komuta gives your service, you can serve it on your own domain (for example `api.mycompany.com`).
 
-### Steps
+### Before You Start
 
-**1. Adding a Domain**
+- The domain must point to a service that serves HTTP traffic. Workers, jobs and cron jobs can't have a custom domain.
+- Start with a subdomain (`www.mycompany.com`, `api.mycompany.com`). A root domain (`mycompany.com`) needs a DNS provider that supports CNAME flattening, ALIAS or ANAME records at the zone apex.
+- Wildcard domains (`*.mycompany.com`) aren't supported. Add each subdomain separately.
 
-- Go to the **Domains** page from the left menu
-- Click the **Yeni Domain Ekle** button
-- Enter your domain name (e.g.: `api.mycompany.com`)
-- Select the service to connect it to
+### 1. Add the Domain
 
-**2. DNS Verification**
+1. Open **Domains** from the left menu.
+2. Click **Add domain**.
+3. Enter the hostname and choose the **Target App**.
 
-DevOpsZon will ask you to create a DNS record to verify your domain ownership:
+### 2. Add the DNS Records
 
-| Record Type | Host | Value |
-|------------|------|-------|
-| **CNAME** | `api.mycompany.com` | Target address provided by DevOpsZon |
+The domain's detail panel lists the **DNS Records to Add**. Create all of them at your DNS provider exactly as shown:
 
-or
+| Purpose | Type | Name | Value |
+|---------|------|------|-------|
+| Traffic routing | CNAME | `api.mycompany.com` | `origin.komuta.app` |
+| Ownership verification | TXT | `_cf-custom-hostname.api.mycompany.com` | The code shown in the console |
+| Certificate validation | CNAME | `_acme-challenge.api.mycompany.com` | `api.mycompany.com.<id>.dcv.cloudflare.com` (shown in the console) |
 
-| Record Type | Host | Value |
-|------------|------|-------|
-| **TXT** | `_devopszon.api.mycompany.com` | Verification code |
+- Use the copy button next to each value. The ownership code and the certificate validation target are unique to your domain.
+- You add the certificate validation record once. Certificates renew automatically after that, and you don't need to change DNS again.
+- If your DNS is hosted on Cloudflare, set these records to **DNS only** (grey cloud). A record proxied through your own Cloudflare account (orange cloud) can't be verified, and access protection can't cover it.
+- Domains added earlier may point to an address like `origin.edge-1.komuta.app`. They keep working, and you don't need to change them.
 
 > DNS changes may take anywhere from a few minutes to 48 hours to propagate.
 
-**3. Verification Check**
+### 3. Wait for Activation
 
-After creating the DNS record, click the **Verify** button. DevOpsZon will check your DNS record.
+Each record shows whether Komuta can see it yet. When ownership verification and the certificate are complete, the domain's status changes to **Active** and your service is reachable at `https://api.mycompany.com`.
 
-- **Success:** The domain is activated and connected to your service
-- **Failure:** Check your DNS record and try again
+- Click **Refresh Validation** to check the status right away.
+- A domain that isn't activated within 14 days is removed automatically. You can add it again at any time.
+- If an active domain is marked for attention (for example because its DNS record no longer points to Komuta), check the records above.
 
-**4. TLS Certificate**
+### Removing a Domain
 
-Once the domain is verified, a TLS certificate is automatically created. Secure access to your service is provided over `https://api.mycompany.com`.
+Select the domain and click **Remove**. Deleting a service also removes its custom domains.
 
 ---
 
 ## Cloudflare Integration
 
-DevOpsZon works integrated with Cloudflare in SaaS mode:
+Custom domains are served through Cloudflare:
 
 | Feature | Description |
-|---------|----------|
-| **DNS management** | Automatic DNS record creation and updates |
+|---------|-------------|
 | **CDN** | Fast access with static content caching |
 | **DDoS protection** | Automatic attack blocking |
-| **SSL/TLS** | Full (strict) TLS mode |
+| **SSL/TLS** | Certificates are issued and renewed automatically |
 
-You can see the Cloudflare status of each hostname in the Ingress Management tab.
+You can see each domain's status on the **Domains** page.
 
 ---
 
@@ -155,6 +159,5 @@ These addresses work with SNI (Server Name Indication) routing, and each instanc
 
 ## Tips
 
-- **Wildcard domain:** By creating a wildcard CNAME record in the form of `*.mycompany.com`, you can route all subdomains
-- **DNS propagation time:** If verification fails, wait a few minutes and try again
+- **DNS propagation time:** If a record still shows as not detected, wait a few minutes and click **Refresh Validation**
 - **HTTPS enforcement:** All services are served over HTTPS by default; HTTP requests are automatically redirected
