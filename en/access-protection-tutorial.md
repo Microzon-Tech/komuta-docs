@@ -344,12 +344,15 @@ Check the status code instead of using `--fail`: if the token isn't read, Komuta
 
 **Effect**
 
+- When you create the first token on a service, Komuta refreshes the service's routing; this takes a few minutes, and until then the token seems not to work (`302`).
 - The CI request reaches `/api/health` without being sent to sign-in. The token header is removed before it reaches your application.
 - **The "Either is enough" choice from Level 3 pays off here:** the token satisfies the sign-in requirement, and since the site rule is "either is enough", the CI machine's IP doesn't have to be on the office list. With **Require both**, the CI machine would also have to come from a listed address; GitHub Actions machines change addresses, so that isn't practical.
 - The token can't open `/admin` (people rule) or `/internal` (block, `403 access denied`); on other pages outside its scope it gets `403 this service token cannot open this path`.
 - An invalid or deleted token gets `401 invalid service token` (unless it comes from an address on the office list); it isn't sent to sign-in.
 
 **Check**
+
+To run this on your own computer you need the token value; a GitHub secret can't be read back. Define it in your terminal with `export KOMUTA_SERVICE_TOKEN='kst_…'` before you press **I saved it**. If you don't have the value any more, the easiest check is to run the job on GitHub and see the **Health check** step pass. If the variable isn't set, `curl` doesn't send the header at all and you get `302`.
 
 ```bash copy
 curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" https://panel.example.com/api/health
@@ -363,7 +366,7 @@ You should see `200`. Running the same command for `https://panel.example.com/` 
 
 Goal: the `report-worker` service running on another cluster reaches `panel` directly over the private mesh, without Komuta sign-in.
 
-You need this level only if you run your services on different clusters and use the private mesh. If the **Private mesh** card on the **Network** tab says "Can't be combined with Access protection", this feature isn't on for your platform yet and a protected service can't join the private mesh; skip this level.
+You need this level only if you run your services on different clusters and use the private mesh. If the switch on the **Private mesh** card of the **Network** tab is locked and the card says "Access protection is on for this service. … turn access protection off first", this feature isn't on for your platform yet and a protected service can't join the private mesh; skip this level. If the card says "Works together with Access protection", go on.
 
 ### Step 6.1 — Turn on the private mesh and choose the service to allow
 
@@ -479,8 +482,8 @@ At the end of the guide, the `panel` service's settings are:
 To set up the most advanced scenario on your own, it's enough to know the order in which Komuta evaluates each request:
 
 1. **Block rule** — If the path falls under a **Block completely** rule, the request is refused. Nothing else is looked at.
-2. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply.
-3. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in.
+2. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply. If the address isn't on the list, the request is refused with `403`; the site's rules aren't tried.
+3. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in. If a rule can't be met even after signing in (an IP-only rule, or **Require both** from an unlisted address), the request is refused here with `403` and the **Access to this service is restricted** page; no sign-in page is shown.
 4. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session and shares are looked at. The share's page limit and the people rule's time window apply here. Without a session, `GET` and `HEAD` requests (from a browser or from `curl` alike) are sent to the sign-in page (`302`); other methods such as `POST` get `401`.
 
 Example requests in this order:
@@ -498,7 +501,7 @@ Example requests in this order:
 | CI with token, `GET /api/health` | Opens | 3–4: the token stands in for sign-in, in scope |
 | CI with token, `GET /admin` | `403` | 4: the people rule doesn't accept tokens |
 
-Before you add a new rule, ask yourself: "At which step is this request decided?" If you aren't sure, the **Access preview** shows you in the same order.
+Before you add a new rule, ask yourself: "At which step is this request decided?" If you aren't sure, the **Access preview** shows the same order for pages opened in a browser (`GET`); it doesn't take service tokens, other methods such as `POST`, or the private mesh into account.
 
 ---
 
@@ -507,11 +510,13 @@ Before you add a new rule, ask yourself: "At which step is this request decided?
 | Symptom | Cause | Fix |
 |---|---|---|
 | Everyone sees **You don't have access** | Sign-in is on but there are no shares | Add a share on the **People** tab. |
-| The sign-in page appears even in the office (or **Access to this service is restricted** with **Require both**) | The service sees an address that isn't on the list (for example IPv6 to the console, IPv4 to the service) | Add the address the service sees to the list; the **Access to this service is restricted** page shows it under **Your address**. Add IPv4 and IPv6 together. |
+| The sign-in page appears even in the office (or **Access to this service is restricted** with **Require both**) | The service sees an address that isn't on the list (for example IPv6 to the console, IPv4 to the service) | Sign in from the office and open a page; the **Address** column of the **Opened the page** row on the **Activity** tab shows the address the service sees (with **Require both**, the **Your address** box on the **Access to this service is restricted** page shows it too). Add that address to the list; add IPv4 and IPv6 together. |
 | The customer can't get in at all and gets 403 | **Require both** is selected | Choose **Either is enough**, or add the customer's address to the list. |
 | I limited a member to some pages but they open everything | The **Your organization** share opens the whole site | The widest share wins; limit the organization share too, or use a people rule. |
-| The CI token gets `401` | The token expired, was deleted or the header name is wrong | Check that the header is named `x-komuta-service-token`; create a new token if needed. |
+| The CI health check returns `302` | The token never reached the check: the header name is misspelled, the `KOMUTA_SERVICE_TOKEN` secret is empty or saved under another name, or the routing is still being refreshed after the first token | Check that the header is named `x-komuta-service-token` and the secret `KOMUTA_SERVICE_TOKEN`; after the first token, wait a few minutes. |
+| The CI token gets `401` | The token expired, was deleted, or its value is incomplete or mistyped | Create a new token and update the secret. |
 | The CI token gets `403` | The path is outside the token's scope, or the IP rule is "require both" | Check **What it can open**; set the site rule to **Either is enough**. |
+| Webhooks get `403` | The sender list is incomplete or out of date | Add the whole `hooks` list from `https://api.github.com/meta` (IPv6 included); the **Came from an address that is not allowed** row on **Activity** shows the refused network. |
 | Webhooks get `302` or `401` | The method isn't chosen, or the path is wrong | Check the open path's methods and path. |
 | The application gets empty identity headers on some requests | The visitor came from the office address (even if signed in), or the page doesn't need sign-in | Protect the paths that need an identity with a sign-in rule. |
 | The team suddenly had to sign in again | A share was removed or narrowed | This is expected; see Step 8.3. |

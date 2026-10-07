@@ -344,12 +344,15 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 
 **Etkisi**
 
+- Serviste ilk token'ı oluşturduğunuzda Komuta servisin yönlendirme ayarlarını yeniler; bu birkaç dakika sürer ve bu sırada token çalışmıyor gibi görünür (`302`).
 - CI isteği giriş sayfasına yönlendirilmeden `/api/health`'e ulaşır. Token başlığı uygulamanıza ulaşmadan silinir.
 - **Seviye 3'teki "Biri yeterli" seçiminin burada bir faydası var:** token giriş şartını karşılar ve site kuralı "biri yeterli" olduğu için CI makinesinin IP adresi ofis listesinde olmak zorunda değildir. **İkisi birden gereksin** seçilseydi, CI makinesinin de listedeki bir adresten gelmesi gerekirdi; GitHub Actions makinelerinin adresleri değiştiği için bu pratik değildir.
 - Token `/admin`'i (kişi kuralı) ve `/internal`'ı (engelleme, `403 access denied`) açamaz; kapsamı dışındaki diğer sayfalarda `403 this service token cannot open this path` alır.
 - Geçersiz ya da silinmiş bir token `401 invalid service token` alır (ofis listesindeki bir adresten gelmiyorsa); giriş sayfasına yönlendirilmez.
 
 **Doğrulayın**
+
+Bu komutu kendi bilgisayarınızda çalıştırmak için token değerine ihtiyacınız var; GitHub'daki gizli değişken sonradan okunamaz. Değeri **Kaydettim**'e basmadan önce terminalde `export KOMUTA_SERVICE_TOKEN='kst_…'` ile tanımlayın. Değeriniz yoksa en kolay doğrulama, GitHub'da işi çalıştırıp **Sağlık kontrolü** adımının yeşil geçtiğini görmektir. Değişken tanımlı değilse `curl` başlığı hiç göndermez ve `302` görürsünüz.
 
 ```bash copy
 curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" https://panel.example.com/api/health
@@ -363,7 +366,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SER
 
 Hedef: başka bir kümede çalışan `rapor-isleyici` servisi, `panel`'e özel ağ üzerinden, Komuta girişi olmadan doğrudan ulaşsın.
 
-Bu seviye yalnızca servislerinizi farklı kümelerde çalıştırıyor ve özel ağı (mesh) kullanıyorsanız gereklidir. **Ağ** sekmesindeki **Özel ağ (mesh)** kartı "Erişim korumasıyla birlikte kullanılamaz" diyorsa bu özellik platformunuzda henüz açık değildir ve korunan bir servis özel ağa açılamaz; bu seviyeyi atlayın.
+Bu seviye yalnızca servislerinizi farklı kümelerde çalıştırıyor ve özel ağı (mesh) kullanıyorsanız gereklidir. **Ağ** sekmesindeki **Özel ağ (mesh)** kartında anahtar kilitliyse ve kart "Bu serviste erişim koruması açık. … Özel ağı açmak için önce erişim korumasını kapatın" diyorsa, bu özellik platformunuzda henüz açık değildir ve korunan bir servis özel ağa açılamaz; bu seviyeyi atlayın. Kart "Erişim korumasıyla birlikte çalışır" diyorsa devam edin.
 
 ### Adım 6.1 — Özel ağı açın ve izin verilecek servisi seçin
 
@@ -479,8 +482,8 @@ Rehberin sonunda `panel` servisinin ayarları şöyledir:
 En ileri senaryoyu kendi başınıza kurabilmek için Komuta'nın her isteği hangi sırayla değerlendirdiğini bilmek yeterlidir:
 
 1. **Engelleme kuralı** — Yol bir **Tamamen engelle** kuralına giriyorsa istek reddedilir. Başka hiçbir şeye bakılmaz.
-2. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz.
-3. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer.
+2. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez.
+3. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez.
 4. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna ve paylaşımlarına bakılır. Paylaşımın sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
 
 Bu sıraya göre örnek istekler:
@@ -498,7 +501,7 @@ Bu sıraya göre örnek istekler:
 | CI, token ile `GET /api/health` | Açılır | 3–4: token giriş yerine geçer, kapsamda |
 | CI, token ile `GET /admin` | `403` | 4: kişi kuralı token'ı kabul etmez |
 
-Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda karar bulur?" Cevaptan emin değilseniz **Erişim önizlemesi** size aynı sırayla gösterir.
+Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda karar bulur?" Cevaptan emin değilseniz **Erişim önizlemesi** tarayıcıyla açılan sayfalar (`GET`) için aynı sırayı gösterir; servis token'larını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
 
 ---
 
@@ -507,11 +510,13 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | Belirti | Neden | Çözüm |
 |---|---|---|
 | Herkes **Erişiminiz yok** görüyor | Giriş açık ama paylaşım yok | **Kişiler** sekmesinde paylaşım ekleyin. |
-| Ofisteyken giriş sayfası çıkıyor (ya da **İkisi birden gereksin** seçiliyse **Erişim kısıtlı**) | Servis, listedekinden farklı bir adres görüyor (ör. konsola IPv6, servise IPv4) | Servisin gördüğü adresi listeye ekleyin; **Erişim kısıtlı** sayfası bu adresi **Adresiniz** kutusunda gösterir. IPv4 ve IPv6'yı birlikte ekleyin. |
+| Ofisteyken giriş sayfası çıkıyor (ya da **İkisi birden gereksin** seçiliyse **Erişim kısıtlı**) | Servis, listedekinden farklı bir adres görüyor (ör. konsola IPv6, servise IPv4) | Ofisten giriş yapıp bir sayfa açın; **Etkinlik** sekmesindeki **Sayfayı açtı** satırının **Adres** sütunu servisin gördüğü adresi gösterir (**İkisi birden gereksin** seçiliyse **Erişim kısıtlı** sayfasındaki **Adresiniz** kutusu da gösterir). Bu adresi listeye ekleyin; IPv4 ve IPv6'yı birlikte ekleyin. |
 | Müşteri hiç giremiyor, 403 alıyor | **İkisi birden gereksin** seçili | **Biri yeterli**'yi seçin ya da müşterinin adresini listeye ekleyin. |
 | Bir üyeyi sayfayla sınırladım ama her yeri açıyor | **Organizasyonunuz** paylaşımı tüm siteyi açıyor | En geniş paylaşım kazanır; organizasyon paylaşımını da sınırlayın ya da kişi kuralı kullanın. |
-| CI token'ı `401` alıyor | Token bitti, silindi ya da başlık yanlış yazıldı | Başlığın adının `x-komuta-service-token` olduğunu kontrol edin; gerekirse yeni token oluşturun. |
+| CI sağlık kontrolü `302` döndürüyor | Token isteğe ulaşmadı: başlığın adı yanlış yazıldı, `KOMUTA_SERVICE_TOKEN` gizli değişkeni boş ya da başka adla kaydedildi, ya da ilk token'dan sonra yönlendirmeler hâlâ yenileniyor | Başlığın adının `x-komuta-service-token`, gizli değişkenin adının `KOMUTA_SERVICE_TOKEN` olduğunu kontrol edin; ilk token'dan sonra birkaç dakika bekleyin. |
+| CI token'ı `401` alıyor | Token bitti, silindi ya da değeri eksik veya yanlış kopyalandı | Yeni bir token oluşturup gizli değişkeni güncelleyin. |
 | CI token'ı `403` alıyor | Yol token'ın kapsamı dışında ya da IP kuralı "ikisi birden" | **Neleri açabilir**'i kontrol edin; site kuralını **Biri yeterli** yapın. |
+| Webhook'lar `403` alıyor | Gönderici listesi eksik ya da eskimiş | `https://api.github.com/meta` adresindeki `hooks` listesinin tamamını (IPv6 dahil) ekleyin; **Etkinlik**'te **İzinli olmayan bir adresten geldi** satırı reddedilen ağı gösterir. |
 | Webhook'lar `302` ya da `401` alıyor | Yöntem seçilmemiş ya da yol yanlış | Açık yolun yöntemlerini ve yolunu kontrol edin. |
 | Uygulama bazı isteklerde kimlik başlığını boş alıyor | Ziyaretçi ofis adresinden geldi (giriş yapmış olsa bile) ya da sayfa giriş gerektirmiyor | Kimlik gereken yolları bir giriş kuralıyla koruyun. |
 | Ekip bir anda yeniden giriş yapmak zorunda kaldı | Bir paylaşım kaldırıldı ya da sınırlandı | Beklenen davranıştır; bkz. Adım 8.3. |
