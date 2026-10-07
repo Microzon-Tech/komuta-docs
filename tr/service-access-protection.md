@@ -36,7 +36,7 @@ Koruma servisinizin tüm genel adresleri için birlikte geçerlidir: Komuta'nın
 
 ## Hızlı başlangıç
 
-Aşağıdaki tarifler en sık kullanılan kurulumlardır. Tüm ayarlar **Servis Detay → Yapılandırma → Erişim ve portlar** sayfasındadır.
+Aşağıdaki tarifler en sık kullanılan kurulumlardır. Tüm ayarlar **Servis Detay → Yapılandırma → Erişim ve portlar** sayfasındadır. Her adımın nedenini ve etkisini anlatan, en ileri senaryoya kadar uzanan adım adım anlatım için [Kurulum Rehberi](access-protection-tutorial.md)'ne bakın.
 
 ### Yalnızca ekibim açabilsin
 
@@ -251,6 +251,7 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 
 ## Erişim koruması rehberleri
 
+- [Kurulum Rehberi](access-protection-tutorial.md) — hızlı başlangıçtan en ileri senaryoya adım adım kurulum.
 - [Kurallar](access-protection-rules.md) — Komuta girişi, IP izin listesi, yol kuralları, erişim önizlemesi.
 - [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) — paylaşımlar, e-posta paylaşımı, dış paylaşım, ziyaretçinin gördükleri.
 - [Makineler ve Özel Ağ](access-protection-machines.md) — webhook yolları, servis token'ları, özel ağ.
