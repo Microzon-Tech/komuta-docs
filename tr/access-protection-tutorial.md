@@ -17,6 +17,8 @@ Her adım dört bölümden oluşur:
 - **Etkisi** — kaydettikten sonra ziyaretçiler için ne değişir.
 - **Doğrulayın** — çalıştığını nasıl göreceğiniz.
 
+Bir bölüm ya da seçenek görünmüyorsa ya da "henüz kullanılamıyor" diyorsa, o özellik platformunuzda henüz açık değildir.
+
 Özelliklerin bütün ayrıntıları için [Erişim Koruması](service-access-protection.md) ve [Başvuru](access-protection-reference.md) sayfalarına bakabilirsiniz; bu rehber "nasıl kurulur" sorusuna odaklanır.
 
 ---
@@ -71,7 +73,7 @@ Erişim korumasında en çok zaman kazandıran adım, ayarlara girmeden önce ş
 
 ### Adım 0.2 — İzinlerinizi kontrol edin
 
-**Yapın** — Organizasyon yöneticinizden şu iki izni aldığınızdan emin olun:
+**Yapın** — Organizasyon yöneticinizden şu iki izni ve servisi düzenleme erişimini aldığınızdan emin olun:
 
 - **Servis erişim korumasını yönet** — korumayı açmak, kuralları ve ayarları değiştirmek için.
 - **Korunan servisin paylaşımlarını yönet** — servisi kişilerle paylaşmak ve servis token'ı oluşturmak için.
@@ -119,7 +121,7 @@ Hedef: servisi yalnızca organizasyonunuzun üyeleri, Komuta hesaplarıyla giri�
 - Komut satırından:
 
 ```bash copy
-curl -sI https://panel.example.com/ | head -3
+curl -sI https://panel.example.com/ | grep -i -E '^(HTTP|location)'
 ```
 
 `HTTP/2 302` ve `location: https://console.komuta.io/access/…` görmelisiniz.
@@ -224,9 +226,9 @@ Hedef: ofis ağından gelenler giriş yapmadan girsin; evden ya da yoldan bağla
 
 - Ofis adresinden gelenler giriş sayfasını görmeden uygulamayı açar.
 - Diğer herkes Seviye 1 ve 2'deki gibi giriş yapar; paylaşımlar aynen geçerlidir.
-- Ofisten girişsiz gelenler erişim kaydına yazılmaz ve uygulamaya kimlikleri bildirilmez (kim oldukları bilinmez). Bu, Seviye 7'de önemlidir.
+- Ofis adresinden gelenler, daha önce giriş yapmış olsalar bile, bu sayfalarda erişim kaydına yazılmaz ve uygulamaya kimlikleri bildirilmez: istek IP adresiyle geçtiği için oturumlarına bakılmaz. Bu, Seviye 7'de önemlidir.
 
-**Doğrulayın** — **Erişim önizlemesi**'nde **Nereden geliyor** seçimini **Tüm listelerdeki bir adresten** yapın: giriş yapmamış biri için **İzinli bir ağdan girer** görmelisiniz. **İzinli ağların dışından** seçince aynı satır **Giriş yapması gerekiyor** demeli.
+**Doğrulayın** — **Erişim önizlemesi**'nde **Bir sayfayı kim açar** görünümünü seçin, **Sayfa** `/` iken **Nereden geliyor**'u **Tüm listelerdeki bir adresten** yapın: giriş yapmamış biri için **İzinli bir ağdan girer** görmelisiniz. **İzinli ağların dışından** seçince aynı satır **Giriş yapması gerekiyor (site geneli)** demeli.
 
 ---
 
@@ -240,6 +242,7 @@ Hedef: `/admin` yalnızca iki kişiye açık olsun, `/internal` kimseye açık o
 
 1. **Kurallar** sekmesindeki **Yol kuralları** bölümünde **Yol kuralı ekle**'ye basın.
 2. **Yol**: `/internal`, **Koruma**: **Tamamen engelle**.
+3. Henüz **Korumayı uygula**'ya basmayın; Adım 4.2 ile birlikte uygulayacağız.
 
 **Neden** — Bazı sayfalar internetten hiç açılmamalıdır; uygulamanın içinde bir hata olsa bile. Engelleme kuralı en güçlü kuraldır: giriş, izinli IP, servis token'ı ya da webhook yolu onu aşamaz.
 
@@ -251,7 +254,7 @@ Hedef: `/admin` yalnızca iki kişiye açık olsun, `/internal` kimseye açık o
 
 1. Önce **Kişiler** sekmesinde paneli kullanacak iki kişiyi **Bir üye** olarak ekleyin. (Organizasyon paylaşımı zaten var; üye paylaşımları, kişileri kuralda tek tek seçebilmeniz içindir.)
 2. **Kurallar** sekmesinde **Yol kuralı ekle**: **Yol** `/admin`, **Koruma** **Yalnızca seçilen kişiler**.
-3. **Bu yolu kimler açabilir** listesinde iki kişinin paylaşımını işaretleyin.
+3. **Bu yolu kimler açabilir** listesinde iki kişinin paylaşımını işaretleyin. Paneli siz de kullanacaksanız Adım 1.1'de otomatik eklenen kendi paylaşımınızı da işaretleyin.
 4. İsterseniz bir kişiye **Başlangıç (isteğe bağlı)** ve **Bitiş (isteğe bağlı)** saatleri verin (örneğin bir danışmana yalnızca bir hafta).
 5. **Korumayı uygula**'ya basın.
 
@@ -264,7 +267,7 @@ Hedef: `/admin` yalnızca iki kişiye açık olsun, `/internal` kimseye açık o
 - Saat aralığı her istekte kontrol edilir; aralık bitince açık oturumlar dahil yol birkaç saniye içinde kapanır.
 - Servis token'ları bu yolu hiçbir zaman açamaz.
 
-**Doğrulayın** — **Erişim önizlemesi → Bir sayfayı kim açar** görünümünde **Sayfa** alanına `/admin` yazın: iki kişi için yeşil onay, diğer paylaşımlar için **/admin için seçilen kişiler arasında değil**, giriş yapmamış biri için **Giriş yapması gerekiyor (/admin)** görmelisiniz. `/internal` yazınca herkes için **/internal kuralı engelliyor** görünmeli.
+**Doğrulayın** — **Erişim önizlemesi → Bir sayfayı kim açar** görünümünde **Sayfa** alanına `/admin` yazın: iki kişi için yeşil onay, organizasyon paylaşımı ve diğer üye paylaşımları için **/admin için seçilen kişiler arasında değil**, müşterinin paylaşımı için **Kendisiyle paylaşılan sayfaların dışında**, giriş yapmamış biri için **Giriş yapması gerekiyor (site geneli)** görmelisiniz. **Nereden geliyor**'u **Tüm listelerdeki bir adresten** yaparsanız giriş yapmamış biri için **Giriş yapması gerekiyor (/admin)** görünür: ofisten gelen biri de bu yolda giriş yapmalıdır. `/internal` yazınca herkes için **/internal kuralı engelliyor** görünmeli.
 
 ---
 
@@ -306,7 +309,7 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 
 İmzası uymayan isteği reddedin. Ayrıca bu yolda `X-HTTP-Method-Override` gibi yöntem değiştirme başlıklarını kabul etmeyin.
 
-**Doğrulayın** — GitHub depo ayarlarındaki webhook sayfasında **Recent Deliveries** başarılı görünmeli. **Erişim önizlemesi**'nde `/webhooks/github` için **Açık yoldan girer; imzayı uygulama doğrular** yazmalı.
+**Doğrulayın** — GitHub depo ayarlarındaki webhook sayfasında **Recent Deliveries** başarılı görünmeli; **Etkinlik** sekmesinde **Açık yol isteği** / **Açık yola teslim edildi** satırı çıkmalı. Kendi bilgisayarınızdan `curl -s -o /dev/null -w "%{http_code}\n" -X POST https://panel.example.com/webhooks/github` çalıştırırsanız `403` görürsünüz: adresiniz gönderici listesinde değildir. (**Erişim önizlemesi** yalnızca `GET` isteklerini hesaplar; yalnızca `POST` açtığınız bu yol için sitenin normal kuralını gösterir.)
 
 ### Adım 5.2 — CI işi için servis token'ı
 
@@ -322,11 +325,16 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 
 ```yaml copy
 - name: Sağlık kontrolü
+  env:
+    KOMUTA_SERVICE_TOKEN: ${{ secrets.KOMUTA_SERVICE_TOKEN }}
   run: |
-    curl --fail -sS \
-      -H "x-komuta-service-token: ${{ secrets.KOMUTA_SERVICE_TOKEN }}" \
-      https://panel.example.com/api/health
+    status=$(curl -sS -o /dev/null -w "%{http_code}" \
+      -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" \
+      https://panel.example.com/api/health)
+    test "$status" = "200" || { echo "health check returned $status"; exit 1; }
 ```
+
+`curl --fail` yerine durum kodunu kontrol edin: token okunmazsa Komuta `302` ile giriş sayfasına yönlendirir ve `curl --fail` bunu başarı sayar.
 
 **Neden**
 
@@ -338,8 +346,8 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 
 - CI isteği giriş sayfasına yönlendirilmeden `/api/health`'e ulaşır. Token başlığı uygulamanıza ulaşmadan silinir.
 - **Seviye 3'teki "Biri yeterli" seçiminin burada bir faydası var:** token giriş şartını karşılar ve site kuralı "biri yeterli" olduğu için CI makinesinin IP adresi ofis listesinde olmak zorunda değildir. **İkisi birden gereksin** seçilseydi, CI makinesinin de listedeki bir adresten gelmesi gerekirdi; GitHub Actions makinelerinin adresleri değiştiği için bu pratik değildir.
-- Token `/admin`'i (kişi kuralı) ve `/internal`'ı (engelleme) açamaz; `/api/health` dışındaki bir sayfada `403 this service token cannot open this path` alır.
-- Geçersiz ya da silinmiş bir token `401 invalid service token` alır; giriş sayfasına yönlendirilmez.
+- Token `/admin`'i (kişi kuralı) ve `/internal`'ı (engelleme, `403 access denied`) açamaz; kapsamı dışındaki diğer sayfalarda `403 this service token cannot open this path` alır.
+- Geçersiz ya da silinmiş bir token `401 invalid service token` alır (ofis listesindeki bir adresten gelmiyorsa); giriş sayfasına yönlendirilmez.
 
 **Doğrulayın**
 
@@ -347,7 +355,7 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" https://panel.example.com/api/health
 ```
 
-`200` görmelisiniz. Aynı komutu `https://panel.example.com/` için çalıştırırsanız `403` görürsünüz (token'ın kapsamı dışında).
+`200` görmelisiniz. Aynı komutu `https://panel.example.com/` için çalıştırırsanız `403` görürsünüz (token'ın kapsamı dışında). **Bu iki denemeyi ofis ağının dışından yapın** (ör. telefonunuzun bağlantısı ya da CI): ofis adresinden gelen istek Seviye 3'teki "biri yeterli" kuralıyla girişsiz geçer, token'a hiç bakılmaz ve her iki komut da `200` döner.
 
 ---
 
@@ -355,7 +363,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SER
 
 Hedef: başka bir kümede çalışan `rapor-isleyici` servisi, `panel`'e özel ağ üzerinden, Komuta girişi olmadan doğrudan ulaşsın.
 
-Bu seviye yalnızca servislerinizi farklı kümelerde çalıştırıyor ve özel ağı (mesh) kullanıyorsanız gereklidir.
+Bu seviye yalnızca servislerinizi farklı kümelerde çalıştırıyor ve özel ağı (mesh) kullanıyorsanız gereklidir. **Ağ** sekmesindeki **Özel ağ (mesh)** kartı "Erişim korumasıyla birlikte kullanılamaz" diyorsa bu özellik platformunuzda henüz açık değildir ve korunan bir servis özel ağa açılamaz; bu seviyeyi atlayın.
 
 ### Adım 6.1 — Özel ağı açın ve izin verilecek servisi seçin
 
@@ -372,7 +380,7 @@ Bu seviye yalnızca servislerinizi farklı kümelerde çalıştırıyor ve özel
 - Aynı kümedeki servisleriniz bu listeden etkilenmez.
 - Listedeki bir servis internete açık ve korumasızsa **Herkese açık, korumasız** uyarısı çıkar: o servis buraya ulaşmak için bir aracı olarak kullanılabilir. O servisi de koruyun ya da aldığı istekleri olduğu gibi iletmediğinden emin olun.
 
-**Doğrulayın** — `rapor-isleyici` içinden `panel`'in özel ağ adresine yapılan istek yanıt almalı; listede olmayan başka bir servisten aynı istek zaman aşımına uğramalı.
+**Doğrulayın** — `rapor-isleyici` içinden `panel`'in özel ağ adresine yapılan istek yanıt almalı; listede olmayan ve **başka bir kümede** çalışan bir servisten aynı istek zaman aşımına uğramalı (aynı kümedeki servisler bu listeden etkilenmez).
 
 ---
 
@@ -384,7 +392,7 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Yapın**
 
-1. **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir** anahtarını açın. (Ayarlar sayfasındaki geçerli notlara bakın.)
+1. **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir** anahtarını açın. (Bu senaryoda site Komuta girişi istediği için güvenlidir; ayrıntı için [Bitiş ve Kimlik Bildirme](access-protection-settings.md#giriş-yapanı-uygulamama-bildir) sayfasındaki notlara bakın.)
 2. Bölüm "Hazırlanıyor" notunu gösterirken birkaç dakika bekleyin.
 
 **Neden** — Komuta ziyaretçinin kim olduğunu zaten biliyor. Bu ayar, bu bilgiyi uygulamanıza her istekte başlık olarak iletir; aynı kişiyi ikinci kez doğrulamak için kod yazmanız gerekmez.
@@ -392,7 +400,7 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 **Etkisi**
 
 - Giriş gerektiren her istekte uygulamanız `x-komuta-user-email`, `x-komuta-user-id` ve imzalı `x-komuta-identity` başlıklarını alır.
-- **Seviye 3'ün sonucu:** ofisten girişsiz gelenler için başlıklar boştur, çünkü kim oldukları bilinmez. Uygulamanız kimliği her sayfada istiyorsa ya **İkisi birden gereksin** seçin ya da kimlik gereken yolları (ör. `/admin`) bir giriş kuralıyla koruyun; bu yollarda ofisten gelenler de giriş yapar.
+- **Seviye 3'ün sonucu:** ofis adresinden gelen isteklerde, ziyaretçi giriş yapmış olsa bile başlıklar boştur; çünkü istek IP adresiyle geçer ve oturuma bakılmaz. Uygulamanız kimliği her sayfada istiyorsa ya **İkisi birden gereksin** seçin (bu, Seviye 2'deki müşteriyi ve Seviye 5'teki CI işini de dışarıda bırakır) ya da kimlik gereken yolları (ör. `/admin`) bir giriş kuralıyla koruyun; bu yollarda ofisten gelenler de giriş yapar.
 - Servis token'ıyla gelen isteklerde yalnızca `x-komuta-identity` dolu gelir (`kind: service_token`).
 
 ### Adım 7.2 — Kimliği uygulamanızda doğrulayın
@@ -401,7 +409,7 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Neden** — Aynı kümedeki diğer servisleriniz ve özel ağdan izin verdiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için düz başlıkları kendileri de gönderebilir. İmzalı jeton taklit edilemez. `aud` ve `sid` kontrolü, başka bir uygulamaya verilmiş geçerli bir jetonun sizin uygulamanıza tekrar gönderilmesini engeller.
 
-**Doğrulayın** — `/admin`'i açtığınızda uygulamanızın kaydında kendi e-postanız görünmeli. Ayarı açmadan önce giriş yapmış olanlar, yeniden giriş yapana kadar (en fazla 12 saat) e-postasız görünür.
+**Doğrulayın** — `/admin` kuralında kendinizi seçtiyseniz `/admin`'i açtığınızda uygulamanızın kaydında kendi e-postanız görünmeli. (Seçmediyseniz ofis dışından `/` sayfasını açarak deneyin.) Ayarı açmadan önce giriş yapmış olanlar, yeniden giriş yapana kadar (en fazla 12 saat) e-postasız görünür.
 
 ---
 
@@ -423,9 +431,9 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Yapın** — **Etkinlik** sekmesinde **Göster: Retler** filtresini seçin.
 
-**Neden** — Retler, kuralların beklediğiniz gibi çalışıp çalışmadığını gösterir: listede olmayan bir ofis adresi, yanlış kişiye kapanmış bir yol ya da süresi dolmuş bir token burada görünür.
+**Neden** — Retler, kuralların beklediğiniz gibi çalışıp çalışmadığını gösterir: listede olmayan bir gönderici adresinden gelen webhook (**İzinli olmayan bir adresten geldi**), yanlış kişiye kapanmış bir yol (**Bu sayfa kendisiyle paylaşılmamış**), engelleme kuralına takılan bir istek (**Sayfa engelli**) ya da süresi dolmuş bir token burada görünür.
 
-**Etkisi** — Kayıt 30 gün saklanır. Giriş yapmamış ziyaretçilerin retleri kötüye kullanımı önlemek için **Herhangi bir sayfa** ve adresin ilk kısmıyla (`/24`) görünür; engelleme kuralı ve açık yol retlerinde kuralın yolu yazar.
+**Etkisi** — Kayıt 30 gün saklanır. Giriş yapmamış ziyaretçilerin retleri kötüye kullanımı önlemek için **Herhangi bir sayfa** ve adresin ilk kısmıyla (IPv4'te `/24`, IPv6'da `/48`) görünür; engelleme kuralı ve açık yol retlerinde kuralın yolu yazar.
 
 ### Adım 8.3 — Değişikliklerin herkesi etkilediğini bilin
 
@@ -459,7 +467,7 @@ Rehberin sonunda `panel` servisinin ayarları şöyledir:
 | Kurallar | Yol kuralı `/admin` | **Yalnızca seçilen kişiler** (iki üye) |
 | Kişiler | **Organizasyonunuz** | Tüm site, bitişsiz |
 | Kişiler | `musteri@ornek.com` | Yalnızca `/raporlar`, proje bitişine kadar |
-| Kişiler | İki **Bir üye** paylaşımı | Tüm site |
+| Kişiler | İki **Bir üye** paylaşımı (ve Adım 1.1'de eklenen kendi paylaşımınız) | Tüm site |
 | Makineler | Webhook yolu `/webhooks/github` | `POST`, GitHub adresleri |
 | Makineler | Servis token'ı `github-actions-health` | Yalnızca `/api/health`, üç ay |
 | Makineler | Özel ağdan gelebilecek servisler | `rapor-isleyici` |
@@ -473,7 +481,7 @@ En ileri senaryoyu kendi başınıza kurabilmek için Komuta'nın her isteği ha
 1. **Engelleme kuralı** — Yol bir **Tamamen engelle** kuralına giriyorsa istek reddedilir. Başka hiçbir şeye bakılmaz.
 2. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz.
 3. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer.
-4. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna ve paylaşımlarına bakılır. Paylaşımın sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa tarayıcı giriş sayfasına yönlendirilir, diğer istemciler `401` alır.
+4. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna ve paylaşımlarına bakılır. Paylaşımın sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
 
 Bu sıraya göre örnek istekler:
 
@@ -481,10 +489,10 @@ Bu sıraya göre örnek istekler:
 |---|---|---|
 | Ofisten, giriş yapmadan `GET /` | Açılır | 3. adım: site kuralı "biri yeterli", adres listede |
 | Evden, ekip üyesi `GET /` | Giriş yapınca açılır | 3–4: adres listede değil, organizasyon paylaşımı var |
-| Ofisten `GET /admin`, seçilmemiş ekip üyesi | **Bu sayfaya erişiminiz yok** | 4: `/admin` kişi kuralı, kişi seçilmemiş |
+| Ofisten `GET /admin`, seçilmemiş ekip üyesi | Giriş yaptıktan sonra **Bu sayfaya erişiminiz yok** | 4: `/admin` kişi kuralı, kişi seçilmemiş |
 | Herhangi biri `GET /internal/araclar` | `403` | 1: engelleme kuralı |
 | Müşteri `GET /raporlar/2026` | E-posta koduyla açılır | 4: e-posta paylaşımı, sayfa kapsamında |
-| Müşteri `GET /` | **Bu sayfaya erişiminiz yok** ve açabileceği sayfalar | 4: sayfa sınırı dışında |
+| Müşteri `GET /` | Giriş ve e-posta kodundan sonra **Bu sayfaya erişiminiz yok** ve açabileceği sayfalar | 4: sayfa sınırı dışında |
 | GitHub `POST /webhooks/github` | Açılır (imzayı uygulama doğrular) | 2: açık yol, gönderici listede |
 | Herhangi biri `GET /webhooks/github` | Site kuralına göre | 2 atlanır (yöntem seçilmemiş), 3–4 uygulanır |
 | CI, token ile `GET /api/health` | Açılır | 3–4: token giriş yerine geçer, kapsamda |
@@ -499,13 +507,13 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | Belirti | Neden | Çözüm |
 |---|---|---|
 | Herkes **Erişiminiz yok** görüyor | Giriş açık ama paylaşım yok | **Kişiler** sekmesinde paylaşım ekleyin. |
-| Ofiste olduğunuz halde **Erişim kısıtlı** | Servis, konsolun gördüğünden farklı bir adres görüyor | Sayfadaki **Adresiniz** değerini listeye ekleyin; IPv4 ve IPv6'yı birlikte ekleyin. |
+| Ofisteyken giriş sayfası çıkıyor (ya da **İkisi birden gereksin** seçiliyse **Erişim kısıtlı**) | Servis, listedekinden farklı bir adres görüyor (ör. konsola IPv6, servise IPv4) | Servisin gördüğü adresi listeye ekleyin; **Erişim kısıtlı** sayfası bu adresi **Adresiniz** kutusunda gösterir. IPv4 ve IPv6'yı birlikte ekleyin. |
 | Müşteri hiç giremiyor, 403 alıyor | **İkisi birden gereksin** seçili | **Biri yeterli**'yi seçin ya da müşterinin adresini listeye ekleyin. |
 | Bir üyeyi sayfayla sınırladım ama her yeri açıyor | **Organizasyonunuz** paylaşımı tüm siteyi açıyor | En geniş paylaşım kazanır; organizasyon paylaşımını da sınırlayın ya da kişi kuralı kullanın. |
 | CI token'ı `401` alıyor | Token bitti, silindi ya da başlık yanlış yazıldı | Başlığın adının `x-komuta-service-token` olduğunu kontrol edin; gerekirse yeni token oluşturun. |
 | CI token'ı `403` alıyor | Yol token'ın kapsamı dışında ya da IP kuralı "ikisi birden" | **Neleri açabilir**'i kontrol edin; site kuralını **Biri yeterli** yapın. |
 | Webhook'lar `302` ya da `401` alıyor | Yöntem seçilmemiş ya da yol yanlış | Açık yolun yöntemlerini ve yolunu kontrol edin. |
-| Uygulama bazı isteklerde kimlik başlığını boş alıyor | Ziyaretçi ofisten girişsiz geldi ya da sayfa giriş gerektirmiyor | Kimlik gereken yolları bir giriş kuralıyla koruyun. |
+| Uygulama bazı isteklerde kimlik başlığını boş alıyor | Ziyaretçi ofis adresinden geldi (giriş yapmış olsa bile) ya da sayfa giriş gerektirmiyor | Kimlik gereken yolları bir giriş kuralıyla koruyun. |
 | Ekip bir anda yeniden giriş yapmak zorunda kaldı | Bir paylaşım kaldırıldı ya da sınırlandı | Beklenen davranıştır; bkz. Adım 8.3. |
 
 ---

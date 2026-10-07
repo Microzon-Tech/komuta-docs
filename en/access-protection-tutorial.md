@@ -17,6 +17,8 @@ Each step has four parts:
 - **Effect** — what changes for visitors after you save.
 - **Check** — how to see that it works.
 
+If a section or option is missing, or says it isn't available yet, that feature isn't on for your platform yet.
+
 For every detail of the features, see [Access Protection](service-access-protection.md) and [Reference](access-protection-reference.md); this guide focuses on "how to set it up".
 
 ---
@@ -71,7 +73,7 @@ The step that saves the most time with access protection is answering these five
 
 ### Step 0.2 — Check your permissions
 
-**Do** — Make sure your organization admin has given you these two permissions:
+**Do** — Make sure your organization admin has given you these two permissions and edit access to the service:
 
 - **Manage service access protection** — to turn protection on and change rules and settings.
 - **Manage who a protected service is shared with** — to share the service with people and create service tokens.
@@ -119,7 +121,7 @@ Goal: only members of your organization can open the service, by signing in with
 - From the command line:
 
 ```bash copy
-curl -sI https://panel.example.com/ | head -3
+curl -sI https://panel.example.com/ | grep -i -E '^(HTTP|location)'
 ```
 
 You should see `HTTP/2 302` and `location: https://console.komuta.io/access/…`.
@@ -180,7 +182,7 @@ Goal: a customer outside the organization sees only the `/reports` pages, and on
 - If they open a page outside `/reports`, they see **This page is not shared with you** and the list of pages they can open.
 - On the end date, access ends on its own; the share stays in the list with an **Expired** badge.
 
-**Mind** — The **Your organization** share opens the whole site, so your team isn't affected. But if you try to limit a teammate with a page-limited member share, it won't work: **the widest share wins**.
+**Note** — The **Your organization** share opens the whole site, so your team isn't affected. But if you try to limit a teammate with a page-limited member share, it won't work: **the widest share wins**.
 
 **Check** — In the **Access preview** at the bottom of the **Rules** tab, choose the **What a person can open** view and pick the customer's share: you should see **Outside the pages shared with them** for `/` and **Gets in after signing in** for `/reports`.
 
@@ -201,7 +203,7 @@ Goal: people coming from the office network get in without signing in; people co
 
 **Effect** — None until you save. The card marks an invalid line as "Line {n}"; private network ranges (such as `10.x` or `192.168.x`) are refused, because a request from the internet can't come from those addresses.
 
-**Mind** — **Add my IP** adds the address the console sees. If your browser reaches the service over a different connection (for example IPv6 to the console, IPv4 to the service), the service sees another address. Adding both your IPv4 and IPv6 addresses is the safe choice.
+**Note** — **Add my IP** adds the address the console sees. If your browser reaches the service over a different connection (for example IPv6 to the console, IPv4 to the service), the service sees another address. Adding both your IPv4 and IPv6 addresses is the safe choice.
 
 ### Step 3.2 — Choose "Either is enough"
 
@@ -224,9 +226,9 @@ Goal: people coming from the office network get in without signing in; people co
 
 - People coming from the office address open the application without seeing the sign-in page.
 - Everyone else signs in as in Levels 1 and 2; shares apply as before.
-- People who come from the office without signing in aren't written to the access log and aren't named to the application (nobody knows who they are). This matters in Level 7.
+- People coming from the office address aren't written to the access log on these pages and aren't identified to the application, even if they signed in earlier: the request passes on its IP address, so their session isn't looked at. This matters in Level 7.
 
-**Check** — In the **Access preview**, set **Coming from** to **An address on every list**: for someone who hasn't signed in you should see **Gets in from an allowed network**. With **Outside the allowed networks**, the same row should say **Needs to sign in**.
+**Check** — In the **Access preview**, choose the **Who can open a page** view and, with **Page** set to `/`, set **Coming from** to **An address on every list**: for someone who hasn't signed in you should see **Gets in from an allowed network**. With **Outside the allowed networks**, the same row should say **Needs to sign in (whole site)**.
 
 ---
 
@@ -240,6 +242,7 @@ Goal: `/admin` is open to two people only, and `/internal` to nobody.
 
 1. In the **Path rules** section of the **Rules** tab, press **Add path rule**.
 2. **Path**: `/internal`, **Protection**: **Block completely**.
+3. Don't press **Apply protection** yet; we'll apply it together with Step 4.2.
 
 **Why** — Some pages should never open from the internet, even if the application has a bug. A block rule is the strongest rule: sign-in, an allowed IP, a service token or a webhook path can't get past it.
 
@@ -251,7 +254,7 @@ Goal: `/admin` is open to two people only, and `/internal` to nobody.
 
 1. First, on the **People** tab, add the two people who use the panel as **A member**. (The organization share already exists; member shares are there so you can pick people one by one in the rule.)
 2. On the **Rules** tab, **Add path rule**: **Path** `/admin`, **Protection** **Only chosen people**.
-3. In **Who can open this path**, tick the two people's shares.
+3. In **Who can open this path**, tick the two people's shares. If you use the panel too, also tick your own share, which was added automatically in Step 1.1.
 4. Optionally give someone **From (optional)** and **Until (optional)** times (for example, a consultant for one week only).
 5. Press **Apply protection**.
 
@@ -264,7 +267,7 @@ Goal: `/admin` is open to two people only, and `/internal` to nobody.
 - The time window is checked on every request; when it ends, the path closes within a few seconds, including for open sessions.
 - Service tokens can never open this path.
 
-**Check** — In **Access preview → Who can open a page**, type `/admin` in **Page**: you should see a green check for the two people, **Not among the people chosen for /admin** for the other shares, and **Needs to sign in (/admin)** for someone who hasn't signed in. For `/internal`, everyone should show **Blocked by the /internal rule**.
+**Check** — In **Access preview → Who can open a page**, type `/admin` in **Page**: you should see a green check for the two people, **Not among the people chosen for /admin** for the organization share and the other member shares, **Outside the pages shared with them** for the customer's share, and **Needs to sign in (whole site)** for someone who hasn't signed in. Set **Coming from** to **An address on every list** and the signed-out row turns into **Needs to sign in (/admin)**: someone in the office must sign in on this path too. For `/internal`, everyone should show **Blocked by the /internal rule**.
 
 ---
 
@@ -306,7 +309,7 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 
 Refuse any request whose signature doesn't match. Also don't accept method-override headers such as `X-HTTP-Method-Override` on this path.
 
-**Check** — **Recent Deliveries** on the webhook page of your GitHub repository settings should show success. The **Access preview** should say **Gets in through an open path; the app checks the signature** for `/webhooks/github`.
+**Check** — **Recent Deliveries** on the webhook page of your GitHub repository settings should show success, and the **Activity** tab should show a **Request on an open path** / **Delivered to an open path** row. If you run `curl -s -o /dev/null -w "%{http_code}\n" -X POST https://panel.example.com/webhooks/github` from your own computer you get `403`: your address isn't on the sender list. (The **Access preview** works out `GET` requests only, so for this `POST`-only path it shows the site's normal rule.)
 
 ### Step 5.2 — A service token for the CI job
 
@@ -322,11 +325,16 @@ Refuse any request whose signature doesn't match. Also don't accept method-overr
 
 ```yaml copy
 - name: Health check
+  env:
+    KOMUTA_SERVICE_TOKEN: ${{ secrets.KOMUTA_SERVICE_TOKEN }}
   run: |
-    curl --fail -sS \
-      -H "x-komuta-service-token: ${{ secrets.KOMUTA_SERVICE_TOKEN }}" \
-      https://panel.example.com/api/health
+    status=$(curl -sS -o /dev/null -w "%{http_code}" \
+      -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" \
+      https://panel.example.com/api/health)
+    test "$status" = "200" || { echo "health check returned $status"; exit 1; }
 ```
+
+Check the status code instead of using `--fail`: if the token isn't read, Komuta answers with a `302` to the sign-in page, and `curl --fail` counts that as success.
 
 **Why**
 
@@ -338,8 +346,8 @@ Refuse any request whose signature doesn't match. Also don't accept method-overr
 
 - The CI request reaches `/api/health` without being sent to sign-in. The token header is removed before it reaches your application.
 - **The "Either is enough" choice from Level 3 pays off here:** the token satisfies the sign-in requirement, and since the site rule is "either is enough", the CI machine's IP doesn't have to be on the office list. With **Require both**, the CI machine would also have to come from a listed address; GitHub Actions machines change addresses, so that isn't practical.
-- The token can't open `/admin` (people rule) or `/internal` (block); on any page other than `/api/health` it gets `403 this service token cannot open this path`.
-- An invalid or deleted token gets `401 invalid service token`; it isn't sent to sign-in.
+- The token can't open `/admin` (people rule) or `/internal` (block, `403 access denied`); on other pages outside its scope it gets `403 this service token cannot open this path`.
+- An invalid or deleted token gets `401 invalid service token` (unless it comes from an address on the office list); it isn't sent to sign-in.
 
 **Check**
 
@@ -347,7 +355,7 @@ Refuse any request whose signature doesn't match. Also don't accept method-overr
 curl -s -o /dev/null -w "%{http_code}\n" -H "x-komuta-service-token: $KOMUTA_SERVICE_TOKEN" https://panel.example.com/api/health
 ```
 
-You should see `200`. Running the same command for `https://panel.example.com/` gives `403` (outside the token's scope).
+You should see `200`. Running the same command for `https://panel.example.com/` gives `403` (outside the token's scope). **Run both from outside the office network** (for example your phone's connection, or CI): a request from the office address passes without sign-in under the "either is enough" rule from Level 3, the token isn't looked at, and both commands return `200`.
 
 ---
 
@@ -355,7 +363,7 @@ You should see `200`. Running the same command for `https://panel.example.com/` 
 
 Goal: the `report-worker` service running on another cluster reaches `panel` directly over the private mesh, without Komuta sign-in.
 
-You need this level only if you run your services on different clusters and use the private mesh.
+You need this level only if you run your services on different clusters and use the private mesh. If the **Private mesh** card on the **Network** tab says "Can't be combined with Access protection", this feature isn't on for your platform yet and a protected service can't join the private mesh; skip this level.
 
 ### Step 6.1 — Turn on the private mesh and choose the service to allow
 
@@ -372,7 +380,7 @@ You need this level only if you run your services on different clusters and use 
 - Your services on the same cluster aren't affected by this list.
 - If a listed service is open to the internet and unprotected, a **Public, unprotected** warning appears: that service can be used as a stand-in to reach this one. Protect it too, or make sure it never forwards what it receives.
 
-**Check** — A request from inside `report-worker` to `panel`'s private mesh address should get an answer; the same request from another service that isn't on the list should time out.
+**Check** — A request from inside `report-worker` to `panel`'s private mesh address should get an answer; the same request from a service that isn't on the list and runs **on another cluster** should time out (services on the same cluster aren't affected by the list).
 
 ---
 
@@ -384,7 +392,7 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Do**
 
-1. On the **Settings** tab, turn on **Tell my application who signed in**. (See the current notes on the Settings page.)
+1. On the **Settings** tab, turn on **Tell my application who signed in**. (This is safe here because the site requires Komuta sign-in; for details see the notes on the [End Date and Visitor Identity](access-protection-settings.md#tell-my-application-who-signed-in) page.)
 2. Wait a few minutes while the section shows the "Getting ready" note.
 
 **Why** — Komuta already knows who the visitor is. This setting passes that to your application as headers on every request; you don't need to write code to verify the same person a second time.
@@ -392,7 +400,7 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 **Effect**
 
 - On every request that needs sign-in, your application receives the `x-komuta-user-email`, `x-komuta-user-id` and signed `x-komuta-identity` headers.
-- **The consequence of Level 3:** for people who come from the office without signing in, the headers are empty, because nobody knows who they are. If your application needs the identity on every page, either choose **Require both**, or protect the paths that need an identity (for example `/admin`) with a sign-in rule; on those paths, people in the office sign in too.
+- **The consequence of Level 3:** on requests from the office address the headers are empty, even if the visitor has signed in, because the request passes on its IP address and the session isn't looked at. If your application needs the identity on every page, either choose **Require both** (which also shuts out the customer from Level 2 and the CI job from Level 5), or protect the paths that need an identity (for example `/admin`) with a sign-in rule; on those paths, people in the office sign in too.
 - On requests with a service token, only `x-komuta-identity` is filled (`kind: service_token`).
 
 ### Step 7.2 — Verify the identity in your application
@@ -401,7 +409,7 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Why** — Your other services on the same cluster, and the services you allowed over the private mesh, can reach your pods without passing Komuta, so they could send the plain headers themselves. The signed token can't be faked. Checking `aud` and `sid` prevents a valid token issued to another application from being replayed to yours.
 
-**Check** — When you open `/admin`, your own email should appear in your application's log. People who signed in before you turned this on appear without their email until they sign in again (at most 12 hours).
+**Check** — If you chose yourself on the `/admin` rule, your own email should appear in your application's log when you open `/admin`. (If you didn't, open `/` from outside the office instead.) People who signed in before you turned this on appear without their email until they sign in again (at most 12 hours).
 
 ---
 
@@ -423,9 +431,9 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Do** — On the **Activity** tab, choose **Show: Refusals**.
 
-**Why** — Refusals show whether the rules work the way you expect: an office address missing from the list, a path closed to the wrong person or an expired token shows up here.
+**Why** — Refusals show whether the rules work the way you expect: a webhook from an address not on the sender list (**Came from an address that is not allowed**), a path closed to the wrong person (**This page is not shared with them**), a request caught by a block rule (**The page is blocked**) or an expired token shows up here.
 
-**Effect** — The log is kept for 30 days. To prevent abuse, refusals of visitors who haven't signed in appear as **Any page** with the first part of the address (`/24`); refusals by a block rule or an open path show the rule's path.
+**Effect** — The log is kept for 30 days. To prevent abuse, refusals of visitors who haven't signed in appear as **Any page** with the first part of the address (`/24` for IPv4, `/48` for IPv6); refusals by a block rule or an open path show the rule's path.
 
 ### Step 8.3 — Know which changes affect everyone
 
@@ -459,7 +467,7 @@ At the end of the guide, the `panel` service's settings are:
 | Rules | Path rule `/admin` | **Only chosen people** (two members) |
 | People | **Your organization** | Whole site, no end date |
 | People | `customer@example.com` | Only `/reports`, until the project end date |
-| People | Two **A member** shares | Whole site |
+| People | Two **A member** shares (plus your own share added in Step 1.1) | Whole site |
 | Machines | Webhook path `/webhooks/github` | `POST`, GitHub addresses |
 | Machines | Service token `github-actions-health` | Only `/api/health`, three months |
 | Machines | Services that may come in over the private mesh | `report-worker` |
@@ -473,7 +481,7 @@ To set up the most advanced scenario on your own, it's enough to know the order 
 1. **Block rule** — If the path falls under a **Block completely** rule, the request is refused. Nothing else is looked at.
 2. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply.
 3. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in.
-4. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session and shares are looked at. The share's page limit and the people rule's time window apply here. Without a session, a browser is sent to the sign-in page and other clients get `401`.
+4. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session and shares are looked at. The share's page limit and the people rule's time window apply here. Without a session, `GET` and `HEAD` requests (from a browser or from `curl` alike) are sent to the sign-in page (`302`); other methods such as `POST` get `401`.
 
 Example requests in this order:
 
@@ -481,10 +489,10 @@ Example requests in this order:
 |---|---|---|
 | From the office, without signing in, `GET /` | Opens | Step 3: site rule is "either is enough", address is listed |
 | From home, team member, `GET /` | Opens after sign-in | 3–4: address not listed, organization share exists |
-| From the office, `GET /admin`, team member not chosen | **This page is not shared with you** | 4: `/admin` people rule, person not chosen |
+| From the office, `GET /admin`, team member not chosen | **This page is not shared with you** after signing in | 4: `/admin` people rule, person not chosen |
 | Anyone, `GET /internal/tools` | `403` | 1: block rule |
 | Customer, `GET /reports/2026` | Opens with the email code | 4: email share, page in scope |
-| Customer, `GET /` | **This page is not shared with you** and the pages they can open | 4: outside the page limit |
+| Customer, `GET /` | After sign-in and the email code, **This page is not shared with you** and the pages they can open | 4: outside the page limit |
 | GitHub, `POST /webhooks/github` | Opens (the app verifies the signature) | 2: open path, sender listed |
 | Anyone, `GET /webhooks/github` | Per the site rule | 2 is skipped (method not chosen), 3–4 apply |
 | CI with token, `GET /api/health` | Opens | 3–4: the token stands in for sign-in, in scope |
@@ -499,13 +507,13 @@ Before you add a new rule, ask yourself: "At which step is this request decided?
 | Symptom | Cause | Fix |
 |---|---|---|
 | Everyone sees **You don't have access** | Sign-in is on but there are no shares | Add a share on the **People** tab. |
-| **Access to this service is restricted** even though you are in the office | The service sees a different address from the one the console sees | Add the **Your address** value from that page to the list; add IPv4 and IPv6 together. |
+| The sign-in page appears even in the office (or **Access to this service is restricted** with **Require both**) | The service sees an address that isn't on the list (for example IPv6 to the console, IPv4 to the service) | Add the address the service sees to the list; the **Access to this service is restricted** page shows it under **Your address**. Add IPv4 and IPv6 together. |
 | The customer can't get in at all and gets 403 | **Require both** is selected | Choose **Either is enough**, or add the customer's address to the list. |
 | I limited a member to some pages but they open everything | The **Your organization** share opens the whole site | The widest share wins; limit the organization share too, or use a people rule. |
 | The CI token gets `401` | The token expired, was deleted or the header name is wrong | Check that the header is named `x-komuta-service-token`; create a new token if needed. |
 | The CI token gets `403` | The path is outside the token's scope, or the IP rule is "require both" | Check **What it can open**; set the site rule to **Either is enough**. |
 | Webhooks get `302` or `401` | The method isn't chosen, or the path is wrong | Check the open path's methods and path. |
-| The application gets empty identity headers on some requests | The visitor came from the office without signing in, or the page doesn't need sign-in | Protect the paths that need an identity with a sign-in rule. |
+| The application gets empty identity headers on some requests | The visitor came from the office address (even if signed in), or the page doesn't need sign-in | Protect the paths that need an identity with a sign-in rule. |
 | The team suddenly had to sign in again | A share was removed or narrowed | This is expected; see Step 8.3. |
 
 ---

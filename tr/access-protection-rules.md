@@ -160,7 +160,7 @@ Her satırda yeşil onay (girer) ya da kırmızı çarpı (giremez) ve nedeni ya
 | Neden | Anlamı |
 |---|---|
 | **Herkese açık** | Bu yolda koruma yok. |
-| **Açık yoldan girer; imzayı uygulama doğrular** | Bir webhook yolu bu isteği giriş olmadan geçirir. |
+| **Açık yoldan girer; imzayı uygulama doğrular** | Bir webhook yolu bu isteği giriş olmadan geçirir. Önizleme yalnızca `GET` isteklerini hesapladığı için bu satır yalnızca `GET` kabul eden açık yollarda görünür. |
 | **İzinli bir ağdan girer** | IP listesindeki bir adresten giriş yapmadan girer. |
 | **Giriş yapınca girer** | Komuta ile giriş yaparsa girer. |
 | **İzinli bir ağdan giriş yapınca girer** | Hem izinli adres hem giriş gerekir. |
