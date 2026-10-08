@@ -1,148 +1,62 @@
-# Notification Settings
+# Channels and Delivery
 
-DevOpsZon's notification system offers multi-channel support to keep you informed about alerts, pipeline statuses, and important events. This guide explains how to configure your notification channels.
+Komuta Alerts uses **Email, Slack and Microsoft Teams** channels. **Alerts → Channels** shows configured channels and delivery records. To add or change a channel, follow **Manage in notification settings** to **Notifications & Alerts**.
 
----
+## Prepare a destination
 
-## Notification System Overview
+| Channel | Required configuration |
+| --- | --- |
+| Email | A channel name and at least one valid recipient address. Add each address to the list before saving. |
+| Slack | An Incoming Webhook URL created for the target conversation. A regular Slack channel link is insufficient. |
+| Microsoft Teams | An HTTPS webhook URL created through Teams Workflows. A Teams channel’s browser link cannot receive alerts. |
 
-Notifications in DevOpsZon are grouped into three categories:
+Creating a channel requires notification-create permission. Editing, enabling/disabling, deleting and **Send test** require notification-edit permission. Confirm that the channel is active. Treat webhook URLs as credentials; do not include them in public documentation, screenshots or support messages.
 
-| Category | Examples |
-|----------|----------|
-| **Alert Notifications** | Notifications sent when an alert rule is triggered |
-| **Pipeline Notifications** | Build success/failure statuses |
-| **System Notifications** | Billing, balance, maintenance, and platform announcements |
+## Email: add recipients and check the actual inbox
 
----
+Select **Email**, add the intended recipients and save. Customers do not enter a Resend key or SMTP server in this form; sending uses Komuta’s email infrastructure through Resend.
 
-## Notification Channels
+After **Send test**, check the actual inbox, spam/quarantine folders and your organization’s mail filtering. Success for a channel with multiple recipients may not mean success for every recipient; verify important recipients individually.
 
-Go to the **Notifications** page from the left menu to configure your notification channels.
+Komuta’s email delivery record represents **provider acceptance**. Resend’s `email.sent` event concerns an accepted send request; `email.delivered` concerns delivery to the recipient’s mail server. Neither establishes that the message was seen in the inbox or read. Do not assume the Komuta page exposes every provider event. [Resend event definitions](https://resend.com/docs/webhooks/event-types).
 
-### Email
+## Slack: use an Incoming Webhook
 
-| Parameter | Description |
-|-----------|----------|
-| **Recipient addresses** | The email addresses the notification will be sent to |
+Enable Incoming Webhooks for your Slack app, create a webhook for an authorized destination channel and save the generated URL in Komuta. You also need the appropriate Slack access for a private channel. [Slack setup guide](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/).
 
-Email notifications are sent to your account email address by default. You can add additional recipients.
+Verify the test in the target Slack channel. Removing the webhook, archiving the channel or changing app access can cause delivery failures; test again with a valid destination.
 
-### Slack
+## Microsoft Teams: a channel link is not a webhook
 
-An Incoming Webhook URL is required for Slack integration:
+1. Open **Workflows** for the target Teams channel.
+2. Create a suitable webhook workflow, such as **Send webhook alerts to a channel**, and choose the team and channel.
+3. Save and copy the generated webhook URL into a **Microsoft Teams** channel in Komuta.
+4. Use **Send test**, then verify the Teams message and, if necessary, the workflow run history.
 
-1. Create an Incoming Webhook in your Slack workspace
-2. Enter the webhook URL on the **Notifications** page
-3. Specify the channel the notification will be sent to
-4. Verify by sending a test notification
+Komuta sends a webhook request; the form does not establish a Microsoft user session or OAuth connection. The workflow’s authentication setting must accept this call. If organizational policy prevents that, work with your Teams administrator on a suitable connection. [Microsoft webhook setup](https://support.microsoft.com/en-us/workflows/send-messages-in-teams-using-incoming-webhooks).
 
-### Telegram
+Keep the workflow enabled with a valid owner. Add a co-owner when appropriate: an owner leaving can affect continuity. [Microsoft’s ownership and Workflows guidance](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook).
 
-| Parameter | Description |
-|-----------|----------|
-| **Bot Token** | The bot token obtained from Telegram BotFather |
-| **Chat ID** | The chat or group ID the notification will be sent to |
+## Route a rule to channels
 
-### Microsoft Teams
+Choose notification channels explicitly when creating or editing an alert. If the selection is empty, matching active channels are used; it does not mean “send to nobody.” Channel enablement and any configured severity filter also affect routing.
 
-| Parameter | Description |
-|-----------|----------|
-| **Webhook URL** | The Incoming Webhook URL for the Teams channel |
+The event-channel matrix in **Notifications & Alerts** controls subscriptions to platform events. It is separate from an alert rule’s own channel selection. Receiving a deployment-completed message does not prove that a particular metric/log rule routes to the intended channel.
 
-### PagerDuty
+## Separate tests from delivery records
 
-| Parameter | Description |
-|-----------|----------|
-| **Integration Key** | The integration key belonging to the PagerDuty service |
+**Send test** checks a channel connection. It does not test the rule’s metrics/logs, publication, firing or resolution. If the test reports that nothing was sent, check channel enablement, settings and notification limits. Tests can affect a channel’s attempt statistics; do not expect the same History row as a normal alert event.
 
-The PagerDuty integration creates an incident based on alert severity and includes it in your incident management process.
+In **Channels**, use period, channel, status and search filters. Distinguish firing from resolved notification types. Expand collapsed identical records when needed; collapsing is a display convenience.
 
-### SMS
+| Status | What it establishes |
+| --- | --- |
+| Pending/processing record | A record exists in the sending flow; delivery is not complete. |
+| Successful/delivered record | The product recorded a successful sending attempt. For email this is provider acceptance; verify actual recipients separately. |
+| Failed record | A sending attempt failed; inspect the error and destination settings. |
+| Suppressed record | A limit or restriction prevented sending; it is not a delivery. |
+| No record | No record matches the selected period/filters. This alone proves neither a lack of firing nor a healthy channel. |
 
-| Parameter | Description |
-|-----------|----------|
-| **Phone number** | The phone number the notification will be sent to |
+Account for scope when comparing period-based delivery statistics with all-time channel attempts. With no attempts there is no success-rate evidence. Notification limits, repeat intervals, silences and provider errors can affect the result; do not assume immediate, guaranteed or exactly-once delivery.
 
-### WhatsApp
-
-| Parameter | Description |
-|-----------|----------|
-| **Business API** | WhatsApp Business API configuration |
-
-### Webhook (Custom)
-
-Define a custom webhook to send notifications to your own systems:
-
-| Parameter | Description |
-|-----------|----------|
-| **URL** | The HTTP endpoint the notification will be POSTed to |
-| **Headers** | Optional HTTP headers (e.g., Authorization) |
-
----
-
-## Channel Configuration
-
-### Adding a New Channel
-
-1. Go to the **Notifications** page
-2. Click the **Yeni Kanal Ekle** button
-3. Select the channel type
-4. Enter the required information
-5. Send a test notification using the **Test** button
-6. Save the channel using the **Kaydet** button
-
-### Linking a Channel to an Alert Rule
-
-Notification channels are associated with alert rules:
-
-1. Go to the **Alert Management** page
-2. Create or edit an alert rule
-3. In the **Notification Channels** section, select which channels the notification will be sent to
-4. You can select multiple channels (e.g., both Slack and email)
-
----
-
-## In-Panel Notifications
-
-In addition to channel notifications, you receive real-time in-panel notifications in the DevOpsZon Console:
-
-- View new notifications via the notification icon in the top right corner
-- Alert, pipeline, and system notifications are listed in chronological order
-- You can click a notification to be taken to the relevant page
-
----
-
-## Notification Flow
-
-The notification process when an alert is triggered:
-
-```
-Alert Triggered → Alertmanager → DevOpsZon API → Notification Queue → Delivery to Channel
-                                       ↓
-                               Real-Time Notification
-                               in Panel (SignalR)
-```
-
-1. A rule threshold is exceeded in Prometheus or Loki
-2. Alertmanager groups the alert and sends it to the DevOpsZon webhook
-3. The DevOpsZon API processes the alert and finds the associated notification channels
-4. A notification is queued for each channel (RabbitMQ)
-5. The queue consumer delivers the notification to the relevant channel
-6. At the same time, a real-time update is made on the panel via SignalR
-
-### Retry Mechanism
-
-If a notification delivery fails:
-- It is automatically retried
-- After multiple failed attempts, it is moved to the Dead Letter Queue (DLQ)
-- Messages in the DLQ can be manually reprocessed
-
----
-
-## Tips
-
-- **Multiple channels:** Define multiple notification channels for critical alerts (e.g., Slack + Email + PagerDuty)
-- **Severity-based:** Route Warning alerts to Slack and Critical alerts to PagerDuty
-- **Test:** Verify by sending a test notification after adding each new channel
-- **Notification fatigue:** Too many notifications cause important ones to be overlooked; set up notifications only for events that require action
+Next: [Missing notifications](alerts-troubleshooting.md) · [Create your first alert](alerts-quick-start.md)
