@@ -282,7 +282,7 @@ There may not be enough history for the forecast, or the relevant query route ma
 ## Related Documents
 
 - [Monitoring and Log Management](https://www.komuta.io/docs/guides/monitoring-logs)
-- [Alert Management](https://www.komuta.io/docs/guides/alert-guide)
+- [Alert Management](alert-guide.md)
 - [Runtime Security](https://www.komuta.io/docs/security/runtime-security-guide)
 - [Security Center](https://www.komuta.io/docs/security/security-center-guide)
 - [Access Control](https://www.komuta.io/docs/security/access-control-guide)
