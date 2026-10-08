@@ -81,7 +81,7 @@ The **Access to this service is restricted** and **This page is not shared with 
 This page tells the visitor why they can't get in and what they can do:
 
 - The **Signed in as** box shows which account and which organization (**Organization: …**) they signed in with.
-- The **Shared with your email address?** section verifies an email share (see below).
+- The **Shared with your email address or company domain?** section verifies an email or domain share (see below).
 - **Continue with another organization** — if the visitor belongs to several organizations, they can **Switch** to another one here and try again. If you shared the service with "Your organization" or "A linked organization", the visitor may need to continue with that organization.
 - **Sign in with another account** — signs in again with a different Komuta account.
 - **Go to Komuta** — returns to the Komuta console.
@@ -100,8 +100,9 @@ The **Shared with** list on the **People** tab shows the people and organization
 | **A member** | One person in this organization. Only active members can be chosen. |
 | **A linked organization** | Everyone in another organization you belong to, including people who join later. Only organizations you are also a member of can be chosen. |
 | **An email address** | Someone outside your organizations. They sign in with any Komuta account, then confirm the address with a one-time code sent to it. |
+| **Everyone at a domain** | Anyone with an email address at a domain such as `@example.com`, optionally its subdomains too. They sign in with any Komuta account, then confirm their address at the domain with a one-time code. See [Domain shares](#domain-shares). |
 
-**A linked organization** and **An email address** shares are listed with an **External** badge and require your organization to allow external sharing (see below).
+**A linked organization** and **An email address** shares are listed with an **External** badge and require your organization to allow external sharing (see below). An **Everyone at a domain** share counts as external too, unless the domain is one your organization has verified (see [Verified domains](#verified-domains)); then it has a **Verified domain** badge instead.
 
 A person, organization or address that is already shared can't be added again (the window says "Already shared."); change its end date or page limit with the pencil icon in the list.
 
@@ -121,7 +122,8 @@ A person, organization or address that is already shared can't be added again (t
 
 Each row shows the share's name, any page limit ("Only: /a, /b") and its end ("Until …" or **No end date**). Badges:
 
-- **External** — a linked organization or email share.
+- **External** — a linked organization, email share, or a domain share for a domain your organization hasn't verified.
+- **Verified domain** — a domain share under a domain your organization has verified; it counts as your organization's own.
 - **Suspended** — a share suspended because external sharing was turned off. Nobody gets in with it.
 - **Expired** — a share whose end time has passed. It stays in the list; give it a new end date with the pencil icon.
 
@@ -249,6 +251,39 @@ Rules:
 
 ---
 
+## Domain shares
+
+An **Everyone at a domain** share lets in anyone who can read a mailbox at that domain, for example the whole team at `@example.com`, without adding people one by one.
+
+- Write the domain only, such as `example.com` (`@example.com` also works). Internationalised domains are accepted.
+- **Also addresses at its subdomains** lets in `@team.example.com` and similar too. It can be chosen only for a domain your organization has verified, because anyone who controls a subdomain could otherwise get in.
+- Public mail services and shared domains where anyone can get an address (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `co.uk`, `onmicrosoft.com` and similar) can't be shared ("Anyone can get an e-mail address at '{Domain}', so a share for it would let anyone in."). Share with single email addresses instead.
+- Visitors sign in exactly like email shares: they sign in with any Komuta account and confirm their address at the domain with an **8-digit** code in the **Shared with your email address or company domain?** section. A Komuta account's own email address never opens a domain share by itself.
+- Someone who leaves the company can't receive new codes once their mailbox is closed; a session that is already open lasts until it ends (**Stay signed in for**).
+
+Extra limits protect the domain's mailboxes:
+
+- One Komuta account can request codes for at most **3 different addresses** of the same domain share in 24 hours.
+- After **200 wrong codes in 24 hours** on a domain share, no new codes are sent for it until the period ends. People who also have their own **An email address** share keep getting codes through that share.
+- Like email shares, the screen gives the same answer whether or not an address has access.
+
+## Verified domains
+
+Verify a domain your organization owns so that shares with everyone at that domain count as your own:
+
+- Setting: **Account → Organizations → Verified domains**. Changing it needs permission to edit the organization.
+- **Add domain**, then add the TXT record shown at your DNS provider: name `_komuta-verify.<domain>`, value `komuta-verify=<code>`. Choose **Check now** (at most once every 10 seconds); Komuta also checks every 6 hours.
+- A verified domain also covers its subdomains: verifying `example.com` makes shares for `team.example.com` your own too.
+- Keep the record in place. If Komuta can't find it on 3 checks spanning at least 2 days, or can't reach DNS for the domain for a week, the domain stops counting as verified (**Record no longer found**).
+- At most **20** domains per organization. Each organization verifies its own domains; verification isn't shared with linked organizations.
+
+What changes when a domain is verified, lapses or is removed:
+
+- A share under a verified domain keeps working while external sharing is off.
+- When a domain stops counting as verified (or is removed), its shares count as external again: while external sharing is off they are **Suspended**, and a share that also covers subdomains is suspended in every case. People who came in through them lose access within about 30 seconds. They come back once the domain is verified again.
+
+---
+
 ## Allowing external sharing
 
 **A linked organization** and **An email address** shares give access outside your organization. They require your organization to allow external sharing:
@@ -262,7 +297,7 @@ While it is off, these two types can't be chosen in the **Add share** window and
 
 If you turn it off:
 
-- Linked organization and email shares on all of the organization's protected services become **Suspended**.
+- Linked organization and email shares on all of the organization's protected services become **Suspended**, and so do domain shares whose domain your organization hasn't verified.
 - People who came in through these shares lose access within about 30 seconds; the other visitors of these services sign in once more too.
 - New external shares can't be added.
 

@@ -81,7 +81,7 @@ Servisinizin içinde gösterilen **Bu servise erişim kısıtlı** ve **Bu sayfa
 Bu sayfa ziyaretçiye neden giremediğini ve ne yapabileceğini gösterir:
 
 - **Oturum açık** kutusu hangi hesapla ve hangi organizasyonla (**Organizasyon: …**) giriş yapıldığını gösterir.
-- **E-posta adresinizle mi paylaşıldı?** bölümü e-posta paylaşımı için doğrulama yapar (aşağıya bakın).
+- **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümü e-posta ve alan adı paylaşımları için doğrulama yapar (aşağıya bakın).
 - **Başka bir organizasyonla devam et** — ziyaretçi birden fazla organizasyonun üyesiyse buradan **Geç** ile diğerine geçip yeniden dener. Servisi "Organizasyonunuz" ya da "Bağlı bir organizasyon" ile paylaştıysanız, ziyaretçinin o organizasyonla devam etmesi gerekebilir.
 - **Başka bir hesapla giriş yap** — farklı bir Komuta hesabıyla yeniden giriş.
 - **Komuta'ya git** — Komuta konsoluna döner.
@@ -100,8 +100,9 @@ Bu sayfa ziyaretçiye neden giremediğini ve ne yapabileceğini gösterir:
 | **Bir üye** | Organizasyondaki tek bir kişi. Yalnızca aktif üyeler seçilebilir. |
 | **Bağlı bir organizasyon** | Üyesi olduğunuz başka bir organizasyondaki herkes; sonradan katılanlar dahil. Yalnızca sizin de üyesi olduğunuz organizasyonlar seçilebilir. |
 | **Bir e-posta adresi** | Organizasyonlarınızın dışındaki biri. Herhangi bir Komuta hesabıyla giriş yapar, ardından bu adrese gönderilen tek kullanımlık kodla adresi doğrular. |
+| **Bir alan adındaki herkes** | `@example.com` gibi bir alan adında (istenirse alt alan adlarında da) e-posta adresi olan herkes. Herhangi bir Komuta hesabıyla giriş yapar, ardından o alan adındaki adresini tek kullanımlık kodla doğrular. Bkz. [Alan adı paylaşımı](#alan-adı-paylaşımı). |
 
-**Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları listede **Dış** etiketiyle görünür ve organizasyonunuzun dış paylaşıma izin vermesini gerektirir (aşağıya bakın).
+**Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları listede **Dış** etiketiyle görünür ve organizasyonunuzun dış paylaşıma izin vermesini gerektirir (aşağıya bakın). **Bir alan adındaki herkes** paylaşımı da dış paylaşım sayılır; alan adı organizasyonunuzun doğruladığı bir alan adıysa sayılmaz (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)) ve bunun yerine **Doğrulanmış alan adı** etiketi taşır.
 
 Zaten paylaşılmış bir kişi, organizasyon ya da adres yeniden eklenemez (pencere "Zaten paylaşıldı." der); bitişini ya da sayfa sınırını listedeki kalem simgesiyle değiştirin.
 
@@ -121,7 +122,8 @@ Zaten paylaşılmış bir kişi, organizasyon ya da adres yeniden eklenemez (pen
 
 Her satırda paylaşımın adı, varsa sayfa sınırı ("Yalnızca: /a, /b") ve bitiş ("… tarihine kadar" ya da **Bitiş yok**) yazar. Etiketler:
 
-- **Dış** — bağlı organizasyon ya da e-posta paylaşımı.
+- **Dış** — bağlı organizasyon, e-posta paylaşımı ya da organizasyonunuzun doğrulamadığı bir alan adının paylaşımı.
+- **Doğrulanmış alan adı** — organizasyonunuzun doğruladığı bir alan adının paylaşımı; organizasyonunuzun kendi paylaşımı sayılır.
 - **Askıda** — dış paylaşım kapatıldığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
 - **Süresi doldu** — bitiş zamanı geçmiş paylaşım. Listede kalır; kalem simgesiyle yeni bir bitiş verilebilir.
 
@@ -249,6 +251,39 @@ Kurallar:
 
 ---
 
+## Alan adı paylaşımı
+
+**Bir alan adındaki herkes** paylaşımı, o alan adında posta kutusunu okuyabilen herkesi içeri alır; örneğin `@example.com` adresli tüm ekibi kişileri tek tek eklemeden.
+
+- Yalnız alan adını yazın: `example.com` (`@example.com` da olur). Uluslararası (Türkçe karakterli) alan adları kabul edilir.
+- **Alt alan adlarındaki adresler de** seçeneği `@ekip.example.com` gibi adresleri de içeri alır. Yalnız organizasyonunuzun doğruladığı bir alan adında seçilebilir; aksi halde bir alt alan adını kontrol eden herkes içeri girebilirdi.
+- Herkesin adres alabildiği genel e-posta servisleri ve ortak alan adları (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `co.uk`, `onmicrosoft.com` ve benzerleri) paylaşılamaz ("'{Domain}' adresinde herkes e-posta adresi alabilir; bu alan adıyla paylaşım herkesi içeri alır."). Bunun yerine tek tek e-posta adresleriyle paylaşın.
+- Ziyaretçiler e-posta paylaşımındaki gibi giriş yapar: herhangi bir Komuta hesabıyla giriş yapıp **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde o alan adındaki adreslerini **8 haneli** kodla doğrularlar. Bir Komuta hesabının kendi e-posta adresi tek başına alan adı paylaşımını açmaz.
+- Şirketten ayrılan biri posta kutusu kapanınca yeni kod alamaz; açık olan oturumu süresi (**Oturum süresi**) bitene kadar sürer.
+
+Alan adındaki posta kutularını korumak için ek sınırlar:
+
+- Bir Komuta hesabı aynı alan adı paylaşımı için 24 saatte en fazla **3 farklı adrese** kod isteyebilir.
+- Bir alan adı paylaşımında 24 saatte **200 yanlış kod** girilirse, süre dolana kadar o paylaşım için yeni kod gönderilmez. Ayrıca kendi **Bir e-posta adresi** paylaşımı olanlar o paylaşım üzerinden kod almaya devam eder.
+- E-posta paylaşımında olduğu gibi ekran, adresin erişimi olsa da olmasa da aynı cevabı verir.
+
+## Doğrulanmış alan adları
+
+Organizasyonunuza ait bir alan adını doğrulayın; o alan adındaki herkesle yapılan paylaşımlar sizin kendi paylaşımınız sayılsın:
+
+- Ayar: **Hesap → Organizasyonlar → Doğrulanmış alan adları**. Değiştirmek için organizasyonu düzenleme izni gerekir.
+- **Alan adı ekle**'yi seçin, ardından gösterilen TXT kaydını DNS sağlayıcınızda ekleyin: ad `_komuta-verify.<alan adı>`, değer `komuta-verify=<kod>`. **Şimdi denetle**'yi seçin (en fazla 10 saniyede bir); Komuta da 6 saatte bir denetler.
+- Doğrulanmış bir alan adı alt alan adlarını da kapsar: `example.com` doğrulanınca `ekip.example.com` paylaşımları da sizin sayılır.
+- Kaydı yerinde tutun. Komuta kaydı en az 2 güne yayılan 3 denetimde bulamazsa ya da alan adı için bir hafta boyunca DNS'e ulaşamazsa, alan adı doğrulanmış sayılmaz (**Kayıt artık bulunamıyor**).
+- Organizasyon başına en fazla **20** alan adı. Her organizasyon kendi alan adlarını doğrular; doğrulama bağlı organizasyonlara geçmez.
+
+Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırıldığında:
+
+- Doğrulanmış alan adının paylaşımları dış paylaşım kapalıyken de çalışmaya devam eder.
+- Alan adı doğrulanmış sayılmayınca (ya da kaldırılınca) paylaşımları yeniden dış paylaşım sayılır: dış paylaşım kapalıyken **Askıda** olurlar; alt alan adlarını da kapsayan paylaşım her durumda askıya alınır. Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer. Alan adı yeniden doğrulanınca geri gelirler.
+
+---
+
 ## Dış paylaşım izni
 
 **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları organizasyon dışına erişim verir. Bunlar için organizasyonunuzun dış paylaşıma izin vermesi gerekir:
@@ -262,7 +297,7 @@ Kurallar:
 
 İzni kapatırsanız:
 
-- Organizasyonun tüm korunan servislerindeki bağlı organizasyon ve e-posta paylaşımları **Askıda** olur.
+- Organizasyonun tüm korunan servislerindeki bağlı organizasyon ve e-posta paylaşımları **Askıda** olur; organizasyonunuzun doğrulamadığı alan adlarının paylaşımları da.
 - Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer; bu servislerdeki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 - Yeni dış paylaşım eklenemez.
 
