@@ -77,7 +77,7 @@ Bu ayar açıkken Komuta, giriş yapmış ziyaretçinin kim olduğunu her istekt
 
 ### Açma
 
-Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der (Komuta'nın değerleri boş gelir; ziyaretçi bu başlıkları kendisi gönderirse dolu görünebilir, bkz. aşağı). Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
+Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der (Komuta'nın değerleri boş gelir; ziyaretçi bu başlıkları kendisi gönderirse dolu görünebilir, aşağıya bakın). Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
 
 ### Uygulamanızın aldığı başlıklar
 

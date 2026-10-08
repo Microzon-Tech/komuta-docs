@@ -33,10 +33,10 @@ Erişim koruması rehberleri:
 | "Yalnızca seçilen kişiler" kuralı | Kural başına en fazla 200 kişi |
 | Servis token'ı | Serviste en fazla 20; ad 1–64 karakter; bitiş en fazla 365 gün; en fazla 50 sayfa |
 | Paylaşım bağlantısı | Serviste en fazla 50; ad 1–64 karakter; bitiş zorunlu (konsolda 1, 7, 30 ya da 90 gün; API'de en fazla 365 gün sonrası); en fazla 50 sayfa |
-| Özel ağdan gelebilecek servisler | En fazla 50; aynı organizasyon |
+| Özel ağdan doğrudan gelebilecek servisler | En fazla 50; aynı organizasyon |
 | Koruma bitişi | Gelecekte, en fazla 365 gün sonra |
 | Korunan adres (host) sayısı | Servis başına en fazla 50 |
-| Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; tek tek çıkarma devreye girene kadar en fazla 12 saat |
+| Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; ziyaretçi oturumları platformunuzda yönetilmiyorsa 12 saat |
 | **Kimler içeride** listesi | En fazla 200 oturum |
 | Tek tek çıkarma | Serviste oturum takibi başladıktan 12 saat 10 dakika sonra başlar; bir oturumun ömrü içinde 500'den fazla oturum tek tek kapatılırsa herkesi çıkarmaya döner |
 | Giriş bağlantısı | Yaklaşık 10 dakika (girişin bu sürede tamamlanması gerekir) |
@@ -347,15 +347,15 @@ Tarayıcının önce gönderdiği `OPTIONS` kontrolü çerez taşımaz; giriş g
 Durum etiketine bakın: **Hazırlanıyor** sırasında kontrol henüz devrede değildir. **Uygulanıyor**'un ilk saniyelerinde yönlendirmeler henüz yenileniyor olabilir; biraz bekleyip sayfayı yenileyin. **Korunuyor** görünüyorsa tarayıcınız sayfayı önbellekten açmış olabilir; sayfayı yenileyin. Sorun sürüyorsa kartta bir uyarı olup olmadığına bakın.
 
 **Kendimi dışarıda bıraktım.**
-Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP listesine yeni adresinizi ekleyin (adresinizi **Erişim kısıtlı** sayfasında görebilirsiniz) ya da **Ayarlar → Şimdi herkese aç** ile korumayı kaldırın.
+Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP listesine yeni adresinizi ekleyin (adresinizi **Bu servise erişim kısıtlı** sayfasında görebilirsiniz) ya da **Ayarlar → Şimdi herkese aç** ile korumayı kaldırın.
 
-**Uyuyan bir servis ne olur?**
+**Uyuyan bir servise ne olur?**
 Koruma uyurken de geçerlidir. Servisi ancak kontrolleri geçen bir ziyaretçi uyandırabilir; giriş yapmamış ya da izinli olmayan bir adresten gelen biri uyandıramaz.
 
 **Bir paylaşımı kaldırdım, kişi hemen çıkar mı?**
 Evet, açık oturumları dahil yaklaşık 30 saniye içinde. Serviste tek tek çıkarma devreye girdiyse yalnızca o paylaşımla açılmış oturumlar sona erer; öncesinde (oturum takibi başladıktan sonraki 12 saat 10 dakika boyunca) servisteki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 
-**Bir kişiyi tek tek oturumdan çıkarabilir miyim?**
+**Tek bir kişiyi oturumdan çıkarabilir miyim?**
 Evet: kişinin satırında **Kişiler → Kimler içeride → Çıkar**. Açık oturumları yaklaşık 30 saniye içinde kapanır; başka kimse etkilenmez. Bir paylaşım ona hâlâ erişim veriyorsa hemen yeniden giriş yapabilir; dışarıda kalması gerekiyorsa o paylaşımı da kaldırın. Serviste tek tek çıkarma devreye girene kadar bir kişiyi çıkarmak herkesi çıkarır ve konsol bunu belirtir. Paylaşım bağlantısıyla girenler listede görünmez; erişimlerini bitirmek için bağlantıyı silin.
 
 **Erişim kaydını dışa aktarabilir miyim?**
@@ -370,7 +370,7 @@ Evet: **Kurallar** sekmesinde **Ülkeler** ve **Hız sınırı**, **Makineler** 
 **Webhook imzalarını Komuta benim için kontrol edebilir mi?**
 Evet: webhook yolunu açarken bir **Kenarda imza kontrolü** (GitHub, Stripe ya da başka bir HMAC-SHA256 başlığı) seçin, ardından yolun altına imza sırrını ekleyin. İmzasız istekler uygulamanıza ulaşmadan `401` alır. İmzalı yollar yalnızca `POST`, `PUT` ve `PATCH` ile en fazla 65.535 baytlık gövdeleri kabul eder. Seçeneği görmüyorsanız platformunuzda henüz açık değildir. Bkz. [Kenarda imza kontrolü](access-protection-machines.md#kenarda-imza-kontrolü).
 
-**Webhook göndericisi GitHub'ın IP aralıklarını değiştirirse?**
+**GitHub gibi bir webhook göndericisi IP aralıklarını değiştirirse ne olur?**
 Gönderici adres listesi isteğe bağlıdır; asıl koruma kenarda ya da uygulamanızda yapılan imza doğrulamasıdır. Listeyi kullanıyorsanız göndericinin yayımladığı aralıkları güncel tutun ya da listeyi boş bırakın.
 
 **Koruma açıkken servisimi yeniden dağıtırsam ne olur?**

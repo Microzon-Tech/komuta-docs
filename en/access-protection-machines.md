@@ -11,7 +11,7 @@ Access protection offers three ways for such requests, and a section for the HTT
 | **Services that may come in over the private mesh** | Your Komuta services on other clusters reaching this service directly | **Machines** tab → **Services that may come in over the private mesh** (the private mesh itself is on the **Network** tab) |
 | **Methods and CORS** | Allowing only the HTTP methods each path needs, and letting browsers' CORS checks through before sign-in | **Machines** tab → **Methods and CORS** |
 
-The webhook, service token and **Methods and CORS** sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, the list appears and can be filled in as soon as you start turning protection on on the **Rules** tab (before saving).
+The webhook, service token and **Methods and CORS** sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and, if you can manage protection, a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, the list appears and can be filled in as soon as you start turning protection on on the **Rules** tab (before saving).
 
 ---
 
@@ -27,7 +27,7 @@ A webhook path opens a specific path of the site without Komuta sign-in. For exa
 2. In the **Open a path for webhooks** window:
    - **Path** — the path to open, for example `/webhooks/github`. This path and everything below it is opened.
    - **Methods** — the HTTP methods accepted on this path: `POST`, `PUT`, `PATCH`, `DELETE`, `GET`, `HEAD`. The default is `POST` only; at least one method must be chosen.
-   - **Sender addresses (optional)** — one IP address or CIDR range per line. If you fill it in, only requests from these addresses get onto the path. If you leave it empty, requests from any address are accepted; the signature check still protects you. You can write ranges the sender publishes here, such as GitHub's webhook addresses (the window shows `140.82.112.0/20` as an example).
+   - **Sender addresses (optional)** — one IP address or CIDR range per line. If you fill it in, only requests from these addresses get onto the path. If you leave it empty, requests from any address are accepted; the signature check (at the edge, or in your application) still protects you. You can write ranges the sender publishes here, such as GitHub's webhook addresses (the window shows `140.82.112.0/20` as an example).
    - **Signature check at the edge** — **None, my app checks it** (default), **GitHub (X-Hub-Signature-256)**, **Stripe (Stripe-Signature)** or **Other HMAC-SHA256 header** (see [below](#signature-check-at-the-edge)).
 3. Save with **Open the path**. The change takes effect within a few seconds ("Webhook paths are being applied"). If you chose a signature check, add the signing secret under the path next ("After you open the path, add the signing secret under it. Until then every request to it gets 401.").
 
@@ -48,7 +48,9 @@ The list shows each open path with its methods, its sender list ("Only from: …
 
 ### Signature check at the edge
 
-With a signature check, Komuta verifies the sender's signature on the raw request body before the request reaches your application. A request without a valid signature gets `401` and never reaches your application. Your application no longer has to verify the signature, but it may keep doing so.
+With a signature check, Komuta verifies the sender's signature on the raw request body before the request reaches your application. A request without a valid signature gets `401` and never reaches your application. Only requests that come through the Komuta gateway are checked: your own services on the same cluster, and services you chose for the private mesh, reach your pods directly without a signature check. If that matters, keep verifying the signature in your application too.
+
+Only the request body is signed (Stripe also signs the time). The sub-path under the signed prefix, the query string and other headers, such as `X-GitHub-Event`, are not covered, so don't trust them on their own.
 
 | Choice | What Komuta checks |
 |---|---|
@@ -92,7 +94,7 @@ Things to know:
 - A secret is 8 to 512 bytes, without spaces or control characters.
 - **At most 2 secrets per path**, so you can rotate without downtime: add the new secret, switch the sender to it, then remove the old one. Both work in between.
 - Removing a secret asks **Remove secret {key}?**; senders still signing with it are refused within a minute. Removing the last secret of a path means every request to it gets `401` until you add a new one.
-- Closing the path, or changing or removing its signature check, deletes the path's secrets; a new signed path needs a new secret.
+- Closing the path, removing its signature check or switching to another provider deletes the path's secrets; a new signed path needs a new secret.
 - Seeing and changing signing secrets needs the **Manage service access protection** permission.
 
 If the **Signature check at the edge** choice says "Signature checks at the edge aren't available on this platform yet.", signature checks aren't enabled on your platform yet; verify the signature in your application.

@@ -71,7 +71,7 @@ Bağlantıyı elinde tutan herkes, bağlantının süresi dolana ya da siz silen
 2. **IP izin listesi**'ne ofisinizin genel IP adresini ya da aralığını yazın (bulunduğunuz yerden bağlanıyorsanız **Kendi IP'mi ekle**).
 3. **Korumayı uygula**.
 
-Listedeki adreslerden gelenler giriş yapmadan girer; diğer herkes **Erişim kısıtlı** sayfasını görür.
+Listedeki adreslerden gelenler giriş yapmadan girer; diğer herkes **Bu servise erişim kısıtlı** sayfasını görür.
 
 ### Ofisten girişsiz, dışarıdan girişle
 
@@ -132,7 +132,7 @@ Korumayı servis genel bakışındaki **Servis koruması** kartından da adım a
 
 - **İlk açılış** genellikle bir iki dakika sürer. Komuta servisinizin yönlendirme ayarlarını yeniler ve pod kilidini uygular; bu bir dağıtım olarak görünebilir ama yeni bir build yapılmaz.
 - Kontrol, koruma **Uygulanıyor** durumuna geçtikten kısa süre sonra, servisin yönlendirmeleri yenilenince devreye girer. **Hazırlanıyor** sırasında servis hâlâ eski haliyle (herkese açık) çalışır.
-- **Açık bir korumada** kural, IP listesi ve paylaşım değişiklikleri genellikle birkaç saniye ile yarım dakika arasında geçerli olur. Bu sırada kart "Son değişikliğiniz uygulanıyor." der. Ülkeler, hız sınırı ile yöntemler ve CORS yaklaşık bir dakika içinde; ziyaretçileri çıkarmak ve paylaşım bağlantılarını silmek yaklaşık 30 saniye içinde geçerli olur.
+- **Korunan bir serviste** kural, IP listesi ve paylaşım değişiklikleri genellikle birkaç saniye ile yarım dakika arasında geçerli olur. Bu sırada kart "Son değişikliğiniz uygulanıyor." der. Ülkeler, hız sınırı ile yöntemler ve CORS yaklaşık bir dakika içinde; ziyaretçileri çıkarmak ve paylaşım bağlantılarını silmek yaklaşık 30 saniye içinde geçerli olur.
 - **Kapatma** da birkaç saniye ile bir iki dakika arasında tamamlanır; kontrol **Kapatılıyor** durumunun son adımında kalkar.
 
 ---
@@ -212,7 +212,7 @@ Kontrol **Kapatılıyor** durumunun son adımında kalkar; bundan sonra URL'e sa
 |---|---|
 | Paylaşımlar (askıdakiler dahil) | Komuta girişi seçimi |
 | Servis token'ları ve paylaşım bağlantıları (süresi dolmamış bağlantılar yeniden çalışır) | IP izin listesi |
-| Özel ağdan gelebilecek servisler listesi | Yol kuralları ve webhook yolları |
+| Özel ağdan doğrudan gelebilecek servisler listesi | Yol kuralları ve webhook yolları |
 | Ülkeler, hız sınırı, yöntem kuralları ve CORS ayarı | Koruma bitiş tarihi |
 | **Oturum süresi** seçimi | |
 | Uygulamaya kimlik bildirme ayarı (korumayı Komuta girişiyle yeniden açarsanız kendiliğinden yeniden devreye girer; giriş istemeyen bir korumada kapanır) | |
@@ -268,7 +268,7 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - **Alan adları** — Koruma, servisin `*.komuta.app` adresi ve **Alan adları** altında eklenen tüm aktif özel alan adları için birlikte geçerlidir. Yeni bir alan adı eklediğinizde koruma onu da kapsar. Özel alan adınızın DNS kaydı kendi Cloudflare hesabınızda proxy'li (turuncu bulut) olmamalıdır; **DNS only** olmalıdır.
 - **Mavi-yeşil dağıtım** — Önizleme adresi de korunur; ziyaretçi önizleme adresi için ayrıca giriş yapar.
 - **Özel ağ (mesh)** — Özel ağ trafiği ağ geçidinden geçmez. Korunan bir serviste diğer kümelerinizden kimin doğrudan gelebileceğini **Makineler** sekmesinde seçersiniz (bkz. [Makineler ve Özel Ağ](access-protection-machines.md#özel-ağdan-doğrudan-gelebilecek-servisler)).
-- **Uygulamanız** — Komuta'nın oturum çerezleri ve servis token'ı başlığı isteğinizden çıkarılır; uygulamanız bunları görmez. Her izinli istekte Komuta'nın pod kilidi için eklediği `x-komuta-access` başlığı bulunur. Bu, servisinize özel gizli bir değerdir: kullanmanız gerekmez, loglamayın ve başka bir yere iletmeyin.
+- **Uygulamanız** — Komuta'nın oturum çerezleri ve servis token'ı başlığı istekten çıkarılır; uygulamanız bunları görmez. Her izinli istekte Komuta'nın pod kilidi için eklediği `x-komuta-access` başlığı bulunur. Bu, servisinize özel gizli bir değerdir: kullanmanız gerekmez, loglamayın ve başka bir yere iletmeyin.
 - **CORS** — Tarayıcının başka bir siteden gönderdiği CORS kontrolü (`OPTIONS`) oturum taşımaz. Giriş isteyen bir sayfadan ancak **Makineler** sekmesinde **CORS kontrollerine girişsiz izin ver** açıksa geçer (bkz. [Yöntemler ve CORS](access-protection-machines.md#yöntemler-ve-cors)); webhook yollarında `OPTIONS` yine seçilemez.
 - **Stack'ler** — Stack'teki bir servis, Komuta girişini, organizasyon paylaşımını ve IP izin listesini manifestinde tanımlayabilir (bkz. [Stack Manifestinde Erişim Koruması](stack-manifest-access.md)).
 - **Desteklenmeyenler** — Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı ya da paylaşım bağlantısı olmalıdır.

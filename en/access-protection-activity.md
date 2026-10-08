@@ -151,7 +151,7 @@ The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-Engli
 | `method`, `path` | The HTTP method and path (`*` when the path is hidden). |
 | `client_ip` | The address, or the `/24` / `/48` network for anonymous refusals. |
 
-Values that start with `=`, `+`, `-`, `@`, a tab or a carriage return get a leading `'`, so a spreadsheet never runs them as formulas. The JSON file holds the same rows as an array.
+Values that start with `=`, `+`, `-`, `@`, a tab or a carriage return get a leading `'`, so a spreadsheet never runs them as formulas. The JSON file holds the same records as an array, with the API's field names.
 
 ---
 

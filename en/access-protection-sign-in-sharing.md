@@ -221,8 +221,7 @@ Komuta can end one person's sessions only for sessions it can tell apart. It sta
 
 - signing one person out signs everyone out, and the confirmation turns into **Sign everyone out?**;
 - the section says "Some sessions here were opened before Komuta could tell them apart. Until {time}, signing one person out signs everyone out." (or "For now, signing one person out signs everyone out of this service.");
-- removing or narrowing a share signs everyone out too;
-- sessions last at most 12 hours, even if **Stay signed in for** is longer.
+- removing or narrowing a share signs everyone out too.
 
 Komuta also falls back to signing everyone out if a very large number of sessions (more than 500) has been ended one by one within a session's lifetime.
 

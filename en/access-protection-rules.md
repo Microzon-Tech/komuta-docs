@@ -150,7 +150,7 @@ Someone who isn't chosen sees the **This page is not shared with you** page: "Th
 
 The **Countries** section admits visitors only from the countries you list. Visitors from anywhere else, or whose country can't be told, are refused before sign-in.
 
-1. Type a two-letter ISO country code in the field (for example `TR` or `DE`) and choose **Add**. The list shows each country with its name and code, for example "Germany (DE)".
+1. Type a two-letter ISO country code in the field (for example `TR` or `DE`) and choose **Add {country}** (for example **Add Germany**). The list shows each country with its name and code, for example "Germany (DE)".
 2. Save with **Save countries** (or undo with **Discard**). The change takes effect within about a minute ("Saved. The gateway applies it within about a minute.").
 
 Rules:
@@ -158,7 +158,7 @@ Rules:
 - At most **250** countries; each can be listed once. Lowercase codes are turned into uppercase.
 - `XX` (unknown country) and `T1` (Tor) can't be listed. While the list has entries, visitors whose country is unknown or who come over Tor are always refused.
 - The country is the one Cloudflare reports, and it is trusted only after Komuta verifies that the request came through Cloudflare, exactly as for the IP list. A request that can't be verified is refused (the access log says "The request did not come through the Komuta edge").
-- **It applies to everyone**, before anything else is looked at: visitors who haven't signed in, signed-in visitors, share links, service tokens, browsers' CORS checks and the sign-in step itself.
+- **It applies to everyone**, right after block and method rules and before anything else: visitors who haven't signed in, signed-in visitors, share links, service tokens, browsers' CORS checks and the sign-in step itself.
 - **Webhook paths are exempt**; they have their own sender list. A share link opened on a webhook path is still checked.
 - A refused visitor sees the **Access to this service is restricted** page, the same page as for the IP list, with the address the service sees. Requests with other methods get `403` with the plain text `access restricted to allowed networks`. The access log says "Came from a country that is not allowed".
 - An empty list admits every country ("Visitors from every country are admitted.").

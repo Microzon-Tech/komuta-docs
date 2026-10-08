@@ -518,7 +518,7 @@ Example requests in this order:
 | Anyone, `GET /internal/tools` | `403` | 1: block rule |
 | Customer, `GET /reports/2026` | Opens with the email code | 8: email share, page in scope |
 | Customer, `GET /` | After sign-in and the email code, **This page is not shared with you** and the pages they can open | 8: outside the page limit |
-| GitHub, `POST /webhooks/github` | Opens (the app verifies the signature) | 6: open path, sender listed |
+| GitHub, `POST /webhooks/github` | Opens (the app verifies the signature, or Komuta if you chose a signature check) | 6: open path, sender listed |
 | Anyone, `GET /webhooks/github` | Per the site rule | 6 is skipped (method not chosen), 7–8 apply |
 | CI with token, `GET /api/health` | Opens | 7–8: the token stands in for sign-in, in scope |
 | CI with token, `GET /admin` | `403` | 8: the people rule doesn't accept tokens |

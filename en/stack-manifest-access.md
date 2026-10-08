@@ -27,7 +27,7 @@ services:
 | `organization` | `true` / `false` | `true` when `signIn` is `true` | Share the service with **Your organization** (every active member). Set it to `false` to turn sign-in on without sharing it with the organization; then add people in the console. |
 | `allowIps` | list of addresses | empty | The **IP allow-list**: one IPv4 or IPv6 address or CIDR range per entry. |
 
-When both `signIn` and `allowIps` are set, they combine as **Require both**: visitors must come from a listed address and sign in.
+When both `signIn` and `allowIps` are set on a new service, they combine as **Require both**: visitors must come from a listed address and sign in. On a service that is already protected, the combination set in the console is kept.
 
 Field names are case-sensitive. A field that isn't one of these three is refused ("Unknown field '…'. Expected fields: signIn, organization, allowIps.").
 
@@ -67,7 +67,7 @@ The plan also refuses a block it can't apply (code `CAPABILITY_NOT_AVAILABLE`), 
 
 When the plan creates a new service:
 
-- **With a block that asks for protection** (`signIn: true`, or a non-empty `allowIps`), protection is set up together with the service: the declared sign-in, IP allow-list and organization share, with no path rules and no end date. It takes effect a few minutes after the service's first deploy, like protection turned on in the console. If the protection can't be set up, the service isn't created ("The declared access protection could not be set up for {Service}; the service was not provisioned.").
+- **With a block that asks for protection** (`signIn: true`, or a non-empty `allowIps`), protection is set up together with the service: the declared sign-in, IP allow-list and organization share, with no path rules and no end date. It takes effect a few minutes after the service's first deploy, like protection turned on in the console. If the protection can't be set up, the service isn't created and the run step fails with one of the codes under [Run errors](#run-errors).
 - **With an open block** (`access: {}`), the service starts open, even if the organization's **Protect new services** setting is on.
 - **Without a block**, the organization's **Protect new services** setting decides, as for a service created in the console.
 
@@ -114,3 +114,19 @@ These are set only in the console (**Service Detail → Configuration → Access
 - [Rules](access-protection-rules.md) — Komuta sign-in and the IP allow-list in detail.
 - [Sign-in and Sharing](access-protection-sign-in-sharing.md) — the organization share and other shares.
 - [Reference](access-protection-reference.md) — limits and error messages.
+
+---
+
+## Run errors
+
+When a plan is applied, a step that can't set up or change the declared protection stops with one of these codes. The message is shown as Komuta returns it.
+
+| Code | Message |
+|---|---|
+| `ACCESS_PROTECTION_NOT_AVAILABLE` | Access protection is not available to this organization. (or: Access protection is not enabled on this platform.) |
+| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. |
+| `ACCESS_MESH_EXPOSED` | Access protection cannot be combined with private network exposure on this platform. |
+| `ACCESS_UNSUPPORTED_CLUSTER` | Access protection is supported only on Komuta hosting clusters. |
+| `ACCESS_RULES_NOT_AVAILABLE` | This service uses access rules that cannot be changed on this platform right now. |
+| `ACCESS_DECLARATION_INVALID` | The declared access protection needs sign-in or an allow-list, and sharing with the organization needs sign-in; provisioning was not started. |
+| `ACCESS_PROTECTION_NOT_PREPARED` | The declared access protection could not be prepared; provisioning was not started. |

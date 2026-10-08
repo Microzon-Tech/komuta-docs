@@ -1,6 +1,6 @@
 # Makineler ve Özel Ağ
 
-Komuta girişi insanlar içindir: tarayıcıda bir giriş sayfası açılır, kişi hesabıyla giriş yapar. Bazı istekler ise bir insandan değil bir programdan gelir. GitHub bir push olduğunda uygulamanıza haber verir, Stripe bir ödeme olduğunda bildirim gönderir, CI hattınız deploy sonrası bir sağlık kontrolü yapar, bir izleme aracı her dakika sitenizi yoklar. Bu programlar giriş sayfasını kullanamaz.
+Komuta girişi insanlar içindir: tarayıcıda bir giriş sayfası açılır, kişi hesabıyla giriş yapar. Bazı istekler ise bir insandan değil bir programdan gelir. GitHub bir push olduğunda uygulamanıza haber verir, Stripe bir ödeme olduğunda bildirim gönderir, CI hattınız dağıtımdan sonra bir sağlık kontrolü yapar, bir izleme aracı her dakika sitenizi yoklar. Bu programlar giriş sayfasını kullanamaz.
 
 Erişim koruması bu tür istekler için üç yol ve servisinizin kabul ettiği HTTP yöntemleri ile tarayıcı CORS kontrolleri için bir bölüm sunar:
 
@@ -8,10 +8,10 @@ Erişim koruması bu tür istekler için üç yol ve servisinizin kabul ettiği 
 |---|---|---|
 | **Webhook yolu** (açık yol) | Giriş yapamayan ve gönderdiğini imzalayan göndericiler (GitHub, Stripe, Slack gibi); imzayı Komuta kontrol edebilir | **Makineler** sekmesi → **Webhook'lar** |
 | **Servis token'ı** | Sizin kontrol ettiğiniz programlar (CI işleri, izleme araçları, betikler) | **Makineler** sekmesi → **Servis token'ları** |
-| **Özel ağdan gelebilecek servisler** | Diğer kümelerinizdeki Komuta servislerinizin bu servise doğrudan ulaşması | **Makineler** sekmesi → **Özel ağdan doğrudan gelebilecek servisler** (özel ağın kendisi **Ağ** sekmesinde) |
+| **Özel ağdan doğrudan gelebilecek servisler** | Diğer kümelerinizdeki Komuta servislerinizin bu servise doğrudan ulaşması | **Makineler** sekmesi → **Özel ağdan doğrudan gelebilecek servisler** (özel ağın kendisi **Ağ** sekmesinde) |
 | **Yöntemler ve CORS** | Her yolda yalnızca gereken HTTP yöntemlerine izin vermek ve tarayıcıların CORS kontrollerini girişten önce geçirmek | **Makineler** sekmesi → **Yöntemler ve CORS** |
 
-Webhook, servis token'ı ve **Yöntemler ve CORS** bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, **Kurallar** sekmesinde korumayı açmaya başladığınızda (kaydetmeden önce) liste görünür ve doldurulabilir.
+Webhook, servis token'ı ve **Yöntemler ve CORS** bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve korumayı yönetebiliyorsanız **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, **Kurallar** sekmesinde korumayı açmaya başladığınızda (kaydetmeden önce) liste görünür ve doldurulabilir.
 
 ---
 
@@ -27,8 +27,8 @@ Webhook yolu, sitenin belirli bir yolunu Komuta girişi olmadan açar. Örneğin
 2. **Webhook için yol aç** penceresinde:
    - **Yol** — açılacak yol, örneğin `/webhooks/github`. Bu yol ve altındaki yollar açılır.
    - **Yöntemler** — bu yolda kabul edilecek HTTP yöntemleri: `POST`, `PUT`, `PATCH`, `DELETE`, `GET`, `HEAD`. Varsayılan yalnızca `POST`'tur; en az bir yöntem seçilmelidir.
-   - **Gönderici adresleri (isteğe bağlı)** — her satıra bir IP adresi ya da CIDR aralığı. Doldurursanız yola yalnızca bu adreslerden gelen istekler girer. Boş bırakırsanız her adresten istek kabul edilir; imza doğrulaması yine sizi korur. GitHub'ın webhook adresleri gibi göndericinin yayımladığı aralıkları buraya yazabilirsiniz (pencere örnek olarak `140.82.112.0/20` gösterir).
-   - **Kenarda imza kontrolü** — **Yok, uygulamam kontrol ediyor** (varsayılan), **GitHub (X-Hub-Signature-256)**, **Stripe (Stripe-Signature)** ya da **Başka bir HMAC-SHA256 başlığı** (bkz. [aşağısı](#kenarda-imza-kontrolü)).
+   - **Gönderici adresleri (isteğe bağlı)** — her satıra bir IP adresi ya da CIDR aralığı. Doldurursanız yola yalnızca bu adreslerden gelen istekler girer. Boş bırakırsanız her adresten istek kabul edilir; imza doğrulaması (kenarda ya da uygulamanızda) yine sizi korur. GitHub'ın webhook adresleri gibi göndericinin yayımladığı aralıkları buraya yazabilirsiniz (pencere örnek olarak `140.82.112.0/20` gösterir).
+   - **Kenarda imza kontrolü** — **Yok, uygulamam kontrol ediyor** (varsayılan), **GitHub (X-Hub-Signature-256)**, **Stripe (Stripe-Signature)** ya da **Başka bir HMAC-SHA256 başlığı** ([aşağıya bakın](#kenarda-imza-kontrolü)).
 3. **Yolu aç** ile kaydedin. Değişiklik birkaç saniye içinde uygulanır ("Webhook yolları uygulanıyor"). Bir imza kontrolü seçtiyseniz ardından yolun altına imza sırrını ekleyin ("Yolu açtıktan sonra altına imza sırrını ekleyin. O zamana kadar bu yola gelen her istek 401 alır.").
 
 Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnızca: …" ya da "Her adresten"), imza kontrolünü (örneğin "GitHub imzası kontrol ediliyor") ve servisin tam adresini gösterir. Bir yolu kapatmak için satırdaki çöp kutusu simgesine tıklayın; yol onay sorulmadan hemen kapatılır.
@@ -48,7 +48,9 @@ Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnı
 
 ### Kenarda imza kontrolü
 
-İmza kontrolü seçildiğinde Komuta, istek uygulamanıza ulaşmadan önce göndericinin imzasını ham istek gövdesi üzerinden doğrular. Geçerli imzası olmayan istek `401` alır ve uygulamanıza hiç ulaşmaz. Uygulamanızın imzayı doğrulaması artık gerekmez, ama doğrulamaya devam edebilir.
+İmza kontrolü seçildiğinde Komuta, istek uygulamanıza ulaşmadan önce göndericinin imzasını ham istek gövdesi üzerinden doğrular. Geçerli imzası olmayan istek `401` alır ve uygulamanıza hiç ulaşmaz. Yalnızca Komuta ağ geçidinden gelen istekler kontrol edilir: aynı kümedeki kendi servisleriniz ve özel ağ için seçtiğiniz servisler pod'larınıza imza kontrolü olmadan doğrudan ulaşır. Bu sizin için önemliyse imzayı uygulamanızda da doğrulamaya devam edin.
+
+Yalnızca istek gövdesi imzalanır (Stripe zamanı da imzalar). İmzalı önekin altındaki alt yol, sorgu dizesi ve `X-GitHub-Event` gibi diğer başlıklar imzaya dahil değildir; bunlara tek başına güvenmeyin.
 
 | Seçenek | Komuta neyi kontrol eder |
 |---|---|
@@ -92,7 +94,7 @@ Bilmeniz gerekenler:
 - Sır, boşluk ve kontrol karakteri içermeyen 8 ile 512 bayt arasında bir değerdir.
 - **Yol başına en fazla 2 sır**; böylece kesinti olmadan sır değiştirebilirsiniz: yeni sırrı ekleyin, göndereni ona geçirin, sonra eskisini kaldırın. Arada ikisi de çalışır.
 - Bir sırrı kaldırmak **{key} sırrı kaldırılsın mı?** onayını ister; hâlâ onunla imzalayan göndericiler bir dakika içinde reddedilir. Bir yolun son sırrını kaldırırsanız, yeni bir sır ekleyene kadar bu yola gelen her istek `401` alır.
-- Yolu kapatmak ya da imza kontrolünü değiştirmek veya kaldırmak yolun sırlarını siler; yeni bir imzalı yol yeni bir sır ister.
+- Yolu kapatmak, imza kontrolünü kaldırmak ya da başka bir sağlayıcıya geçmek yolun sırlarını siler; yeni bir imzalı yol yeni bir sır ister.
 - İmza sırlarını görmek ve değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
 
 **Kenarda imza kontrolü** seçimi "Kenarda imza kontrolü bu platformda henüz açık değil." diyorsa imza kontrolü platformunuzda henüz açık değildir; imzayı uygulamanızda doğrulayın.

@@ -74,7 +74,7 @@ Giriş isteyen bir sayfaya oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayf
 | Yolun izin vermediği bir yöntem kullandı | `405`, düz metin `method not allowed` ve `Allow` başlığı. |
 | Bir paylaşım bağlantısı açtı | Bkz. [Paylaşım bağlantıları](#paylaşım-bağlantıları). |
 
-Servisinizin içinde gösterilen **Erişim kısıtlı** ve **Bu sayfaya erişiminiz yok** sayfaları, ziyaretçinin tarayıcı dili Türkçe ise Türkçe, değilse İngilizce görünür. `GET`/`HEAD` dışındaki istekler (tarayıcıdan ya da programdan) bu sayfalar yerine kısa düz metin alır: `access restricted to allowed networks` ya da `this path is not shared with you`.
+Servisinizin içinde gösterilen **Bu servise erişim kısıtlı** ve **Bu sayfaya erişiminiz yok** sayfaları, ziyaretçinin tarayıcı dili Türkçe ise Türkçe, değilse İngilizce görünür. `GET`/`HEAD` dışındaki istekler (tarayıcıdan ya da programdan) bu sayfalar yerine kısa düz metin alır: `access restricted to allowed networks` ya da `this path is not shared with you`.
 
 ### Erişiminiz yok sayfası
 
@@ -221,8 +221,7 @@ Komuta yalnızca birbirinden ayırt edebildiği oturumları tek tek kapatabilir.
 
 - bir kişiyi çıkarmak herkesi çıkarır ve onay penceresi **Herkes çıkarılsın mı?** olur;
 - bölüm "Buradaki bazı oturumlar Komuta onları birbirinden ayırt edemeden açıldı. {time} saatine kadar bir kişiyi çıkarmak herkesi çıkarır." (ya da "Şimdilik bir kişiyi çıkarmak bu servisteki herkesi çıkarır.") der;
-- bir paylaşımı kaldırmak ya da daraltmak da herkesi çıkarır;
-- **Oturum süresi** daha uzun olsa bile oturumlar en fazla 12 saat sürer.
+- bir paylaşımı kaldırmak ya da daraltmak da herkesi çıkarır.
 
 Bir oturumun ömrü içinde çok sayıda (500'den fazla) oturum tek tek kapatıldıysa Komuta yine herkesi çıkarmaya döner.
 

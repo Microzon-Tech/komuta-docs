@@ -53,7 +53,7 @@ Kart hatalı satırları siz yazarken "Satır {n}" diye işaretler ve hata düze
 - Adresiniz zaten listedeyse "Adresiniz ({adres}) zaten listede." yazar.
 - Bağlantınız için genel bir adres belirlenemezse hiçbir şey eklenmez.
 
-> **Kendinizi dışarıda bırakmayın.** Eklenen adres, konsolun gördüğü adrestir. Tarayıcınız servise farklı bir bağlantıyla ulaşıyor olabilir (örneğin konsola IPv6, servise IPv4); bu durumda servis başka bir adres görür. Uygulamadan önce kontrol edin; gerekirse hem IPv4 hem IPv6 adresinizi ekleyin. Yine de dışarıda kalırsanız **Erişim kısıtlı** sayfası servisin gördüğü adresi gösterir; bu adresi kopyalayıp listeye ekleyebilirsiniz.
+> **Kendinizi dışarıda bırakmayın.** Eklenen adres, konsolun gördüğü adrestir. Tarayıcınız servise farklı bir bağlantıyla ulaşıyor olabilir (örneğin konsola IPv6, servise IPv4); bu durumda servis başka bir adres görür. Uygulamadan önce kontrol edin; gerekirse hem IPv4 hem IPv6 adresinizi ekleyin. Yine de dışarıda kalırsanız **Bu servise erişim kısıtlı** sayfası servisin gördüğü adresi gösterir; bu adresi kopyalayıp listeye ekleyebilirsiniz.
 
 ### Adres nasıl belirlenir
 
@@ -102,7 +102,7 @@ Bir istek hem sitenin kontrollerini **hem de** yoluyla eşleşen **her** kuralı
 - `/internal` **Tamamen engelle** ise oturumu olan ya da izinli adresten gelen biri de 403 alır.
 - `/admin` için **Komuta girişi**, `/admin/raporlar` için **IP listesi** kuralı varsa `/admin/raporlar`'a girmek için ikisi de gerekir.
 
-Herkese açık bir yolun girişsiz açılması gerekiyorsa (örneğin webhook), yol kuralı değil [webhook yolu](access-protection-machines.md#webhook-yolları) kullanılır; webhook yolları sitenin kurallarından muaftır.
+Bir yolun girişsiz açılması gerekiyorsa (örneğin webhook), yol kuralı değil [webhook yolu](access-protection-machines.md#webhook-yolları) kullanılır; webhook yolları sitenin kurallarından muaftır.
 
 ### Yol eşleşmesi
 
@@ -150,7 +150,7 @@ Seçilmemiş biri bu yolu açmaya çalışırsa **Bu sayfaya erişiminiz yok** s
 
 **Ülkeler** bölümü yalnızca listelediğiniz ülkelerden gelen ziyaretçileri kabul eder. Başka bir yerden gelen ya da ülkesi anlaşılamayan ziyaretçiler girişten önce reddedilir.
 
-1. Alana iki harfli ISO ülke kodunu yazın (örneğin `TR` ya da `DE`) ve **Ekle**'yi seçin. Liste her ülkeyi adı ve koduyla gösterir, örneğin "Almanya (DE)".
+1. Alana iki harfli ISO ülke kodunu yazın (örneğin `TR` ya da `DE`) ve **Ekle: {ülke}** düğmesini seçin (örneğin **Ekle: Almanya**). Liste her ülkeyi adı ve koduyla gösterir, örneğin "Almanya (DE)".
 2. **Ülkeleri kaydet** ile kaydedin (ya da **Vazgeç** ile geri alın). Değişiklik yaklaşık bir dakika içinde geçerli olur ("Kaydedildi. Ağ geçidi yaklaşık bir dakika içinde uygular.").
 
 Kurallar:
@@ -158,7 +158,7 @@ Kurallar:
 - En fazla **250** ülke; her ülke bir kez yazılabilir. Küçük harfle yazılan kodlar büyük harfe çevrilir.
 - `XX` (bilinmeyen ülke) ve `T1` (Tor) listelenemez. Listede ülke varken ülkesi bilinmeyen ya da Tor üzerinden gelen ziyaretçiler her zaman reddedilir.
 - Ülke, Cloudflare'in bildirdiği ülkedir; Komuta isteğin Cloudflare üzerinden geldiğini IP listesindeki gibi doğruladıktan sonra buna güvenir. Doğrulanamayan istek reddedilir (erişim kaydında "İstek Komuta kenarından gelmedi").
-- **Herkese uygulanır** ve başka her şeyden önce bakılır: giriş yapmamış ziyaretçiler, giriş yapmış ziyaretçiler, paylaşım bağlantıları, servis token'ları, tarayıcıların CORS kontrolleri ve girişin kendisi.
+- **Herkese uygulanır**; engelleme ve yöntem kurallarından hemen sonra, diğer her şeyden önce bakılır: giriş yapmamış ziyaretçiler, giriş yapmış ziyaretçiler, paylaşım bağlantıları, servis token'ları, tarayıcıların CORS kontrolleri ve girişin kendisi.
 - **Webhook yolları etkilenmez**; onların kendi gönderici listesi vardır. Bir webhook yolunda açılan paylaşım bağlantısı ise yine kontrol edilir.
 - Reddedilen ziyaretçi, IP listesindeki gibi **Bu servise erişim kısıtlı** sayfasını ve servisin gördüğü adresi görür. Diğer yöntemlerle gelen istekler `403` ve düz metin `access restricted to allowed networks` alır. Erişim kaydında "İzin verilmeyen bir ülkeden geldi" yazar.
 - Liste boşsa her ülke kabul edilir ("Her ülkeden gelen ziyaretçiler kabul ediliyor.").
@@ -181,7 +181,7 @@ Nasıl sayılır:
 - **Engelleme kurallarını, yöntem kurallarını ve ülke listesini geçen her istek sayılır:** sayfalar, dosyalar, giriş adımları, paylaşım bağlantıları, servis token'ları, CORS kontrolleri ve webhook teslimatları.
 - **Sınır aşılınca** `429`, düz metin `too many requests` ve beklenecek saniyeyi bildiren bir `Retry-After` başlığı döner. HTML sayfası yoktur. Erişim kaydında "Çok fazla istek gönderdi" yazar.
 - **Yaklaşıktır.** Her ağ geçidi kopyası ayrı ve bellekte sayar; bu yüzden gerçek sınır birkaç kat yüksek olabilir ve ağ geçidi yeniden başladığında sayımlar sıfırlanır. Kesin bir kota olarak değil, istek selini ve kazıyıcıları yavaşlatmak için kullanın.
-- 10'dan az istek kabul edilmez; çünkü yalnızca giriş yapmak bile birkaç istek sürer.
+- 10'dan az istek kabul edilmez; çünkü yalnızca giriş yapmak bile birkaç istek gerektirir.
 - Sınırı değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
 
 Bu bölümü görmüyorsanız hız sınırı platformunuzda henüz açık değildir. Bir sınır kaydedildikten sonra özellik kapatılırsa bölüm sınırı salt okunur gösterir: "Bu ayar bu platformda henüz değiştirilemiyor; mevcut sınır geçerli kalır."
@@ -228,7 +228,7 @@ Her satırda yeşil onay (girer) ya da kırmızı çarpı (giremez) ve nedeni ya
 | **{yol} için seçilen kişiler arasında değil** | Bir **Yalnızca seçilen kişiler** kuralı. |
 | **{yol} için yalnızca seçilen kişiler girer; servis token'ı asla giremez** / **…; paylaşım bağlantısı asla giremez** | Token'lar ve bağlantılar **Yalnızca seçilen kişiler** yollarını hiçbir zaman açmaz. |
 | **Servis token'ı tanınmıyor ya da süresi dolmuş** / **Paylaşım bağlantısının süresi dolmuş, bağlantı geri çekilmiş ya da henüz yürürlükte değil** | Token ya da bağlantı artık çalışmıyor. |
-| **{yol} erişimi {tarih} tarihinde başlıyor** / **bitti** | Kişinin saat aralığı dışında. |
+| **{yol} erişimi {tarih} tarihinde başlıyor** / **{tarih} tarihinde bitti** | Kişinin saat aralığı dışında. |
 
 Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-postasını doğrulayarak)" yazar. Kaydedilen kurallar henüz yayılıyorsa önizleme bunu belirtir. Önizleme, tarayıcıyla bir sayfanın açılmasını (`GET`) hesaplar; hız sınırını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
 

@@ -27,7 +27,7 @@ services:
 | `organization` | `true` / `false` | `signIn` `true` ise `true` | Servisi **Organizasyonunuz** ile (tüm aktif üyelerle) paylaşır. Girişi açıp organizasyonla paylaşmamak için `false` yapın; kişileri sonra konsoldan ekleyin. |
 | `allowIps` | adres listesi | boş | **IP izin listesi**: her girdide bir IPv4 ya da IPv6 adresi veya CIDR aralığı. |
 
-`signIn` ve `allowIps` birlikte verildiğinde **İkisi birden gereksin** olarak birleşir: ziyaretçi listedeki bir adresten gelmeli ve giriş yapmalıdır.
+Yeni bir serviste `signIn` ve `allowIps` birlikte verildiğinde **İkisi birden gereksin** olarak birleşir: ziyaretçi listedeki bir adresten gelmeli ve giriş yapmalıdır. Zaten korunan bir serviste konsolda seçilen birleşim korunur.
 
 Alan adları büyük/küçük harfe duyarlıdır. Bu üçü dışındaki bir alan reddedilir ("Unknown field '…'. Expected fields: signIn, organization, allowIps.").
 
@@ -67,7 +67,7 @@ Plan, uygulayamayacağı bir bloğu da reddeder (kod `CAPABILITY_NOT_AVAILABLE`)
 
 Plan yeni bir servis oluşturduğunda:
 
-- **Koruma isteyen bir blokla** (`signIn: true` ya da boş olmayan `allowIps`) koruma servisle birlikte kurulur: tanımlanan giriş, IP izin listesi ve organizasyon paylaşımı; yol kuralı ve bitiş tarihi olmadan. Konsoldan açılan koruma gibi, servisin ilk dağıtımından birkaç dakika sonra devreye girer. Koruma kurulamazsa servis oluşturulmaz ("{Service} için tanımlanan erişim koruması kurulamadı; servis oluşturulmadı.").
+- **Koruma isteyen bir blokla** (`signIn: true` ya da boş olmayan `allowIps`) koruma servisle birlikte kurulur: tanımlanan giriş, IP izin listesi ve organizasyon paylaşımı; yol kuralı ve bitiş tarihi olmadan. Konsoldan açılan koruma gibi, servisin ilk dağıtımından birkaç dakika sonra devreye girer. Koruma kurulamazsa servis oluşturulmaz ve çalıştırma adımı [Çalıştırma hataları](#çalıştırma-hataları) altındaki kodlardan biriyle başarısız olur.
 - **Açık blokla** (`access: {}`) servis, organizasyonun **Yeni servisleri koru** ayarı açık olsa bile korumasız başlar.
 - **Blok yoksa**, konsoldan oluşturulan servislerde olduğu gibi organizasyonun **Yeni servisleri koru** ayarı belirler.
 
@@ -114,3 +114,19 @@ Stack'in **Dışa aktar** çıktısı `access`'i yalnızca uygulanan manifest ta
 - [Kurallar](access-protection-rules.md) — Komuta girişi ve IP izin listesinin ayrıntıları.
 - [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) — organizasyon paylaşımı ve diğer paylaşımlar.
 - [Başvuru](access-protection-reference.md) — sınırlar ve hata mesajları.
+
+---
+
+## Çalıştırma hataları
+
+Bir plan uygulanırken tanımlanan korumayı kuramayan ya da değiştiremeyen adım bu kodlardan biriyle durur. Mesaj, Komuta'nın döndürdüğü haliyle (İngilizce) gösterilir.
+
+| Kod | Mesaj |
+|---|---|
+| `ACCESS_PROTECTION_NOT_AVAILABLE` | Access protection is not available to this organization. (ya da: Access protection is not enabled on this platform.) — erişim koruması bu organizasyonda ya da platformda kullanılamıyor. |
+| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. — koruma, Komuta barındırmasında herkese açık adresi olan bir servis ister. |
+| `ACCESS_MESH_EXPOSED` | Access protection cannot be combined with private network exposure on this platform. — bu platformda koruma, özel ağa açma ile birlikte kullanılamaz. |
+| `ACCESS_UNSUPPORTED_CLUSTER` | Access protection is supported only on Komuta hosting clusters. — koruma yalnızca Komuta barındırma kümelerinde desteklenir. |
+| `ACCESS_RULES_NOT_AVAILABLE` | This service uses access rules that cannot be changed on this platform right now. — servis, bu platformda şu an değiştirilemeyen kurallar kullanıyor. |
+| `ACCESS_DECLARATION_INVALID` | The declared access protection needs sign-in or an allow-list, and sharing with the organization needs sign-in; provisioning was not started. — tanım giriş ya da izin listesi içermeli, organizasyonla paylaşım da giriş ister; servis oluşturulmadı. |
+| `ACCESS_PROTECTION_NOT_PREPARED` | The declared access protection could not be prepared; provisioning was not started. — tanımlanan koruma hazırlanamadı; servis oluşturulmadı. |

@@ -20,7 +20,7 @@ Kayıt, erişim koruması açıkken tutulur. Koruma kapalıyken sekme "Erişim k
 
 Neler **kaydedilmez**:
 
-- **Dosya istekleri.** Sayfa görüntüleme olarak yalnızca `GET` istekleri ve son bölümünde nokta olmayan yollar sayılır. `/app.js`, `/logo.png`, `/style.css` gibi istekler kaydedilmez; böylece kayıt gerçek sayfa açılışlarını gösterir.
+- **Dosya istekleri.** Sayfa görüntüleme olarak yalnızca son yol bölümünde nokta olmayan `GET` istekleri sayılır. `/app.js`, `/logo.png`, `/style.css` gibi istekler kaydedilmez; böylece kayıt gerçek sayfa açılışlarını gösterir.
 - **Girişin gerekmediği yerlerdeki ziyaretler.** Sayfa açılışları yalnızca girişin gerektiği sayfalarda, giriş yapmış ziyaretçiler, token'lar ve paylaşım bağlantıları için kaydedilir. Korumasız yollarda (hiçbir kontrolün uygulanmadığı yollar; webhook yolları hariç) ve IP listesiyle girişsiz geçilen sayfalarda kimse kaydedilmez; ziyaretçi giriş yapmış olsa bile.
 - **Giriş sayfasına yönlendirmeler.** Giriş yapmamış bir ziyaretçinin giriş sayfasına gönderilmesi ve oturumsuz program isteklerine dönen `401` ret sayılmaz; kayıtta görünmez.
 - **Tarayıcıların CORS kontrolleri**; **CORS kontrollerine girişsiz izin ver** ile geçirilenler.
@@ -151,7 +151,7 @@ CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama progra
 | `method`, `path` | HTTP yöntemi ve yol (yol gizliyse `*`). |
 | `client_ip` | Adres; anonim retlerde `/24` / `/48` ağı. |
 
-`=`, `+`, `-`, `@`, sekme ya da satır başı karakteriyle başlayan değerlerin önüne `'` eklenir; böylece tablolama programı bunları hiçbir zaman formül olarak çalıştırmaz. JSON dosyası aynı satırları bir dizi olarak içerir.
+`=`, `+`, `-`, `@`, sekme ya da satır başı karakteriyle başlayan değerlerin önüne `'` eklenir; böylece tablolama programı bunları hiçbir zaman formül olarak çalıştırmaz. JSON dosyası aynı kayıtları, API'nin alan adlarıyla bir dizi olarak içerir.
 
 ---
 

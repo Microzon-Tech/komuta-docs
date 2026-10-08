@@ -36,7 +36,7 @@ Access protection guides:
 | Services that may come in over the private mesh | At most 50; same organization |
 | Protection end date | In the future, at most 365 days away |
 | Protected addresses (hosts) | At most 50 per service |
-| Visitor session | 15 minutes, 1 hour, 4 hours, 12 hours (default), 1 day or 7 days (**Stay signed in for**); never past the share end, the link end or an "open to everyone" end; at most 12 hours until one-by-one sign-out is active |
+| Visitor session | 15 minutes, 1 hour, 4 hours, 12 hours (default), 1 day or 7 days (**Stay signed in for**); never past the share end, the link end or an "open to everyone" end; 12 hours while visitor sessions aren't managed on your platform |
 | **Who is signed in** list | At most 200 sessions |
 | One-by-one sign-out | Starts 12 hours 10 minutes after session tracking began on the service; falls back to signing everyone out if more than 500 sessions are ended one by one within a session's lifetime |
 | Sign-in link | About 10 minutes (sign-in must be completed within this time) |

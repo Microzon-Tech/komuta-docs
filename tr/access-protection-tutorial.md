@@ -293,7 +293,7 @@ Hedef: GitHub webhook'ları ve CI işinin sağlık kontrolü, giriş yapamadıkl
 - `GET /webhooks/github` gibi başka yöntemler açık yol yokmuş gibi değerlendirilir ve sitenin normal korumasından geçmek zorundadır.
 - Erişim kaydında teslimatlar **Açık yol isteği** / **Açık yola teslim edildi** olarak görünür.
 
-**Uygulamanızda yapmanız gereken** — Kenarda imza kontrolü yoksa (aşağıdaki tarife bakın) Komuta bu yolda kimlik sormaz; isteğin gerçekten GitHub'dan geldiğini uygulamanız doğrulamalıdır. GitHub her isteğe `X-Hub-Signature-256` başlığını ekler: webhook gizli anahtarınızla isteğin ham gövdesinin HMAC-SHA256 özetidir. Node.js örneği:
+**Uygulamanızda yapmanız gereken** — Kenarda imza kontrolü yoksa (aşağıdaki tarife bakın) Komuta bu yolda kimlik sormaz; isteğin gerçekten GitHub'dan geldiğini uygulamanız doğrulamalıdır. GitHub her isteğe `X-Hub-Signature-256` başlığını ekler: webhook imza sırrınızla isteğin ham gövdesinin HMAC-SHA256 özetidir. Node.js örneği:
 
 ```javascript copy
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -491,7 +491,7 @@ Rehberin sonunda `panel` servisinin ayarları şöyledir:
 | Kişiler | İki **Bir üye** paylaşımı (ve Adım 1.1'de eklenen kendi paylaşımınız) | Tüm site |
 | Makineler | Webhook yolu `/webhooks/github` | `POST`, GitHub adresleri |
 | Makineler | Servis token'ı `github-actions-health` | Yalnızca `/api/health`, üç ay |
-| Makineler | Özel ağdan gelebilecek servisler | `rapor-isleyici` |
+| Makineler | Özel ağdan doğrudan gelebilecek servisler | `rapor-isleyici` |
 | Ayarlar | **Giriş yapanı uygulamama bildir** | Açık |
 | Ayarlar | Koruma bitişi | Lansman tarihi, **Sonra kilitli kalsın** |
 
@@ -505,7 +505,7 @@ En ileri senaryoyu kendi başınıza kurabilmek için Komuta'nın her isteği ha
 4. **Hız sınırı** — Adres [hız sınırını](access-protection-rules.md#hız-sınırı) doldurduysa yanıt `429`'dur.
 5. **Paylaşım bağlantısı** — Adreste `?komuta_link=` varsa bağlantı kontrol edilir (IP listeleri yine uygulanır) ve ziyaretçi bir oturumla aynı adrese gönderilir ya da `403` ile reddedilir.
 6. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez. Yolda imza kontrolü varsa ardından gövdenin imzası kontrol edilir (geçerli imza yoksa `401`, 65.535 bayttan büyük gövdede `413`). İmzalı bir yolun altına gelen ama yolun kabul etmediği bir istek de burada, sitenin kurallarına geçmeden `401` alır.
-7. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez. **CORS kontrollerine girişsiz izin ver** açıksa tarayıcının CORS kontrolü bu noktada geçer.
+7. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Bu servise erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez. **CORS kontrollerine girişsiz izin ver** açıksa tarayıcının CORS kontrolü bu noktada geçer.
 8. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna (Komuta girişi ya da paylaşım bağlantısı) ve paylaşımlarına bakılır. Paylaşımın ya da bağlantının sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
 
 Bu sıraya göre örnek istekler:
@@ -518,7 +518,7 @@ Bu sıraya göre örnek istekler:
 | Herhangi biri `GET /internal/araclar` | `403` | 1: engelleme kuralı |
 | Müşteri `GET /raporlar/2026` | E-posta koduyla açılır | 8: e-posta paylaşımı, sayfa kapsamında |
 | Müşteri `GET /` | Giriş ve e-posta kodundan sonra **Bu sayfaya erişiminiz yok** ve açabileceği sayfalar | 8: sayfa sınırı dışında |
-| GitHub `POST /webhooks/github` | Açılır (imzayı uygulama doğrular) | 6: açık yol, gönderici listede |
+| GitHub `POST /webhooks/github` | Açılır (imzayı uygulama, imza kontrolü seçtiyseniz Komuta doğrular) | 6: açık yol, gönderici listede |
 | Herhangi biri `GET /webhooks/github` | Site kuralına göre | 6 atlanır (yöntem seçilmemiş), 7–8 uygulanır |
 | CI, token ile `GET /api/health` | Açılır | 7–8: token giriş yerine geçer, kapsamda |
 | CI, token ile `GET /admin` | `403` | 8: kişi kuralı token'ı kabul etmez |
@@ -532,7 +532,7 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | Belirti | Neden | Çözüm |
 |---|---|---|
 | Herkes **Erişiminiz yok** görüyor | Giriş açık ama paylaşım yok | **Kişiler** sekmesinde paylaşım ekleyin. |
-| Ofisteyken giriş sayfası çıkıyor (ya da **İkisi birden gereksin** seçiliyse **Erişim kısıtlı**) | Servis, listedekinden farklı bir adres görüyor (ör. konsola IPv6, servise IPv4) | Ofisten giriş yapıp bir sayfa açın; **Etkinlik** sekmesindeki **Sayfayı açtı** satırının **Adres** sütunu servisin gördüğü adresi gösterir (**İkisi birden gereksin** seçiliyse **Erişim kısıtlı** sayfasındaki **Adresiniz** kutusu da gösterir). Bu adresi listeye ekleyin; IPv4 ve IPv6'yı birlikte ekleyin. |
+| Ofisteyken giriş sayfası çıkıyor (ya da **İkisi birden gereksin** seçiliyse **Bu servise erişim kısıtlı**) | Servis, listedekinden farklı bir adres görüyor (ör. konsola IPv6, servise IPv4) | Ofisten giriş yapıp bir sayfa açın; **Etkinlik** sekmesindeki **Sayfayı açtı** satırının **Adres** sütunu servisin gördüğü adresi gösterir (**İkisi birden gereksin** seçiliyse **Bu servise erişim kısıtlı** sayfasındaki **Adresiniz** kutusu da gösterir). Bu adresi listeye ekleyin; IPv4 ve IPv6'yı birlikte ekleyin. |
 | Müşteri hiç giremiyor, 403 alıyor | **İkisi birden gereksin** seçili | **Biri yeterli**'yi seçin ya da müşterinin adresini listeye ekleyin. |
 | Bir üyeyi sayfayla sınırladım ama her yeri açıyor | **Organizasyonunuz** paylaşımı tüm siteyi açıyor | En geniş paylaşım kazanır; organizasyon paylaşımını da sınırlayın ya da kişi kuralı kullanın. |
 | CI sağlık kontrolü `302` döndürüyor | Token isteğe ulaşmadı: başlığın adı yanlış yazıldı, `KOMUTA_SERVICE_TOKEN` gizli değişkeni boş ya da başka adla kaydedildi, ya da ilk token'dan sonra yönlendirmeler hâlâ yenileniyor | Başlığın adının `x-komuta-service-token`, gizli değişkenin adının `KOMUTA_SERVICE_TOKEN` olduğunu kontrol edin; ilk token'dan sonra birkaç dakika bekleyin. |
@@ -547,7 +547,7 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | Başka bir sitedeki tarayıcı CORS hatası alıyor | Tarayıcının `OPTIONS` kontrolü oturum taşımıyor ve `401` alıyor | **Makineler → Yöntemler ve CORS → CORS kontrollerine girişsiz izin ver**'i açın. |
 | İstekler `405` alıyor | **Makineler** sekmesindeki bir yöntem kuralı o yolda bu yönteme izin vermiyor | Yöntemi kurala ekleyin; `Allow` başlığı yolun kabul ettiklerini listeler. |
 | İstekler `429` alıyor | Adres hız sınırını aştı | Sınırı yükseltin ya da daha uzun bir zaman aralığı seçin; giriş ve webhook isteklerinin de sayıldığını unutmayın. |
-| Hiçbir IP listesine takılmayan bir ziyaretçi **Erişim kısıtlı** görüyor | Ülkesi **Ülkeler** listesinde değil ya da anlaşılamıyor | **Etkinlik** sekmesinde "İzin verilmeyen bir ülkeden geldi" görünür; ülkeyi ekleyin. |
+| Hiçbir IP listesine takılmayan bir ziyaretçi **Bu servise erişim kısıtlı** görüyor | Ülkesi **Ülkeler** listesinde değil ya da anlaşılamıyor | **Etkinlik** sekmesinde "İzin verilmeyen bir ülkeden geldi" görünür; ülkeyi ekleyin. |
 | Paylaşım bağlantısıyla giren biri "The share link you opened this site with has ended." görüyor | Bağlantı silindi, süresi doldu ya da herkes çıkarıldı | Yeni bir bağlantı oluşturup yeniden gönderin. |
 
 ---
