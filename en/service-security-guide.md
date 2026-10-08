@@ -162,6 +162,82 @@ Acknowledging, allowing, marking as a threat, dismissing or resolving a finding 
 
 For an available response action, inspect the preview, required permission, scope and expected impact. Verify its application and the outcome separately. [Security Center](security-center-guide.md) explains findings, playbooks, suggestions and response workflows together.
 
+### Finding actions, screen by screen
+
+Open **Findings → Respond → Choose response**. These are real forms from the admin test environment, captured at final review or preview without applying the decisions. The Turkish reason text says that this is an unapplied documentation preview; enter your actual evidence and reason in a real investigation.
+
+**PaaS scope:** PaaS here means Komuta's managed **isolated VM/Kata** runtime. The admin test service shown is outside that scope. All five review decisions can be used on PaaS when a finding is accessible and the user has permission; they do not imply process/file monitoring or enforcement support on PaaS. Resolved records and existing blocking rules can restrict decisions.
+
+**Acknowledge**
+
+Records that the finding was seen and reviewed, removing it from the Open queue. It does not classify the behavior as legitimate or malicious. **PaaS: supported, subject to finding state and permissions.**
+
+![Final review showing the finding, reason and expected outcome for Acknowledge](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-acknowledge.jpg)
+
+*Final review with Acknowledge selected, shown in Turkish. Apply decision has not been used.*
+
+**Allow**
+
+Records the behavior as legitimate and closes the finding; a reason is required. It does not create a runtime allowlist or network rule. **PaaS: supported; it does not apply a protection exception.**
+
+![Final review showing the finding, reason and expected outcome for Allow](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-allow.jpg)
+
+*Final review with Allow selected, shown in Turkish. Apply decision has not been used.*
+
+**Mark as threat**
+
+Classifies the behavior as a threat; a reason is required. It does not stop a process or cut traffic. Use a separate applicable response for enforcement. **PaaS: supported; it does not provide host runtime blocking.**
+
+![Final review showing the finding, reason and expected outcome for Mark as threat](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-threat.jpg)
+
+*Final review with Mark as threat selected, shown in Turkish. Apply decision has not been used.*
+
+**Dismiss**
+
+Closes the finding as noise, such as a false positive, duplicate or expected activity. It does not change protection policy. **PaaS: supported; first establish why the finding is noise.**
+
+![Final review showing the finding, reason and expected outcome for Dismiss](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-dismiss.jpg)
+
+*Final review with Dismiss selected, shown in Turkish. Apply decision has not been used.*
+
+**Resolve**
+
+Closes the finding after you conclude that the underlying issue was fixed. It does not perform the fix; verify the image update and healthy deployment separately. Resolved findings may not accept further decisions. **PaaS: supported; evidence of remediation is still required.**
+
+![Final review showing the finding, reason and expected outcome for Resolve](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-resolve.jpg)
+
+*Final review with Resolve selected, shown in Turkish. Apply decision has not been used.*
+
+### Actions that change protection or require eligibility
+
+**Block at runtime:** inspect the operation and target path derived from the finding. Applying the response can require a runtime rule and redeployment; verify actual denial evidence afterwards. **Unsupported on isolated PaaS.** A host-observable environment still requires suitable evidence, an enabled control and permission.
+
+![Runtime-block preview showing operation, target path, impact and required reason](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-runtime-block.jpg)
+
+*Preview of a rule targeting writes to `/etc/hostname`; it was not applied. Availability in the admin environment does not imply availability for a PaaS customer.*
+
+**Rollback:** removes an existing runtime block through its own workflow. Check rule removal and redeployment, then application health. **This host runtime blocking workflow is unsupported on isolated PaaS.** Releasing network isolation is a separate operation.
+
+![Existing runtime-block state with a Rollback control](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-runtime-rollback.jpg)
+
+*State of an existing block; Rollback was not used. “Rule configured” alone does not prove effective enforcement across every workload.*
+
+**Add exception:** read **Exception type** and **Impact** before confirming. This example offers only **Suppress finding**, leaving enforcement unchanged. **Suppression of an existing finding may be supported on PaaS; it does not imply host runtime allowlisting or blocking support.** Other sources and findings can offer different exception types.
+
+![Exception preview showing Suppress finding and unchanged enforcement](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-exception.jpg)
+
+*This is a visibility-only exception preview; it was not applied. An Allow decision and a protection exception are separate operations.*
+
+**Approve suggested policy:** requires an applicable existing recommendation. Review its source, scope and resulting rule. **Eligible network-policy suggestions can be used on PaaS; host runtime process/file policies are unsupported.** The screenshot disables this option because the service has no suggestion.
+
+**Isolate workload:** restricts an eligible customer service's network connections within the selected scope. **Supported for eligible deployed customer workloads on PaaS; Kata alone does not prevent this network action.** The admin service shown belongs to platform scope, so isolation is refused. That refusal does not mean isolation is unsupported for PaaS customer services.
+
+![Response options disabled because no suggestion exists and the platform service is protected](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-action-availability.jpg)
+
+*Each disabled option explains why: a missing suggestion is an unmet prerequisite, while platform-service isolation is structurally restricted. Neither is the same as PaaS host runtime incompatibility.*
+
+Available actions depend on finding source, target service, runtime and permissions. Do not assume that mode changes or evidence export are offered in this example; inspect their scope and permissions where those controls are available. Active host-sensor enforcement is unsupported on isolated PaaS. Reading finding details or exporting existing evidence does not require that capability.
+
 ## Workload isolation and recovery
 
 Isolation restricts the selected workload's network connectivity and can interrupt normal service and dependency access. It requires an eligible workload and dedicated permission. The preview shows the proposed scope and impact before you confirm.

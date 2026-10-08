@@ -45,6 +45,18 @@ An unavailable card is not a finding, and a hidden card is not proof of complete
 
 *The admin test environment’s komuta-test-app supports five capabilities, including host runtime detection and enforcement. The Turkish UI’s Supported label is not, by itself, a test result proving effective protection.*
 
+### Separate managed PaaS from the admin test environment
+
+**Komuta's managed isolated VM/Kata PaaS does not support host runtime process/file/system-call detection, host runtime blocking or HoneyPath access detection.** The admin test service in this guide runs in a host-observable non-Kata environment. Do not present its successful block as a PaaS result.
+
+![Managed isolated PaaS service capabilities for network, isolation, supply chain and application layer](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*A separate example from the managed isolated runtime: network detection, workload isolation, supply chain and application layer are shown. This list does not establish host runtime support.*
+
+The network layer can still apply to an isolated runtime. Isolating and reconnecting an eligible customer service is independent of host runtime blocking. Finding decisions remain available for existing records with permission; a stored record does not prove that the environment can produce host runtime events. Public access protection, build/image evidence and hardening have their own applicability conditions.
+
+See [Service Security](service-security-guide.md) for action-specific PaaS availability and real forms, and [Security Center](security-center-guide.md) for HoneyPath setup screenshots.
+
 ## Runtime mode and protection action
 
 ### Read the runtime mode

@@ -45,6 +45,18 @@ Kullanılamayan kart bulgu değildir; görünmeyen kart da tam koruma kanıtı d
 
 *Admin test ortamındaki komuta-test-app, host runtime tespiti ve engelleme dahil beş yeteneği destekliyor. Destekleniyor etiketi, tek başına korumanın etkinliğine ilişkin bir test sonucu değildir.*
 
+### Yönetilen PaaS ile admin test ortamını ayırın
+
+**Komuta'nın yönetilen izole VM/Kata PaaS'ında host runtime süreç/dosya/sistem çağrısı tespiti, host runtime engelleme ve HoneyPath erişim tespiti desteklenmez.** Bu rehberdeki admin test servisi host tarafından gözlenebilen, Kata kullanmayan ortamda çalışır. Oradaki başarılı engellemeyi PaaS sonucu olarak sunmayın.
+
+![Yönetilen izole PaaS servisinde ağ, izolasyon, tedarik zinciri ve uygulama katmanı yetenekleri](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*Yönetilen izole çalışma zamanından ayrı bir örnek: ağ tespiti, iş yükü izolasyonu, tedarik zinciri ve uygulama katmanı gösterilir. Host runtime desteği bu listeden çıkarılamaz.*
+
+Ağ katmanı izole çalışma zamanında da uygulanabilir. Uygun müşteri servisini izole etme ve yeniden bağlama, host runtime engellemesinden bağımsızdır. Bulgu inceleme kararları mevcut kayıt ve yetkiyle kullanılabilir; kayıt bulunması, o ortamda host runtime olayının üretilebildiğini kanıtlamaz. Erişim koruması, derleme/imaj kanıtı ve sıkılaştırma kendi uygunluklarıyla değerlendirilir.
+
+Aksiyon bazında PaaS desteği ve gerçek form görselleri için [Servis Güvenliği](service-security-guide.md), HoneyPath kurulum görselleri için [Güvenlik Merkezi](security-center-guide.md) rehberine bakın.
+
 ## Çalışma zamanı modu ve koruma eylemi
 
 ### Çalışma zamanı modunu okuyun
