@@ -124,10 +124,10 @@ Her satırda paylaşımın adı, varsa sayfa sınırı ("Yalnızca: /a, /b") ve 
 
 - **Dış** — bağlı organizasyon, e-posta paylaşımı ya da organizasyonunuzun doğrulamadığı bir alan adının paylaşımı.
 - **Doğrulanmış alan adı** — organizasyonunuzun doğruladığı bir alan adının paylaşımı; organizasyonunuzun kendi paylaşımı sayılır.
-- **Askıda** — dış paylaşım kapatıldığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
+- **Askıda** — dış paylaşım kapatıldığı ya da alan adı paylaşımının alan adı artık doğrulanmış sayılmadığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
 - **Süresi doldu** — bitiş zamanı geçmiş paylaşım. Listede kalır; kalem simgesiyle yeni bir bitiş verilebilir.
 
-Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak, bitişi kaldırmak ya da paylaşımı **Tüm site**'ye açmak açık oturumları etkilemez. Bitiş eklemek, bitişi öne çekmek ya da sayfa listesini değiştirmek o paylaşımla açılmış oturumları sonlandırır; serviste tek tek çıkarma henüz devrede değilse bu servisteki tüm açık oturumlar sona erer ve herkes bir kez yeniden giriş yapar (bkz. [Oturumların erken bittiği durumlar](#oturumların-erken-bittiği-durumlar)).
+Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak, bitişi kaldırmak ya da paylaşımı **Tüm site**'ye açmak açık oturumları etkilemez. Bitiş eklemek, bitişi öne çekmek ya da sayfa listesini değiştirmek o paylaşımla açılmış oturumları sonlandırır; serviste tek tek çıkarma henüz devrede değilse bu servisteki tüm açık oturumlar sona erer ve herkes bir kez yeniden giriş yapar (bkz. [Oturumların erken bittiği durumlar](#oturumların-erken-bittiği-durumlar)). **Bir alan adındaki herkes** paylaşımında alan adı değiştirilemez. **Alt alan adlarındaki adresler de** kapatılabilir (bu, paylaşımla açılmış oturumları sonlandırır); açmak ise yalnız doğrulanmış alan adında mümkündür. Doğrulaması düşmüş bir alan adının alt alan adlarını da kapsayan paylaşım **Askıda** kalır; pencere bu paylaşımı ancak alan adı yeniden doğrulanınca ya da alt alan adı seçeneği kapatılınca kaydeder.
 
 ### Paylaşımı kaldırma
 
@@ -236,7 +236,7 @@ Bu bölümü görmüyorsanız ziyaretçi oturumlarını yönetme platformunuzda 
 E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması gerekmez; herhangi bir Komuta hesabıyla giriş yapıp posta kutusunu okuyabildiğini kanıtlar.
 
 1. Kişi servisi açar ve herhangi bir Komuta hesabıyla giriş yapar (hesabı yoksa Google ya da GitHub ile açabilir).
-2. Hesabı başka bir paylaşımla eşleşmiyorsa **Erişiminiz yok** sayfasını görür. Sayfadaki **E-posta adresinizle mi paylaşıldı?** bölümünde adres alanı hesabın e-postasıyla dolu gelir; paylaşılan adres farklıysa değiştirilir.
+2. Hesabı başka bir paylaşımla eşleşmiyorsa **Erişiminiz yok** sayfasını görür. Sayfadaki **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde adres alanı hesabın e-postasıyla dolu gelir; paylaşılan adres farklıysa değiştirilir.
 3. **Bana kod gönder** ile adrese **8 haneli**, **10 dakika** geçerli bir kod gönderilir. E-postanın konusu "{servis} için Komuta erişim kodunuz"dur ve kodu isteyen Komuta hesabını, servisi ve adresi gösterir.
 4. Kişi kodu girip **Doğrula ve devam et** der; servis açılır.
 
@@ -253,18 +253,19 @@ Kurallar:
 
 ## Alan adı paylaşımı
 
-**Bir alan adındaki herkes** paylaşımı, o alan adında posta kutusunu okuyabilen herkesi içeri alır; örneğin `@example.com` adresli tüm ekibi kişileri tek tek eklemeden.
+**Bir alan adındaki herkes** paylaşımı, o alan adında posta kutusunu okuyabilen herkesi içeri alır; örneğin `@example.com` adresli tüm ekibi, kişileri tek tek eklemeden.
 
-- Yalnız alan adını yazın: `example.com` (`@example.com` da olur). Uluslararası (Türkçe karakterli) alan adları kabul edilir.
+- Yalnız alan adını yazın: `example.com` (`@example.com` da olur). Uluslararası (Türkçe karakterli) alan adları kabul edilir; `xn--` biçiminde saklanır ve listelenir (ör. `şirket.com.tr` → `xn--irket-idb.com.tr`). Ziyaretçiler erişim sayfasında adreslerini bu biçimde yazmalıdır.
 - **Alt alan adlarındaki adresler de** seçeneği `@ekip.example.com` gibi adresleri de içeri alır. Yalnız organizasyonunuzun doğruladığı bir alan adında seçilebilir; aksi halde bir alt alan adını kontrol eden herkes içeri girebilirdi.
-- Herkesin adres alabildiği genel e-posta servisleri ve ortak alan adları (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `co.uk`, `onmicrosoft.com` ve benzerleri) paylaşılamaz ("'{Domain}' adresinde herkes e-posta adresi alabilir; bu alan adıyla paylaşım herkesi içeri alır."). Bunun yerine tek tek e-posta adresleriyle paylaşın.
+- Herkesin adres alabildiği genel e-posta servisleri ve ortak alan adları (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `com.tr`, `co.uk`, `onmicrosoft.com` ve benzerleri) paylaşılamaz ("'{Domain}' adresinde herkes e-posta adresi alabilir; bu alan adıyla paylaşım herkesi içeri alır."). Bunun yerine tek tek e-posta adresleriyle paylaşın.
 - Ziyaretçiler e-posta paylaşımındaki gibi giriş yapar: herhangi bir Komuta hesabıyla giriş yapıp **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde o alan adındaki adreslerini **8 haneli** kodla doğrularlar. Bir Komuta hesabının kendi e-posta adresi tek başına alan adı paylaşımını açmaz.
 - Şirketten ayrılan biri posta kutusu kapanınca yeni kod alamaz; açık olan oturumu süresi (**Oturum süresi**) bitene kadar sürer.
 
 Alan adındaki posta kutularını korumak için ek sınırlar:
 
 - Bir Komuta hesabı aynı alan adı paylaşımı için 24 saatte en fazla **3 farklı adrese** kod isteyebilir.
-- Bir alan adı paylaşımında 24 saatte **200 yanlış kod** girilirse, süre dolana kadar o paylaşım için yeni kod gönderilmez. Ayrıca kendi **Bir e-posta adresi** paylaşımı olanlar o paylaşım üzerinden kod almaya devam eder.
+- Bir alan adı paylaşımında 24 saatte **200 yanlış kod** girilirse, süre dolana kadar o paylaşım için yeni kod gönderilmez.
+- Bu iki sınır, kendi **Bir e-posta adresi** paylaşımı da olan kişiyi etkilemez; o kişi kodlarını o paylaşım üzerinden (o paylaşımın sınırları içinde) almaya devam eder.
 - E-posta paylaşımında olduğu gibi ekran, adresin erişimi olsa da olmasa da aynı cevabı verir.
 
 ## Doğrulanmış alan adları
@@ -274,13 +275,13 @@ Organizasyonunuza ait bir alan adını doğrulayın; o alan adındaki herkesle y
 - Ayar: **Hesap → Organizasyonlar → Doğrulanmış alan adları**. Değiştirmek için organizasyonu düzenleme izni gerekir.
 - **Alan adı ekle**'yi seçin, ardından gösterilen TXT kaydını DNS sağlayıcınızda ekleyin: ad `_komuta-verify.<alan adı>`, değer `komuta-verify=<kod>`. **Şimdi denetle**'yi seçin (en fazla 10 saniyede bir); Komuta da 6 saatte bir denetler.
 - Doğrulanmış bir alan adı alt alan adlarını da kapsar: `example.com` doğrulanınca `ekip.example.com` paylaşımları da sizin sayılır.
-- Kaydı yerinde tutun. Komuta kaydı en az 2 güne yayılan 3 denetimde bulamazsa ya da alan adı için bir hafta boyunca DNS'e ulaşamazsa, alan adı doğrulanmış sayılmaz (**Kayıt artık bulunamıyor**).
+- Kaydı yerinde tutun. Kayıt art arda 3 denetimde bulunamazsa ve en son en az 2 gün önce bulunduysa, ya da alan adı için DNS cevap vermezse ve kayıt en son bir haftadan uzun süre önce bulunduysa, alan adı doğrulanmış sayılmaz (**Kayıt artık bulunamıyor**).
 - Organizasyon başına en fazla **20** alan adı. Her organizasyon kendi alan adlarını doğrular; doğrulama bağlı organizasyonlara geçmez.
 
 Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırıldığında:
 
 - Doğrulanmış alan adının paylaşımları dış paylaşım kapalıyken de çalışmaya devam eder.
-- Alan adı doğrulanmış sayılmayınca (ya da kaldırılınca) paylaşımları yeniden dış paylaşım sayılır: dış paylaşım kapalıyken **Askıda** olurlar; alt alan adlarını da kapsayan paylaşım her durumda askıya alınır. Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer. Alan adı yeniden doğrulanınca geri gelirler.
+- Alan adı doğrulanmış sayılmayınca (ya da kaldırılınca) paylaşımları yeniden dış paylaşım sayılır: dış paylaşım kapalıyken **Askıda** olurlar; alt alan adlarını da kapsayan paylaşım her durumda askıya alınır. Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer; bu servislerdeki diğer ziyaretçiler de bir kez yeniden giriş yapar. Alan adı yeniden doğrulanınca geri gelirler.
 
 ---
 
@@ -293,7 +294,7 @@ Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırı
 - Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
 - Açmak hemen geçerlidir. Kapatmak bir onay ister (**Dış paylaşım kapatılsın mı?**).
 
-İzin kapalıyken **Paylaşım ekle** penceresinde bu iki tür seçilemez ve liste bunu söyler. Ayarı değiştirme yetkiniz varsa **Organizasyon ayarlarını aç** düğmesi ayarı yeni sekmede vurgulanmış olarak açar; ayarı açıp geri döndüğünüzde seçenekler sayfa yenilemeden etkinleşir. Yetkiniz yoksa bir organizasyon yöneticisinden bu ayarı açmasını isteyin.
+İzin kapalıyken **Paylaşım ekle** penceresinde bu iki tür seçilemez ve liste bunu söyler. Ayarı değiştirme yetkiniz varsa **Organizasyon ayarlarını aç** düğmesi ayarı yeni sekmede vurgulanmış olarak açar; ayarı açıp geri döndüğünüzde seçenekler sayfa yenilemeden etkinleşir. Yetkiniz yoksa bir organizasyon yöneticisinden bu ayarı açmasını isteyin. **Bir alan adındaki herkes** kapalıyken de seçilebilir, ancak yalnız organizasyonunuzun doğruladığı bir alan adı için; bu paylaşımlar organizasyonunuzun kendi paylaşımı sayılır ve bu izni gerektirmez (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)).
 
 İzni kapatırsanız:
 
@@ -301,7 +302,7 @@ Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırı
 - Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer; bu servislerdeki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 - Yeni dış paylaşım eklenemez.
 
-İzni yeniden açarsanız e-posta paylaşımları geri gelir; bağlı organizasyon paylaşımları ise iki organizasyon arasındaki bağ hâlâ sürüyorsa geri gelir. Komuta bağı 5 dakikada bir denetler; bağ koptuysa (iki organizasyon arasında birbirine bağlı ve aktif hiçbir kullanıcı hesabı kalmadıysa) bağlı organizasyon paylaşımı askıya alınır.
+İzni yeniden açarsanız e-posta ve alan adı paylaşımları geri gelir (doğrulanmamış bir alan adının alt alan adlarını da kapsayan paylaşım hariç; o, alan adı yeniden doğrulanana kadar askıda kalır); bağlı organizasyon paylaşımları ise iki organizasyon arasındaki bağ hâlâ sürüyorsa geri gelir. Komuta bağı 5 dakikada bir denetler; bağ koptuysa (iki organizasyon arasında birbirine bağlı ve aktif hiçbir kullanıcı hesabı kalmadıysa) bağlı organizasyon paylaşımı askıya alınır.
 
 ---
 

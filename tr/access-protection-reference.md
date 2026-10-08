@@ -31,7 +31,7 @@ Erişim koruması rehberleri:
 | Paylaşımın sayfa sınırı | En fazla 50 sayfa (seçildiği "yalnızca seçilen kişiler" yolları dahil) |
 | Paylaşım bitişi | Gelecekte olmalı; üst sınır yok |
 | Alan adı paylaşımı | Yalnız alan adı (`@` öncesinde ad yok); genel e-posta ve ortak alan adları reddedilir; alt alan adları yalnız doğrulanmış alan adında; Komuta hesabı ve paylaşım başına 24 saatte en fazla 3 farklı adrese kod; 24 saatte 200 yanlış koddan sonra yeni kod yok |
-| Doğrulanmış alan adları | Organizasyon başına en fazla 20; TXT `_komuta-verify.<alan adı>`; 6 saatte bir ve **Şimdi denetle** ile (10 sn'de bir) denetlenir; 2 güne yayılan 3 başarısız denetimde ya da bir hafta DNS cevabı alınamazsa düşer |
+| Doğrulanmış alan adları | Organizasyon başına en fazla 20; TXT `_komuta-verify.<alan adı>`; 6 saatte bir ve **Şimdi denetle** ile (10 sn'de bir) denetlenir; kayıt 2 gün boyunca bulunamazsa (art arda en az 3 denetim) ya da bir hafta DNS cevabı alınamazsa düşer |
 | "Yalnızca seçilen kişiler" kuralı | Kural başına en fazla 200 kişi |
 | Servis token'ı | Serviste en fazla 20; ad 1–64 karakter; bitiş en fazla 365 gün; en fazla 50 sayfa |
 | Paylaşım bağlantısı | Serviste en fazla 50; ad 1–64 karakter; bitiş zorunlu (konsolda 1, 7, 30 ya da 90 gün; API'de en fazla 365 gün sonrası); en fazla 50 sayfa |
@@ -67,7 +67,7 @@ Erişim koruması rehberleri:
 
 Bitiş davranışı (`ExpiryAction`): `KeepLocked` = **Sonra kilitli kalsın** (varsayılan), `OpenToEveryone` = **Sonra herkese açılsın**.
 
-Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**.
+Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**, `EmailDomain` = **Bir alan adındaki herkes**.
 
 Birleşim (`Combine`): `All` = **İkisi birden gereksin**, `Any` = **Biri yeterli**.
 
@@ -398,7 +398,7 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine ya da bir alan adındaki herkese servise giriş izni. |
 | **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
 | **Doğrulanmış alan adı** | Organizasyonun bir DNS TXT kaydıyla sahibi olduğunu kanıtladığı alan adı; altındaki paylaşımlar organizasyonun kendi paylaşımı sayılır. |
-| **Askıda** | Dış paylaşım kapatıldığı ya da organizasyon bağı koptuğu için geçici olarak çalışmayan paylaşım. |
+| **Askıda** | Dış paylaşım kapatıldığı, organizasyon bağı koptuğu ya da alan adı artık doğrulanmış sayılmadığı için geçici olarak çalışmayan paylaşım. |
 | **Sayfa sınırı (kapsam)** | Bir paylaşımın, token'ın ya da paylaşım bağlantısının yalnızca belirli yolları açması. |
 | **Paylaşım bağlantısı** | Elinde tutan herkesi Komuta hesabı olmadan içeri alan, bitiş tarihi olan bağlantı. |
 | **Oturum süresi** | Bir girişin ne kadar sürdüğü; varsayılan 12 saat. |

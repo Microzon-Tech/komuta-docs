@@ -158,7 +158,7 @@ Goal: a customer outside the organization sees only the `/reports` pages, and on
 
 **Why** — Giving access outside the organization is a deliberate decision; that's why this setting is **off by default** and lives at organization level.
 
-**Effect** — The **A linked organization** and **An email address** share types become available on all of the organization's protected services. If you turn the setting off later, those shares become **Suspended** and the people who came in through them lose access.
+**Effect** — The **A linked organization** and **An email address** share types, and **Everyone at a domain** for domains your organization hasn't verified, become available on all of the organization's protected services. If you turn the setting off later, those shares become **Suspended** and the people who came in through them lose access.
 
 ### Step 2.2 — Add the customer by email address
 

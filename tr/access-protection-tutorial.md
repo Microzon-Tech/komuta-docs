@@ -158,7 +158,7 @@ Hedef: organizasyon dışındaki bir müşteri, yalnızca `/raporlar` sayfaları
 
 **Neden** — Organizasyon dışına erişim vermek bilinçli bir karardır; bu yüzden ayar **varsayılan olarak kapalıdır** ve organizasyon düzeyindedir.
 
-**Etkisi** — Organizasyonun tüm korunan servislerinde **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşım türleri kullanılabilir hale gelir. İleride bu ayarı kapatırsanız bu tür paylaşımlar **Askıda** olur ve bunlarla girenlerin erişimi biter.
+**Etkisi** — Organizasyonun tüm korunan servislerinde **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşım türleri ile organizasyonunuzun doğrulamadığı alan adları için **Bir alan adındaki herkes** kullanılabilir hale gelir. İleride bu ayarı kapatırsanız bu tür paylaşımlar **Askıda** olur ve bunlarla girenlerin erişimi biter.
 
 ### Adım 2.2 — Müşteriyi e-posta adresiyle ekleyin
 

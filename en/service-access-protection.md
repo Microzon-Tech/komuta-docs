@@ -10,7 +10,7 @@ Access protection is included in every plan.
 
 With access protection you can:
 
-- **Require Komuta sign-in.** Visitors sign in with a Komuta account; only the people, organizations and email addresses you share the service with get in.
+- **Require Komuta sign-in.** Visitors sign in with a Komuta account; only the people, organizations, email addresses and company domains you share the service with get in.
 - **Limit by IP address.** The service opens only from networks you choose (for example your office). It can be combined with sign-in as "require both" or "either is enough".
 - **Protect path by path.** Keep the site open while `/admin` is open only to signed-in people, close `/internal` completely, or open `/reports` to chosen people at chosen times.
 - **Send a share link.** Let someone without a Komuta account in for a while — a client demo or an outside tester — with a link that ends on its own.
@@ -223,9 +223,10 @@ The access log is not kept, and can't be viewed, while protection is off; earlie
 
 ## Organization settings
 
-Three settings in **Account → Organizations** apply to every service of the organization. Changing them needs permission to edit the organization.
+These settings in **Account → Organizations** apply to every service of the organization. Changing them needs permission to edit the organization.
 
 - **Allow external sharing** — whether services can be shared with linked organizations and email addresses (see [Sign-in and Sharing](access-protection-sign-in-sharing.md#allowing-external-sharing)).
+- **Verified domains** — domains your organization has proved it owns; shares with everyone at them count as your own (see [Sign-in and Sharing](access-protection-sign-in-sharing.md#verified-domains)).
 - **Protect new services** — off by default. While it is on, every new service with a public address starts with Komuta sign-in and a **Your organization** share; protection takes effect a few minutes after the service's first deploy. Protection can still be changed or removed per service later. Existing services are not changed. These aren't protected automatically: API gateways, job and cron job services, services without a public address, services on your own clusters, services whose private mesh is on (when the platform can't combine the private mesh with protection), and Stack services that declare their own `access` block.
 - **Keep access logs for** — 30 (default), 90 or 365 days (see [Access Log](access-protection-activity.md#retention)).
 
