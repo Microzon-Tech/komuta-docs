@@ -8,6 +8,35 @@ Use search and the available scope, severity, enablement and publication filters
 
 Severity levels are **Info, Warning, Critical and Emergency**. Severity communicates priority and interacts with channel severity filters; it is not a promise of automatic remediation or escalation.
 
+## How should I fill in the fields?
+
+| Field | A useful choice | Form limit or behavior |
+| --- | --- | --- |
+| Name | `Orders API — connection errors` identifies the service and condition | Required, up to 128 characters in the text-match and edit forms. |
+| Summary | `Database connection errors appeared in the last 5 minutes; inspect service logs.` | Required, up to 256 characters in those forms. Omit secrets and customer data. |
+| Match text | A stable fragment such as `connection refused` | Up to 512 characters in the log text form; case-sensitive literal containment. |
+| Threshold | `0` to detect at least one matching log line | A non-negative integer in the text form. Template units and limits vary. |
+| Duration | `30s`, `5m`, `1h` | A number and unit; use `60s` or `90s`, not `60` or `1m30s`. `0s` removes the hold duration. |
+| Notification interval | For example, `15m` for an ongoing condition | At least 5 minutes when supplied. Leaving it blank does not disable notifications. |
+| Severity | The priority agreed by your team | Check that the channel’s severity filter accepts it. |
+| Channels | An active channel for the team responsible | Empty selection routes to eligible active channels. Select a target explicitly if you want one. |
+| Advanced query | A numerical condition in an eligible scope when a template is insufficient | Up to 2,000 characters in the edit form. Follow query locks. |
+
+Template creation parameters and existing-rule edit fields are not always interchangeable. For example, you cannot change a shared-infrastructure metric expression in the edit dialog. If you need another threshold, prepare the new definition through an appropriate template and deliberately manage any overlap between enabled old and new rules.
+
+## Example: reduce notifications from brief CPU spikes
+
+After observing the normal workload, you decide that CPU increases lasting over five but less than ten minutes do not require action. This is an illustrative tuning decision; do not hide a real capacity problem by extending the duration.
+
+1. Find the correct service’s CPU rule in **Rules**. Record its current `80%` threshold, `5m` duration, severity and channels.
+2. Select **Edit** and change only duration to `10m`. The same condition must now continue longer; CPU limits and the data window remain separate settings.
+3. Save and reopen the form to confirm that `10m` persisted. Then inspect the publication check time and any operation result.
+4. Follow automatic publication for automatically delivered rules. Use the direct publication flow if it is offered. If **Definition differs** persists, do not assume the new duration is installed.
+5. Compare service measurements and **History** during the next comparable workload. The expected effect is fewer events from brief spikes, not immediate resolution of an existing open record.
+6. If the result is unsuitable, restore `5m` and repeat the save/publication checks.
+
+If you use **Duplicate** to prepare another configuration, the copy starts disabled. Enabling both rules does not create a special comparison mode; both can generate notifications.
+
 ## Available operations
 
 | Operation | Effect and considerations |

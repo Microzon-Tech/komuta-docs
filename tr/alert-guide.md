@@ -4,6 +4,25 @@ Komuta Uyarılar ile servislerinizin metriklerini ve loglarını izleyin; ilgile
 
 [İlk uyarını oluştur](alerts-quick-start.md) · [Şablon seç](alerts-templates.md) · [Bildirim kanalını bağla](notification-guide.md)
 
+## Nereden başlamalıyım?
+
+| Yapmak istediğiniz | İzlenecek yol | Yolun sonunda |
+| --- | --- | --- |
+| İlk kez uyarı kurmak | [Doldurulmuş log örneği](alerts-quick-start.md) → kanal testi → olay ve çözülme | Bir log satırını gerçek hedefteki mesaja kadar takip edebilirsiniz. |
+| Servis için anlamlı bir koşul seçmek | [Şablon karar tablosu](alerts-templates.md) → normal yükü inceleme → parametreler | Ölçümün birimini ve eşiği neden seçtiğinizi bilirsiniz. |
+| Mevcut kuralı değiştirmek | [Alanlar ve güvenli değişiklik örneği](alerts-rules.md) → yayın kontrolü | Kayıtlı ayarla yayın gözlemini ayırabilirsiniz. |
+| Gelen mesajı araştırmak | [Örnek olay kaydı](alerts-history.md) → doğrulanmış kapsam → ilgili servis | Hangi olayı ve hangi kaynağı araştıracağınızı seçebilirsiniz. |
+| Mesajın neden gelmediğini bulmak | [Sorun giderme karar adımları](alerts-troubleshooting.md) | Sorunu veri, kural, yayın veya teslim aşamasına daraltabilirsiniz. |
+| Bakım sırasında bildirimleri susturmak | [30 dakikalık bakım örneği](alerts-silences.md) | Seçili kurallar için başlangıcı ve bitişi belli bir pencere oluşturabilirsiniz. |
+
+## Temel kavramlar
+
+**Kapsam**, kuralın hangi servis, kendi cluster’ınız veya hesap düzeyi kayıtla ilgili olduğunu anlatır. **Metrik**, CPU yüzdesi gibi sayısal bir ölçümdür; **log** uygulamanın ürettiği metin kaydıdır. Log uyarısı da bu metinlerden sayısal bir koşul üretir.
+
+**Eşik** karşılaştırılan sınırdır. **Veri penceresi**, her değerlendirmede ne kadar geçmişe bakıldığını; **süre**, koşulun tetiklenmeden önce ne kadar devam etmesi gerektiğini anlatır. **Bildirim aralığı** aynı durumun tekrar gönderimleriyle ilgilidir. Örneğin “son 5 dakikada 0’dan fazla eşleşme, 1 dakika sürsün, tekrar aralığı 15 dakika” üç ayrı zaman/koşul seçimidir.
+
+**Şiddet**, olayın önceliğidir. **Kanal**, mesajın hedefidir. **Olay**, Komuta’nın aldığı tetiklenme/çözülme kaydıdır. **Sessizlik**, seçili kuralların bildirimlerini belirli bir süre susturur. Bu kavramların birlikte nasıl çalıştığını [ilk örneğin zaman çizelgesinde](alerts-quick-start.md) görebilirsiniz.
+
 ## Bir uyarının dört adımı
 
 <ol class="docs-alert-flow" aria-label="Uyarı akışı">

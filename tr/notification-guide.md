@@ -20,6 +20,21 @@ Kanal türünü **E-posta** seçin, ekibinizin kullanacağı alıcıları ekleyi
 
 Komuta’daki e-posta teslim kaydı **sağlayıcının gönderimi kabul etmesi** düzeyindedir. Resend’in `email.sent` olayı da gönderim isteğinin kabulüyle, `email.delivered` ise alıcının posta sunucusuna teslimle ilgilidir. Bunlar mesajın gelen kutusunda görüldüğü veya okunduğu anlamına gelmez. Komuta ekranının bu sağlayıcı olaylarının tamamını gösterdiğini varsaymayın. [Resend olay açıklamaları](https://resend.com/docs/webhooks/event-types).
 
+### Tam örnek: Docs test e-posta kanalı
+
+1. **Uyarılar → Kanallar → Bildirim ayarlarında yönet** yolundan kanal ekleme formunu açın.
+2. Adı **Docs test**, türü **E-posta** seçin. Ad en az iki karakter olmalıdır.
+3. Gerçekten kontrol edebildiğiniz test alıcısını yazın ve **Ekle** düğmesine basın veya Enter kullanın. Adresin ayrı bir alıcı etiketi olarak listede görünmesi gerekir; yalnız giriş kutusunda bırakmayın.
+4. İsterseniz “Dokümantasyon örneği için test hedefi” açıklamasını ekleyin. Kaydedin ve kanalın aktif listede göründüğünü doğrulayın.
+5. Kanalın **Test gönder** işlemini kullanın. Komuta’daki sonucu ve gerçek posta kutusundaki mesajı birlikte kontrol edin. Birden fazla alıcı varsa her gerekli hedefi doğrulayın.
+6. [İlk uyarı formuna](alerts-quick-start.md) dönün ve **Docs test** kanalını seçin. Kanal testinin geçmesi tek başına kuralı bu kanala bağlamaz.
+
+![Örnek e-posta kanalı formu: 1 kanal adı, 2 e-posta türü, 3 listeye eklenmiş alıcı.](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/alerts/tr/channel-form.png)
+
+*Gerçek form bileşeni örnek verilerle yerel olarak gösterilmiştir. Görseldeki `alerts@example.com` yalnız örnektir; kullanılabilir test alıcınızla değiştirin. Bu görsel hazırlanırken kanal oluşturulmamış ve mesaj gönderilmemiştir.*
+
+**Alıcı eklenmiyorsa:** Adresin geçerli olduğunu ve listede zaten bulunmadığını kontrol edin. Virgül, noktalı virgül veya satırlarla ayrılmış bir listeyi yapıştırdıktan sonra oluşan etiketleri sayın; yazdığınız her adresin kabul edildiğini varsaymayın. Hatalı etiketi kaldırıp düzeltin.
+
 ## Slack: Incoming Webhook kullanın
 
 Slack uygulamanız için Incoming Webhooks özelliğini açın, izin verilen hedef kanala bir webhook oluşturun ve üretilen adresi Komuta kanalına kaydedin. Özel bir kanala bağlanıyorsanız gerekli Slack erişiminiz de olmalıdır. [Slack’in kurulum rehberi](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/).
@@ -42,6 +57,12 @@ Workflow’un çalışır durumda ve geçerli bir sahibinin olmasına dikkat edi
 Uyarı oluşturma/düzenleme ekranında bildirim kanallarını açıkça seçin. Seçim boşsa uygun aktif kanallar kullanılır; “hiç kimseye gönderme” anlamına gelmez. Kanalın etkinliği ve yapılandırılmış şiddet filtresi de yönlendirmeyi etkiler.
 
 **Bildirimler ve Uyarılar** sayfasındaki olay-kanal matrisi platform olaylarının abonelikleri içindir. Bir uyarı kuralının kendi kanal seçimiyle aynı ayar değildir. “Dağıtım tamamlandı” bildirimi almanız, belirli bir metrik/log kuralının doğru kanala yönlendiğini kanıtlamaz.
+
+### Kanal hazır, kural bağlı: son kontrol
+
+Örneğin **Uyarı** şiddetindeki `Docs sample alert` kuralını **Docs test** kanalına bağladınız. Kuralı yeniden açın: seçili kanal doğru mu? Kanal listesinde hedef aktif mi? Şiddet filtresi varsa Uyarı seviyesini kabul ediyor mu? Sonra kontrollü örneğin **Geçmiş** olayını ve ona ait gönderimi takip edin.
+
+Test mesajı geliyor ama gerçek olayın mesajı gelmiyorsa bağlantıyı baştan kurmak yerine kuralın kanal seçimini, aktif sessizliği, tekrar aralığını ve başarısız/bastırılmış kayıtları inceleyin. Test de başarısızsa önce kanal yapılandırmasını düzeltin. [Karar adımları](alerts-troubleshooting.md), her sonuç için sonraki ekranı gösterir.
 
 ## Test ve teslim kayıtlarını ayırın
 

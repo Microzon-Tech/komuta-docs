@@ -12,6 +12,28 @@
 
 Select at least one rule. All selected rules must belong to a single cluster scope; create separate windows for different clusters. The end must be later than the start. Adjust the prefilled two-hour window to fit the actual work.
 
+## Complete example: service maintenance from 14:00 to 14:30
+
+You want to suppress maintenance notifications from your **High CPU** and **Pod not ready** rules for `orders-api-demo` on the same cluster. Names are examples; use only selectable rules affected by your maintenance.
+
+| Form field | Example selection |
+| --- | --- |
+| Name | `Orders demo — planned maintenance` |
+| Rules | High CPU and Pod not ready for the correct service |
+| Start | Your planned maintenance date, 14:00 local time |
+| End | The same date, 14:30 local time |
+| Comment | `Planned release change. Service health and notifications will be checked afterward.` |
+
+**Before maintenance:** Create the window. Check the two selected rules, date, timezone, upcoming state and synchronization result. Include the timezone when sharing the maintenance window with a team in another timezone. If creation fails, do not assume notifications are silenced.
+
+**During maintenance:** After the start, confirm the window is active and covers the expected rules. Continue watching service metrics and event history; silence does not repair the condition. If a message arrives, compare its event time, rule and delivery record. An earlier send, another rule or another scope does not by itself show this window failed.
+
+**After maintenance:** Check service health. If work finishes early, use **Expire** and verify the result; otherwise follow the scheduled end. Check routing and the destination for the next real event. No immediate message when there is no new event is not a failure.
+
+**If work runs longer:** Create a separate window covering the new end and verify synchronization before ending the current window early. When windows overlap, ending one does not remove the effect of another. Review the list for the same rules and close only windows you no longer need.
+
+Completion means the rule definitions remain available, the maintenance window has ended and service health has been checked separately.
+
 ## Interpret the states
 
 The page separates windows in progress, upcoming windows and expired windows. A window being active by time alone does not prove it reached the target. Do not rely on muting until publication is confirmed. **Alertmanager** here is the notification component applying the silence; customers are not expected to enter its connection address.

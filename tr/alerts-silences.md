@@ -12,6 +12,28 @@
 
 En az bir kural seçilmelidir. Seçili kurallar tek bir cluster kapsamında olmalıdır; farklı cluster’lardaki kurallar için ayrı pencereler oluşturun. Bitiş, başlangıçtan sonra olmalıdır. Önceden doldurulan iki saatlik pencereyi ihtiyacınıza göre kısaltın veya değiştirin.
 
+## Tam örnek: 14:00–14:30 arasında servis bakımı
+
+Bu senaryoda aynı cluster’daki `orders-api-demo` servisi için oluşturduğunuz **CPU yüksek** ve **Pod hazır değil** kurallarının bakım sırasında mesaj göndermesini istemiyorsunuz. Adlar örnektir; yalnız hesabınızda seçilebilir ve bakımın etkilediği kuralları kullanın.
+
+| Form alanı | Örnek seçim |
+| --- | --- |
+| Ad | `Orders demo — planlı bakım` |
+| Kurallar | Doğru servise ait CPU yüksek ve Pod hazır değil |
+| Başlangıç | Planladığınız bakım günü, yerel saat 14:00 |
+| Bitiş | Aynı gün, yerel saat 14:30 |
+| Yorum | `Planlı sürüm geçişi. Bakım sonunda servis sağlığı ve bildirimler kontrol edilecek.` |
+
+**Bakım öncesinde:** Pencereyi oluşturun. Seçili iki kuralı, tarihi, saat dilimini, yaklaşan durumunu ve eşitleme sonucunu kontrol edin. Ekip başka bir saat dilimindeyse saat dilimini de bakım duyurusuna ekleyin. Oluşturma hata verdiyse bakımı susturulmuş kabul etmeyin.
+
+**Bakım sırasında:** Başlangıç geçince pencerenin aktif olduğunu ve beklenen kuralları kapsadığını kontrol edin. Servis metriklerini ve olay geçmişini izlemeye devam edin; sessizlik koşulu düzeltmez. Mesaj gelirse mesajın olay zamanı, kuralı ve gönderim kaydını karşılaştırın: daha önce gönderilmiş bir mesaj, başka kural veya başka kapsam bu pencerenin etkisiz olduğunu tek başına göstermez.
+
+**Bakım bittiğinde:** Servisin sağlığını kontrol edin. Bakım erken bittiyse **Süresi sona ersin** işlemini uygulayıp sonucu doğrulayın; aksi hâlde planlanan bitişi takip edin. Sonraki gerçek olaya ait bildirim yönlendirmesini ve hedefi kontrol edin. Yeni olay yokken hemen mesaj gelmemesi bir hata değildir.
+
+**Bakım uzarsa:** Yeni bitişi kapsayan ayrı bir pencere oluşturup eşitlemesini doğrulayın; gerekli kapsama ulaşmadan mevcut pencereyi erken sonlandırmayın. Örtüşen pencereler varsa yalnız birini sonlandırmak diğerinin etkisini kaldırmaz. Listeyi aynı kurallar açısından gözden geçirip yalnız artık gerekmeyen pencereleri kapatın.
+
+Tamamlandığında kural tanımları yerinde kalmalı, bakım penceresi bitmiş olmalı ve servis sağlığı ayrıca doğrulanmış olmalıdır.
+
 ## Durumları yorumlayın
 
 Ekranda devam eden, yaklaşan ve süresi dolan pencereler ayrılır. Bir pencerenin zaman olarak aktif olması, susturmanın hedefe ulaştığını tek başına göstermez. Yayın doğrulanmamışsa bildirimlerin sustuğuna güvenmeyin. Buradaki **Alertmanager**, susturmayı uygulayan bildirim bileşenidir; müşterinin ayrıca bağlantı adresi girmesi beklenmez.

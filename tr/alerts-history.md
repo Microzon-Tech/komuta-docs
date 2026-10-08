@@ -15,6 +15,28 @@
 
 Bir kuralın kapatılması/silinmesi ya da servisin uyuması eski olayın çözüldüğünü kanıtlamaz. Loglarda beş dakikalık veri penceresi hâlâ eski eşleşmeleri içeriyor olabilir. [Çözülmeme kontrollerini](alerts-troubleshooting.md) izleyin.
 
+## Örnek kayıt: tek test logunu takip edin
+
+Aşağıdaki kayıtlar **temsili anlatımdır; canlı olay veya teslim kanıtı değildir**. [İlk uyarı örneğindeki](alerts-quick-start.md) `Docs sample alert` ve `orders-api-demo` adlarını kullanır. Saatler aynı gün ve aynı saat dilimindedir; garanti edilen gecikme göstermez.
+
+| Kontrol anı | Geçmişte okuduğunuz | Buradan çıkarılabilecek sonuç |
+| --- | --- | --- |
+| 12:02 | Kural: Docs sample alert; doğrulanmış servis: orders-api-demo; tetiklenme zamanı: 12:01:20; çözülme bilgisi yok | Bu servise ait tetiklenme kaydı alınmıştır. Güncel koşulu servis loglarında araştırabilirsiniz. |
+| 12:03 | Aynı olay hâlâ çözülme bekliyor | Yeni çözülme bilgisi henüz görünmüyor. Bunun yeni bir tetiklenme veya canlı durum güncellemesi olduğunu varsaymayın. |
+| 12:06 | Aynı olayda çözülme zamanı: 12:05:40; durum: çözüldü | Çözülme bilgisi alınmıştır. Yeni olay oluşmadığını söylemek için seçili dönem ve diğer satırlara da bakın. |
+
+**Mesajla eşleştirme:** Önce kural adını ve doğrulanmış kapsamı, ardından olay zamanını karşılaştırın. **Kanallar** ekranında aynı dönem ve hedef için tetiklenme gönderimini arayın. Örneğin 12:02’de **Docs test** için başarılı gönderim görülmesi, o denemenin başarılı kaydedildiğini anlatır. E-postayı alıcının posta kutusunda ayrıca bulun. 12:06’daki çözülme gönderimi varsa onu ayrı kayıt olarak okuyun.
+
+**Beklenen sonuç:** Tek olayın önce açık, sonra çözülmüş hâlini ayırt edebilmek ve ona ait gönderimi bulmak. Kural adı aynı olan farklı servisleri veya farklı saatlerdeki olayları yalnız adına bakarak birleştirmeyin.
+
+## Olayı araştırmak için izlenecek sıra
+
+1. **Geçmiş** içindeki dönemi olayın saatini kapsayacak şekilde ayarlayın. Aramayı kural adına daraltın; beklediğiniz satır yoksa durum filtresini temizleyin.
+2. Satırı açın. Görünen kapsamı ve tetiklenme/çözülme zamanlarını not edin. Değer alanı varsa birimini kuralın şablonuyla birlikte okuyun; sayı her zaman yüzde değildir.
+3. Doğrulanmış servis varsa o servisin metrik veya log ekranını aynı zaman aralığında inceleyin. Kapsam hesap ise hesap trafiği üzerinden ilerleyin; tek servis seçmeyin.
+4. Mesaj eksikse **Kanallar** ekranına geçin. Olay da eksikse [tetiklenmeme adımlarından](alerts-troubleshooting.md) başlayın.
+5. Kapsam doğrulanamıyorsa görünür durumu ve zamanları [destek talebine](support-tickets.md) ekleyin. Ham etiketlerden yeni bir kapsam üretmeyin.
+
 ## Hangi servis etkileniyor?
 
 | Görülen kapsam | Güvenle söylenebilen |

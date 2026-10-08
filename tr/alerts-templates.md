@@ -4,6 +4,35 @@
 
 Kendi cluster’ınızda metrik değerlendirmesi için Prometheus, log değerlendirmesi için Loki ve bildirim/susturma akışı için Alertmanager bileşenlerinin uygun biçimde kurulmuş ve çalışır olması gerekir. Eksik bileşen hatasını cluster yöneticinizle giderin. Komuta’da yalnız servis kullanan müşterinin bu bileşenlere ait erişim adreslerini yapılandırması beklenmez.
 
+## Hangi koşul için hangi şablon?
+
+| Gözlemek istediğiniz durum | Başlangıç seçimi | Seçim gerekçesi ve sınırı |
+| --- | --- | --- |
+| Süren kaynak baskısı | Servis CPU veya bellek yüzdesi | Tanımlı limite ne kadar yaklaşıldığını izler. Limit yoksa bu oranı güvenilir başlangıç kabul etmeyin. |
+| Uygulamanın tekrar tekrar başlaması | Sık Pod Yeniden Başlatmaları | Tek bir dağıtım anından çok tekrarları araştırmak için uygundur. Son 15 dakikalık tahmini artışı kullanır. |
+| Servisin çalışmaya hazır olmaması | Pod Hazır Değil | Kaynak kullanımından farklı olarak hazır olma durumunu izler. Tamamlanmış işleri sürekli çalışan servis gibi ele almaz. |
+| Bildiğiniz tek bir hata mesajı | Log metin eşleşmesi | Kendi sabit metninizi ve kaynağı seçersiniz. Bir olay türünün beş dakikalık sayımı için uygundur. |
+| Çok sayıda genel hata logu | Yüksek Hata Log Oranı | Şablonun tanıdığı kalıpların saniyelik hızını izler. Özel hata kodunuz kalıba uymuyorsa metin eşleşmesini seçin. |
+| Kullanıcının gateway üzerinden yavaş yanıt alması | API Gateway p95 gecikme | Gateway istek gecikmesini izler. CPU yüksekliğini gecikmenin tek açıklaması olarak varsaymaz. |
+| Gateway’de sunucu hatalarının artması | API Gateway 5xx hata oranı | Toplam trafiğe göre yüzdeyi izler; çok düşük trafikte koruyucu trafik koşulu vardır. |
+| Node veya kalıcı disk kapasitesi | Node disk / PVC şablonu | Kendi cluster kapsamı ve ilgili kapasite ölçümleri gerekir; uygulama log boyutunu ölçmez. |
+
+Bir servis için bütün şablonları açmak yerine, ekibin hangi durumda ne yapacağını bildiği birkaç koşulla başlayın. Her kurala bakacak kişiyi, hedef kanalı ve ilk kontrolü belirleyin. Örneğin bağlantı hatası mesajı için ilk kontrol servis logları ve veritabanı erişimidir; yalnız şiddeti yükseltmek bağlantıyı düzeltmez.
+
+## Başlangıç değerini nasıl seçmeliyim?
+
+Şablon varsayılanları başlangıç noktasıdır; her uygulama için önerilen evrensel sınırlar değildir. Aşağıdaki sayısal örnekler varsayımsaldır.
+
+**CPU:** Normal yükte limitin `%35–60`’ı kullanılıyor ve kısa dağıtım sıçramaları görülüyorsa, varsayılan `%80 / 5m` süren baskıyı ayırmak için değerlendirilebilir. Normal yük zaten `%85` ise eşiği hemen artırmak yerine kapasiteyi ve limitleri araştırın. Metrik şablonundaki süre ile ölçümün kendi hesaplama penceresi farklıdır.
+
+**Bellek:** Varsayılan `%85 / 10m`, limite yaklaşan sürekli kullanımı izler. Hızla bellek tüketip sonlanan bir uygulama için tek başına yeterli erken uyarı olmayabilir; OOM sonlanma şablonu farklı bir olguyu izler. Birini diğerinin eşdeğeri saymayın.
+
+**Yeniden başlatma:** Servis varsayılanı, son 15 dakikadaki tahmini artışın `3` veya daha fazla olması ve koşulun `2m` sürmesidir. “Dakikada üç kez” anlamına gelmez. Bakım/dağıtım dönemlerini normal çalışma dönemiyle karşılaştırın.
+
+**Log metni:** Nadir ve işlem gerektiren bir ifade için `> 0 / 1m` başlangıcını test edebilirsiniz. Zararsız tekil hatalar bekleniyorsa `> 10 / 1m`, son beş dakikada en az 11 satır ister. Aynı `10` değeri saniyelik hız şablonunda çok farklı yoğunluk demektir.
+
+Ayarlama döngüsü: temsil edici bir normal dönem seçin → ölçümün mevcut olduğunu doğrulayın → tek eşiği veya süreyi değiştirin → kaydetme/yayını kontrol edin → benzer bir dönemde gerçek olayları karşılaştırın. Beklenen fayda görülmezse önceki değere dönün. [Kurallar rehberindeki örnek](alerts-rules.md) bu değişikliğin ekrandaki adımlarını gösterir.
+
 ## Servis metrik şablonları
 
 | Şablon | İzlediği koşul | Başlangıç süresi |
@@ -40,6 +69,17 @@ Deployment ve Rollout farklı iş yükleridir. Servise özgü **Rollout Kullanı
 ## API Gateway şablonları
 
 Yönetilen **API Gateway** servisi seçildiğinde p95 gecikme, 5xx hata oranı, 429 yanıt hızı ve yanıt önbelleğinin dolması şablonları kullanılabilir. Bunlar sıradan uygulama servislerine sunulmaz; ilgili gateway metriklerinin toplanması gerekir. İlk üç şablonun başlangıç süresi beş dakika, önbellek doluluğununki 15 dakikadır. Gecikme, yüzde ve saniyelik hız birimlerini formdaki açıklamaya göre okuyun.
+
+### Gateway eşiklerini doğru birimle okuyun
+
+| Koşul | Varsayılan eşik / süre | Doğru yorum |
+| --- | --- | --- |
+| p95 gecikme | `2000` milisaniye / `5m` | Beş dakikalık hızlardan hesaplanan gecikme dağılımının p95 değeri 2 saniyeyi aşar. Bütün isteklerin 2 saniyeyi aştığı anlamına gelmez. |
+| 5xx hata oranı | `%5` / `5m` | Oran eşiği aşmalı ve toplam istek hızı `0,1 istek/s` üzerinde olmalı. Az trafikte tek hataya rağmen olay çıkmayabilir. |
+| 429 yanıtları | `1 istek/s` / `5m` | 429 yanıtlarının saniyelik hızı eşiği aşar; yüzde değildir. |
+| Yanıt önbelleği doluluğu | `%5` ayrılmamış alan / `15m` | Önbelleğin henüz ayrılmamış alanı bu oranın altına iner. Sıcak önbellekte düşük kalabilir; cache-miss veya eviction oranını ölçmez. |
+
+p95 için formda `2` yazmak iki saniye değil **iki milisaniye** seçer. Önbellek uyarısını değerlendirirken yalnız bu değerden performans kaybı sonucu çıkarmayın; kullanım senaryosunu ve diğer gateway ölçümlerini birlikte inceleyin.
 
 ## Log şablonları
 

@@ -15,6 +15,28 @@
 
 Disabling/deleting a rule or putting a service to sleep does not prove an old event resolved. A five-minute log window may still contain earlier matches. Follow the [resolution checks](alerts-troubleshooting.md).
 
+## Sample record: follow one test log
+
+The following records are **illustrative, not live events or delivery evidence**. They use `Docs sample alert` and `orders-api-demo` from the [first alert example](alerts-quick-start.md). Times are on the same day and in the same timezone; they do not promise a delivery delay.
+
+| When you check | What you read in History | Supported conclusion |
+| --- | --- | --- |
+| 12:02 | Rule: Docs sample alert; verified service: orders-api-demo; firing time: 12:01:20; no resolution information | A firing record for this service was received. Investigate the current condition in its logs. |
+| 12:03 | The same event is still awaiting resolution | No new resolution information is visible. Do not interpret this as a new firing or a live status update. |
+| 12:06 | The same event has resolution time 12:05:40 and status resolved | Resolution information was received. Review the selected period and other rows before concluding that no new events occurred. |
+
+**Match it to a message:** Compare the rule name and verified scope first, then the event time. In **Channels**, look for the firing delivery in the same period and destination. For example, a successful send to **Docs test** at 12:02 means that attempt was recorded as successful. Find the email in the recipient’s mailbox separately. If a resolution send appears at 12:06, inspect it as a separate delivery.
+
+**Expected outcome:** Distinguish one event’s open and resolved states and find its associated delivery. Do not combine different services or events at different times just because their rule names match.
+
+## An investigation sequence
+
+1. Set the **History** period to include the event time. Search for the rule name; clear the status filter if the expected row is missing.
+2. Open the row. Note its displayed scope and firing/resolution times. If a value is available, read its unit alongside the template; a number is not always a percentage.
+3. For a verified service, inspect its metrics or logs over the same time range. For account scope, investigate account traffic without assigning it to one service.
+4. If a message is missing, continue to **Channels**. If the event is missing too, start with the [not-firing checks](alerts-troubleshooting.md).
+5. If scope cannot be verified, include the visible status and times in a [support ticket](support-tickets.md). Do not infer a new scope from raw labels.
+
 ## Which service is affected?
 
 | Displayed scope | What it establishes |

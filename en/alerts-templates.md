@@ -4,6 +4,35 @@ Start with search, category and scope filters in **Alerts → Templates**. **Use
 
 On your own cluster, metric evaluation requires Prometheus, log evaluation requires Loki, and notification/silence handling requires an appropriately configured Alertmanager. Work with your cluster administrator on missing-component errors. Customers using services on Komuta are not expected to configure connection addresses for these components.
 
+## Which template fits the condition?
+
+| What you want to detect | Starting choice | Reason and limitation |
+| --- | --- | --- |
+| Sustained resource pressure | Service CPU or memory percentage | Measures proximity to a configured limit. Without a limit, do not rely on this ratio as a starting point. |
+| An application restarting repeatedly | Frequent Pod Restarts | Useful for investigating repetition beyond one deployment moment; uses estimated increase over 15 minutes. |
+| A service unable to become ready | Pod Not Ready | Tracks readiness rather than resource consumption, excluding completed work from continuous-service assumptions. |
+| One known error message | Log text match | Choose your own stable text and source. Appropriate for counting one type of record over five minutes. |
+| Many general error logs | High Error Log Rate | Tracks the per-second rate of recognized patterns. Use text match if your custom error code does not match them. |
+| Slow responses through a gateway | API Gateway p95 latency | Tracks gateway request latency without assuming high CPU is the only explanation. |
+| Increasing server errors at a gateway | API Gateway 5xx error ratio | Measures a percentage of traffic and includes a guard for very low traffic. |
+| Node or persistent disk capacity | Node disk / PVC template | Requires your own cluster scope and relevant capacity measurements; does not measure application log size. |
+
+Start with a few conditions for which your team knows what action to take. Identify an owner, destination and first investigation step for each rule. For a connection-error message, that might be service logs and database reachability; raising severity does not repair the connection.
+
+## How should I choose a starting value?
+
+Template defaults are starting points, not universal recommended limits. The numerical workload examples below are hypothetical.
+
+**CPU:** If normal load uses `35–60%` of the limit with brief deployment spikes, the default `80% / 5m` can be evaluated for sustained pressure. If normal usage is already `85%`, investigate capacity and limits before simply raising the threshold. The template’s duration and the metric’s calculation window are distinct.
+
+**Memory:** The default `85% / 10m` tracks sustained usage near the limit. It may not provide enough advance warning for an application that consumes memory rapidly and exits. The OOM termination template tracks a different condition; the two are not interchangeable.
+
+**Restarts:** The service default requires an estimated increase of `3` or more over 15 minutes, with the condition continuing for `2m`. It does not mean three restarts per minute. Compare maintenance/deployment periods with ordinary operation.
+
+**Log text:** For a rare message requiring action, test a `> 0 / 1m` starting point. If occasional harmless errors are expected, `> 10 / 1m` requires at least 11 lines in the last five minutes. A threshold of `10` in a per-second rate template represents a very different volume.
+
+Tune in a cycle: choose a representative normal period → verify data exists → change one threshold or duration → check save/publication → compare actual events during a similar period. Restore the previous setting if the expected benefit does not appear. The [Rules example](alerts-rules.md) shows the screen-level steps.
+
 ## Service metric templates
 
 | Template | Condition | Initial duration |
@@ -40,6 +69,17 @@ Deployments and Rollouts are different workloads. **Rollout Unavailable Replicas
 ## API Gateway templates
 
 Selecting a managed **API Gateway** service makes p95 latency, 5xx ratio, 429 response rate and response-cache-full templates available. These are not offered for ordinary application services; the relevant gateway metrics must be collected. The first three start with a five-minute duration, and cache-full with 15 minutes. Follow the form’s units for latency, percentages and per-second rates.
+
+### Read gateway thresholds in the right units
+
+| Condition | Default threshold / duration | Correct interpretation |
+| --- | --- | --- |
+| p95 latency | `2000` milliseconds / `5m` | The p95 of the latency distribution computed from five-minute rates exceeds 2 seconds. It does not mean every request takes more than 2 seconds. |
+| 5xx error ratio | `5%` / `5m` | The ratio must exceed the threshold and total request rate must exceed `0.1 requests/s`. A single error at low traffic may not produce an event. |
+| 429 responses | `1 request/s` / `5m` | The per-second rate of 429 responses exceeds the threshold; this is not a percentage. |
+| Response cache fullness | `5%` unallocated space / `15m` | Space not yet allocated to the cache falls below this percentage. It may remain low in a warm cache; this does not measure cache-miss or eviction rate. |
+
+Entering `2` for p95 selects **two milliseconds**, not two seconds. Do not infer poor performance from the cache value alone; inspect the workload and other gateway measurements together.
 
 ## Log templates
 

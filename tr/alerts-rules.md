@@ -8,6 +8,35 @@ Arama ve mevcut kapsam, şiddet, etkinlik ve yayın filtrelerini kullanın. List
 
 Şiddet seviyeleri **Bilgi, Uyarı, Kritik ve Acil** şeklindedir. Şiddet, ekibinize öncelik verir ve kanalın şiddet filtresiyle ilişkilidir; otomatik müdahale veya eskalasyon taahhüdü değildir.
 
+## Form alanlarını nasıl doldurmalıyım?
+
+| Alan | İyi bir seçim | Formdaki sınır veya davranış |
+| --- | --- | --- |
+| Ad | `Orders API — bağlantı hatası` gibi servis ve koşulu anlatan ad | Log metin eşleşmesi ve düzenleme formunda zorunlu, en çok 128 karakter. |
+| Özet | `Son 5 dakikada veritabanı bağlantı hatası görüldü; servis loglarını inceleyin.` | Aynı formlarda zorunlu, en çok 256 karakter. Parola veya müşteri verisi yazmayın. |
+| Eşleşme metni | `connection refused` gibi sabit bir bölüm | Log metin formunda en çok 512 karakter; büyük/küçük harfe duyarlı düz metin. |
+| Eşik | Log sayımında `0` ile en az bir eşleşme aramak | Metin formunda negatif olmayan tam sayı. Şablonlarda birim ve sınır şablona bağlıdır. |
+| Süre | `30s`, `5m`, `1h` | Bir sayı ve birim; `60` veya `1m30s` yerine `60s` veya `90s`. `0s` beklemeyi kaldırır. |
+| Bildirim aralığı | Süren bir durum için örneğin `15m` | Değer veriliyorsa en az 5 dakika. Boş bırakmak bildirimleri kapatma yöntemi değildir. |
+| Şiddet | Ekipte belirlenmiş önem derecesi | Kanal şiddet filtresinin seçiminizi kabul ettiğini kontrol edin. |
+| Kanallar | O kuralı takip eden ekibin aktif kanalı | Boş seçim uygun aktif kanallara yönlenir. Tek hedef istiyorsanız onu seçin. |
+| Gelişmiş sorgu | Şablon yeterli değilse, izin verilen kapsamda sayısal koşul | Düzenleme formunda en çok 2.000 karakter. Sorgu kilitliyse değiştirmeye çalışmayın. |
+
+Şablon oluşturma ekranındaki parametreler ile mevcut kuralın düzenleme alanları aynı olmak zorunda değildir. Örneğin paylaşılan altyapıdaki metrik sorgusunu düzenleme ekranından değiştiremezsiniz. Farklı eşik gerekiyorsa uygun şablonla yeni tanımı hazırlayın; yeni ve eski kuralların aynı anda etkin kalmasını bilinçli yönetin.
+
+## Örnek: kısa CPU sıçramalarının bildirimini azaltın
+
+Normal iş yükünü incelediniz ve beş dakikayı aşan, fakat on dakikaya ulaşmadan biten CPU yükselişlerinin müdahale gerektirmediğine karar verdiniz. Bu, varsayımsal bir ayarlama örneğidir; gerçek kapasite sorununu süreyi uzatarak gizlemeyin.
+
+1. **Kurallar** içinde doğru servisin CPU kuralını bulun. Mevcut `%80` eşiğini, `5m` süreyi, şiddeti ve kanalları not edin.
+2. **Düzenle** ile yalnız süreyi `10m` yapın. Böylece aynı karşılaştırmanın daha uzun devam etmesini istersiniz; CPU limitini veya veri penceresini değiştirmezsiniz.
+3. Kaydedin, formu yeniden açarak `10m` değerinin saklandığını doğrulayın. Ardından yayın rozetinin kontrol zamanını ve varsa işlem sonucunu inceleyin.
+4. Otomatik yayınlanan kuralda yayın akışını izleyin. Doğrudan yayın işlemi sunuluyorsa o akışı kullanın. **Tanım farklı** sürüyorsa yeni sürenin kurulu olduğunu varsaymayın.
+5. Sonraki benzer yük döneminde servis ölçümlerini ve **Geçmiş** kayıtlarını karşılaştırın. Beklenen etki, kısa dalgalanmaların daha az olay üretmesidir; mevcut açık olayın anında çözülmesi değildir.
+6. Sonuç uygun değilse önceki `5m` değerine dönün ve kaydetme/yayın kontrolünü tekrarlayın.
+
+Bir ayarı denemek için **Çoğalt** kullanıyorsanız kopyanın kapalı başladığını unutmayın. İki kuralı açmak, tek kuralın iki sürümünü karşılaştıran özel bir deneme modu oluşturmaz; ikisi de bildirim üretebilir.
+
 ## Yapılabilen işlemler
 
 | İşlem | Etkisi ve dikkat edilecek nokta |
