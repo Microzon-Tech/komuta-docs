@@ -75,11 +75,9 @@ Bu ayar açıkken Komuta, giriş yapmış ziyaretçinin kim olduğunu her istekt
 - Bölüm görünmüyorsa özellik platformunuzda henüz açık değildir.
 - Kurallarda girişi kaldırırsanız ayar kapanır; girişi yeniden açtığınızda kendiliğinden açılmaz. Korumayı kapatmak ise ayarı korur: korumayı Komuta girişiyle yeniden açtığınızda ziyaretçi bilgileri yeniden iletilmeye başlar.
 
-> **Şimdilik dikkat:** Bu ayarı yalnızca sitenin tamamı Komuta girişi isterken (**Kurallar → Komuta girişi iste** açık) değiştirin. Girişi yalnızca bir yol kuralında isteyen servislerde ayarı değiştirmek, bilinen bir hata nedeniyle korumayı kapatabilir; düzeltme yayınlanınca bu not kaldırılacaktır.
-
 ### Açma
 
-Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der (Komuta'nın değerleri boş gelir; ziyaretçi bu başlıkları kendisi gönderirse dolu görünebilir, bkz. aşağı). Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
+Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulamanıza bildirilecek"). Komuta servisinizin yönlendirme ayarlarını günceller; bu sırada bölüm "Hazırlanıyor: servisin rotaları güncelleniyor. O zamana kadar uygulamanız başlıkları boş alır." der (Komuta'nın değerleri boş gelir; ziyaretçi bu başlıkları kendisi gönderirse dolu görünebilir, aşağıya bakın). Bu genellikle birkaç dakika sürer. Uzun sürerse bölüm "Servisi yeniden dağıtmak rotaları günceller." der; servisi yeniden dağıtmanız yeterlidir.
 
 ### Uygulamanızın aldığı başlıklar
 
@@ -93,12 +91,13 @@ Bilmeniz gerekenler:
 
 - **Başlıklar yalnızca girişin gerektiği isteklerde dolu gelir.** Sitenin herkese açık kısımlarında, IP listesiyle girişsiz geçilen yerlerde ve webhook yollarında, ziyaretçi giriş yapmış olsa bile başlıklar boş gelir.
 - **Servis token'ıyla gelen isteklerde** yalnızca `x-komuta-identity` dolu gelir; içinde `kind` değeri `service_token`, `sub` değeri token'ın kimliğidir: token değerindeki `kst_` sonrasındaki 32 onaltılık karakterin tireli GUID biçimi. Diğer iki başlık boştur.
-- **Ayarı açmadan önce giriş yapmış ziyaretçiler** yeniden giriş yapana kadar (en fazla 12 saat) e-postasız bildirilir: `x-komuta-user-email` boş gelir ve JWT'de `email` alanı olmaz.
+- **Paylaşım bağlantısıyla giren ziyaretçinin isteklerinde** yalnızca `x-komuta-identity` dolu gelir; `kind` değeri `share_link`, `sub` değeri bağlantının kimliğidir (tireli GUID) ve `email` alanı yoktur. Diğer iki başlık boştur.
+- **Ayarı açmadan önce giriş yapmış ziyaretçiler** yeniden giriş yapana kadar (en fazla servisin oturum süresi kadar, bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#oturum-süresi)) e-postasız bildirilir: `x-komuta-user-email` boş gelir ve JWT'de `email` alanı olmaz.
 - Bölüm "Hazırlanıyor" ya da "rotaları henüz güncellenmedi" demiyorsa, ziyaretçinin kendi gönderdiği aynı adlı başlıklar Komuta'dan geçerken silinir ve doğru değerle (ya da boş) yeniden yazılır; internetten gelen biri bu başlıkları taklit edemez. Hazırlık sürerken düz başlıklara güvenmeyin; imzalı `x-komuta-identity` her zaman doğrulanabilir.
 
 ### Hangi başlığa güvenmeli
 
-Aynı kümedeki servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir.
+Aynı kümedeki servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir. `kind` değerine de bakın: `share_link` ziyaretçisi tanınan bir kişi değil, bağlantıyı elinde tutan herhangi biridir.
 
 ### Kimlik kanıtı (JWT)
 
@@ -110,8 +109,8 @@ Başlık (header): `{"alg": "ES256", "typ": "JWT", "kid": "<anahtar kimliği>"}`
 |---|---|
 | `iss` | Her zaman `komuta-access`. |
 | `aud` | Ziyaretçinin açtığı adres (host), örneğin `panel.example.com`. Servisin her adresi (özel alan adı, `*.komuta.app` adresi, mavi-yeşil önizleme adresi) ayrı bir `aud` değeridir. |
-| `sub` | Komuta kullanıcı kimliği; servis token'ında token'ın kimliği. |
-| `kind` | `user` ya da `service_token`. |
+| `sub` | Komuta kullanıcı kimliği; servis token'ında token'ın kimliği; paylaşım bağlantısında bağlantının kimliği. |
+| `kind` | `user`, `service_token` ya da `share_link`. |
 | `email` | Ziyaretçinin e-postası. Yalnızca `user` türünde ve e-posta bilindiğinde bulunur. |
 | `sid` | Servisin kimliği. Konsolda servis adresindeki `/services/<kimlik>` bölümüdür. |
 | `tid` | Organizasyonun (kiracının) kimliği. |
@@ -217,7 +216,7 @@ Anahtarı kapattığınızda başlıklar birkaç saniye içinde boş gelmeye ba�
 
 ## Korumayı hemen kaldır
 
-**Ayarlar** sekmesinin en altındaki **Şimdi herkese aç** düğmesi korumayı hemen kaldırır: giriş, IP izin listesi ve yol kuralları artık uygulanmaz ve URL'e sahip herkes servisi açabilir. **Bu servis herkese açılsın mı?** onayı istenir. Paylaşımlar ve servis token'ları saklanır; korumayı yeniden açarsanız tekrar geçerli olur. Ayrıntılar için bkz. [Erişim Koruması](service-access-protection.md#korumayı-kapatma).
+**Ayarlar** sekmesinin en altındaki **Şimdi herkese aç** düğmesi korumayı hemen kaldırır: giriş, IP izin listesi, yol kuralları, ülkeler ve hız sınırı artık uygulanmaz ve URL'e sahip herkes servisi açabilir. **Bu servis herkese açılsın mı?** onayı istenir. Paylaşımlar, paylaşım bağlantıları ve servis token'ları saklanır; korumayı yeniden açarsanız tekrar geçerli olur. Ayrıntılar için bkz. [Erişim Koruması](service-access-protection.md#korumayı-kapatma).
 
 ---
 

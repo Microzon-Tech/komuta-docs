@@ -11,6 +11,7 @@ Erişim koruması rehberleri:
 - [Makineler ve Özel Ağ](access-protection-machines.md) — webhook yolları, servis token'ları, özel ağ.
 - [Erişim Kaydı](access-protection-activity.md) — **Etkinlik** sekmesi.
 - [Bitiş ve Kimlik Bildirme](access-protection-settings.md) — **Ayarlar** sekmesi.
+- [Stack Manifestinde Erişim Koruması](stack-manifest-access.md) — Stack servisinin `access` bloğu.
 
 ---
 
@@ -22,22 +23,30 @@ Erişim koruması rehberleri:
 | Yol kuralı | Serviste en fazla 50 (webhook yolları dahil); her yol için tek kural |
 | Yol uzunluğu | 2–256 karakter; `/` ile başlar; küçük harf, rakam ve `- . _ ~ ! $ & ' ( ) * + , = : @ /` |
 | Webhook (açık) yolu | En fazla 10; yöntemler `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| İmzalı webhook yolu | Yalnızca `POST`, `PUT`, `PATCH`; gövde en fazla 65.535 bayt (yaklaşık 64 KiB); yol başına en fazla 2 imza sırrı; sır 8–512 bayt, boşluk ve kontrol karakteri yok; Stripe zamanı en fazla 300 saniye farklı; HMAC değer öneki en fazla 16 karakter |
+| Yöntem kuralı | Serviste en fazla 50 (yol kurallarından ayrı); yöntemler `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`; `/` yazılabilir; her yol için tek kural |
+| Ülkeler | En fazla 250 iki harfli ISO kodu; `XX` (bilinmeyen) ve `T1` (Tor) listelenemez |
+| Hız sınırı | 1–3600 saniyede 10–100.000 istek (konsolda saniyede, 10 saniyede, dakikada, 10 dakikada ya da saatte); adres başına, IPv6'da `/64` başına; her ağ geçidi kopyası ayrı saydığı için yaklaşık |
 | Paylaşım | Serviste en fazla 200 |
 | Paylaşımın sayfa sınırı | En fazla 50 sayfa (seçildiği "yalnızca seçilen kişiler" yolları dahil) |
 | Paylaşım bitişi | Gelecekte olmalı; üst sınır yok |
 | "Yalnızca seçilen kişiler" kuralı | Kural başına en fazla 200 kişi |
 | Servis token'ı | Serviste en fazla 20; ad 1–64 karakter; bitiş en fazla 365 gün; en fazla 50 sayfa |
-| Özel ağdan gelebilecek servisler | En fazla 50; aynı organizasyon |
+| Paylaşım bağlantısı | Serviste en fazla 50; ad 1–64 karakter; bitiş zorunlu (konsolda 1, 7, 30 ya da 90 gün; API'de en fazla 365 gün sonrası); en fazla 50 sayfa |
+| Özel ağdan doğrudan gelebilecek servisler | En fazla 50; aynı organizasyon |
 | Koruma bitişi | Gelecekte, en fazla 365 gün sonra |
 | Korunan adres (host) sayısı | Servis başına en fazla 50 |
-| Ziyaretçi oturumu | En fazla 12 saat; paylaşımın ve "herkese açılsın" bitişinin ötesine geçmez |
+| Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; ziyaretçi oturumları platformunuzda yönetilmiyorsa 12 saat |
+| **Kimler içeride** listesi | En fazla 200 oturum |
+| Tek tek çıkarma | Serviste oturum takibi başladıktan 12 saat 10 dakika sonra başlar; bir oturumun ömrü içinde 500'den fazla oturum tek tek kapatılırsa herkesi çıkarmaya döner |
 | Giriş bağlantısı | Yaklaşık 10 dakika (girişin bu sürede tamamlanması gerekir) |
 | Giriş denemesi | Kullanıcı başına dakikada 30 |
 | E-posta doğrulama kodu | 8 hane, 10 dakika geçerli, 5 hatalı denemede geçersiz |
 | E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
-| Erişim kaydı | 30 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
-| Paylaşım kaldırıldıktan sonra erişimin kesilmesi | Yaklaşık 30 saniye (servisteki tüm oturumlar sona erer; herkes yeniden giriş yapar) |
+| Erişim kaydı | Organizasyon başına 30 (varsayılan), 90 ya da 365 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
+| Erişim kaydının dışa aktarımı | CSV ya da JSON; saklama süresi içinde; en fazla 50.000 satır; organizasyon başına aynı anda tek dışa aktarım |
+| Paylaşım kaldırıldıktan, bir kişi çıkarıldıktan ya da bağlantı silindikten sonra erişimin kesilmesi | Yaklaşık 30 saniye (tek tek çıkarma devreye girmeden önce paylaşımı kaldırmak servisteki tüm oturumları sonlandırır) |
 | Kimlik JWT'si | 5 dakika geçerli; `nbf` = `iat` − 30 sn |
 
 ---
@@ -81,6 +90,19 @@ Uyarı kodlarının (`lastError`) anlamları [Erişim Koruması → Uyarılar ve
 | Geçerli token, kapsam dışı sayfa | `403` | `this service token cannot open this path` |
 | Okunamayan ya da 1024 bayttan uzun yol (yol kuralı/sayfa sınırı olan serviste) | `400` | `bad request` |
 | Aynı Komuta çerezi iki kez gönderildi | `400` | `duplicate access cookie` |
+| Yöntem, bir yöntem kuralınca izinli değil | `405` | `method not allowed`, `Allow: <kuralın yöntemleri>` |
+| Ülke listede değil (ya da bilinmiyor), `GET`/`HEAD` | `403` | Adresle birlikte "Bu servise erişim kısıtlı" HTML sayfası |
+| Aynısı, diğer yöntemler | `403` | `access restricted to allowed networks` |
+| Hız sınırı aşıldı | `429` | `too many requests`, `Retry-After: <saniye>` |
+| Geçerli paylaşım bağlantısı açıldı | `302` | `komuta_link` çıkarılmış aynı adrese yönlendirme (oturum açılır; mevcut Komuta oturumu korunur) |
+| Yanlış ya da süresi dolmuş paylaşım bağlantısı | `403` | `This share link is not valid or has expired. Ask the person who sent it for a new one.` |
+| Paylaşım bağlantısı `GET`/`HEAD` dışında bir yöntemle açıldı | `403` | `Open a share link in a browser.` |
+| Bağlantıyla giren ziyaretçi, bağlantının dışındaki sayfa | `403` | `Your share link does not open this page.` |
+| Bağlantı silindikten ya da süresi dolduktan sonra bağlantıyla giren ziyaretçi | `403` | `The share link you opened this site with has ended. Ask the person who sent it for a new one.` |
+| **CORS kontrollerine girişsiz izin ver** açıkken tarayıcının CORS kontrolü | — | Uygulamaya iletilir (asıl istek yine giriş ister) |
+| İmzalı webhook yolu: imza yok ya da yanlış, ya da yolun kabul etmediği bir istek | `401` | `invalid webhook signature` |
+| İmza sırrı olmayan imzalı webhook yolu | `401` | `webhook signature cannot be checked` |
+| İmzalı webhook yolu, gövde 65.535 bayttan büyük | `413` | `webhook body too large to verify` |
 | Koruma bilgisi geçici olarak alınamıyor | `503` | `access policy unavailable` |
 | Giriş geçici olarak kullanılamıyor | `503` | `sign-in unavailable` |
 
@@ -98,8 +120,11 @@ Tüm ret yanıtları `Cache-Control: no-store` taşır. HTML sayfalar ziyaretçi
 | `x-komuta-identity` | Komuta → uygulama | ES256 imzalı kimlik JWT'si (kimlik bildirme açıkken). |
 | `x-komuta-access` | Komuta → uygulama | Pod kilidi için servise özel gizli değer. Kullanmayın, loglamayın. |
 | `Cache-Control: private, no-store` | Komuta → ziyaretçi | Korunan servisin tüm yanıtlarına yazılır. |
-| `__Host-komuta_access` | Çerez | Ziyaretçi oturumu; yalnızca servisin o adresi için; en fazla 12 saat. Uygulamaya iletilmez. |
+| `__Host-komuta_access` | Çerez | Ziyaretçi oturumu (paylaşım bağlantısıyla girenler için de); yalnızca servisin o adresi için; servisin oturum süresi kadar sürer. Uygulamaya iletilmez. |
 | `__Host-komuta_state` | Çerez | Giriş sürerken kullanılan kısa ömürlü çerez (10 dakika). Uygulamaya iletilmez. |
+| `komuta_link` | Sorgu parametresi | Paylaşım bağlantısını (`kl_…`) taşır. Komuta bir yönlendirmeyle siler; uygulamaya ve erişim kaydına hiçbir zaman ulaşmaz. |
+| `Retry-After` | Komuta → ziyaretçi | Hız sınırından dönen `429` yanıtında beklenecek saniye. |
+| `Allow` | Komuta → ziyaretçi | Yöntem kuralından dönen `405` yanıtında yolun kabul ettiği yöntemler. |
 | `/.komuta-access/callback` | Yol | Girişten dönüş adresi. `/.komuta-access` ile başlayan yollar Komuta'ya ayrılmıştır; kural ya da webhook yolu tanımlanamaz. |
 
 Kimlik bildirme etkinleştikten sonra (Ayarlar'daki "Hazırlanıyor" notu kalktığında) bu başlıklar ziyaretçi tarafından taklit edilemez: Komuta'dan geçen her izinli istekte silinip yeniden yazılır. İmzalı `x-komuta-identity` her zaman doğrulanabilir. JWT alanları ve doğrulama kuralları için bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#kimlik-kanıtı-jwt).
@@ -126,7 +151,20 @@ Erişim kaydındaki teknik kodlar ve arayüzdeki karşılıkları:
 | `code_rejected` | Ret | Komuta girişi reddetti |
 | `token_invalid` | Ret | Bilinmeyen ya da süresi dolmuş bir servis token'ı gönderdi |
 | `token_not_allowed` | Ret | Servis token'ı bu sayfayı açamaz |
+| `link_opened` | Giriş | Paylaşım bağlantısıyla girdi |
+| `link_valid` | Sayfa görüntüleme | Sayfayı paylaşım bağlantısıyla açtı |
+| `link_invalid` | Ret | Bilinmeyen ya da süresi dolmuş bir paylaşım bağlantısı açtı |
+| `link_not_allowed` | Ret | Paylaşım bağlantısı bu sayfayı açmıyor |
+| `link_ended` | Ret | Paylaşım bağlantısı sona erdikten sonra geri geldi |
+| `method_not_allowed` | Ret | Bu yolun izin vermediği bir yöntem kullandı |
+| `country_not_allowed` | Ret | İzin verilmeyen bir ülkeden geldi |
+| `rate_limited` | Ret | Çok fazla istek gönderdi |
+| `signature_invalid` | Ret | Geçerli imzası olmayan bir webhook gönderdi |
+| `signature_key_missing` | Ret | Henüz imza sırrı olmayan bir yola webhook gönderdi |
+| `webhook_body_too_large` | Ret | 64 KiB'tan büyük bir webhook gövdesi gönderdi |
 | `overflow` | Toplam | Bu saatteki diğer ziyaretler, birlikte gruplandı |
+
+`preflight` (**CORS kontrollerine girişsiz izin ver** ile geçirilen tarayıcı CORS kontrolü) ağ geçidinin kullandığı bir nedendir, ancak erişim kaydına yazılmaz.
 
 ---
 
@@ -139,6 +177,7 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | Kod | Mesaj |
 |---|---|
 | `DevOpsZon:AccessProtection:NothingProtected` | En az bir IP aralığı ekleyin, Komuta girişini açın ya da bir yol kuralı ekleyin; aksi halde servis korunmaz. |
+| `DevOpsZon:AccessProtection:TurnOffWithOpen` | Erişim korumasını kapatmak için kapatma işlemini kullanın; tüm IP aralıklarını, girişi ve yol kurallarını kaldıran bir değişiklik kaydedilmez. |
 | `DevOpsZon:AccessProtection:AllowListInvalid` | '{Entry}' geçerli bir IP adresi ya da CIDR aralığı değil. 8.8.8.8 veya 8.8.8.0/24 biçimini kullanın; aralığın host bitleri sıfır olmalı. |
 | `DevOpsZon:AccessProtection:AllowListNotPublic` | '{Entry}' özel, ayrılmış ya da dokümantasyon aralığıdır veya bunlarla çakışıyor. Yalnızca genel internet adreslerine izin verilebilir. |
 | `DevOpsZon:AccessProtection:AllowListEverything` | '{Entry}' tüm adreslere izin verir. Bunun yerine erişim korumasını kapatın. |
@@ -169,6 +208,39 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtection:ServiceNotFound` | Servis bulunamadı ya da bu organizasyona ait değil. |
 | `DevOpsZon:AccessProtection:IdentityNeedsSignIn` | Ziyaretçi kimliği yalnızca Komuta girişi isteyen bir serviste uygulamaya iletilebilir. Önce girişi açın. |
 | `DevOpsZon:AccessProtection:IdentityNotAvailable` | Ziyaretçi kimliğini iletme bu platformda henüz açık değil. |
+
+### Webhook imzaları
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:PathRuleSignatureInvalid` | {Prefix} için imza kontrolü geçerli değil. İmzalı yol açık bir yoldur, yalnız POST, PUT ve PATCH kabul eder ve GitHub, Stripe ya da ağ geçidinin ilettiği bir HMAC başlığı kullanır. |
+| `DevOpsZon:AccessProtection:WebhookSignaturesNotAvailable` | Webhook imza kontrolü bu platformda henüz açık değil. |
+| `DevOpsZon:AccessProtection:WebhookKeyPathNotSigned` | {Prefix} imza kontrolü olan açık bir yol değil; webhook sırrı tutamaz. |
+| `DevOpsZon:AccessProtection:TooManyWebhookKeys` | İmzalı bir yol en fazla {Max} webhook sırrı tutabilir; gönderen yenisini kullanmaya başlayınca eskisini kaldırın. |
+| `DevOpsZon:AccessProtection:WebhookKeyNotFound` | Webhook sırrı bulunamadı. |
+| `DevOpsZon:AccessProtection:WebhookSecretInvalid` | Webhook sırrı boşluk ve kontrol karakteri içermeyen {Min} ile {Max} bayt arasında bir değerdir. |
+
+### Ülkeler, hız sınırı ve yöntemler
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:CountryInvalid` | {Country} iki harfli bir ISO ülke kodu değil (bilinmeyen ve Tor kodları listelenemez). |
+| `DevOpsZon:AccessProtection:CountriesTooMany` | Bir servis en fazla {Max} ülke listeleyebilir. |
+| `DevOpsZon:AccessProtection:RateLimitInvalid` | Hız sınırı 1 ile {MaxSeconds} saniye başına {Min} ile {Max} arasında istek olabilir; 0 istek sınırı kapatır. |
+| `DevOpsZon:AccessProtection:MethodRuleInvalid` | {Prefix} için yöntem kuralı geçerli değil. Bir yol öneki ve GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS yöntemlerinden en az birini kullanın; her yol en fazla bir kez yazılabilir. |
+| `DevOpsZon:AccessProtection:MethodRulesTooMany` | Bir servisin en fazla {Max} yöntem kuralı olabilir. |
+| `DevOpsZon:AccessProtection:MethodRulesNotAvailable` | CORS ön kontrolü ve yöntem kuralları bu platformda henüz kullanılamıyor. |
+
+`MethodRulesNotAvailable`, bu özelliklerin açık olmadığı bir platformda ülke ya da hız sınırı eklerken de dönen yanıttır.
+
+### Erişim önizlemesi
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:ExplainPathInvalid` | {Path} yolu açıklanamıyor. / ile başlayan, kodlanmış karakter, ters eğik çizgi, ';', boş ya da '.' bölüm içermeyen ve /.komuta-access altında olmayan düz bir yol verin. Bu tür yollar daha sıkı okunur ve düz yolun açtığından fazlasını asla açmaz. |
+| `DevOpsZon:AccessProtection:ExplainMethodInvalid` | HTTP yöntemi geçersiz. GET ya da POST gibi bir yöntem adı kullanın. |
+| `DevOpsZon:AccessProtection:ExplainAddressInvalid` | {Address} geçerli bir IPv4 ya da IPv6 adresi değil. |
+| `DevOpsZon:AccessProtection:ExplainVisitorInvalid` | {Kind} ziyaretçisi eksik ya da karışık: üye için kullanıcı, paylaşım için paylaşım kimliği, e-posta ziyaretçisi için geçerli bir adres, token için token kimliği, paylaşım linki için link kimliği gerekir; anonim ziyaretçi bunların hiçbirini taşımaz. |
 
 ### Özel ağ
 
@@ -204,6 +276,41 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtection:ServiceTokenScopeInvalid` | Token'ın açabileceği '{Prefix}' sayfası geçersiz ya da 50'den fazla sayfa seçildi. Sayfaları / ile başlatın; hiçbir sayfa seçmezseniz token tüm siteyi açar. |
 | `DevOpsZon:AccessProtection:TooManyServiceTokens` | Bir serviste en fazla {Max} servis token'ı olabilir. Kullanmadığınız birini silin. |
 
+### Paylaşım bağlantıları ve oturumlar
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:ShareLinksNotAvailable` | Paylaşım bağlantıları bu platformda henüz açık değil. |
+| `DevOpsZon:AccessProtection:ShareLinkNeedsSignIn` | Önce Komuta girişini açın; paylaşım bağlantısı giriş yapmadan içeri almayı sağlar. |
+| `DevOpsZon:AccessProtection:ShareLinkNameInvalid` | Bağlantıya en fazla {Max} karakterlik bir ad verin. |
+| `DevOpsZon:AccessProtection:ShareLinkNameTaken` | {Name} adında bir bağlantı zaten var. |
+| `DevOpsZon:AccessProtection:ShareLinkEndRequired` | Paylaşım bağlantısının bir bitiş tarihi olmalı. |
+| `DevOpsZon:AccessProtection:ShareLinkScopeInvalid` | Bağlantının {Prefix} yolu geçerli değil. |
+| `DevOpsZon:AccessProtection:TooManyShareLinks` | Bir servisin en fazla {Max} paylaşım bağlantısı olabilir. |
+| `DevOpsZon:AccessProtection:ShareLinkNotFound` | Bu paylaşım bağlantısı artık yok. |
+| `DevOpsZon:AccessProtection:SessionLifetimeInvalid` | Oturum süresi olarak 15 dakika, 1 saat, 4 saat, 12 saat, 24 saat veya 7 gün seçin. |
+| `DevOpsZon:AccessProtection:SessionsNotAvailable` | Ziyaretçi oturumlarını yönetme bu platformda henüz açık değil. |
+| `DevOpsZon:AccessProtection:SessionNotFound` | Bu oturum zaten sona ermiş. |
+
+### Erişim kaydı
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:AccessLogRetentionInvalid` | Erişim kaydını 30, 90 ya da 365 gün saklayabilirsiniz. |
+| `DevOpsZon:AccessProtection:AccessLogExportRangeInvalid` | Başlangıcı bitişinden önce olan ve erişim kaydının saklandığı günler içinde kalan bir aralık seçin. |
+| `DevOpsZon:AccessProtection:AccessLogExportTooLarge` | Bu aralıkta {Max} kayıttan fazlası var. Daha kısa bir aralık ya da tek bir kayıt türü seçin. |
+| `DevOpsZon:AccessProtection:AccessLogExportBusy` | Kuruluşunuzun erişim kaydının başka bir dışa aktarımı hâlâ sürüyor. Birazdan yeniden deneyin. |
+| `DevOpsZon:AccessProtection:AccessLogExportUnaudited` | Dışa aktarım denetim kaydına yazılamadığı için yapılmadı. Birazdan yeniden deneyin. |
+
+### Stack'ler
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:DeclaredProtectionRefused` | {Service} için tanımlanan erişim koruması kurulamadı; servis oluşturulmadı. |
+| `DevOpsZon:AccessProtection:DeclaredProtectionInvalid` | {Service} için tanımlanan erişim korumasında oturum açma ya da izin listesi olmalı, kuruluşla paylaşım da oturum açma ister; servis oluşturulmadı. |
+
+Manifestin `access` bloğunun doğrulama kodları [Stack Manifestinde Erişim Koruması](stack-manifest-access.md#doğrulama) sayfasındadır.
+
 ### Ziyaretçi girişi
 
 | Kod | Mesaj |
@@ -225,40 +332,46 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 ## Sık sorulan sorular
 
 **Ziyaretçilerin Komuta hesabı açması gerekiyor mu?**
-Komuta girişi kullanıyorsanız evet. Hesap açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. Hesap açtırmak istemiyorsanız IP izin listesi kullanın. Kendi kimlik sağlayıcınızla (SSO) giriş şu an desteklenmez.
+Komuta girişi kullanıyorsanız, onlara bir [paylaşım bağlantısı](access-protection-sign-in-sharing.md#paylaşım-bağlantıları) göndermediğiniz sürece evet. Hesap açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. Hesap açtırmak istemiyorsanız paylaşım bağlantısı ya da IP izin listesi kullanın. Kendi kimlik sağlayıcınızla (SSO) giriş şu an desteklenmez.
+
+**Komuta hesabı olmayan birini içeri alabilir miyim?**
+Evet, bir paylaşım bağlantısıyla (**Kişiler → Paylaşım bağlantıları → Bağlantı oluştur**). Bağlantıyı elinde tutan herkes giriş yapmadan, yalnızca bağlantının sayfalarına, bağlantının süresi dolana (konsolda en fazla 90 gün) ya da siz silene kadar girer. Sohbet uygulamalarındaki ve e-postadaki bağlantı önizlemelerinin de açılış sayıldığını ve bağlantının iletildiği herkesin de girebileceğini unutmayın.
 
 **Neden bir API isteğim 302 yerine 401 alıyor?**
 Giriş gerektiren bir yola oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayfasına yönlendirilir (`302`); diğer yöntemler, bir programın yönlendirmeyi takip edip bir HTML sayfasını cevap sanmaması için `401` alır. Programlar için [servis token'ı](access-protection-machines.md#servis-tokenları) ya da IP listesi kullanın.
 
 **Tarayıcıdan başka bir siteden servisimin API'sini çağırıyorum, CORS hatası alıyorum.**
-Tarayıcının gönderdiği `OPTIONS` ön uçuş isteği çerez taşımaz; giriş gerektiren bir yolda `401` alır. Webhook yollarında da `OPTIONS` seçilemez. Başka bir siteden tarayıcıyla çağrılması gereken uç noktaları korumanın dışında tutmak için o yolları korumasız bırakın (site korumasını kapatıp yalnızca diğer yolları yol kurallarıyla koruyarak) ya da isteği sunucu tarafından yapın.
+Tarayıcının önce gönderdiği `OPTIONS` kontrolü çerez taşımaz; giriş gerektiren bir yolda `401` alır. **Makineler → Yöntemler ve CORS → CORS kontrollerine girişsiz izin ver**'i açın: tarayıcı kontrolü (tek `Origin` ve tek `Access-Control-Request-Method` başlığı) bundan sonra geçer; IP listesi, engelleme kuralları ve yöntem kuralları yine uygulanır. Yalnızca kontrol geçer: asıl istek yine giriş ister (tarayıcının gönderdiği bir oturum, bir servis token'ı ya da onu içeri alan bir IP listesi) ve CORS başlıklarını yine uygulamanız döndürür. Webhook yollarında `OPTIONS` yine seçilemez. Ayarı görmüyorsanız platformunuzda henüz açık değildir; bu tür uç noktaları korumanın dışında tutun ya da isteği sunucu tarafından yapın.
 
 **Korumayı açtım ama hâlâ giriş istemeden açılıyor.**
 Durum etiketine bakın: **Hazırlanıyor** sırasında kontrol henüz devrede değildir. **Uygulanıyor**'un ilk saniyelerinde yönlendirmeler henüz yenileniyor olabilir; biraz bekleyip sayfayı yenileyin. **Korunuyor** görünüyorsa tarayıcınız sayfayı önbellekten açmış olabilir; sayfayı yenileyin. Sorun sürüyorsa kartta bir uyarı olup olmadığına bakın.
 
 **Kendimi dışarıda bıraktım.**
-Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP listesine yeni adresinizi ekleyin (adresinizi **Erişim kısıtlı** sayfasında görebilirsiniz) ya da **Ayarlar → Şimdi herkese aç** ile korumayı kaldırın.
+Komuta konsolu korumadan etkilenmez. Konsoldan **Kurallar** sekmesine girip IP listesine yeni adresinizi ekleyin (adresinizi **Bu servise erişim kısıtlı** sayfasında görebilirsiniz) ya da **Ayarlar → Şimdi herkese aç** ile korumayı kaldırın.
 
-**Uyuyan bir servis ne olur?**
+**Uyuyan bir servise ne olur?**
 Koruma uyurken de geçerlidir. Servisi ancak kontrolleri geçen bir ziyaretçi uyandırabilir; giriş yapmamış ya da izinli olmayan bir adresten gelen biri uyandıramaz.
 
 **Bir paylaşımı kaldırdım, kişi hemen çıkar mı?**
-Evet, açık oturumları dahil yaklaşık 30 saniye içinde. Servisteki diğer ziyaretçiler de bir kez yeniden giriş yapar.
+Evet, açık oturumları dahil yaklaşık 30 saniye içinde. Serviste tek tek çıkarma devreye girdiyse yalnızca o paylaşımla açılmış oturumlar sona erer; öncesinde (oturum takibi başladıktan sonraki 12 saat 10 dakika boyunca) servisteki diğer ziyaretçiler de bir kez yeniden giriş yapar.
 
-**Bir kişiyi tek tek oturumdan çıkarabilir miyim?**
-Kişi bazında oturum kapatma yoktur. Bir paylaşımı kaldırmak ya da bitişini öne çekmek (ya da bitiş eklemek, sayfa listesini değiştirmek) o kişinin erişimini keser, ancak bu servisteki **tüm** açık oturumları da sonlandırır: herkes bir sonraki sayfa açılışında yeniden giriş yapar (Komuta'ya zaten giriş yapmış olanlar için bu otomatiktir; e-posta paylaşımıyla girenler yeni kod ister). Organizasyon paylaşımıyla giren tek bir kişiyi çıkarmak için o kişiyi organizasyondan çıkarın.
+**Tek bir kişiyi oturumdan çıkarabilir miyim?**
+Evet: kişinin satırında **Kişiler → Kimler içeride → Çıkar**. Açık oturumları yaklaşık 30 saniye içinde kapanır; başka kimse etkilenmez. Bir paylaşım ona hâlâ erişim veriyorsa hemen yeniden giriş yapabilir; dışarıda kalması gerekiyorsa o paylaşımı da kaldırın. Serviste tek tek çıkarma devreye girene kadar bir kişiyi çıkarmak herkesi çıkarır ve konsol bunu belirtir. Paylaşım bağlantısıyla girenler listede görünmez; erişimlerini bitirmek için bağlantıyı silin.
 
 **Erişim kaydını dışa aktarabilir miyim?**
-Şu an hayır. Kayıt konsolda 30 gün görünür.
+Evet: **Etkinlik → Dışa aktar** ile CSV ya da JSON olarak, dışa aktarım başına en fazla 50.000 satır. Kayıt varsayılan olarak 30 gün saklanır; organizasyon 90 ya da 365 gün saklamayı seçebilir (**Hesap → Organizasyonlar → Erişim kaydı saklama süresi**).
 
 **Ülkeye, HTTP yöntemine ya da istek sayısına göre kural koyabilir miyim?**
-Hayır. Kurallar adres, giriş ve yola göredir. Yöntem seçimi yalnızca webhook yollarında vardır.
+Evet: **Kurallar** sekmesinde **Ülkeler** ve **Hız sınırı**, **Makineler** sekmesinde **Yöntemler ve CORS** altındaki yöntem kuralları. Bu bölümleri görmüyorsanız platformunuzda henüz açık değildir.
 
 **Uygulamam ziyaretçinin kim olduğunu nasıl öğrenir?**
 **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir**'i açın ve `x-komuta-identity` JWT'sini doğrulayın. Bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#giriş-yapanı-uygulamama-bildir).
 
-**Webhook göndericisi GitHub'ın IP aralıklarını değiştirirse?**
-Gönderici adres listesi isteğe bağlıdır; asıl koruma uygulamanızın imza doğrulamasıdır. Listeyi kullanıyorsanız göndericinin yayımladığı aralıkları güncel tutun ya da listeyi boş bırakın.
+**Webhook imzalarını Komuta benim için kontrol edebilir mi?**
+Evet: webhook yolunu açarken bir **Kenarda imza kontrolü** (GitHub, Stripe ya da başka bir HMAC-SHA256 başlığı) seçin, ardından yolun altına imza sırrını ekleyin. İmzasız istekler uygulamanıza ulaşmadan `401` alır. İmzalı yollar yalnızca `POST`, `PUT` ve `PATCH` ile en fazla 65.535 baytlık gövdeleri kabul eder. Seçeneği görmüyorsanız platformunuzda henüz açık değildir. Bkz. [Kenarda imza kontrolü](access-protection-machines.md#kenarda-imza-kontrolü).
+
+**GitHub gibi bir webhook göndericisi IP aralıklarını değiştirirse ne olur?**
+Gönderici adres listesi isteğe bağlıdır; asıl koruma kenarda ya da uygulamanızda yapılan imza doğrulamasıdır. Listeyi kullanıyorsanız göndericinin yayımladığı aralıkları güncel tutun ya da listeyi boş bırakın.
 
 **Koruma açıkken servisimi yeniden dağıtırsam ne olur?**
 Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
@@ -276,17 +389,26 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Paylaşım** | Bir kişiye, organizasyona ya da e-posta adresine servise giriş izni. |
 | **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon ya da e-posta). Organizasyon ayarıyla izin verilir. |
 | **Askıda** | Dış paylaşım kapatıldığı ya da organizasyon bağı koptuğu için geçici olarak çalışmayan paylaşım. |
-| **Sayfa sınırı (kapsam)** | Bir paylaşımın ya da token'ın yalnızca belirli yolları açması. |
+| **Sayfa sınırı (kapsam)** | Bir paylaşımın, token'ın ya da paylaşım bağlantısının yalnızca belirli yolları açması. |
+| **Paylaşım bağlantısı** | Elinde tutan herkesi Komuta hesabı olmadan içeri alan, bitiş tarihi olan bağlantı. |
+| **Oturum süresi** | Bir girişin ne kadar sürdüğü; varsayılan 12 saat. |
+| **Tek tek çıkarma** | Herkesi çıkarmadan bir kişinin ya da bir paylaşımın oturumlarını kapatma; oturum takibi başladıktan 12 saat 10 dakika sonra devreye girer. |
 | **IP izin listesi** | Servise girişsiz ulaşabilecek ya da (ikisi birden seçiliyse) ulaşması gereken genel IP adresleri. |
 | **CIDR** | Bir adres aralığının yazımı, örneğin `203.0.113.0/24` (256 adres). |
 | **İkisi birden gereksin / Biri yeterli** | IP listesi ile girişin birlikte nasıl değerlendirileceği. |
 | **Yol kuralı** | Belirli bir yol ve altındaki yollar için ek koruma ya da engelleme. |
 | **Yalnızca seçilen kişiler** | Bir yolu yalnızca seçilen paylaşımlara, isteğe bağlı saat aralığında açan yol kuralı. |
-| **Webhook yolu (açık yol)** | Seçilen yöntemlerle gelen istekleri giriş istemeden geçiren yol. Göndericinin imzasını uygulama doğrular. |
+| **Webhook yolu (açık yol)** | Seçilen yöntemlerle gelen istekleri giriş istemeden geçiren yol. Göndericinin imzasını Komuta (imza kontrolüyle) ya da uygulama doğrular. |
+| **İmza sırrı** | Webhook göndericisinin isteklerini imzaladığı ortak sır; Komuta bunu şifreli saklar ve imzalı bir webhook yolunda imzaları kontrol etmek için kullanır. |
 | **Servis token'ı** | Programların başlık olarak gönderdiği, giriş yerine geçen gizli anahtar. |
 | **Özel ağ (mesh)** | Kümeleriniz arasında genel internete çıkmayan bağlantı; ağ geçidinden geçmez. |
+| **Yöntem kuralı** | Bir yolun kabul ettiği HTTP yöntemleri; diğer yöntemler `405` alır. |
+| **CORS kontrolü (ön uçuş)** | Tarayıcının başka bir siteyi çağırmadan önce gönderdiği `OPTIONS` isteği; girişsiz geçirilebilir. |
+| **Ülke listesi** | Ziyaretçilerin gelebileceği ülkeler; girişten önce kontrol edilir. |
+| **Hız sınırı** | Bir adresin bir zaman aralığında gönderebileceği istek sayısı; aşılınca `429`. |
 | **Erişim önizlemesi** | Kayıtlı kurallarla kimin nereye girebildiğini gösteren, hiçbir şeyi değiştirmeyen araç. |
-| **Erişim kaydı** | Girişlerin, sayfa görüntülemelerinin ve retlerin 30 günlük kaydı. |
+| **Erişim kaydı** | Girişlerin, sayfa görüntülemelerinin ve retlerin 30, 90 ya da 365 gün saklanan kaydı. |
+| **Yeni servisleri koru** | Her yeni genel servisi organizasyon için Komuta girişiyle korunarak başlatan organizasyon ayarı. |
 | **Koruma bitişi** | Korumanın sona ereceği zaman ve o zaman ne olacağı. |
 | **Kimlik bildirme** | Giriş yapan ziyaretçinin kimliğinin uygulamaya başlıklarla iletilmesi. |
 | **JWT / JWKS** | İmzalı kimlik jetonu / imzayı doğrulamak için yayımlanan açık anahtar listesi. |

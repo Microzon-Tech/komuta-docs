@@ -7,7 +7,9 @@ Kurallar iki katmandan oluşur:
 1. **Sitenin tamamı için** — **Kimler girebilir** bölümü: Komuta girişi, IP izin listesi ve ikisinin nasıl birleşeceği.
 2. **Belirli yollar için** — **Yol kuralları** bölümü: `/admin`'i yalnızca giriş yapanlara açmak, `/internal`'ı tamamen kapatmak, `/raporlar`'ı yalnızca seçilen kişilere belirli saatlerde açmak gibi.
 
-Kartta yaptığınız değişiklikler **Korumayı uygula** düğmesine basana kadar kaydedilmez. Kartın altındaki özet kutusu **Şu anda** etkin olan durumu ve kaydedilmemiş değişiklik varsa **Uyguladıktan sonra** ne olacağını tek cümleyle anlatır.
+Bunların altında, kimse giriş yapmadan önce her isteğe uygulanan iki bölüm daha vardır: [Ülkeler](#ülkeler) ve [Hız sınırı](#hız-sınırı). Her yolun kabul ettiği HTTP yöntemleri **Makineler** sekmesinde ayarlanır (bkz. [Yöntemler ve CORS](access-protection-machines.md#yöntemler-ve-cors)).
+
+Kartta yaptığınız değişiklikler **Korumayı uygula** düğmesine basana kadar kaydedilmez. **Ülkeler** ve **Hız sınırı** bölümlerinin kendi kaydetme düğmeleri vardır. Kartın altındaki özet kutusu **Şu anda** etkin olan durumu ve kaydedilmemiş değişiklik varsa **Uyguladıktan sonra** ne olacağını tek cümleyle anlatır.
 
 ---
 
@@ -51,13 +53,13 @@ Kart hatalı satırları siz yazarken "Satır {n}" diye işaretler ve hata düze
 - Adresiniz zaten listedeyse "Adresiniz ({adres}) zaten listede." yazar.
 - Bağlantınız için genel bir adres belirlenemezse hiçbir şey eklenmez.
 
-> **Kendinizi dışarıda bırakmayın.** Eklenen adres, konsolun gördüğü adrestir. Tarayıcınız servise farklı bir bağlantıyla ulaşıyor olabilir (örneğin konsola IPv6, servise IPv4); bu durumda servis başka bir adres görür. Uygulamadan önce kontrol edin; gerekirse hem IPv4 hem IPv6 adresinizi ekleyin. Yine de dışarıda kalırsanız **Erişim kısıtlı** sayfası servisin gördüğü adresi gösterir; bu adresi kopyalayıp listeye ekleyebilirsiniz.
+> **Kendinizi dışarıda bırakmayın.** Eklenen adres, konsolun gördüğü adrestir. Tarayıcınız servise farklı bir bağlantıyla ulaşıyor olabilir (örneğin konsola IPv6, servise IPv4); bu durumda servis başka bir adres görür. Uygulamadan önce kontrol edin; gerekirse hem IPv4 hem IPv6 adresinizi ekleyin. Yine de dışarıda kalırsanız **Bu servise erişim kısıtlı** sayfası servisin gördüğü adresi gösterir; bu adresi kopyalayıp listeye ekleyebilirsiniz.
 
 ### Adres nasıl belirlenir
 
 Komuta ziyaretçinin adresini yalnızca Cloudflare'in yazdığı bilgiden alır ve isteğin gerçekten Cloudflare üzerinden geldiğini ayrıca doğrular. Ziyaretçinin kendi gönderdiği `X-Forwarded-For`, `X-Real-IP`, `True-Client-IP` ya da `Forwarded` gibi başlıklar dikkate alınmaz; adres taklit edilerek listeye girilemez.
 
-Bu yüzden IP listesi (site için, bir yol kuralında ya da bir webhook yolunda), servise gelen isteklerin Cloudflare üzerinden geçmesini gerektirir. Komuta'nın verdiği `*.komuta.app` adresleri ve **Alan adları** altında eklenen özel alan adları bu şekilde çalışır. Cloudflare üzerinden geldiği doğrulanamayan bir istek, IP listesi isteyen bir yerde reddedilir (erişim kaydında "İstek Komuta kenarından gelmedi"); **Biri yeterli** seçiliyse bunun yerine giriş sayfasına yönlendirilir.
+Bu yüzden IP listesi (site için, bir yol kuralında ya da bir webhook yolunda), ülke listesi ve hız sınırı, servise gelen isteklerin Cloudflare üzerinden geçmesini gerektirir. Komuta'nın verdiği `*.komuta.app` adresleri ve **Alan adları** altında eklenen özel alan adları bu şekilde çalışır. Cloudflare üzerinden geldiği doğrulanamayan bir istek, IP listesi isteyen bir yerde reddedilir (erişim kaydında "İstek Komuta kenarından gelmedi"); **Biri yeterli** seçiliyse bunun yerine giriş sayfasına yönlendirilir.
 
 ### Giriş ve IP izin listesi nasıl birleşsin?
 
@@ -100,7 +102,7 @@ Bir istek hem sitenin kontrollerini **hem de** yoluyla eşleşen **her** kuralı
 - `/internal` **Tamamen engelle** ise oturumu olan ya da izinli adresten gelen biri de 403 alır.
 - `/admin` için **Komuta girişi**, `/admin/raporlar` için **IP listesi** kuralı varsa `/admin/raporlar`'a girmek için ikisi de gerekir.
 
-Herkese açık bir yolun girişsiz açılması gerekiyorsa (örneğin webhook), yol kuralı değil [webhook yolu](access-protection-machines.md#webhook-yolları) kullanılır; webhook yolları sitenin kurallarından muaftır.
+Bir yolun girişsiz açılması gerekiyorsa (örneğin webhook), yol kuralı değil [webhook yolu](access-protection-machines.md#webhook-yolları) kullanılır; webhook yolları sitenin kurallarından muaftır.
 
 ### Yol eşleşmesi
 
@@ -144,35 +146,93 @@ Seçilmemiş biri bu yolu açmaya çalışırsa **Bu sayfaya erişiminiz yok** s
 
 ---
 
+## Ülkeler
+
+**Ülkeler** bölümü yalnızca listelediğiniz ülkelerden gelen ziyaretçileri kabul eder. Başka bir yerden gelen ya da ülkesi anlaşılamayan ziyaretçiler girişten önce reddedilir.
+
+1. Alana iki harfli ISO ülke kodunu yazın (örneğin `TR` ya da `DE`) ve **Ekle: {ülke}** düğmesini seçin (örneğin **Ekle: Almanya**). Liste her ülkeyi adı ve koduyla gösterir, örneğin "Almanya (DE)".
+2. **Ülkeleri kaydet** ile kaydedin (ya da **Vazgeç** ile geri alın). Değişiklik yaklaşık bir dakika içinde geçerli olur ("Kaydedildi. Ağ geçidi yaklaşık bir dakika içinde uygular.").
+
+Kurallar:
+
+- En fazla **250** ülke; her ülke bir kez yazılabilir. Küçük harfle yazılan kodlar büyük harfe çevrilir.
+- `XX` (bilinmeyen ülke) ve `T1` (Tor) listelenemez. Listede ülke varken ülkesi bilinmeyen ya da Tor üzerinden gelen ziyaretçiler her zaman reddedilir.
+- Ülke, Cloudflare'in bildirdiği ülkedir; Komuta isteğin Cloudflare üzerinden geldiğini IP listesindeki gibi doğruladıktan sonra buna güvenir. Doğrulanamayan istek reddedilir (erişim kaydında "İstek Komuta kenarından gelmedi").
+- **Herkese uygulanır**; engelleme ve yöntem kurallarından hemen sonra, diğer her şeyden önce bakılır: giriş yapmamış ziyaretçiler, giriş yapmış ziyaretçiler, paylaşım bağlantıları, servis token'ları, tarayıcıların CORS kontrolleri ve girişin kendisi.
+- **Webhook yolları etkilenmez**; onların kendi gönderici listesi vardır. Bir webhook yolunda açılan paylaşım bağlantısı ise yine kontrol edilir.
+- Reddedilen ziyaretçi, IP listesindeki gibi **Bu servise erişim kısıtlı** sayfasını ve servisin gördüğü adresi görür. Diğer yöntemlerle gelen istekler `403` ve düz metin `access restricted to allowed networks` alır. Erişim kaydında "İzin verilmeyen bir ülkeden geldi" yazar.
+- Liste boşsa her ülke kabul edilir ("Her ülkeden gelen ziyaretçiler kabul ediliyor.").
+- Listeyi değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
+
+Bu bölümü görmüyorsanız ülke kuralları platformunuzda henüz açık değildir. Bir liste kaydedildikten sonra özellik kapatılırsa bölüm listeyi salt okunur gösterir: "Bu ayar bu platformda henüz değiştirilemiyor; mevcut liste geçerli kalır."
+
+---
+
+## Hız sınırı
+
+**Hız sınırı** bölümü, izin verdiğinizden fazla istek gönderen adrese `429` döndürür.
+
+1. **İstek sayısı**'nı (10 ile 100.000 arası) girin ve bir **Zaman aralığı** seçin: saniyede, 10 saniyede, dakikada, 10 dakikada ya da saatte.
+2. **Sınırı kaydet** ile kaydedin. Bölüm bundan sonra örneğin "Her adres dakikada 120 istek gönderebilir." der. **Sınırı kaldır** sınırı kapatır ("Hız sınırı yok.").
+
+Nasıl sayılır:
+
+- **Adres başına.** Her ziyaretçi adresinin kendi hakkı vardır; IPv6 adresleri `/64` blok başına sayılır. Adresin, IP listesindeki gibi Cloudflare üzerinden geldiği doğrulanmalıdır.
+- **Engelleme kurallarını, yöntem kurallarını ve ülke listesini geçen her istek sayılır:** sayfalar, dosyalar, giriş adımları, paylaşım bağlantıları, servis token'ları, CORS kontrolleri ve webhook teslimatları.
+- **Sınır aşılınca** `429`, düz metin `too many requests` ve beklenecek saniyeyi bildiren bir `Retry-After` başlığı döner. HTML sayfası yoktur. Erişim kaydında "Çok fazla istek gönderdi" yazar.
+- **Yaklaşıktır.** Her ağ geçidi kopyası ayrı ve bellekte sayar; bu yüzden gerçek sınır birkaç kat yüksek olabilir ve ağ geçidi yeniden başladığında sayımlar sıfırlanır. Kesin bir kota olarak değil, istek selini ve kazıyıcıları yavaşlatmak için kullanın.
+- 10'dan az istek kabul edilmez; çünkü yalnızca giriş yapmak bile birkaç istek gerektirir.
+- Sınırı değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
+
+Bu bölümü görmüyorsanız hız sınırı platformunuzda henüz açık değildir. Bir sınır kaydedildikten sonra özellik kapatılırsa bölüm sınırı salt okunur gösterir: "Bu ayar bu platformda henüz değiştirilemiyor; mevcut sınır geçerli kalır."
+
+---
+
 ## Erişim önizlemesi
 
-**Erişim önizlemesi**, kayıtlı kurallarınızla ve paylaşımlarınızla kimin nereye girebildiğini hiçbir şeyi değiştirmeden gösterir. Koruma açıkken **Kurallar** sekmesinin en altında görünür.
+**Erişim önizlemesi**, kimin nereye girebildiğini hiçbir şeyi değiştirmeden gösterir. Koruma açıkken **Kurallar** sekmesinin en altında görünür; korumayı düzenlerken de (yönetme izniniz varsa) görünür.
+
+- **Kaydedilmemiş değişiklik yokken** kayıtlı kuralları ve paylaşımları kullanır ("Kayıtlı kurallar ve paylaşımlarla şu anki duruma göre hesaplanır.").
+- **Kartta kaydedilmemiş değişiklik varken** bunları uyguladığınızda ne olacağını gösterir ("Değişikliklerinizi uyguladığınızda kimin nereye girebileceğini görün. Hiçbir şey kaydedilmez."). Komuta taslağınızı mevcut paylaşımlara göre denetler; uygulamak başarısız olacaksa sorunlar "Bu değişiklikleri uygulamak başarısız olur:" altında listelenir ve satırlar siz düzeltince görünür. **Ülkeler** ve **Hız sınırı** taslağa dahil değildir; önizleme bunların kayıtlı değerlerini kullanır.
 
 İki görünümü vardır:
 
-- **Bir sayfayı kim açar** — **Sayfa** alanına bir yol yazın (örneğin `/raporlar`). Liste; giriş yapmamış bir ziyaretçiyi ve her paylaşımı, girip giremeyeceğiyle birlikte gösterir.
-- **Bir kişi neyi açar** — **Kişi** listesinden bir üye ya da paylaşım seçin. Liste; sitenin kökünü, her yol kuralını ve kişinin paylaşımındaki sayfaları gösterir.
+- **Bir sayfayı kim açar** — **Sayfa** alanına bir yol yazın (örneğin `/raporlar`). Liste; giriş yapmamış bir ziyaretçiyi, her paylaşımı, her servis token'ını ve süresi dolmamış her paylaşım bağlantısını, girip giremeyeceğiyle birlikte gösterir.
+- **Bir kişi neyi açar** — **Kişi** listesinden bir üye, paylaşım, servis token'ı ya da paylaşım bağlantısı seçin. Liste; sitenin kökünü, her yol kuralını ve kapsamındaki sayfaları gösterir.
 
-Sitede ya da bir kuralda IP listesi varsa **Nereden geliyor** seçimi de çıkar: **İzinli ağların dışından** (varsayılan), **Tüm listelerdeki bir adresten** ya da **Belirli bir adresten**.
+Gerektiğinde iki seçim daha çıkar:
+
+- **Nereden geliyor** — sitede ya da bir kuralda IP listesi varsa: **İzinli ağların dışından** (varsayılan) ya da **Belirli bir adresten** (bir IPv4 ya da IPv6 adresi yazın, örneğin ofis adresinizi).
+- **Ülke** — serviste ülke listesi varsa: **Listedeki bir ülke** (varsayılan) ya da **Listede olmayan bir ülke**.
 
 Her satırda yeşil onay (girer) ya da kırmızı çarpı (giremez) ve nedeni yazar:
 
 | Neden | Anlamı |
 |---|---|
+| **Koruma kapalı, herkes girer** | Koruma henüz açık değil. |
 | **Herkese açık** | Bu yolda koruma yok. |
 | **Açık yoldan girer; imzayı uygulama doğrular** | Bir webhook yolu bu isteği giriş olmadan geçirir. Önizleme yalnızca `GET` isteklerini hesapladığı için bu satır yalnızca `GET` kabul eden açık yollarda görünür. |
 | **İzinli bir ağdan girer** | IP listesindeki bir adresten giriş yapmadan girer. |
 | **Giriş yapınca girer** | Komuta ile giriş yaparsa girer. |
 | **İzinli bir ağdan giriş yapınca girer** | Hem izinli adres hem giriş gerekir. |
+| **Servis token'ıyla girer** / **Paylaşım bağlantısıyla girer** | Token ya da bağlantı bu sayfayı açar. |
 | **{yol} kuralı engelliyor** | Bir **Tamamen engelle** kuralı. |
+| **{yol} üzerinde bu yönteme izin verilmiyor** | **Makineler** sekmesindeki bir yöntem kuralı burada `GET`'e izin vermiyor. |
+| "{yol} webhook imzasını kontrol eder ve yalnız listelediği yöntemleri kabul eder; bu istek uygulamaya ulaşmadan 401 ile reddedilir." | Sayfa, [imza kontrolü](access-protection-machines.md#kenarda-imza-kontrolü) olan bir webhook yolunun altında; imzalı yollar `GET` kabul etmez. |
+| **Ziyaretçinin ülkesi listede yok** | Ülke listesi reddediyor. |
 | **İzinli bir ağdan gelmesi gerekiyor ({yol})** | Bu yol için adres listede değil. |
 | **Giriş yapması gerekiyor ({yol})** | Giriş yapmamış biri. |
 | **Servis bu kişiyle paylaşılmamış ya da paylaşım askıda veya bitmiş** | Paylaşım yok, askıda ya da süresi dolmuş. |
 | **Kendisiyle paylaşılan sayfaların dışında** | Paylaşımı belirli sayfalarla sınırlı. |
+| **Servis token'ının kapsadığı yolların dışında** / **Paylaşım bağlantısının kapsadığı yolların dışında** | Sayfa, token'ın ya da bağlantının sayfalarının dışında. |
 | **{yol} için seçilen kişiler arasında değil** | Bir **Yalnızca seçilen kişiler** kuralı. |
-| **{yol} erişimi {tarih} tarihinde başlıyor** / **bitti** | Kişinin saat aralığı dışında. |
+| **{yol} için yalnızca seçilen kişiler girer; servis token'ı asla giremez** / **…; paylaşım bağlantısı asla giremez** | Token'lar ve bağlantılar **Yalnızca seçilen kişiler** yollarını hiçbir zaman açmaz. |
+| **Servis token'ı tanınmıyor ya da süresi dolmuş** / **Paylaşım bağlantısının süresi dolmuş, bağlantı geri çekilmiş ya da henüz yürürlükte değil** | Token ya da bağlantı artık çalışmıyor. |
+| **{yol} erişimi {tarih} tarihinde başlıyor** / **{tarih} tarihinde bitti** | Kişinin saat aralığı dışında. |
 
-Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-postasını doğrulayarak)" yazar. Önizleme kaydedilmemiş değişiklikleri hesaba katmaz; kaydedilen kurallar henüz yayılıyorsa bunu belirtir.
+Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-postasını doğrulayarak)" yazar. Kaydedilen kurallar henüz yayılıyorsa önizleme bunu belirtir. Önizleme, tarayıcıyla bir sayfanın açılmasını (`GET`) hesaplar; hız sınırını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
+
+Önizlemeyi görmek için **Servis erişim korumasını yönet** ya da **Korunan servisin paylaşımlarını yönet** izni gerekir.
 
 ---
 
@@ -180,5 +240,5 @@ Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-post
 
 - [Erişim Koruması](service-access-protection.md) — açma, kapatma ve durumlar.
 - [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) — paylaşımlar ve ziyaretçinin gördükleri.
-- [Makineler ve Özel Ağ](access-protection-machines.md) — webhook yolları ve servis token'ları.
+- [Makineler ve Özel Ağ](access-protection-machines.md) — webhook yolları, servis token'ları, yöntemler ve CORS.
 - [Başvuru](access-protection-reference.md) — sınırlar ve hata mesajları.

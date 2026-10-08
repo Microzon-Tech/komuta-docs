@@ -13,9 +13,12 @@ With access protection you can:
 - **Require Komuta sign-in.** Visitors sign in with a Komuta account; only the people, organizations and email addresses you share the service with get in.
 - **Limit by IP address.** The service opens only from networks you choose (for example your office). It can be combined with sign-in as "require both" or "either is enough".
 - **Protect path by path.** Keep the site open while `/admin` is open only to signed-in people, close `/internal` completely, or open `/reports` to chosen people at chosen times.
-- **Let machines in.** Open paths that don't ask for sign-in for webhook senders such as GitHub and Stripe; give CI and monitoring tools a service token.
+- **Send a share link.** Let someone without a Komuta account in for a while — a client demo or an outside tester — with a link that ends on its own.
+- **Let machines in.** Open paths that don't ask for sign-in for webhook senders such as GitHub and Stripe, and let Komuta check their signatures; give CI and monitoring tools a service token.
+- **Limit countries, methods and request rates.** Admit visitors only from chosen countries, allow only the HTTP methods each path needs (and browsers' CORS checks), and answer `429` to an address that sends too many requests.
+- **Control sessions.** Choose how long a sign-in lasts, see who is signed in, and sign one person or everyone out.
 - **Set an end date.** End protection on a date; when it ends, keep the service locked or open it to everyone.
-- **See who got in.** The access log shows sign-ins, the pages people opened and the visitors who were refused.
+- **See who got in.** The access log shows sign-ins, the pages people opened and the visitors who were refused; you can export it as CSV or JSON.
 - **Tell your application who it is.** The signed-in visitor's email and a signed proof of identity can be passed to your application as headers.
 
 ---
@@ -25,7 +28,7 @@ With access protection you can:
 Every request to a protected service passes a check at the Komuta gateway before it reaches your application:
 
 1. A visitor opens your service's address.
-2. Komuta checks the request against your rules: is the IP address on the list, does the visitor have a valid session for this service, is there a special rule for this path?
+2. Komuta checks the request against your rules: is the path blocked, is the method allowed, is the visitor's country and request rate within limits, is the IP address on the list, does the visitor have a valid session or share link for this service, is there a special rule for this path? (The exact order is in the [Setup Guide](access-protection-tutorial.md#how-a-request-is-decided).)
 3. If the rules are met, the request is passed to your application. If sign-in is needed, the visitor is sent to the Komuta sign-in page. If access is not allowed, the visitor sees an explanatory page and the request never reaches your application.
 
 The check can't be bypassed. When protection is turned on, Komuta also locks your service's pods: they accept only requests that come from the gateway, having passed the check. A request that tries to skip the gateway and reach a pod directly is refused. (Your own services on the same cluster, and the services you chose for the private mesh on the **Machines** tab, keep reaching your pods directly.)
@@ -54,6 +57,14 @@ Every member of your organization can sign in with their Komuta account and open
 
 The customer signs in with any Komuta account (created in seconds with Google or GitHub), then confirms the address with the 8-digit code sent to it.
 
+### Show it to someone without a Komuta account
+
+1. Turn protection on with **Require Komuta sign-in**.
+2. On the **People** tab, in **Share links**, choose **Create link**, give it a name and choose how long it **Works for**.
+3. Copy the link and send it only to the people it is meant for.
+
+Whoever holds the link gets in until it ends or you delete it, without signing in (see [Share links](access-protection-sign-in-sharing.md#share-links)).
+
 ### Only from the office network
 
 1. On the **Rules** tab, turn protection on and turn **Require Komuta sign-in** off.
@@ -74,7 +85,11 @@ Turn on **Require Komuta sign-in**, enter your office addresses in the **IP allo
 
 ### Let a GitHub webhook in too
 
-On a protected service, on the **Machines** tab, use **Webhooks → Open a path** to open `/webhooks/github` for `POST`, and verify GitHub's signature (`X-Hub-Signature-256`) in your application.
+On a protected service, on the **Machines** tab, use **Webhooks → Open a path** to open `/webhooks/github` for `POST`, choose **GitHub (X-Hub-Signature-256)** as the **Signature check at the edge**, then add the signing secret under the path and paste the same secret into GitHub. Komuta then refuses unsigned requests before they reach your application. (Without the check, verify GitHub's signature in your application.)
+
+### Protect every new service from the start
+
+In **Account → Organizations**, turn on **Protect new services**. Every new service with a public address then starts behind Komuta sign-in for your organization (see [Organization settings](#organization-settings)).
 
 ---
 
@@ -85,10 +100,10 @@ Access protection is managed in tabs on **Service Detail → Configuration → A
 | Tab | Contents | Guide |
 |---|---|---|
 | **Overview** | A summary of the service's current exposure, how traffic reaches the service, and recent access events. | This page |
-| **Rules** | The protection switch, status, **Who can get in** (Komuta sign-in, IP allow-list), **Path rules**, **Access preview**. | [Rules](access-protection-rules.md) |
-| **People** | Who the service is shared with. | [Sign-in and Sharing](access-protection-sign-in-sharing.md) |
-| **Machines** | Service tokens, webhook paths and services that may come in over the private mesh. | [Machines and Private Mesh](access-protection-machines.md) |
-| **Activity** | The access log. | [Access Log](access-protection-activity.md) |
+| **Rules** | The protection switch, status, **Who can get in** (Komuta sign-in, IP allow-list), **Path rules**, **Countries**, **Rate limit**, **Access preview**. | [Rules](access-protection-rules.md) |
+| **People** | Who the service is shared with, **Share links**, **Who is signed in** and how long a sign-in lasts. | [Sign-in and Sharing](access-protection-sign-in-sharing.md) |
+| **Machines** | Service tokens, webhook paths, **Methods and CORS** and services that may come in over the private mesh. | [Machines and Private Mesh](access-protection-machines.md) |
+| **Activity** | The access log and its export. | [Access Log](access-protection-activity.md) |
 | **Network** | Public addresses (public URL), ports and the private mesh. | [Machines and Private Mesh](access-protection-machines.md#services-that-may-come-in-over-the-private-mesh) |
 | **Settings** | Protection end date, telling your application who signed in, and **Open to everyone now**. | [End Date and Visitor Identity](access-protection-settings.md) |
 
@@ -117,7 +132,7 @@ You can also set protection up step by step from the **Service protection** card
 
 - **Turning it on the first time** usually takes a minute or two. Komuta refreshes the service's routing and applies the pod lock; this may show up as a deployment, but nothing is rebuilt.
 - The check takes effect shortly after protection reaches **Applying**, once the service's routing has been refreshed. During **Preparing** the service still runs as before (open to everyone).
-- **On a protected service**, changes to rules, the IP list and shares usually take effect within a few seconds to half a minute. Meanwhile the card says "Your latest change is being rolled out."
+- **On a protected service**, changes to rules, the IP list and shares usually take effect within a few seconds to half a minute. Meanwhile the card says "Your latest change is being rolled out." Countries, the rate limit, and methods and CORS take effect within about a minute; signing people out and deleting share links within about 30 seconds.
 - **Turning it off** also finishes within a few seconds to a couple of minutes; the check is removed in the last step of **Turning off**.
 
 ---
@@ -196,11 +211,36 @@ The check is removed in the last step of **Turning off**; after that, anyone wit
 | Kept (applies again when you turn protection back on) | You need to set again |
 |---|---|
 | Shares (including suspended ones) | The Komuta sign-in choice |
-| Service tokens | The IP allow-list |
+| Service tokens and share links (links that haven't ended yet work again) | The IP allow-list |
 | The list of services that may come in over the private mesh | Path rules and webhook paths |
-| Telling your application who signed in (comes back on by itself when you turn protection on again with Komuta sign-in; switched off if the new protection doesn't ask for sign-in) | The protection end date |
+| Countries, the rate limit, method rules and the CORS setting | The protection end date |
+| The session length (**Stay signed in for**) | |
+| Telling your application who signed in (comes back on by itself when you turn protection on again with Komuta sign-in; switched off if the new protection doesn't ask for sign-in) | |
 
-The access log is not kept, and can't be viewed, while protection is off; earlier records are kept for 30 days and show up on the **Activity** tab again if you turn protection back on.
+The access log is not kept, and can't be viewed, while protection is off; earlier records are kept for the organization's retention period (30 days by default) and show up on the **Activity** tab again if you turn protection back on.
+
+---
+
+## Organization settings
+
+Three settings in **Account → Organizations** apply to every service of the organization. Changing them needs permission to edit the organization.
+
+- **Allow external sharing** — whether services can be shared with linked organizations and email addresses (see [Sign-in and Sharing](access-protection-sign-in-sharing.md#allowing-external-sharing)).
+- **Protect new services** — off by default. While it is on, every new service with a public address starts with Komuta sign-in and a **Your organization** share; protection takes effect a few minutes after the service's first deploy. Protection can still be changed or removed per service later. Existing services are not changed. These aren't protected automatically: API gateways, job and cron job services, services without a public address, services on your own clusters, services whose private mesh is on (when the platform can't combine the private mesh with protection), and Stack services that declare their own `access` block.
+- **Keep access logs for** — 30 (default), 90 or 365 days (see [Access Log](access-protection-activity.md#retention)).
+
+If you can't see these settings, access protection isn't enabled on your platform yet, or you don't have permission to edit the organization.
+
+---
+
+## Security → Access protection
+
+The **Security → Access protection** page (**Who can reach your services**) lists every service of the organization that has a public address, in one table: whether anyone on the internet can open it, its protection state, a summary of its rules (Komuta sign-in, number of IP rules, number of path rules) and when protection ends. The tiles at the top count **Public services**, **Protection on**, **Open to anyone**, **Needs attention** and **Refused requests, 24 h**; **Show** filters the table and the search box finds services or projects.
+
+- Anyone who can view services can open the page.
+- People who can manage a service's protection or its shares (and can edit that service) also see, for that service, the access given (people and organizations, share links, service tokens), allowed and refused requests in the last 24 hours, and whether the last change failed. For other people these columns show "—".
+- The page doesn't change anything. Click a service to go to its **Access & ports** page and change its protection there.
+- At most 1,000 services are shown. If access protection isn't available for your organization, the page says so.
 
 ---
 
@@ -215,7 +255,7 @@ On the service overview (dashboard), the **Service protection** card shows the p
 5. **Duration** — the protection end date and what happens when it is reached (**Keep the protection rules** or **Open to everyone**).
 6. **Review changes** — current and new settings side by side; save with **Apply protection**.
 
-Nothing changes until you review and apply. If a step fails while saving, the successful steps are kept and the service is never opened to everyone on its own. Webhook paths, service tokens, the access log and visitor identity are only on the **Access & ports** page (the window links to it as **Advanced settings in Access & ports**).
+Nothing changes until you review and apply. If a step fails while saving, the successful steps are kept and the service is never opened to everyone on its own. Webhook paths, service tokens, share links, countries, the rate limit, methods and CORS, sessions, the access log and visitor identity are only on the **Access & ports** page (the window links to it as **Advanced settings in Access & ports**).
 
 The wizard doesn't let you set up protection while the service's private mesh is on; use the **Access & ports** page in that case.
 
@@ -229,7 +269,9 @@ The wizard doesn't let you set up protection while the service's private mesh is
 - **Blue-green deployment** — The preview address is protected too; visitors sign in to the preview address separately.
 - **Private mesh** — Private mesh traffic doesn't pass the gateway. On a protected service you choose on the **Machines** tab which services may come in directly from your other clusters (see [Machines and Private Mesh](access-protection-machines.md#services-that-may-come-in-over-the-private-mesh)).
 - **Your application** — Komuta's session cookies and the service token header are removed from the request; your application doesn't see them. Every allowed request carries the `x-komuta-access` header that Komuta adds for the pod lock. It is a secret value specific to your service: you don't need to use it, so don't log it or forward it anywhere.
-- **Not supported** — Browser CORS preflight requests (`OPTIONS`) from another site carry no session, so they can't pass paths that require sign-in; `OPTIONS` can't be chosen on webhook paths either. Visitors signing in with your own identity provider (SSO) is not supported at the moment; visitors need a Komuta account.
+- **CORS** — A browser's CORS check (`OPTIONS`) from another site carries no session. It passes a page that needs sign-in only if you turn on **Allow CORS checks without sign-in** on the **Machines** tab (see [Methods and CORS](access-protection-machines.md#methods-and-cors)); `OPTIONS` still can't be chosen on webhook paths.
+- **Stacks** — A service in a Stack can declare Komuta sign-in, the organization share and the IP allow-list in its manifest (see [Access Protection in a Stack Manifest](stack-manifest-access.md)).
+- **Not supported** — Visitors signing in with your own identity provider (SSO) is not supported at the moment; visitors need a Komuta account or a share link.
 
 ---
 
@@ -237,13 +279,13 @@ The wizard doesn't let you set up protection while the service's private mesh is
 
 - The service needs a public URL and at least one public address.
 - The service must run on Komuta's shared hosting clusters.
-- Wherever an IP list is used, requests must come through Cloudflare; Komuta addresses and custom domains added to Komuta work this way.
+- Wherever an IP list, a country list or a rate limit is used, requests must come through Cloudflare; Komuta addresses and custom domains added to Komuta work this way.
 - Access protection is on by default for organizations. If it has been turned off for your organization, no new protection or share can be added ("Access protection is turned off for this organization. Contact Komuta support to turn it on."); existing protections keep working.
 
 | Permission | What it allows |
 |---|---|
-| **Manage service access protection** | Turning protection on and off; Komuta sign-in, the IP allow-list, path rules, webhook paths, the private mesh list, the end date, visitor identity; **Open to everyone now**. |
-| **Manage who a protected service is shared with** | Managing shares and service tokens. |
+| **Manage service access protection** | Turning protection on and off; Komuta sign-in, the IP allow-list, path rules, countries, the rate limit, webhook paths, methods and CORS, the private mesh list, the session length, the end date, visitor identity; **Open to everyone now**. |
+| **Manage who a protected service is shared with** | Managing shares, share links and service tokens; signing visitors out. |
 
 Both also need edit access to the service. People without the permission see the settings read-only ("Read-only — you need permission to manage access protection to change these settings.").
 
@@ -258,5 +300,6 @@ Both also need edit access to the service. People without the permission see the
 - [Access Log](access-protection-activity.md) — the **Activity** tab.
 - [End Date and Visitor Identity](access-protection-settings.md) — protection end date, reminders, passing identity to your application, JWT verification.
 - [Reference](access-protection-reference.md) — limits, responses, headers, error messages, FAQ, glossary.
+- [Access Protection in a Stack Manifest](stack-manifest-access.md) — declaring sign-in and the IP allow-list in a Stack.
 
 Related: [Service Ports](services-ports.md) — the ports part of the **Access & ports** page.
