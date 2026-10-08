@@ -102,7 +102,7 @@ Bunlar yalnızca konsoldan (**Servis Detay → Yapılandırma → Erişim ve por
 - **Biri yeterli** birleşimi;
 - **Organizasyonunuz** dışındaki paylaşımlar (üyeler, bağlı organizasyonlar, e-posta adresleri), paylaşım bağlantıları ve servis token'ları;
 - oturum süresi, koruma bitiş tarihi ve giriş yapanı uygulamaya bildirme;
-- özel ağdan gelebilecek servisler.
+- özel ağdan doğrudan gelebilecek servisler.
 
 Stack'in **Dışa aktar** çıktısı `access`'i yalnızca uygulanan manifest tanımladıysa yazar; konsoldan kurulan koruma dışa aktarıma yazılmaz.
 
@@ -119,14 +119,16 @@ Stack'in **Dışa aktar** çıktısı `access`'i yalnızca uygulanan manifest ta
 
 ## Çalıştırma hataları
 
-Bir plan uygulanırken tanımlanan korumayı kuramayan ya da değiştiremeyen adım bu kodlardan biriyle durur. Mesaj, Komuta'nın döndürdüğü haliyle (İngilizce) gösterilir.
+Bir plan uygulanırken tanımlanan korumayı kuramayan ya da değiştiremeyen adım örneğin şu kodlardan biriyle durur. Mesaj, Komuta'nın döndürdüğü haliyle (İngilizce) gösterilir.
 
 | Kod | Mesaj |
 |---|---|
 | `ACCESS_PROTECTION_NOT_AVAILABLE` | Access protection is not available to this organization. (ya da: Access protection is not enabled on this platform.) — erişim koruması bu organizasyonda ya da platformda kullanılamıyor. |
-| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. — koruma, Komuta barındırmasında herkese açık adresi olan bir servis ister. |
+| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. (Güncellemede: Access protection needs a service with a public address.) — koruma, Komuta barındırmasında herkese açık adresi olan bir servis ister. |
 | `ACCESS_MESH_EXPOSED` | Access protection cannot be combined with private network exposure on this platform. — bu platformda koruma, özel ağa açma ile birlikte kullanılamaz. |
 | `ACCESS_UNSUPPORTED_CLUSTER` | Access protection is supported only on Komuta hosting clusters. — koruma yalnızca Komuta barındırma kümelerinde desteklenir. |
 | `ACCESS_RULES_NOT_AVAILABLE` | This service uses access rules that cannot be changed on this platform right now. — servis, bu platformda şu an değiştirilemeyen kurallar kullanıyor. |
 | `ACCESS_DECLARATION_INVALID` | The declared access protection needs sign-in or an allow-list, and sharing with the organization needs sign-in; provisioning was not started. — tanım giriş ya da izin listesi içermeli, organizasyonla paylaşım da giriş ister; servis oluşturulmadı. |
 | `ACCESS_PROTECTION_NOT_PREPARED` | The declared access protection could not be prepared; provisioning was not started. — tanımlanan koruma hazırlanamadı; servis oluşturulmadı. |
+| `ACCESS_DRIFT` | Access protection changed outside the approved baseline; inspect it in the console before replanning. — koruma onaylanan temelin dışında değişti; yeniden planlamadan önce konsolda inceleyin. (Ayrıca: koruma konsolda bildirimden farklı ayarlanmış, ya da Stack değişikliği uygulanırken kapatılmış veya değiştirilmiş.) |
+| `ACCESS_ALLOW_IP_INVALID` | The declared allowIps could not be normalized. — tanımlanan allowIps düzenlenemedi. |

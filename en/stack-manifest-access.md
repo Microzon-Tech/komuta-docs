@@ -119,14 +119,16 @@ These are set only in the console (**Service Detail → Configuration → Access
 
 ## Run errors
 
-When a plan is applied, a step that can't set up or change the declared protection stops with one of these codes. The message is shown as Komuta returns it.
+When a plan is applied, a step that can't set up or change the declared protection stops with a code such as these. The message is shown as Komuta returns it.
 
 | Code | Message |
 |---|---|
 | `ACCESS_PROTECTION_NOT_AVAILABLE` | Access protection is not available to this organization. (or: Access protection is not enabled on this platform.) |
-| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. |
+| `ACCESS_REQUIRES_PUBLIC_ADDRESS` | Access protection needs a public service on Komuta hosting. (On an update: Access protection needs a service with a public address.) |
 | `ACCESS_MESH_EXPOSED` | Access protection cannot be combined with private network exposure on this platform. |
 | `ACCESS_UNSUPPORTED_CLUSTER` | Access protection is supported only on Komuta hosting clusters. |
 | `ACCESS_RULES_NOT_AVAILABLE` | This service uses access rules that cannot be changed on this platform right now. |
 | `ACCESS_DECLARATION_INVALID` | The declared access protection needs sign-in or an allow-list, and sharing with the organization needs sign-in; provisioning was not started. |
 | `ACCESS_PROTECTION_NOT_PREPARED` | The declared access protection could not be prepared; provisioning was not started. |
+| `ACCESS_DRIFT` | Access protection changed outside the approved baseline; inspect it in the console before replanning. (Also: protection was configured in the console and differs from the declaration, or was turned off or changed while the Stack change was being enforced.) |
+| `ACCESS_ALLOW_IP_INVALID` | The declared allowIps could not be normalized. |

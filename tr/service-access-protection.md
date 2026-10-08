@@ -102,7 +102,7 @@ Erişim koruması **Servis Detay → Yapılandırma → Erişim ve portlar** say
 | **Genel bakış** | Servisin şu anki erişim durumunun özeti, trafiğin servise nasıl ulaştığı ve son erişim olayları. | Bu sayfa |
 | **Kurallar** | Korumayı açma anahtarı, durum, **Kimler girebilir** (Komuta girişi, IP izin listesi), **Yol kuralları**, **Ülkeler**, **Hız sınırı**, **Erişim önizlemesi**. | [Kurallar](access-protection-rules.md) |
 | **Kişiler** | Servisin kimlerle paylaşıldığı, **Paylaşım bağlantıları**, **Kimler içeride** ve bir girişin ne kadar sürdüğü. | [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) |
-| **Makineler** | Servis token'ları, webhook yolları, **Yöntemler ve CORS** ve özel ağdan gelebilecek servisler. | [Makineler ve Özel Ağ](access-protection-machines.md) |
+| **Makineler** | Servis token'ları, webhook yolları, **Yöntemler ve CORS** ve özel ağdan doğrudan gelebilecek servisler. | [Makineler ve Özel Ağ](access-protection-machines.md) |
 | **Etkinlik** | Erişim kaydı ve dışa aktarımı. | [Erişim Kaydı](access-protection-activity.md) |
 | **Ağ** | Genel adresler (genel URL), portlar ve özel ağ (mesh). | [Makineler ve Özel Ağ](access-protection-machines.md#özel-ağdan-doğrudan-gelebilecek-servisler) |
 | **Ayarlar** | Koruma bitişi, uygulamaya kimlik bildirme ve **Şimdi herkese aç**. | [Bitiş ve Kimlik Bildirme](access-protection-settings.md) |
