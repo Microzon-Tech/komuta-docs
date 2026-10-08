@@ -51,6 +51,7 @@ Dar ekranlarda yalnızca **Saat** ve **Kim** sütunları görünür; neden ve sa
 |---|---|
 | Ad ve e-posta | Organizasyonunuzdan, giriş yapmış bir kişi. E-posta yalnızca kullanıcıları görme izni olanlara gösterilir. |
 | **Başka bir organizasyondan biri** | Organizasyonunuzun dışından giriş yapmış biri (bağlı bir organizasyon ya da e-posta paylaşımıyla gelen biri). Adı ve e-postası gösterilmez. |
+| **E-posta koduyla giriş yapan biri** | Komuta hesabı olmadan, bir paylaşımın içeri aldığı e-posta adresini kanıtlamış biri. E-postası kullanıcıları görme ya da paylaşımları yönetme izni olanlara gösterilir. |
 | **Servis token'ı: {ad}** | Bu adlı servis token'ını kullanan bir program. |
 | **Silinmiş bir servis token'ı** | Sonradan silinmiş bir token. |
 | **Paylaşım bağlantısı: {ad}** | Bu adlı paylaşım bağlantısıyla giren bir ziyaretçi. |
@@ -145,9 +146,9 @@ CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama progra
 | `count` | Kaç kez yaşandığı (**Adet**). |
 | `outcome` | `SignIn`, `Allow` ya da `Deny`. |
 | `reason` | Teknik neden kodu (bkz. [Başvuru](access-protection-reference.md#erişim-kaydı-neden-kodları)). |
-| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); giriş yapmamış ziyaretçilerde boş. |
+| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ziyaretçisinde size gösteriliyorsa e-postası, değilse kimliği; giriş yapmamış ziyaretçilerde boş. |
 | `email` | Size gösteriliyorsa ziyaretçinin e-postası. |
-| `kind` | `user`, `external_user`, `service_token`, `share_link` ya da `anonymous`. |
+| `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` ya da `anonymous`. |
 | `method`, `path` | HTTP yöntemi ve yol (yol gizliyse `*`). |
 | `client_ip` | Adres; anonim retlerde `/24` / `/48` ağı. |
 

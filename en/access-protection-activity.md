@@ -51,6 +51,7 @@ On narrow screens only **Time** and **Who** are shown; the reason and page appea
 |---|---|
 | Name and email | A signed-in person from your organization. The email is shown only to people allowed to view users. |
 | **Someone from another organization** | A signed-in person from outside your organization (who came in through a linked organization or email share). Their name and email aren't shown. |
+| **Someone who signed in with an e-mail code** | Someone without a Komuta account who proved an email address that a share lets in. Their email is shown to people allowed to view users or to manage shares. |
 | **Service token: {name}** | A program using the service token with this name. |
 | **A deleted service token** | A token that was deleted later. |
 | **Share link: {name}** | A visitor who came in with the share link with this name. |
@@ -145,9 +146,9 @@ The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-Engli
 | `count` | How many times it happened (**Times**). |
 | `outcome` | `SignIn`, `Allow` or `Deny`. |
 | `reason` | The technical reason code (see [Reference](access-protection-reference.md#access-log-reason-codes)). |
-| `who` | The person's, token's or link's name (an id if it was deleted); empty for visitors who haven't signed in. |
+| `who` | The person's, token's or link's name (an id if it was deleted); for an email visitor, their email if shown to you, otherwise their id; empty for visitors who haven't signed in. |
 | `email` | The visitor's email, if shown to you. |
-| `kind` | `user`, `external_user`, `service_token`, `share_link` or `anonymous`. |
+| `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` or `anonymous`. |
 | `method`, `path` | The HTTP method and path (`*` when the path is hidden). |
 | `client_ip` | The address, or the `/24` / `/48` network for anonymous refusals. |
 

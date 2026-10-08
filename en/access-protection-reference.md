@@ -118,7 +118,7 @@ Every refusal carries `Cache-Control: no-store`. HTML pages appear in Turkish or
 |---|---|---|
 | `x-komuta-service-token` | Client → Komuta | The service token (`kst_<32 hex>_<43 characters>`). Komuta removes it after checking; it never reaches the application. |
 | `x-komuta-user-email` | Komuta → application | The signed-in visitor's email (while visitor identity is on). |
-| `x-komuta-user-id` | Komuta → application | The signed-in visitor's Komuta user id (while visitor identity is on). |
+| `x-komuta-user-id` | Komuta → application | The signed-in visitor's Komuta user id, or `eml:<32 hex>` for someone who signed in with an email code without an account (while visitor identity is on). |
 | `x-komuta-identity` | Komuta → application | The ES256-signed identity JWT (while visitor identity is on). |
 | `x-komuta-access` | Komuta → application | A secret value specific to the service, used for the pod lock. Don't use or log it. |
 | `Cache-Control: private, no-store` | Komuta → visitor | Written on every response of a protected service. |

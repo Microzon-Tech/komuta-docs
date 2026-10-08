@@ -1,6 +1,6 @@
 # Sign-in and Sharing
 
-While **Komuta sign-in** is on, anyone who wants to open your service first signs in with a Komuta account; only the people you shared the service with get in. You manage who it is shared with on the **People** tab of the **Access & ports** page.
+While **Komuta sign-in** is on, anyone who wants to open your service first signs in with a Komuta account, or, if the service is shared with their email address or domain, with a one-time code sent to that mailbox; only the people you shared the service with get in. You manage who it is shared with on the **People** tab of the **Access & ports** page.
 
 This page covers both sides: how the service owner manages shares, share links and visitor sessions, and what a visitor sees while signing in.
 
@@ -15,6 +15,8 @@ This page covers both sides: how the service owner manages shares, share links a
 5. If their account matches a share, they return to the page they wanted (`/reports` in the example). Otherwise they see the **You don't have access** page (see below).
 
 A visitor who is already signed in to Komuta skips step 3; the redirect completes within a few seconds.
+
+If the service has an **An email address** or **Everyone at a domain** share, the **Sign in to continue** page also shows, under **Sign in with Komuta**, an **or** divider and the **Shared with your email address or company domain?** section: the visitor can get in with a code sent to their mailbox, without a Komuta account (see [Without a Komuta account](#without-a-komuta-account)).
 
 ### Session
 
@@ -99,8 +101,8 @@ The **Shared with** list on the **People** tab shows the people and organization
 | **Your organization** | Every active member of this organization. A service can have one. Listed as **Everyone in your organization**. |
 | **A member** | One person in this organization. Only active members can be chosen. |
 | **A linked organization** | Everyone in another organization you belong to, including people who join later. Only organizations you are also a member of can be chosen. |
-| **An email address** | Someone outside your organizations. They sign in with any Komuta account, then confirm the address with a one-time code sent to it. |
-| **Everyone at a domain** | Anyone with an email address at a domain such as `@example.com`, optionally its subdomains too. They sign in with any Komuta account, then confirm their address at the domain with a one-time code. See [Domain shares](#domain-shares). |
+| **An email address** | Someone outside your organizations. They confirm the address with a one-time code sent to it, either after signing in with any Komuta account or without an account. |
+| **Everyone at a domain** | Anyone with an email address at a domain such as `@example.com`, optionally its subdomains too. They confirm their address at the domain with a one-time code, with or without a Komuta account. See [Domain shares](#domain-shares). |
 
 **A linked organization** and **An email address** shares are listed with an **External** badge and require your organization to allow external sharing (see below). An **Everyone at a domain** share counts as external too, unless the domain is one your organization has verified (see [Verified domains](#verified-domains)); then it has a **Verified domain** badge instead.
 
@@ -192,11 +194,12 @@ If the section says "Share links aren't available on this service yet.", share l
 
 ## Who is signed in
 
-The **Who is signed in** section of the **People** tab lists the people who signed in to this service with their Komuta account and whose session is still open, one row per person:
+The **Who is signed in** section of the **People** tab lists the people who signed in to this service, with their Komuta account or with an email code, and whose session is still open, one row per person:
 
 - The name (or the email). Someone whose name isn't known is shown as "A visitor from another organization"; people from outside your organization have an **Outside your organization** badge. If the person is signed in on several browsers or devices, "{count} sessions" is shown.
 - "Signed in … · last seen … · until …". **Last seen** comes from the access log ("not yet" if they haven't opened a recorded page since signing in).
 - Email addresses are shown only to people allowed to view users (for email-share sessions, also to people who can manage shares).
+- Someone who signed in with an email code without a Komuta account is shown by their email address, with the **Outside your organization** badge ("A visitor from another organization" to people who can't see emails). They can be signed out like anyone else.
 - At most **200** sessions are listed; when there are more, the section says "Showing the most recent sign-ins only."
 - Visitors who came in with a share link or a service token aren't listed.
 
@@ -233,7 +236,7 @@ If you don't see this section, managing visitor sessions isn't enabled on your p
 
 ## Email shares
 
-The person an email address is shared with doesn't need a Komuta account with that address; they sign in with any Komuta account and prove they can read the mailbox.
+The person an email address is shared with doesn't need a Komuta account with that address; they prove they can read the mailbox, either after signing in with any Komuta account (below) or without an account (see [Without a Komuta account](#without-a-komuta-account)).
 
 1. The person opens the service and signs in with any Komuta account (they can create one with Google or GitHub).
 2. If their account matches no other share, they see the **You don't have access** page. In its **Shared with your email address or company domain?** section, the address field is prefilled with the account's email; they change it if the shared address is different.
@@ -242,12 +245,35 @@ The person an email address is shared with doesn't need a Komuta account with th
 
 Rules:
 
-- The code works only for the Komuta account that asked for it and only once. A new code is needed for every sign-in; a session opened through an email share lasts the service's **Stay signed in for** length too.
+- The code works only once, and only for the Komuta account that asked for it (without an account: only in the browser that asked for it). A new code is needed for every sign-in; a session opened through an email share lasts the service's **Stay signed in for** length too.
 - A code stops working after 5 wrong attempts. After 50 wrong attempts in 24 hours for the same account, service and address, no new codes are sent.
 - Code request limits: a user can request at most 20 codes per hour, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address for the same Komuta account and service; switching browser or device doesn't reset this, and beyond it the screen still says a code was sent but no email goes out. Resending waits 30, 60 and 120 seconds.
 - The screen gives the same answer whether or not the address has access ("If {email} has access to this page, we've emailed it a {length}-digit code."), so nobody can guess which addresses a service is shared with.
-- If the sign-in link expires before the code would, the screen says "This sign-in link expires before a code would."; open the protected page again and request a code right away. Enter the code without waiting: sign-in must be completed within about 10 minutes of being sent from the protected page.
-- The email address must be a plain address: ASCII letters, at most 254 characters; wildcards, spaces, IP addresses and non-English letters aren't accepted.
+- Sign-in must be completed within about 9 minutes of being sent from the protected page, so enter the code without waiting; the code screen says how many minutes are left. With less than 2 minutes left no new code is sent and the screen says "This sign-in link is about to expire."; open the protected page again and request a code.
+- The email address must be a plain address of at most 254 characters; wildcards, spaces and IP addresses aren't accepted. The part before `@` must use ASCII letters; an internationalised domain after `@` is accepted and read in its `xn--` form (`ali@şirket.com.tr` is the same address as `ali@xn--irket-idb.com.tr`).
+
+
+### Without a Komuta account
+
+Someone an email address or domain is shared with can also get in without a Komuta account:
+
+1. They open the service. On the **Sign in to continue** page, under **Sign in with Komuta** and the **or** divider, is the **Shared with your email address or company domain?** section.
+2. They type their address and choose **Email me a code**. The email says the code was asked for by "Someone without a Komuta account, on the service's sign-in page" and that the code only works in the browser where it was requested.
+3. They enter the code on **Enter the code** and choose **Verify and continue**; the service opens.
+
+Things to know:
+
+- The section appears only while the service has an active **An email address** or **Everyone at a domain** share (not suspended, not expired). If your platform hasn't turned on sign-in without an account yet, it doesn't appear and visitors use their Komuta account as before.
+- Someone who has a Komuta account can use either way; through the code they are an email visitor, not their account.
+- The visitor isn't a Komuta user. Your organization sees them by their email address: in the access log as **Someone who signed in with an e-mail code**, in **Who is signed in** by the address. The same address is the same visitor on all your organization's services, and a different one in other organizations.
+- If visitor identity is on, your application receives the visitor's email and an id of the form `eml:<32 hex>` instead of a Komuta user id (see [Settings](access-protection-settings.md#headers-your-application-receives)).
+- Removing the share, or the share ending, closes their session like everyone else's.
+
+Limits without an account, counted per network (an IPv4 address, or an IPv6 `/64`) instead of per account:
+
+- At most 60 code requests per hour per network and service, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address from one network.
+- An address receives at most 10 codes per hour from visitors without an account on one service, and 30 across your organization; above that the screen still says a code was sent but no email goes out. These limits don't affect people signing in with Komuta.
+- A network that sends too many requests in a short time is refused for a moment; the screen asks to wait and try again.
 
 ---
 
@@ -258,7 +284,7 @@ An **Everyone at a domain** share lets in anyone who can read a mailbox at that 
 - Write the domain only, such as `example.com` (`@example.com` also works). Internationalised domains are accepted; they are stored and listed in their `xn--` form (for example `şirket.com.tr` becomes `xn--irket-idb.com.tr`), and visitors must type their address in that form on the access page.
 - **Also addresses at its subdomains** lets in `@team.example.com` and similar too. It can be chosen only for a domain your organization has verified, because anyone who controls a subdomain could otherwise get in.
 - Public mail services and shared domains where anyone can get an address (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `co.uk`, `onmicrosoft.com` and similar) can't be shared ("Anyone can get an e-mail address at '{Domain}', so a share for it would let anyone in."). Share with single email addresses instead.
-- Visitors sign in exactly like email shares: they sign in with any Komuta account and confirm their address at the domain with an **8-digit** code in the **Shared with your email address or company domain?** section. A Komuta account's own email address never opens a domain share by itself.
+- Visitors sign in exactly like email shares: they confirm their address at the domain with an **8-digit** code in the **Shared with your email address or company domain?** section, after signing in with any Komuta account or without an account. A Komuta account's own email address never opens a domain share by itself.
 - Someone who leaves the company can't receive new codes once their mailbox is closed; a session that is already open lasts until it ends (**Stay signed in for**).
 
 Extra limits protect the domain's mailboxes:
@@ -266,6 +292,7 @@ Extra limits protect the domain's mailboxes:
 - One Komuta account can request codes for at most **3 different addresses** of the same domain share in 24 hours.
 - After **200 wrong codes in 24 hours** on a domain share, no new codes are sent for it until the period ends.
 - These two limits don't affect someone who also has their own **An email address** share; they keep getting codes through that share (within its own limits).
+- Without a Komuta account the requester is the visitor's network, so an office behind one address isn't held to 3: up to **20 different addresses** of a domain share get codes from one network in 24 hours. Wrong codes entered without an account are counted apart: 200 of them pause codes only for visitors without an account, never for people signing in with Komuta.
 - Like email shares, the screen gives the same answer whether or not an address has access.
 
 ## Verified domains

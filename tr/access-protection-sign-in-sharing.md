@@ -1,6 +1,6 @@
 # Giriş ve Paylaşım
 
-**Komuta girişi** açıkken servisinizi açmak isteyen herkes önce Komuta hesabıyla giriş yapar; yalnızca servisi paylaştığınız kişiler içeri girer. Kimlerle paylaştığınızı **Erişim ve portlar** sayfasının **Kişiler** sekmesinden yönetirsiniz.
+**Komuta girişi** açıkken servisinizi açmak isteyen herkes önce Komuta hesabıyla ya da, servis e-posta adresiyle veya alan adıyla paylaşıldıysa, o posta kutusuna gönderilen tek kullanımlık kodla giriş yapar; yalnızca servisi paylaştığınız kişiler içeri girer. Kimlerle paylaştığınızı **Erişim ve portlar** sayfasının **Kişiler** sekmesinden yönetirsiniz.
 
 Bu sayfa iki tarafı anlatır: servis sahibinin paylaşımları, paylaşım bağlantılarını ve ziyaretçi oturumlarını nasıl yönettiği ve ziyaretçinin giriş sırasında ne gördüğü.
 
@@ -15,6 +15,8 @@ Bu sayfa iki tarafı anlatır: servis sahibinin paylaşımları, paylaşım bağ
 5. Hesabı bir paylaşımla eşleşiyorsa açmak istediği sayfaya geri döner (örnekte `/raporlar`). Eşleşmiyorsa **Erişiminiz yok** sayfasını görür (aşağıya bakın).
 
 Komuta'ya zaten giriş yapmış bir ziyaretçi 3. adımı görmez; yönlendirme birkaç saniye içinde tamamlanır.
+
+Servisin **Bir e-posta adresi** ya da **Bir alan adındaki herkes** paylaşımı varsa **Devam etmek için giriş yapın** sayfasında **Komuta ile giriş yap** düğmesinin altında **ya da** ayracı ve **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümü de görünür: ziyaretçi Komuta hesabı olmadan, posta kutusuna gelen kodla girebilir (bkz. [Komuta hesabı olmadan](#komuta-hesabı-olmadan)).
 
 ### Oturum
 
@@ -99,8 +101,8 @@ Bu sayfa ziyaretçiye neden giremediğini ve ne yapabileceğini gösterir:
 | **Organizasyonunuz** | Bu organizasyonun tüm aktif üyeleri. Serviste bir tane olabilir. Listede **Organizasyonunuzdaki herkes** olarak görünür. |
 | **Bir üye** | Organizasyondaki tek bir kişi. Yalnızca aktif üyeler seçilebilir. |
 | **Bağlı bir organizasyon** | Üyesi olduğunuz başka bir organizasyondaki herkes; sonradan katılanlar dahil. Yalnızca sizin de üyesi olduğunuz organizasyonlar seçilebilir. |
-| **Bir e-posta adresi** | Organizasyonlarınızın dışındaki biri. Herhangi bir Komuta hesabıyla giriş yapar, ardından bu adrese gönderilen tek kullanımlık kodla adresi doğrular. |
-| **Bir alan adındaki herkes** | `@example.com` gibi bir alan adında (istenirse alt alan adlarında da) e-posta adresi olan herkes. Herhangi bir Komuta hesabıyla giriş yapar, ardından o alan adındaki adresini tek kullanımlık kodla doğrular. Bkz. [Alan adı paylaşımı](#alan-adı-paylaşımı). |
+| **Bir e-posta adresi** | Organizasyonlarınızın dışındaki biri. Adresi, bu adrese gönderilen tek kullanımlık kodla doğrular; herhangi bir Komuta hesabıyla giriş yaptıktan sonra ya da hesapsız. |
+| **Bir alan adındaki herkes** | `@example.com` gibi bir alan adında (istenirse alt alan adlarında da) e-posta adresi olan herkes. O alan adındaki adresini tek kullanımlık kodla doğrular; Komuta hesabıyla ya da hesapsız. Bkz. [Alan adı paylaşımı](#alan-adı-paylaşımı). |
 
 **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları listede **Dış** etiketiyle görünür ve organizasyonunuzun dış paylaşıma izin vermesini gerektirir (aşağıya bakın). **Bir alan adındaki herkes** paylaşımı da dış paylaşım sayılır; alan adı organizasyonunuzun doğruladığı bir alan adıysa sayılmaz (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)) ve bunun yerine **Doğrulanmış alan adı** etiketi taşır.
 
@@ -192,11 +194,12 @@ Bölümde "Paylaşım bağlantıları bu serviste henüz kullanılamıyor." yaz�
 
 ## Kimler içeride
 
-**Kişiler** sekmesindeki **Kimler içeride** bölümü, bu servise Komuta hesabıyla giriş yapmış ve oturumu hâlâ açık olan kişileri, her kişi için bir satırda listeler:
+**Kişiler** sekmesindeki **Kimler içeride** bölümü, bu servise Komuta hesabıyla ya da e-posta koduyla giriş yapmış ve oturumu hâlâ açık olan kişileri, her kişi için bir satırda listeler:
 
 - Ad (ya da e-posta). Adı bilinmeyen biri "Başka bir kuruluştan bir ziyaretçi" olarak görünür; organizasyonunuzun dışından gelenlerde **Kuruluşunuz dışından** etiketi bulunur. Kişi birden fazla tarayıcıda ya da cihazda giriş yaptıysa "{count} oturum" yazar.
 - "Giriş … · son görülme … · bitiş …". **Son görülme** erişim kaydından gelir (girişten sonra kaydedilen bir sayfa açmadıysa "henüz yok").
 - E-posta adresleri yalnızca kullanıcıları görme izni olanlara gösterilir (e-posta paylaşımıyla açılan oturumlarda paylaşımları yönetebilenlere de).
+- Komuta hesabı olmadan e-posta koduyla giren biri e-posta adresiyle ve **Kuruluşunuz dışından** etiketiyle görünür (e-postaları göremeyenlere "Başka bir kuruluştan bir ziyaretçi"). Diğerleri gibi çıkarılabilir.
 - En fazla **200** oturum listelenir; daha fazlası varsa bölüm "Yalnızca en son girişler gösteriliyor." der.
 - Paylaşım bağlantısıyla ya da servis token'ıyla girenler listelenmez.
 
@@ -233,7 +236,7 @@ Bu bölümü görmüyorsanız ziyaretçi oturumlarını yönetme platformunuzda 
 
 ## E-posta paylaşımı
 
-E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması gerekmez; herhangi bir Komuta hesabıyla giriş yapıp posta kutusunu okuyabildiğini kanıtlar.
+E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması gerekmez; posta kutusunu okuyabildiğini herhangi bir Komuta hesabıyla giriş yaptıktan sonra (aşağıda) ya da hesapsız (bkz. [Komuta hesabı olmadan](#komuta-hesabı-olmadan)) kanıtlar.
 
 1. Kişi servisi açar ve herhangi bir Komuta hesabıyla giriş yapar (hesabı yoksa Google ya da GitHub ile açabilir).
 2. Hesabı başka bir paylaşımla eşleşmiyorsa **Erişiminiz yok** sayfasını görür. Sayfadaki **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde adres alanı hesabın e-postasıyla dolu gelir; paylaşılan adres farklıysa değiştirilir.
@@ -242,12 +245,35 @@ E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması ge
 
 Kurallar:
 
-- Kod yalnızca isteyen Komuta hesabında çalışır ve tek kullanımlıktır. Her girişte yeni kod gerekir; e-posta paylaşımıyla açılan oturum da servisin **Oturum süresi** kadar sürer.
+- Kod tek kullanımlıktır ve yalnızca isteyen Komuta hesabında (hesapsız istendiyse yalnızca istendiği tarayıcıda) çalışır. Her girişte yeni kod gerekir; e-posta paylaşımıyla açılan oturum da servisin **Oturum süresi** kadar sürer.
 - Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez.
 - Kod isteme sınırları: bir kullanıcı saatte en fazla 20 kod, aynı adres için saatte en fazla 5 kod isteyebilir. Aynı Komuta hesabıyla, aynı servis için bir adrese saatte en fazla 3 kod gönderilir; tarayıcı ya da cihaz değiştirmek bunu sıfırlamaz ve sınırdan sonra ekran yine "kod gönderdik" dese de e-posta gitmez. Yeniden göndermeden önce 30, 60 ve 120 saniye beklenir.
 - Ekran, adresin erişimi olsa da olmasa da aynı cevabı verir ("{adres} adresinin bu sayfaya erişimi varsa, adrese {uzunluk} haneli bir kod gönderdik."); böylece hangi adreslerle paylaşım yapıldığı tahmin edilemez.
-- Giriş bağlantısının süresi kodun süresinden önce doluyorsa ekran "Bu giriş bağlantısının süresi, kodun süresinden önce doluyor." der; korunan sayfayı yeniden açıp hemen kod istemek gerekir. Kodu istedikten sonra beklemeden girin: giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 10 dakika içinde tamamlanmalıdır.
-- E-posta adresi düz bir adres olmalıdır: ASCII harfler, en fazla 254 karakter; joker karakter, boşluk, IP adresi ve İngilizce dışı harf kabul edilmez.
+- Giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 9 dakika içinde tamamlanmalıdır; kodu beklemeden girin, kod ekranı kaç dakika kaldığını yazar. 2 dakikadan az kaldıysa yeni kod gönderilmez ve ekran "Bu giriş bağlantısının süresi dolmak üzere." der; korunan sayfayı yeniden açıp kod isteyin.
+- E-posta adresi en fazla 254 karakterlik düz bir adres olmalıdır; joker karakter, boşluk ve IP adresi kabul edilmez. `@` işaretinden önceki kısım ASCII harflerle yazılmalıdır; `@` sonrasındaki Türkçe karakterli alan adı kabul edilir ve `xn--` biçiminde okunur (`ali@şirket.com.tr` ile `ali@xn--irket-idb.com.tr` aynı adrestir).
+
+
+### Komuta hesabı olmadan
+
+E-posta adresiyle ya da alan adıyla paylaşılan biri Komuta hesabı olmadan da girebilir:
+
+1. Servisi açar. **Devam etmek için giriş yapın** sayfasında **Komuta ile giriş yap** düğmesinin ve **ya da** ayracının altında **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümü vardır.
+2. Adresini yazıp **Bana kod gönder** der. E-postada kodu "Komuta hesabı olmayan biri, servisin giriş sayfasından" istediği ve kodun yalnız istendiği tarayıcıda çalıştığı yazar.
+3. **Kodu girin** ekranında kodu girip **Doğrula ve devam et** der; servis açılır.
+
+Bilinmesi gerekenler:
+
+- Bölüm yalnızca serviste etkin (askıda olmayan, süresi dolmamış) bir **Bir e-posta adresi** ya da **Bir alan adındaki herkes** paylaşımı varken görünür. Platformunuzda hesapsız giriş henüz açılmadıysa görünmez; ziyaretçiler eskisi gibi Komuta hesabıyla girer.
+- Komuta hesabı olan biri iki yolu da kullanabilir; kodla girdiğinde hesabıyla değil, e-posta ziyaretçisi olarak görünür.
+- Ziyaretçi bir Komuta kullanıcısı değildir. Organizasyonunuz onu e-posta adresiyle görür: erişim kaydında **E-posta koduyla giriş yapan biri**, **Kimler içeride** bölümünde adresiyle. Aynı adres organizasyonunuzun tüm servislerinde aynı ziyaretçidir, başka organizasyonlarda farklıdır.
+- Kimlik bildirme açıksa uygulamanız Komuta kullanıcı kimliği yerine ziyaretçinin e-postasını ve `eml:<32 onaltılık>` biçiminde bir kimlik alır (bkz. [Ayarlar](access-protection-settings.md#uygulamanızın-aldığı-başlıklar)).
+- Paylaşım kaldırılınca ya da süresi dolunca oturumu da herkesinki gibi kapanır.
+
+Hesapsız girişte sınırlar hesap başına değil ağ başına (bir IPv4 adresi ya da bir IPv6 `/64`) sayılır:
+
+- Ağ ve servis başına saatte en fazla 60, aynı adres için saatte en fazla 5 kod isteği. Bir ağdan bir adrese saatte en fazla 3 kod gönderilir.
+- Bir adrese bir serviste hesapsız ziyaretçilerden saatte en fazla 10, organizasyonunuzun tamamında 30 kod gider; sonrasında ekran yine "kod gönderdik" der ama e-posta gitmez. Bu sınırlar Komuta ile giriş yapanları etkilemez.
+- Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir; ekran biraz bekleyip tekrar denemeyi söyler.
 
 ---
 
@@ -258,7 +284,7 @@ Kurallar:
 - Yalnız alan adını yazın: `example.com` (`@example.com` da olur). Uluslararası (Türkçe karakterli) alan adları kabul edilir; `xn--` biçiminde saklanır ve listelenir (ör. `şirket.com.tr` → `xn--irket-idb.com.tr`). Ziyaretçiler erişim sayfasında adreslerini bu biçimde yazmalıdır.
 - **Alt alan adlarındaki adresler de** seçeneği `@ekip.example.com` gibi adresleri de içeri alır. Yalnız organizasyonunuzun doğruladığı bir alan adında seçilebilir; aksi halde bir alt alan adını kontrol eden herkes içeri girebilirdi.
 - Herkesin adres alabildiği genel e-posta servisleri ve ortak alan adları (`gmail.com`, `outlook.com`, `yahoo.co.uk`, `com.tr`, `co.uk`, `onmicrosoft.com` ve benzerleri) paylaşılamaz ("'{Domain}' adresinde herkes e-posta adresi alabilir; bu alan adıyla paylaşım herkesi içeri alır."). Bunun yerine tek tek e-posta adresleriyle paylaşın.
-- Ziyaretçiler e-posta paylaşımındaki gibi giriş yapar: herhangi bir Komuta hesabıyla giriş yapıp **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde o alan adındaki adreslerini **8 haneli** kodla doğrularlar. Bir Komuta hesabının kendi e-posta adresi tek başına alan adı paylaşımını açmaz.
+- Ziyaretçiler e-posta paylaşımındaki gibi giriş yapar: herhangi bir Komuta hesabıyla giriş yaptıktan sonra ya da hesapsız, **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünde o alan adındaki adreslerini **8 haneli** kodla doğrularlar. Bir Komuta hesabının kendi e-posta adresi tek başına alan adı paylaşımını açmaz.
 - Şirketten ayrılan biri posta kutusu kapanınca yeni kod alamaz; açık olan oturumu süresi (**Oturum süresi**) bitene kadar sürer.
 
 Alan adındaki posta kutularını korumak için ek sınırlar:
@@ -266,6 +292,7 @@ Alan adındaki posta kutularını korumak için ek sınırlar:
 - Bir Komuta hesabı aynı alan adı paylaşımı için 24 saatte en fazla **3 farklı adrese** kod isteyebilir.
 - Bir alan adı paylaşımında 24 saatte **200 yanlış kod** girilirse, süre dolana kadar o paylaşım için yeni kod gönderilmez.
 - Bu iki sınır, kendi **Bir e-posta adresi** paylaşımı da olan kişiyi etkilemez; o kişi kodlarını o paylaşım üzerinden (o paylaşımın sınırları içinde) almaya devam eder.
+- Komuta hesabı olmadan isteyen, ziyaretçinin ağıdır; bu yüzden tek adres arkasındaki bir ofis 3 ile sınırlanmaz: bir ağdan bir alan adı paylaşımının 24 saatte **20 farklı adresine** kod gider. Hesapsız girilen yanlış kodlar ayrı sayılır: 200 yanlış kod yalnızca hesapsız ziyaretçilerin kodlarını durdurur, Komuta ile giriş yapanları asla.
 - E-posta paylaşımında olduğu gibi ekran, adresin erişimi olsa da olmasa da aynı cevabı verir.
 
 ## Doğrulanmış alan adları

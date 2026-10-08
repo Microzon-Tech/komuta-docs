@@ -118,7 +118,7 @@ Tüm ret yanıtları `Cache-Control: no-store` taşır. HTML sayfalar ziyaretçi
 |---|---|---|
 | `x-komuta-service-token` | İstemci → Komuta | Servis token'ı (`kst_<32 onaltılık>_<43 karakter>`). Komuta kontrol ettikten sonra siler; uygulamaya ulaşmaz. |
 | `x-komuta-user-email` | Komuta → uygulama | Giriş yapan ziyaretçinin e-postası (kimlik bildirme açıkken). |
-| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği (kimlik bildirme açıkken). |
+| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği; hesapsız e-posta koduyla giren biri için `eml:<32 onaltılık>` (kimlik bildirme açıkken). |
 | `x-komuta-identity` | Komuta → uygulama | ES256 imzalı kimlik JWT'si (kimlik bildirme açıkken). |
 | `x-komuta-access` | Komuta → uygulama | Pod kilidi için servise özel gizli değer. Kullanmayın, loglamayın. |
 | `Cache-Control: private, no-store` | Komuta → ziyaretçi | Korunan servisin tüm yanıtlarına yazılır. |
