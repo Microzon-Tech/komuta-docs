@@ -41,10 +41,11 @@ Erişim koruması rehberleri:
 | Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; ziyaretçi oturumları platformunuzda yönetilmiyorsa 12 saat |
 | **Kimler içeride** listesi | En fazla 200 oturum |
 | Tek tek çıkarma | Serviste oturum takibi başladıktan 12 saat 10 dakika sonra başlar; bir oturumun ömrü içinde 500'den fazla oturum tek tek kapatılırsa herkesi çıkarmaya döner |
-| Giriş bağlantısı | Yaklaşık 10 dakika (girişin bu sürede tamamlanması gerekir) |
+| Giriş bağlantısı | Yaklaşık 9 dakika (girişin bu sürede tamamlanması gerekir); 2 dakikadan az kaldıysa yeni e-posta kodu gönderilmez |
 | Giriş denemesi | Kullanıcı başına dakikada 30 |
 | E-posta doğrulama kodu | 8 hane, 10 dakika geçerli, 5 hatalı denemede geçersiz |
 | E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
+| Komuta hesabı olmadan e-posta kodu | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına sayılır: saatte 60 istek, adres başına saatte 5 istek, adres başına saatte 3 gönderim, adres başına 24 saatte 50 yanlış kod; bir adrese bir serviste saatte en fazla 10, organizasyonda 30 böyle kod gider; alan adı paylaşımı bir ağdan 24 saatte en fazla 20 farklı adrese kod gönderir; yanlış kodları, alan adı paylaşımı başına, yalnız hesapsız kodları durduran ayrı bir 24 saatte 200 sınırına sayılır |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
 | Erişim kaydı | Organizasyon başına 30 (varsayılan), 90 ya da 365 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
 | Erişim kaydının dışa aktarımı | CSV ya da JSON; saklama süresi içinde; en fazla 50.000 satır; organizasyon başına aynı anda tek dışa aktarım |
@@ -118,7 +119,7 @@ Tüm ret yanıtları `Cache-Control: no-store` taşır. HTML sayfalar ziyaretçi
 |---|---|---|
 | `x-komuta-service-token` | İstemci → Komuta | Servis token'ı (`kst_<32 onaltılık>_<43 karakter>`). Komuta kontrol ettikten sonra siler; uygulamaya ulaşmaz. |
 | `x-komuta-user-email` | Komuta → uygulama | Giriş yapan ziyaretçinin e-postası (kimlik bildirme açıkken). |
-| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği (kimlik bildirme açıkken). |
+| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği; hesapsız e-posta koduyla giren biri için `eml:<32 onaltılık>` (kimlik bildirme açıkken). |
 | `x-komuta-identity` | Komuta → uygulama | ES256 imzalı kimlik JWT'si (kimlik bildirme açıkken). |
 | `x-komuta-access` | Komuta → uygulama | Pod kilidi için servise özel gizli değer. Kullanmayın, loglamayın. |
 | `Cache-Control: private, no-store` | Komuta → ziyaretçi | Korunan servisin tüm yanıtlarına yazılır. |
@@ -330,6 +331,7 @@ Manifestin `access` bloğunun doğrulama kodları [Stack Manifestinde Erişim Ko
 | `DevOpsZon:AccessProtection:SignInNotRequired` | Bu servis şu anda Komuta ile giriş istemiyor. Açamıyorsanız yalnızca belirli ağlardan erişilebiliyor olabilir; servis sahibiyle iletişime geçin. |
 | `DevOpsZon:AccessProtection:EmailChallengeInvalid` | Doğrulama kodu hatalı ya da süresi dolmuş. Yeni bir kod isteyip tekrar deneyin. |
 | `DevOpsZon:AccessProtection:EmailChallengeRateLimited` | Çok fazla doğrulama kodu istendi. Bir saat bekleyip tekrar deneyin. |
+| `DevOpsZon:AccessProtection:EmailVisitorsNotAvailable` | Bu serviste Komuta hesabı olmadan e-posta koduyla giriş kullanılamıyor. |
 | `DevOpsZon:AccessProtection:CodeInvalid` | Giriş kodu geçersiz ya da süresi dolmuş. |
 | `DevOpsZon:AccessProtection:CodeAlreadyUsed` | Giriş kodu zaten kullanılmış. |
 | `DevOpsZon:AccessProtection:CodeRevoked` | Servisin erişim ayarları değiştiği için giriş kodu artık geçerli değil. |
@@ -341,10 +343,10 @@ Manifestin `access` bloğunun doğrulama kodları [Stack Manifestinde Erişim Ko
 ## Sık sorulan sorular
 
 **Ziyaretçilerin Komuta hesabı açması gerekiyor mu?**
-Komuta girişi kullanıyorsanız, onlara bir [paylaşım bağlantısı](access-protection-sign-in-sharing.md#paylaşım-bağlantıları) göndermediğiniz sürece evet. Hesap açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. Hesap açtırmak istemiyorsanız paylaşım bağlantısı ya da IP izin listesi kullanın. Kendi kimlik sağlayıcınızla (SSO) giriş şu an desteklenmez.
+Komuta girişi kullanıyorsanız, onlara bir [paylaşım bağlantısı](access-protection-sign-in-sharing.md#paylaşım-bağlantıları) göndermediğiniz ya da servisi e-posta adresleriyle veya alan adlarıyla paylaşmadığınız sürece evet; paylaştıysanız [e-posta koduyla girebilirler](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan). Hesap açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. Hesap açtırmak istemiyorsanız paylaşım bağlantısı ya da IP izin listesi kullanın. Kendi kimlik sağlayıcınızla (SSO) giriş şu an desteklenmez.
 
 **Komuta hesabı olmayan birini içeri alabilir miyim?**
-Evet, bir paylaşım bağlantısıyla (**Kişiler → Paylaşım bağlantıları → Bağlantı oluştur**). Bağlantıyı elinde tutan herkes giriş yapmadan, yalnızca bağlantının sayfalarına, bağlantının süresi dolana (konsolda en fazla 90 gün) ya da siz silene kadar girer. Sohbet uygulamalarındaki ve e-postadaki bağlantı önizlemelerinin de açılış sayıldığını ve bağlantının iletildiği herkesin de girebileceğini unutmayın.
+Evet: servisi e-posta adresiyle ya da şirketinin alan adıyla paylaşın; posta kutusuna gelen tek kullanımlık kodla girer ([Komuta hesabı olmadan](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan)). Ya da bir paylaşım bağlantısıyla (**Kişiler → Paylaşım bağlantıları → Bağlantı oluştur**). Bağlantıyı elinde tutan herkes giriş yapmadan, yalnızca bağlantının sayfalarına, bağlantının süresi dolana (konsolda en fazla 90 gün) ya da siz silene kadar girer. Sohbet uygulamalarındaki ve e-postadaki bağlantı önizlemelerinin de açılış sayıldığını ve bağlantının iletildiği herkesin de girebileceğini unutmayın.
 
 **Neden bir API isteğim 302 yerine 401 alıyor?**
 Giriş gerektiren bir yola oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayfasına yönlendirilir (`302`); diğer yöntemler, bir programın yönlendirmeyi takip edip bir HTML sayfasını cevap sanmaması için `401` alır. Programlar için [servis token'ı](access-protection-machines.md#servis-tokenları) ya da IP listesi kullanın.
@@ -394,7 +396,7 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Erişim koruması** | Servisin genel adresine kimin ulaşabileceğini Komuta'nın ağ geçidinde denetleyen özellik. |
 | **Ağ geçidi (gateway)** | Servisinize internetten gelen trafiğin geçtiği Komuta katmanı; kontrol burada yapılır. |
 | **Pod kilidi** | Korunan servisin pod'larının yalnızca ağ geçidinden, kontrolü geçmiş istekleri kabul etmesi. Kontrolün atlanmasını önler. |
-| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla giriş yapması. |
+| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla da) giriş yapması. |
 | **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine ya da bir alan adındaki herkese servise giriş izni. |
 | **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
 | **Doğrulanmış alan adı** | Organizasyonun bir DNS TXT kaydıyla sahibi olduğunu kanıtladığı alan adı; altındaki paylaşımlar organizasyonun kendi paylaşımı sayılır. |

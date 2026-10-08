@@ -172,7 +172,7 @@ Goal: a customer outside the organization sees only the `/reports` pages, and on
 
 **Why**
 
-- An **email share** doesn't require the customer to join your organization. The customer signs in with any Komuta account and proves they can read the mailbox with a one-time code at every sign-in.
+- An **email share** doesn't require the customer to join your organization. The customer proves they can read the mailbox with a one-time code at every sign-in, with any Komuta account or without one.
 - **Only these pages** is the principle of least privilege: the customer opens `/reports` and the pages under it, not the rest of the application.
 - **Access ends** removes the risk of forgetting to take the access away.
 

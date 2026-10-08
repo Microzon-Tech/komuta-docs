@@ -51,6 +51,7 @@ Dar ekranlarda yalnızca **Saat** ve **Kim** sütunları görünür; neden ve sa
 |---|---|
 | Ad ve e-posta | Organizasyonunuzdan, giriş yapmış bir kişi. E-posta yalnızca kullanıcıları görme izni olanlara gösterilir. |
 | **Başka bir organizasyondan biri** | Organizasyonunuzun dışından giriş yapmış biri (bağlı bir organizasyon ya da e-posta paylaşımıyla gelen biri). Adı ve e-postası gösterilmez. |
+| **E-posta koduyla giriş yapan biri** | Komuta hesabı olmadan, bir paylaşımın içeri aldığı e-posta adresini kanıtlamış biri. E-postası kullanıcıları görme ya da paylaşımları yönetme izni olanlara gösterilir. |
 | **Servis token'ı: {ad}** | Bu adlı servis token'ını kullanan bir program. |
 | **Silinmiş bir servis token'ı** | Sonradan silinmiş bir token. |
 | **Paylaşım bağlantısı: {ad}** | Bu adlı paylaşım bağlantısıyla giren bir ziyaretçi. |
@@ -135,7 +136,7 @@ Listenin üstündeki **Dışa aktar** kaydı indirir: **CSV olarak indir (tablo)
 - En fazla **50.000** satır. Aralıkta daha fazlası varsa dışa aktarım reddedilir: "Bu aralıkta 50000 kayıttan fazlası var. Daha kısa bir aralık ya da tek bir kayıt türü seçin."
 - Organizasyon başına aynı anda tek dışa aktarım. Organizasyonunuzun başka bir dışa aktarımı sürüyorsa: "Kuruluşunuzun erişim kaydının başka bir dışa aktarımı hâlâ sürüyor. Birazdan yeniden deneyin."
 - Her dışa aktarım organizasyonunuzun denetim kaydına yazılır. Yazılamazsa dışa aktarım yapılmaz: "Dışa aktarım denetim kaydına yazılamadığı için yapılmadı. Birazdan yeniden deneyin."
-- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir.
+- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir (e-posta ziyaretçisinin adresi, paylaşımları yönetebiliyorsanız da).
 
 CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama programları Türkçe karakterleri doğru okur) ve şu sütunları içerir:
 
@@ -145,9 +146,9 @@ CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama progra
 | `count` | Kaç kez yaşandığı (**Adet**). |
 | `outcome` | `SignIn`, `Allow` ya da `Deny`. |
 | `reason` | Teknik neden kodu (bkz. [Başvuru](access-protection-reference.md#erişim-kaydı-neden-kodları)). |
-| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); giriş yapmamış ziyaretçilerde boş. |
+| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ziyaretçisinde size gösteriliyorsa e-postası, değilse kimliği (tireli GUID); giriş yapmamış ziyaretçilerde boş. |
 | `email` | Size gösteriliyorsa ziyaretçinin e-postası. |
-| `kind` | `user`, `external_user`, `service_token`, `share_link` ya da `anonymous`. |
+| `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` ya da `anonymous`. |
 | `method`, `path` | HTTP yöntemi ve yol (yol gizliyse `*`). |
 | `client_ip` | Adres; anonim retlerde `/24` / `/48` ağı. |
 

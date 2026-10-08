@@ -10,7 +10,7 @@ Access protection is included in every plan.
 
 With access protection you can:
 
-- **Require Komuta sign-in.** Visitors sign in with a Komuta account; only the people, organizations, email addresses and company domains you share the service with get in.
+- **Require Komuta sign-in.** Visitors sign in with a Komuta account (or, for email and domain shares, with a one-time email code); only the people, organizations, email addresses and company domains you share the service with get in.
 - **Limit by IP address.** The service opens only from networks you choose (for example your office). It can be combined with sign-in as "require both" or "either is enough".
 - **Protect path by path.** Keep the site open while `/admin` is open only to signed-in people, close `/internal` completely, or open `/reports` to chosen people at chosen times.
 - **Send a share link.** Let someone without a Komuta account in for a while — a client demo or an outside tester — with a link that ends on its own.
@@ -55,7 +55,7 @@ Every member of your organization can sign in with their Komuta account and open
 2. Turn protection on as above.
 3. On the **People** tab, choose **Add share → An email address** and type the customer's address. Setting an **Access ends** date is a good idea.
 
-The customer signs in with any Komuta account (created in seconds with Google or GitHub), then confirms the address with the 8-digit code sent to it.
+The customer confirms the address with the 8-digit code sent to it, after signing in with any Komuta account (created in seconds with Google or GitHub) or without an account.
 
 ### Show it to someone without a Komuta account
 
@@ -272,7 +272,7 @@ The wizard doesn't let you set up protection while the service's private mesh is
 - **Your application** — Komuta's session cookies and the service token header are removed from the request; your application doesn't see them. Every allowed request carries the `x-komuta-access` header that Komuta adds for the pod lock. It is a secret value specific to your service: you don't need to use it, so don't log it or forward it anywhere.
 - **CORS** — A browser's CORS check (`OPTIONS`) from another site carries no session. It passes a page that needs sign-in only if you turn on **Allow CORS checks without sign-in** on the **Machines** tab (see [Methods and CORS](access-protection-machines.md#methods-and-cors)); `OPTIONS` still can't be chosen on webhook paths.
 - **Stacks** — A service in a Stack can declare Komuta sign-in, the organization share and the IP allow-list in its manifest (see [Access Protection in a Stack Manifest](stack-manifest-access.md)).
-- **Not supported** — Visitors signing in with your own identity provider (SSO) is not supported at the moment; visitors need a Komuta account or a share link.
+- **Not supported** — Visitors signing in with your own identity provider (SSO) is not supported at the moment; visitors need a Komuta account, an email code (for email and domain shares) or a share link.
 
 ---
 

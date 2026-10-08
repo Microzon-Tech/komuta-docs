@@ -84,20 +84,21 @@ Anahtarı açın; ayar hemen kaydedilir ("Giriş yapan ziyaretçi artık uygulam
 | Başlık | İçerik |
 |---|---|
 | `x-komuta-user-email` | Ziyaretçinin doğrulanmış e-posta adresi. |
-| `x-komuta-user-id` | Ziyaretçinin Komuta kullanıcı kimliği (GUID). |
+| `x-komuta-user-id` | Ziyaretçinin Komuta kullanıcı kimliği (GUID); Komuta hesabı olmadan e-posta koduyla giren biri için `eml:` ve 32 küçük harfli onaltılık karakter. |
 | `x-komuta-identity` | Ziyaretçiyi tanıtan, Komuta tarafından imzalanmış bir kanıt (JWT). |
 
 Bilmeniz gerekenler:
 
 - **Başlıklar yalnızca girişin gerektiği isteklerde dolu gelir.** Sitenin herkese açık kısımlarında, IP listesiyle girişsiz geçilen yerlerde ve webhook yollarında, ziyaretçi giriş yapmış olsa bile başlıklar boş gelir.
 - **Servis token'ıyla gelen isteklerde** yalnızca `x-komuta-identity` dolu gelir; içinde `kind` değeri `service_token`, `sub` değeri token'ın kimliğidir: token değerindeki `kst_` sonrasındaki 32 onaltılık karakterin tireli GUID biçimi. Diğer iki başlık boştur.
+- **Komuta hesabı olmadan e-posta koduyla giren birinin isteklerinde** üç başlık da dolu gelir: `x-komuta-user-email` kanıtlanan adres, `x-komuta-user-id` ve JWT'deki `sub` `eml:<32 onaltılık>`, `kind` ise `email`. Bu kimlik organizasyona özeldir: aynı adres organizasyonunuzun tüm servislerinde aynı, başka yerlerde farklı kimliği alır. Yani `x-komuta-user-id` her zaman GUID değildir; uygulamanız onu GUID olarak çözümlüyorsa önce `kind` değerine bakın.
 - **Paylaşım bağlantısıyla giren ziyaretçinin isteklerinde** yalnızca `x-komuta-identity` dolu gelir; `kind` değeri `share_link`, `sub` değeri bağlantının kimliğidir (tireli GUID) ve `email` alanı yoktur. Diğer iki başlık boştur.
 - **Ayarı açmadan önce giriş yapmış ziyaretçiler** yeniden giriş yapana kadar (en fazla servisin oturum süresi kadar, bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#oturum-süresi)) e-postasız bildirilir: `x-komuta-user-email` boş gelir ve JWT'de `email` alanı olmaz.
 - Bölüm "Hazırlanıyor" ya da "rotaları henüz güncellenmedi" demiyorsa, ziyaretçinin kendi gönderdiği aynı adlı başlıklar Komuta'dan geçerken silinir ve doğru değerle (ya da boş) yeniden yazılır; internetten gelen biri bu başlıkları taklit edemez. Hazırlık sürerken düz başlıklara güvenmeyin; imzalı `x-komuta-identity` her zaman doğrulanabilir.
 
 ### Hangi başlığa güvenmeli
 
-Aynı kümedeki servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir. `kind` değerine de bakın: `share_link` ziyaretçisi tanınan bir kişi değil, bağlantıyı elinde tutan herhangi biridir.
+Aynı kümedeki servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için bu başlıkları kendileri de gönderebilir. Bu sizin için önemliyse düz başlıklara değil, yalnızca **imzalı `x-komuta-identity` başlığına** güvenin ve her istekte doğrulayın. Düz başlıklar kolaylık içindir. `kind` değerine de bakın: `share_link` ziyaretçisi tanınan bir kişi değil, bağlantıyı elinde tutan herhangi biridir; `email` ziyaretçisi de bir Komuta hesabı değil, bir e-posta adresini kanıtlamış biridir.
 
 ### Kimlik kanıtı (JWT)
 
@@ -109,9 +110,9 @@ Başlık (header): `{"alg": "ES256", "typ": "JWT", "kid": "<anahtar kimliği>"}`
 |---|---|
 | `iss` | Her zaman `komuta-access`. |
 | `aud` | Ziyaretçinin açtığı adres (host), örneğin `panel.example.com`. Servisin her adresi (özel alan adı, `*.komuta.app` adresi, mavi-yeşil önizleme adresi) ayrı bir `aud` değeridir. |
-| `sub` | Komuta kullanıcı kimliği; servis token'ında token'ın kimliği; paylaşım bağlantısında bağlantının kimliği. |
-| `kind` | `user`, `service_token` ya da `share_link`. |
-| `email` | Ziyaretçinin e-postası. Yalnızca `user` türünde ve e-posta bilindiğinde bulunur. |
+| `sub` | Komuta kullanıcı kimliği; servis token'ında token'ın kimliği; paylaşım bağlantısında bağlantının kimliği; hesapsız e-posta ziyaretçisinde `eml:<32 onaltılık>`. |
+| `kind` | `user`, `email`, `service_token` ya da `share_link`. |
+| `email` | Ziyaretçinin e-postası. Yalnızca `user` ve `email` türünde ve e-posta bilindiğinde bulunur. |
 | `sid` | Servisin kimliği. Konsolda servis adresindeki `/services/<kimlik>` bölümüdür. |
 | `tid` | Organizasyonun (kiracının) kimliği. |
 | `iat` | İmzalanma zamanı (Unix saniyesi). |
