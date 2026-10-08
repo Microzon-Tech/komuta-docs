@@ -4,6 +4,26 @@ Komuta Security Center brings security findings, service protection, access acti
 
 You can move from a risk summary to the underlying finding, compare it with service traffic and protection state, review policy suggestions and track the records behind a decision. The same workspace connects these investigations with audit history, build and image evidence, controlled security scenarios and notification workflows.
 
+## Runtime Security: understand and protect running services
+
+Runtime Security helps you investigate what your application does while it is running and manage supported protection controls. Komuta connects available evidence about process execution, file access and network connections with findings, rules and service posture. You can move from suspicious behavior to the affected service, then from investigation to a targeted response.
+
+| Capability | What it helps you do |
+|---|---|
+| **Behavior observations and findings** | Review recorded program execution, file writes and network attempts; assess severity, recurrence and the event timeline together. |
+| **Traffic visibility** | Inspect connection flows, network incidents and denied connections against the service's expected communication. |
+| **Behavior rules and suggestions** | Define Audit or Block rules for supported process and file behavior; evaluate suggestions against their evidence and follow application status. |
+| **Baseline protection and live posture** | Compare expected security settings with the running service; narrowly manage allowed privileges and writable areas around application needs. |
+| **Service isolation and recovery** | Restrict connections for an eligible service through an authorized response; assess the impact in the preview and follow the reconnection outcome. |
+| **Controlled verification** | Use supported security scenarios to inspect whether the expected finding appears and how long detection takes. |
+
+**Security Center** provides the organization-wide risk and findings view of these capabilities. For a particular service's traffic, protection settings and detailed evidence, open **Services → the relevant service → Security**. Available controls depend on the service environment and your permissions; assess effective protection using application status and relevant outcome evidence.
+
+Detailed usage guides are under **Services → Service Security**:
+
+- [Runtime Security](runtime-security-guide.md): protection layers, runtime modes, rule actions, applicability and verification steps.
+- [Service Security](service-security-guide.md): step-by-step investigation and authorized response across the Overview, Traffic, Protection and Findings tabs.
+
 > **Start with the right context:** confirm the organization, service, time window and freshness of the evidence. A saved protection setting describes intent; application status and observed outcomes tell you what happened.
 
 ## Choose your starting point
