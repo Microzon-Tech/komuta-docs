@@ -250,7 +250,7 @@ Rules:
 - Code request limits: a user can request at most 20 codes per hour, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address for the same Komuta account and service; switching browser or device doesn't reset this, and beyond it the screen still says a code was sent but no email goes out. Resending waits 30, 60 and 120 seconds.
 - The screen gives the same answer whether or not the address has access ("If {email} has access to this page, we've emailed it a {length}-digit code."), so nobody can guess which addresses a service is shared with.
 - Sign-in must be completed within about 9 minutes of being sent from the protected page, so enter the code without waiting; the code screen says how many minutes are left. With less than 2 minutes left no new code is sent and the screen says "This sign-in link is about to expire."; open the protected page again and request a code.
-- The email address must be a plain address of at most 254 characters; wildcards, spaces and IP addresses aren't accepted. The part before `@` must use ASCII letters; an internationalised domain after `@` is accepted and read in its `xn--` form (`ali@şirket.com.tr` is the same address as `ali@xn--irket-idb.com.tr`).
+- The email address must be a plain address: ASCII letters, at most 254 characters; wildcards, spaces and IP addresses aren't accepted. An address at an internationalised domain is typed in its `xn--` form (`ali@xn--irket-idb.com.tr` for `şirket.com.tr`).
 
 
 ### Without a Komuta account
@@ -265,7 +265,7 @@ Things to know:
 
 - The section appears only while the service has an active **An email address** or **Everyone at a domain** share (not suspended, not expired). If your platform hasn't turned on sign-in without an account yet, it doesn't appear and visitors use their Komuta account as before.
 - Someone who has a Komuta account can use either way; through the code they are an email visitor, not their account.
-- The visitor isn't a Komuta user. Your organization sees them by their email address: in the access log as **Someone who signed in with an e-mail code**, in **Who is signed in** by the address. The same address is the same visitor on all your organization's services, and a different one in other organizations.
+- The visitor isn't a Komuta user. Your organization sees them by their email address: in the access log and in **Who is signed in** by the address (people who can't see emails see **Someone who signed in with an e-mail code** in the log). The same address is the same visitor on all your organization's services, and a different one in other organizations.
 - If visitor identity is on, your application receives the visitor's email and an id of the form `eml:<32 hex>` instead of a Komuta user id (see [Settings](access-protection-settings.md#headers-your-application-receives)).
 - Removing the share, or the share ending, closes their session like everyone else's.
 
@@ -273,7 +273,8 @@ Limits without an account, counted per network (an IPv4 address, or an IPv6 `/64
 
 - At most 60 code requests per hour per network and service, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address from one network.
 - An address receives at most 10 codes per hour from visitors without an account on one service, and 30 across your organization; above that the screen still says a code was sent but no email goes out. These limits don't affect people signing in with Komuta.
-- A network that sends too many requests in a short time is refused for a moment; the screen asks to wait and try again.
+- A network that sends too many requests in a short time is refused for a moment (a code request then shows "Too many codes were requested. Wait an hour and try again.", even though a few minutes are usually enough).
+- After 50 wrong codes in 24 hours for the same network, service and address, no new codes are sent.
 
 ---
 

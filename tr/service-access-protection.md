@@ -55,7 +55,7 @@ Organizasyonunuzun tüm üyeleri Komuta hesaplarıyla giriş yapıp servisi aça
 2. Korumayı yukarıdaki gibi açın.
 3. **Kişiler** sekmesinde **Paylaşım ekle → Bir e-posta adresi** seçin ve müşterinin adresini yazın. Bir **Erişim bitişi** vermek iyi olur.
 
-Müşteri herhangi bir Komuta hesabıyla (Google ya da GitHub ile saniyeler içinde açılabilir) giriş yapar, ardından adresine gelen 8 haneli kodla adresini doğrular.
+Müşteri adresine gelen 8 haneli kodla adresini doğrular; herhangi bir Komuta hesabıyla (Google ya da GitHub ile saniyeler içinde açılabilir) giriş yaptıktan sonra ya da hesapsız.
 
 ### Komuta hesabı olmayan birine göstereyim
 
@@ -272,7 +272,7 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - **Uygulamanız** — Komuta'nın oturum çerezleri ve servis token'ı başlığı istekten çıkarılır; uygulamanız bunları görmez. Her izinli istekte Komuta'nın pod kilidi için eklediği `x-komuta-access` başlığı bulunur. Bu, servisinize özel gizli bir değerdir: kullanmanız gerekmez, loglamayın ve başka bir yere iletmeyin.
 - **CORS** — Tarayıcının başka bir siteden gönderdiği CORS kontrolü (`OPTIONS`) oturum taşımaz. Giriş isteyen bir sayfadan ancak **Makineler** sekmesinde **CORS kontrollerine girişsiz izin ver** açıksa geçer (bkz. [Yöntemler ve CORS](access-protection-machines.md#yöntemler-ve-cors)); webhook yollarında `OPTIONS` yine seçilemez.
 - **Stack'ler** — Stack'teki bir servis, Komuta girişini, organizasyon paylaşımını ve IP izin listesini manifestinde tanımlayabilir (bkz. [Stack Manifestinde Erişim Koruması](stack-manifest-access.md)).
-- **Desteklenmeyenler** — Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı ya da paylaşım bağlantısı olmalıdır.
+- **Desteklenmeyenler** — Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı, e-posta kodu (e-posta ve alan adı paylaşımlarında) ya da paylaşım bağlantısı olmalıdır.
 
 ---
 

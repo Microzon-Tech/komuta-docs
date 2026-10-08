@@ -146,7 +146,7 @@ The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-Engli
 | `count` | How many times it happened (**Times**). |
 | `outcome` | `SignIn`, `Allow` or `Deny`. |
 | `reason` | The technical reason code (see [Reference](access-protection-reference.md#access-log-reason-codes)). |
-| `who` | The person's, token's or link's name (an id if it was deleted); for an email visitor, their email if shown to you, otherwise their id; empty for visitors who haven't signed in. |
+| `who` | The person's, token's or link's name (an id if it was deleted); for an email visitor, their email if shown to you, otherwise their id (a dashed GUID); empty for visitors who haven't signed in. |
 | `email` | The visitor's email, if shown to you. |
 | `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` or `anonymous`. |
 | `method`, `path` | The HTTP method and path (`*` when the path is hidden). |

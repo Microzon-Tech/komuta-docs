@@ -146,7 +146,7 @@ CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama progra
 | `count` | Kaç kez yaşandığı (**Adet**). |
 | `outcome` | `SignIn`, `Allow` ya da `Deny`. |
 | `reason` | Teknik neden kodu (bkz. [Başvuru](access-protection-reference.md#erişim-kaydı-neden-kodları)). |
-| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ziyaretçisinde size gösteriliyorsa e-postası, değilse kimliği; giriş yapmamış ziyaretçilerde boş. |
+| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ziyaretçisinde size gösteriliyorsa e-postası, değilse kimliği (tireli GUID); giriş yapmamış ziyaretçilerde boş. |
 | `email` | Size gösteriliyorsa ziyaretçinin e-postası. |
 | `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` ya da `anonymous`. |
 | `method`, `path` | HTTP yöntemi ve yol (yol gizliyse `*`). |

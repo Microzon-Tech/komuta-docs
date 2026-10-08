@@ -172,7 +172,7 @@ Hedef: organizasyon dışındaki bir müşteri, yalnızca `/raporlar` sayfaları
 
 **Neden**
 
-- **E-posta paylaşımı**, müşterinin sizin organizasyonunuza katılmasını gerektirmez. Müşteri herhangi bir Komuta hesabıyla giriş yapar ve posta kutusunu okuyabildiğini her girişte tek kullanımlık bir kodla kanıtlar.
+- **E-posta paylaşımı**, müşterinin sizin organizasyonunuza katılmasını gerektirmez. Müşteri posta kutusunu okuyabildiğini her girişte tek kullanımlık bir kodla kanıtlar; herhangi bir Komuta hesabıyla ya da hesapsız.
 - **Yalnızca şu sayfalar**, en az yetki ilkesidir: müşteri `/raporlar` ve altındaki sayfaları açar, uygulamanın geri kalanını açamaz.
 - **Erişim bitişi**, erişimi kaldırmayı unutma riskini ortadan kaldırır.
 

@@ -250,7 +250,7 @@ Kurallar:
 - Kod isteme sınırları: bir kullanıcı saatte en fazla 20 kod, aynı adres için saatte en fazla 5 kod isteyebilir. Aynı Komuta hesabıyla, aynı servis için bir adrese saatte en fazla 3 kod gönderilir; tarayıcı ya da cihaz değiştirmek bunu sıfırlamaz ve sınırdan sonra ekran yine "kod gönderdik" dese de e-posta gitmez. Yeniden göndermeden önce 30, 60 ve 120 saniye beklenir.
 - Ekran, adresin erişimi olsa da olmasa da aynı cevabı verir ("{adres} adresinin bu sayfaya erişimi varsa, adrese {uzunluk} haneli bir kod gönderdik."); böylece hangi adreslerle paylaşım yapıldığı tahmin edilemez.
 - Giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 9 dakika içinde tamamlanmalıdır; kodu beklemeden girin, kod ekranı kaç dakika kaldığını yazar. 2 dakikadan az kaldıysa yeni kod gönderilmez ve ekran "Bu giriş bağlantısının süresi dolmak üzere." der; korunan sayfayı yeniden açıp kod isteyin.
-- E-posta adresi en fazla 254 karakterlik düz bir adres olmalıdır; joker karakter, boşluk ve IP adresi kabul edilmez. `@` işaretinden önceki kısım ASCII harflerle yazılmalıdır; `@` sonrasındaki Türkçe karakterli alan adı kabul edilir ve `xn--` biçiminde okunur (`ali@şirket.com.tr` ile `ali@xn--irket-idb.com.tr` aynı adrestir).
+- E-posta adresi düz bir adres olmalıdır: ASCII harfler, en fazla 254 karakter; joker karakter, boşluk ve IP adresi kabul edilmez. Türkçe karakterli bir alan adındaki adres `xn--` biçiminde yazılır (`şirket.com.tr` için `ali@xn--irket-idb.com.tr`).
 
 
 ### Komuta hesabı olmadan
@@ -265,7 +265,7 @@ Bilinmesi gerekenler:
 
 - Bölüm yalnızca serviste etkin (askıda olmayan, süresi dolmamış) bir **Bir e-posta adresi** ya da **Bir alan adındaki herkes** paylaşımı varken görünür. Platformunuzda hesapsız giriş henüz açılmadıysa görünmez; ziyaretçiler eskisi gibi Komuta hesabıyla girer.
 - Komuta hesabı olan biri iki yolu da kullanabilir; kodla girdiğinde hesabıyla değil, e-posta ziyaretçisi olarak görünür.
-- Ziyaretçi bir Komuta kullanıcısı değildir. Organizasyonunuz onu e-posta adresiyle görür: erişim kaydında **E-posta koduyla giriş yapan biri**, **Kimler içeride** bölümünde adresiyle. Aynı adres organizasyonunuzun tüm servislerinde aynı ziyaretçidir, başka organizasyonlarda farklıdır.
+- Ziyaretçi bir Komuta kullanıcısı değildir. Organizasyonunuz onu e-posta adresiyle görür: erişim kaydında ve **Kimler içeride** bölümünde adresiyle (e-postaları göremeyenler kayıtta **E-posta koduyla giriş yapan biri** görür). Aynı adres organizasyonunuzun tüm servislerinde aynı ziyaretçidir, başka organizasyonlarda farklıdır.
 - Kimlik bildirme açıksa uygulamanız Komuta kullanıcı kimliği yerine ziyaretçinin e-postasını ve `eml:<32 onaltılık>` biçiminde bir kimlik alır (bkz. [Ayarlar](access-protection-settings.md#uygulamanızın-aldığı-başlıklar)).
 - Paylaşım kaldırılınca ya da süresi dolunca oturumu da herkesinki gibi kapanır.
 
@@ -273,7 +273,8 @@ Hesapsız girişte sınırlar hesap başına değil ağ başına (bir IPv4 adres
 
 - Ağ ve servis başına saatte en fazla 60, aynı adres için saatte en fazla 5 kod isteği. Bir ağdan bir adrese saatte en fazla 3 kod gönderilir.
 - Bir adrese bir serviste hesapsız ziyaretçilerden saatte en fazla 10, organizasyonunuzun tamamında 30 kod gider; sonrasında ekran yine "kod gönderdik" der ama e-posta gitmez. Bu sınırlar Komuta ile giriş yapanları etkilemez.
-- Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir; ekran biraz bekleyip tekrar denemeyi söyler.
+- Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir (kod isteğinde ekran "Çok fazla kod istendi. Bir saat bekleyip tekrar deneyin." der; genellikle birkaç dakika yeterlidir).
+- Aynı ağ, servis ve adres için 24 saatte 50 hatalı koddan sonra yeni kod gönderilmez.
 
 ---
 
