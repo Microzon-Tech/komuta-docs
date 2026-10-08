@@ -10,7 +10,7 @@ Access protection is included in every plan.
 
 With access protection you can:
 
-- **Require Komuta sign-in.** Visitors sign in with a Komuta account; only the people, organizations, email addresses and company domains you share the service with get in.
+- **Require Komuta sign-in.** Visitors sign in with a Komuta account (or, for email and domain shares, with a one-time email code); only the people, organizations, email addresses and company domains you share the service with get in.
 - **Limit by IP address.** The service opens only from networks you choose (for example your office). It can be combined with sign-in as "require both" or "either is enough".
 - **Protect path by path.** Keep the site open while `/admin` is open only to signed-in people, close `/internal` completely, or open `/reports` to chosen people at chosen times.
 - **Send a share link.** Let someone without a Komuta account in for a while — a client demo or an outside tester — with a link that ends on its own.

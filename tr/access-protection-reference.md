@@ -45,7 +45,7 @@ Erişim koruması rehberleri:
 | Giriş denemesi | Kullanıcı başına dakikada 30 |
 | E-posta doğrulama kodu | 8 hane, 10 dakika geçerli, 5 hatalı denemede geçersiz |
 | E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
-| Komuta hesabı olmadan e-posta kodu | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına sayılır: saatte 60 istek, adres başına saatte 5 istek, adres başına saatte 3 gönderim, adres başına 24 saatte 50 yanlış kod; bir adrese bir serviste saatte en fazla 10, organizasyonda 30 böyle kod gider; alan adı paylaşımı bir ağdan 24 saatte en fazla 20 farklı adrese kod gönderir; yanlış kodları, yalnız hesapsız kodları durduran ayrı bir 24 saatte 200 sınırına sayılır |
+| Komuta hesabı olmadan e-posta kodu | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına sayılır: saatte 60 istek, adres başına saatte 5 istek, adres başına saatte 3 gönderim, adres başına 24 saatte 50 yanlış kod; bir adrese bir serviste saatte en fazla 10, organizasyonda 30 böyle kod gider; alan adı paylaşımı bir ağdan 24 saatte en fazla 20 farklı adrese kod gönderir; yanlış kodları, alan adı paylaşımı başına, yalnız hesapsız kodları durduran ayrı bir 24 saatte 200 sınırına sayılır |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
 | Erişim kaydı | Organizasyon başına 30 (varsayılan), 90 ya da 365 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
 | Erişim kaydının dışa aktarımı | CSV ya da JSON; saklama süresi içinde; en fazla 50.000 satır; organizasyon başına aynı anda tek dışa aktarım |
@@ -396,7 +396,7 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Erişim koruması** | Servisin genel adresine kimin ulaşabileceğini Komuta'nın ağ geçidinde denetleyen özellik. |
 | **Ağ geçidi (gateway)** | Servisinize internetten gelen trafiğin geçtiği Komuta katmanı; kontrol burada yapılır. |
 | **Pod kilidi** | Korunan servisin pod'larının yalnızca ağ geçidinden, kontrolü geçmiş istekleri kabul etmesi. Kontrolün atlanmasını önler. |
-| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla giriş yapması. |
+| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla da) giriş yapması. |
 | **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine ya da bir alan adındaki herkese servise giriş izni. |
 | **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
 | **Doğrulanmış alan adı** | Organizasyonun bir DNS TXT kaydıyla sahibi olduğunu kanıtladığı alan adı; altındaki paylaşımlar organizasyonun kendi paylaşımı sayılır. |

@@ -25,7 +25,7 @@ Başarılı bir girişten sonra ziyaretçinin tarayıcısına servisin kendi adr
 - Oturum, servisin **Oturum süresi** ayarı kadar sürer: 15 dakika, 1 saat, 4 saat, **12 saat** (varsayılan), 1 gün ya da 7 gün (bkz. [Kimler içeride](#kimler-içeride)). Ziyaretçinin paylaşımının bitiş zamanını ve korumanın "herkese açılsın" bitişini hiçbir zaman geçmez.
 - Oturum **yalnızca giriş yapılan adres için** geçerlidir. Servisin birden fazla adresi varsa (örneğin `*.komuta.app` adresi ve özel alan adınız ya da mavi-yeşil dağıtımın önizleme adresi) her biri için ayrı giriş gerekir.
 - Komuta'nın çerezleri isteğe uygulamanıza ulaşmadan önce çıkarılır; uygulamanız bu çerezleri görmez ve etkilenmez.
-- Girişin yaklaşık 10 dakika içinde tamamlanması gerekir. Ziyaretçi daha uzun beklerse konsol **Bu giriş bağlantısı geçersiz** der ya da servis kısa bir `sign-in link is invalid or expired` yanıtı verir; korunan sayfayı yeniden açması yeterlidir.
+- Girişin yaklaşık 9 dakika içinde tamamlanması gerekir. Ziyaretçi daha uzun beklerse konsol **Bu giriş bağlantısı geçersiz** der ya da servis kısa bir `sign-in link is invalid or expired` yanıtı verir; korunan sayfayı yeniden açması yeterlidir.
 
 ### Oturumların erken bittiği durumlar
 
@@ -273,7 +273,7 @@ Hesapsız girişte sınırlar hesap başına değil ağ başına (bir IPv4 adres
 
 - Ağ ve servis başına saatte en fazla 60, aynı adres için saatte en fazla 5 kod isteği. Bir ağdan bir adrese saatte en fazla 3 kod gönderilir.
 - Bir adrese bir serviste hesapsız ziyaretçilerden saatte en fazla 10, organizasyonunuzun tamamında 30 kod gider; sonrasında ekran yine "kod gönderdik" der ama e-posta gitmez. Bu sınırlar Komuta ile giriş yapanları etkilemez.
-- Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir (kod isteğinde ekran "Çok fazla kod istendi. Bir saat bekleyip tekrar deneyin." der; genellikle birkaç dakika yeterlidir).
+- Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir (kod isteğinde ekran "Çok fazla kod istendi. Bir saat bekleyip tekrar deneyin." der; genellikle bir dakika yeterlidir).
 - Aynı ağ, servis ve adres için 24 saatte 50 hatalı koddan sonra yeni kod gönderilmez.
 
 ---

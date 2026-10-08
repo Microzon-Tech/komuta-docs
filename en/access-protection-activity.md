@@ -136,7 +136,7 @@ The list doesn't refresh on its own; change a filter or reload the page to see n
 - At most **50,000** rows. If the range holds more, the export is refused: "This range holds more than 50000 entries. Choose a shorter range or one kind of entry."
 - One export at a time per organization. If another export of your organization is still running: "Another export of your organization's access log is still running. Try again in a moment."
 - Every export is recorded in your organization's audit log. If it can't be recorded, the export isn't made: "The export could not be recorded in the audit log, so it was not made. Try again in a moment."
-- Exporting needs the same permission as seeing the log. Email addresses are included only if you are allowed to view users.
+- Exporting needs the same permission as seeing the log. Email addresses are included only if you are allowed to view users (an email visitor's address also if you can manage shares).
 
 The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-English letters correctly) and has these columns:
 

@@ -25,7 +25,7 @@ After a successful sign-in, a session cookie for the service's own address is st
 - The session lasts as long as the service's **Stay signed in for** setting: 15 minutes, 1 hour, 4 hours, **12 hours** (default), 1 day or 7 days (see [Who is signed in](#who-is-signed-in)). It never outlives the visitor's share end date or an "open to everyone" protection end date.
 - The session is valid **only for the address signed in to**. If the service has several addresses (for example the `*.komuta.app` address and your custom domain, or a blue-green preview address), each needs its own sign-in.
 - Komuta's cookies are removed from the request before it reaches your application; your application never sees or is affected by them.
-- Sign-in must be completed within about 10 minutes. If the visitor waits longer, the console says **This sign-in link isn't valid** or the service answers with a short `sign-in link is invalid or expired`; opening the protected page again is enough.
+- Sign-in must be completed within about 9 minutes. If the visitor waits longer, the console says **This sign-in link isn't valid** or the service answers with a short `sign-in link is invalid or expired`; opening the protected page again is enough.
 
 ### When sessions end early
 
@@ -273,7 +273,7 @@ Limits without an account, counted per network (an IPv4 address, or an IPv6 `/64
 
 - At most 60 code requests per hour per network and service, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address from one network.
 - An address receives at most 10 codes per hour from visitors without an account on one service, and 30 across your organization; above that the screen still says a code was sent but no email goes out. These limits don't affect people signing in with Komuta.
-- A network that sends too many requests in a short time is refused for a moment (a code request then shows "Too many codes were requested. Wait an hour and try again.", even though a few minutes are usually enough).
+- A network that sends too many requests in a short time is refused for a moment (a code request then shows "Too many codes were requested. Wait an hour and try again.", even though a minute is usually enough).
 - After 50 wrong codes in 24 hours for the same network, service and address, no new codes are sent.
 
 ---

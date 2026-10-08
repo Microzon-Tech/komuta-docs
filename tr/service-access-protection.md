@@ -10,7 +10,7 @@ Erişim koruması tüm planlara dahildir.
 
 Erişim korumasıyla şunları yapabilirsiniz:
 
-- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar, e-posta adresleri ve şirket alan adları içeri girer.
+- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla da) giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar, e-posta adresleri ve şirket alan adları içeri girer.
 - **IP adresiyle sınırlayın.** Servis yalnızca belirlediğiniz ağlardan (örneğin ofisinizden) açılır. Giriş ile birlikte "ikisi birden" ya da "biri yeterli" olarak kullanılabilir.
 - **Yol yol koruyun.** Site açıkken `/admin`'i yalnızca giriş yapanlara açın, `/internal`'ı tamamen kapatın, `/raporlar`'ı yalnızca seçtiğiniz kişilere belirli saatlerde açın.
 - **Paylaşım bağlantısı gönderin.** Komuta hesabı olmayan birini — bir müşteri demosu ya da dışarıdan test eden biri — kendiliğinden sona eren bir bağlantıyla bir süreliğine içeri alın.

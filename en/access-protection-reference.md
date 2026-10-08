@@ -45,7 +45,7 @@ Access protection guides:
 | Sign-in attempts | 30 per user per minute |
 | Email verification code | 8 digits, valid 10 minutes, invalid after 5 wrong attempts |
 | Email code requests | 20 per user per hour; 5 per user and address per hour; 3 sends per hour per Komuta account, service and address (30/60/120 s waits) |
-| Email codes without a Komuta account | Counted per network (IPv4 address or IPv6 `/64`) and service: 60 requests per hour, 5 per address per hour, 3 sends per address per hour, 50 wrong codes per address in 24 hours; an address receives at most 10 such codes per hour per service and 30 across the organization; a domain share sends codes to at most 20 different addresses per network in 24 hours; their wrong codes count toward a separate 200-in-24-hours limit that pauses only codes without an account |
+| Email codes without a Komuta account | Counted per network (IPv4 address or IPv6 `/64`) and service: 60 requests per hour, 5 per address per hour, 3 sends per address per hour, 50 wrong codes per address in 24 hours; an address receives at most 10 such codes per hour per service and 30 across the organization; a domain share sends codes to at most 20 different addresses per network in 24 hours; their wrong codes count toward a separate 200-in-24-hours limit per domain share that pauses only codes without an account |
 | Request path (on a service with path rules or page limits) | At most 1024 bytes; longer gets `400` |
 | Access log | Kept 30 (default), 90 or 365 days, per organization; 15 s batches; 500 rows per service per hour (sign-ins excluded); 50 records per page |
 | Access log export | CSV or JSON; inside the retention period; at most 50,000 rows; one export per organization at a time |
@@ -396,7 +396,7 @@ Protection isn't affected; the new version goes live with the same protection.
 | **Access protection** | The feature that controls, at the Komuta gateway, who can reach a service's public address. |
 | **Gateway** | The Komuta layer that internet traffic to your service passes through; the check happens here. |
 | **Pod lock** | A protected service's pods accepting only requests from the gateway that passed the check. It prevents bypassing the check. |
-| **Komuta sign-in** | A visitor signing in with a Komuta account. |
+| **Komuta sign-in** | A visitor signing in with a Komuta account (or, for email and domain shares, with a one-time email code). |
 | **Share** | Permission for a person, organization, email address or everyone at a domain to sign in to the service. |
 | **External sharing** | Sharing outside the organization (a linked organization, an email address, or a domain the organization hasn't verified). Allowed by an organization setting. |
 | **Verified domain** | A domain an organization proved it owns with a DNS TXT record; shares under it count as the organization's own. |

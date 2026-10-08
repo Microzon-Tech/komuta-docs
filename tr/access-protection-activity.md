@@ -136,7 +136,7 @@ Listenin üstündeki **Dışa aktar** kaydı indirir: **CSV olarak indir (tablo)
 - En fazla **50.000** satır. Aralıkta daha fazlası varsa dışa aktarım reddedilir: "Bu aralıkta 50000 kayıttan fazlası var. Daha kısa bir aralık ya da tek bir kayıt türü seçin."
 - Organizasyon başına aynı anda tek dışa aktarım. Organizasyonunuzun başka bir dışa aktarımı sürüyorsa: "Kuruluşunuzun erişim kaydının başka bir dışa aktarımı hâlâ sürüyor. Birazdan yeniden deneyin."
 - Her dışa aktarım organizasyonunuzun denetim kaydına yazılır. Yazılamazsa dışa aktarım yapılmaz: "Dışa aktarım denetim kaydına yazılamadığı için yapılmadı. Birazdan yeniden deneyin."
-- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir.
+- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir (e-posta ziyaretçisinin adresi, paylaşımları yönetebiliyorsanız da).
 
 CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama programları Türkçe karakterleri doğru okur) ve şu sütunları içerir:
 
