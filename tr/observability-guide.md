@@ -284,7 +284,7 @@ Tahmin için yeterli geçmiş olmayabilir veya ilgili sorgu rotası kullanılam�
 ## İlgili Dokümanlar
 
 - [İzleme ve Log Yönetimi](https://www.komuta.io/docs/guides/monitoring-logs)
-- [Uyarı Yönetimi](https://www.komuta.io/docs/guides/alert-guide)
+- [Uyarı Yönetimi](alert-guide.md)
 - [Çalışma Zamanı Koruması](https://www.komuta.io/docs/security/runtime-security-guide)
 - [Güvenlik Merkezi](https://www.komuta.io/docs/security/security-center-guide)
 - [Erişim Kontrolü](https://www.komuta.io/docs/security/access-control-guide)

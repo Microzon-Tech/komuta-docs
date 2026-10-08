@@ -1,169 +1,70 @@
-# Alert Management
+# Alerts: Overview
 
-DevOpsZon's alert system allows you to proactively monitor the health of your services and infrastructure. By defining metric- and log-based rules, detect issues before your users do.
+Use Komuta Alerts to monitor service metrics and logs, and configure rules that notify your team by email, Slack or Microsoft Teams. Start with a template, turn a log line into an alert, and manage the same rules from a service or the global **Alerts** menu.
 
----
+[Create your first alert](alerts-quick-start.md) · [Choose a template](alerts-templates.md) · [Connect a channel](notification-guide.md)
 
-## How Does the Alert System Work?
+## Four steps in an alert
 
-The DevOpsZon alert pipeline consists of the following stages:
+<ol class="docs-alert-flow" aria-label="Alert flow">
+<li><span>01</span><strong>Define the rule</strong><p>Choose a service, condition, duration and notification channels.</p></li>
+<li><span>02</span><strong>Check publication</strong><p>Read the saved definition’s publication state and check time.</p></li>
+<li><span>03</span><strong>Follow the event</strong><p>Find the last received firing or resolution record in History.</p></li>
+<li><span>04</span><strong>Verify the message</strong><p>Check the delivery record and receipt at the actual destination separately.</p></li>
+</ol>
 
-```
-Metric/Log Collection → Rule Evaluation → Alert Triggering → Notification Sending
- (Komuta Metrics    →    (Alert rule)  → (Komuta Alerts) → (Email/Slack/...)
-  / Komuta Logs)
-```
+**Saving, publishing, firing and receiving a notification are separate stages.** Success at one stage does not confirm completion of the next.
 
-1. **Komuta Metrics** collects metrics from the cluster
-2. **Komuta Logs** collects application logs
-3. Defined rules are evaluated periodically
-4. When the condition is met, an alert is triggered via **Komuta Alerts**
-5. An instant notification is sent to your notification channels
-6. The dashboard is updated in **real time**
+## What is in the Alerts menu?
 
----
+| Page | Use it to… |
+| --- | --- |
+| **Overview** | Review rule and publication summaries, recent events, frequently firing rules, starter templates and notification health when permitted. |
+| [**Rules**](alerts-rules.md) | Find, filter, create and perform permitted operations on rules. |
+| [**History**](alerts-history.md) | Inspect the last received status, scope, firing/resolution times and available event details. |
+| [**Silences**](alerts-silences.md) | Mute notifications for selected rules during a time window. |
+| [**Templates**](alerts-templates.md) | Start from a condition suitable for a service or a cluster you own. |
+| [**Channels**](notification-guide.md) | Inspect configured channels and delivery records; open notification settings to manage channels. |
 
-## Alert Scopes
+Overview counts relate to the loaded scope and stated period. If data could not be loaded, do not interpret that as zero events or a healthy system. The number of records **awaiting resolution** is not a live count of alerts currently firing.
 
-In DevOpsZon, alerts are managed in two scopes:
+## Which scope should I choose?
 
-### Global Alerts
+| Your situation | Where to start |
+| --- | --- |
+| You have services on Komuta, without your own cluster | Choose **App Level**. Service metric templates, log templates and text matching are available. You do not need to enter infrastructure addresses. |
+| You also own a cluster | In addition to service rules, use **Cluster Level** metric templates for your own clusters offered in the picker. Advanced metric queries are available in an eligible scope. |
+| You are investigating account bandwidth alerts | Read the [scope explanation](alerts-history.md). An account aggregate cannot identify a single responsible service. |
 
-Manage all application-wide alert rules from the **Alerts** page in the left menu. On this page:
-- Alerts for all clusters and services are listed
-- You can filter by cluster or service
-- You can create new rules or edit existing ones
+On shared infrastructure, use service templates for metrics instead of custom metric queries. Custom log queries remain scoped to a service; cluster-wide log rules are not supported. An empty owned-cluster list does not prevent you from using service alerts.
 
-### Service-Level Alerts
+## Read and change permissions
 
-Manage alerts belonging only to the selected service from the **Service Management** → **Alert Management** tab. This lets you focus on the health of a single service.
+Operations depend on your role’s permissions and access to the particular resource. A role name alone does not establish what you can do.
 
----
+| Operation | Permission needed |
+| --- | --- |
+| Overview, Rules, History, Silences, Templates and rule validation | Read alerts |
+| Create, create from a template and duplicate | Create alerts |
+| Edit, enable/disable, delete, publish and silence | Edit alerts, plus change access to the relevant rule |
+| Select services and verify service eligibility | Read services and access the relevant service |
+| Alerts → Channels and channel selection | Read notifications; Alerts pages also require read access to alerts |
+| Add a channel | Create notifications |
+| Edit, enable/disable, delete or test channels; change notification routing | Edit notifications |
 
-## Creating an Alert Rule
+Read access does not allow sending a test message or changing a rule. Action controls may remain unavailable while permissions load. Notification read access can provide access to the notification page without general settings-view permission; change permissions are checked separately.
 
-### Step 1: Choose the Rule Type
+## Help from the mascot
 
-| Type | Description | Query Language |
-|-----|----------|-----------|
-| **Metric-based** | Based on metrics such as CPU, memory, request count | Metric query language |
-| **Log-based** | Based on patterns in application logs | Log query language |
+Use **Guide** in the alert wizard to follow the scope, template, parameter and channel steps. Guided tours also cover service alerts, creating an alert from a log, and following alerts after creation.
 
-### Step 2: Define the Query
+Ask “What does this publication state confirm?” or “Does this record refer to a service or the whole account?” Help uses the page’s verified scope, loading/error state, visible record summary and form step. This context does not represent the entire history, raw logs or the recipient’s inbox. The mascot cannot bypass access permissions; do not treat unknown scope or delivery as verified. Tours explain fields and navigation; review and complete creation or other changes in the relevant form.
 
-**Metric-based examples:**
+## A useful order to follow
 
-| Scenario | Metric Query |
-|---------|----------------|
-| CPU above 80% | `rate(container_cpu_usage_seconds_total[5m]) > 0.8` |
-| Memory above 90% | `container_memory_working_set_bytes / container_spec_memory_limit_bytes > 0.9` |
-| High 5xx error rate | `rate(http_requests_total{status=~"5.."}[5m]) > 0.05` |
-| Pod restart count increased | `increase(pod_container_status_restarts_total[1h]) > 3` |
+1. Add a [notification channel](notification-guide.md) and test it at the actual destination.
+2. Create your [first alert](alerts-quick-start.md) for one service and one condition.
+3. Check [publication](alerts-rules.md), then [event history](alerts-history.md).
+4. Reduce unnecessary repetition with thresholds, duration and [silence windows](alerts-silences.md).
 
-**Log-based examples:**
-
-| Scenario | Log Query |
-|---------|----------------|
-| Error log detected | `{app="my-service"} |= "ERROR"` |
-| High exception count | `count_over_time({app="my-service"} |= "Exception" [5m]) > 10` |
-
-### Step 3: Set the Severity
-
-| Level | Use Case |
-|--------|----------------|
-| **Info** | For informational purposes; does not require urgent action |
-| **Warning** | A situation requiring attention; may become a problem soon |
-| **Critical** | Urgent action required; the service may be affected |
-| **Emergency** | The system is completely affected; immediate action is essential |
-
-### Step 4: Set the Duration
-
-Specify how many minutes the condition must be continuously met for the alert to be triggered. This prevents temporary fluctuations from creating false alarms.
-
-| Duration | Use |
-|------|----------|
-| **1 minute** | Fast detection for instant issues |
-| **5 minutes** | General purpose; suitable for most scenarios |
-| **15 minutes** | Trend-based issues; filters out short-lived fluctuations |
-
-### Step 5: Choose the Notification Channel
-
-Select which channels will receive a notification when the alert is triggered. You can select multiple channels.
-
-### Step 6: Test It
-
-Before saving your rule, verify it with the **Test** button. The test runs your query against the cluster and shows whether the alert would be triggered under the current state.
-
-### Step 7: Deploy to Kubernetes
-
-Your saved rule is automatically deployed to the Kubernetes cluster as a PrometheusRule CRD, and monitoring begins.
-
----
-
-## Alert Templates
-
-DevOpsZon offers ready-made alert templates for commonly used scenarios:
-
-| Template | Description |
-|--------|----------|
-| **High CPU Usage** | CPU limit is about to be exceeded |
-| **High Memory Usage** | Memory limit is about to be exceeded |
-| **Pod Restart Loop** | Pod is continuously restarting |
-| **5xx Error Rate** | HTTP 5xx errors are increasing |
-| **Disk Capacity** | Disk capacity is running low |
-| **Database Connection Pool** | Connection pool is about to fill up |
-
-> You can use the templates directly or customize them to create new rules.
-
----
-
-## Notification Channels
-
-You can receive alert notifications through the following channels:
-
-| Channel | Configuration |
-|-------|-------------|
-| **Email** | SMTP settings and recipient addresses |
-| **Slack** | Channel integration via webhook URL |
-| **Telegram** | Bot token and chat ID |
-| **Microsoft Teams** | Incoming webhook URL |
-| **PagerDuty** | Incident management via integration key |
-| **SMS** | Phone number and SMS provider settings |
-| **WhatsApp** | Business API integration |
-| **Webhook** | POST request to a custom HTTP endpoint |
-
-You can configure notification channels from the **Notifications** page.
-
----
-
-## Alert Silencing
-
-You can temporarily silence certain alerts during planned maintenance or known issues:
-
-1. In the alert list, click the **Sustur** (Silence) button next to the rule you want to silence
-2. Set a duration (e.g., 2 hours, 1 day)
-3. Optionally add a description
-4. At the end of the specified duration, the alert automatically becomes active again
-
----
-
-## Addon Alerts
-
-When managed services (PostgreSQL, RabbitMQ, Valkey) are created, basic alert rules are automatically defined:
-
-| Service | Automatic Alerts |
-|--------|-------------------|
-| **PostgreSQL** | High CPU, memory, disk, connection pool, replication lag |
-| **RabbitMQ** | Queue capacity, memory, connection count |
-| **Valkey** | Memory usage, connection count |
-
-These alerts are active by default and can be customized according to your needs.
-
----
-
-## Tips
-
-- **Tiered alerting:** Define Warning and Critical alerts with different thresholds for the same metric
-- **Duration setting:** Too short durations produce false alarms, too long durations cause late detection
-- **Test:** Always test each rule before saving it
-- **Notification fatigue:** Too many alerts cause important alerts to be overlooked; only define alerts that require action
+Use [troubleshooting](alerts-troubleshooting.md) when a stage does not behave as expected.

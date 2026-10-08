@@ -1,169 +1,70 @@
-# Uyarı Yönetimi (Alert Management)
+# Uyarılar: Genel Bakış
 
-DevOpsZon'un uyarı sistemi, servislerinizin ve altyapınızın sağlığını proaktif olarak izlemenizi sağlar. Metrik ve log tabanlı kurallar tanımlayarak, sorunları kullanıcılarınızdan önce tespit edin.
+Komuta Uyarılar ile servislerinizin metriklerini ve loglarını izleyin; ilgilenmeniz gereken durumları e-posta, Slack veya Microsoft Teams üzerinden ekibinize ulaştıracak kurallar oluşturun. Şablonla başlayabilir, bir log satırını uyarıya dönüştürebilir ve aynı kuralları servis detaylarından ya da genel **Uyarılar** menüsünden yönetebilirsiniz.
 
----
+[İlk uyarını oluştur](alerts-quick-start.md) · [Şablon seç](alerts-templates.md) · [Bildirim kanalını bağla](notification-guide.md)
 
-## Uyarı Sistemi Nasıl Çalışır?
+## Bir uyarının dört adımı
 
-DevOpsZon uyarı pipeline'ı şu aşamalardan oluşur:
+<ol class="docs-alert-flow" aria-label="Uyarı akışı">
+<li><span>01</span><strong>Kuralı tanımla</strong><p>Servisi, koşulu, süreyi ve bildirim kanallarını seç.</p></li>
+<li><span>02</span><strong>Yayını kontrol et</strong><p>Kaydedilen tanımın yayın durumunu ve kontrol zamanını incele.</p></li>
+<li><span>03</span><strong>Olayı takip et</strong><p>Geçmişte son alınan tetiklenme veya çözülme kaydını gör.</p></li>
+<li><span>04</span><strong>Bildirimi doğrula</strong><p>Kanal kaydını ve mesajın gerçek hedefe ulaştığını ayrı kontrol et.</p></li>
+</ol>
 
-```
-Metrik/Log Toplama → Kural Değerlendirme → Uyarı Tetikleme → Bildirim Gönderme
- (Komuta Metrics    →    (Uyarı kuralı)  → (Komuta Alerts) → (E-posta/Slack/...)
-  / Komuta Logs)
-```
+**Kuralın kaydedilmesi, yayınlanması, tetiklenmesi ve bildirimin alınması farklı aşamalardır.** Bir aşamadaki başarı, sonraki aşamanın tamamlandığını göstermez.
 
-1. **Komuta Metrics** cluster'daki metrikleri toplar
-2. **Komuta Logs** uygulama loglarını toplar
-3. Tanımlanan kurallar periyodik olarak değerlendirilir
-4. Koşul sağlandığında **Komuta Alerts** üzerinden uyarı tetiklenir
-5. Bildirim kanallarınıza anlık bildirim gönderilir
-6. Panel üzerinde **gerçek zamanlı** güncelleme yapılır
+## Uyarılar menüsünde neler var?
 
----
+| Ekran | Ne için kullanılır? |
+| --- | --- |
+| **Genel Bakış** | Kural ve yayın özetini, son olayları, sık tekrarlayan kuralları, başlangıç şablonlarını ve yetkiniz varsa bildirim durumunu görmek. |
+| [**Kurallar**](alerts-rules.md) | Kuralları aramak, filtrelemek, oluşturmak ve izin verilen işlemleri yapmak. |
+| [**Geçmiş**](alerts-history.md) | Son alınan durumu, kapsamı, tetiklenme/çözülme zamanlarını ve mevcut olay ayrıntılarını incelemek. |
+| [**Sessizlikler**](alerts-silences.md) | Seçili kurallar için belirli bir zaman aralığında bildirimleri susturmak. |
+| [**Şablonlar**](alerts-templates.md) | Servise veya kendi cluster’ınıza uygun hazır koşullardan başlamak. |
+| [**Kanallar**](notification-guide.md) | Tanımlı kanalları ve teslim kayıtlarını incelemek; kanal yönetimi için bildirim ayarlarına geçmek. |
 
-## Uyarı Kapsamları
+Genel Bakıştaki sayılar yüklenen kapsam ve belirtilen dönemle ilgilidir. Veri alınamadıysa bunu “sıfır olay” veya “her şey sağlıklı” şeklinde yorumlamayın. **Çözülme bekleyen** kayıt sayısı da şu anda tetiklenen uyarıların canlı sayımı değildir.
 
-DevOpsZon'da uyarılar iki kapsamda yönetilir:
+## Hangi kapsamı seçmeliyim?
 
-### Global Uyarılar
+| Durumunuz | Uygun başlangıç |
+| --- | --- |
+| Komuta’da servisiniz var; kendi cluster’ınız yok | **Uygulama Düzeyi** seçin. Servis metrik şablonları, log şablonları ve metin eşleşmesi kullanılabilir. Servisin altyapı adreslerini girmeniz gerekmez. |
+| Kendi cluster’ınız da var | Servis kurallarına ek olarak, listede sunulan kendi cluster’ınız için **Cluster Düzeyi** metrik şablonlarını kullanabilirsiniz. Uygun kapsamda gelişmiş metrik sorgusu da oluşturabilirsiniz. |
+| Hesap genelindeki bant genişliği uyarısını inceliyorsunuz | [Kapsam açıklamasını](alerts-history.md) okuyun. Hesap toplamı, hangi servisin sorumlu olduğunu tek başına göstermez. |
 
-Sol menüdeki **Alerts** sayfasından uygulama genelindeki tüm uyarı kurallarını yönetin. Bu sayfada:
-- Tüm cluster ve servislere ait uyarılar listelenir
-- Cluster veya servis bazında filtreleme yapabilirsiniz
-- Yeni kural oluşturabilir, mevcut kuralları düzenleyebilirsiniz
+Paylaşılan altyapıda özel metrik sorgusu yerine servis şablonları kullanılır. Özel log sorguları servis kapsamıyla sınırlıdır; cluster genelinde log kuralı oluşturulmaz. Kendi cluster listenizin boş olması, servis uyarılarını kullanamayacağınız anlamına gelmez.
 
-### Servis Bazlı Uyarılar
+## Görüntüleme ve değiştirme izinleri
 
-**Service Management** → **Alert Management** sekmesinden yalnızca seçili servise ait uyarıları yönetin. Bu, tek bir servisin sağlığına odaklanmanızı sağlar.
+İşlemler hesabınızın rolündeki izinlere ve ilgili kaynağa erişiminize bağlıdır; yalnız rolün adına bakarak yetki varsaymayın.
 
----
+| İşlem | Gerekli izin türü |
+| --- | --- |
+| Genel Bakış, Kurallar, Geçmiş, Sessizlikler ve Şablonlar; kural testi | Uyarıları okuma |
+| Kural oluşturma, şablondan oluşturma, çoğaltma | Uyarı oluşturma |
+| Düzenleme, etkinleştirme/kapatma, silme, yayın işlemleri ve susturma | Uyarıları düzenleme; ilgili kural için değişiklik erişimi |
+| Servis seçimi ve servise uygun seçeneklerin doğrulanması | Servisleri okuma ve ilgili servise erişim |
+| Uyarılar → Kanallar ve kanal seçimi | Bildirimleri okuma; Uyarılar ekranları için ayrıca uyarıları okuma |
+| Kanal ekleme | Bildirim oluşturma |
+| Kanal düzenleme, etkinleştirme, silme, test gönderme ve bildirim yönlendirmesi | Bildirimleri düzenleme |
 
-## Uyarı Kuralı Oluşturma
+Okuma izni, test mesajı gönderme veya kuralı değiştirme izni vermez. İzinler yüklenirken işlem düğmeleri kullanılamayabilir. Bildirimleri okuma izni olan kullanıcı, genel ayarları görüntüleme izni olmasa da bildirim sayfasına erişebilir; değiştirme izinleri ayrıca değerlendirilir.
 
-### Adım 1: Kural Tipini Seçin
+## Maskotla yardım
 
-| Tip | Açıklama | Sorgu Dili |
-|-----|----------|-----------|
-| **Metrik tabanlı** | CPU, bellek, istek sayısı gibi metriklere dayalı | Metrik sorgu dili |
-| **Log tabanlı** | Uygulama loglarındaki kalıplara dayalı | Log sorgu dili |
+Uyarı sihirbazındaki **Rehber** ile kapsam, şablon, parametre ve kanal adımlarını izleyebilirsiniz. Servis uyarıları, logdan uyarı oluşturma ve uyarıları takip etme için de rehber turları bulunur.
 
-### Adım 2: Sorguyu Tanımlayın
+Maskota “Bu ekrandaki yayın durumu neyi doğruluyor?” veya “Bu kayıt bir servise mi, hesabın tamamına mı ait?” diye sorabilirsiniz. Yardım, sayfanın paylaştığı doğrulanmış kapsam, yükleme/hata durumu, görünür kayıt özeti ve form adımına dayanır. Bu bağlam bütün geçmişi, ham logları veya alıcının posta kutusunu temsil etmez. Maskot erişim izinlerini aşamaz; bilinmeyen kapsamı veya teslimi doğrulanmış gibi kabul etmeyin. Tur, alanları açıklar ve yönlendirir; oluşturma ve diğer değişiklikleri ilgili formda gözden geçirip tamamlayın.
 
-**Metrik tabanlı örnekler:**
+## Önerilen kullanım sırası
 
-| Senaryo | Metrik Sorgusu |
-|---------|----------------|
-| CPU %80'in üzerinde | `rate(container_cpu_usage_seconds_total[5m]) > 0.8` |
-| Bellek %90'ın üzerinde | `container_memory_working_set_bytes / container_spec_memory_limit_bytes > 0.9` |
-| 5xx hata oranı yüksek | `rate(http_requests_total{status=~"5.."}[5m]) > 0.05` |
-| Pod restart sayısı arttı | `increase(pod_container_status_restarts_total[1h]) > 3` |
+1. Bir [bildirim kanalı](notification-guide.md) ekleyin ve gerçek hedefte test edin.
+2. Tek servis ve tek koşulla [ilk uyarıyı](alerts-quick-start.md) oluşturun.
+3. [Yayın durumunu](alerts-rules.md), ardından [olay geçmişini](alerts-history.md) kontrol edin.
+4. Gereksiz tekrarları eşik, süre ve [susturma pencereleriyle](alerts-silences.md) azaltın.
 
-**Log tabanlı örnekler:**
-
-| Senaryo | Log Sorgusu |
-|---------|----------------|
-| Error logu tespit | `{app="my-service"} |= "ERROR"` |
-| Exception sayısı yüksek | `count_over_time({app="my-service"} |= "Exception" [5m]) > 10` |
-
-### Adım 3: Şiddeti (Severity) Belirleyin
-
-| Seviye | Kullanım Alanı |
-|--------|----------------|
-| **Info** | Bilgilendirme amaçlı; acil müdahale gerektirmez |
-| **Warning** | Dikkat gerektiren durum; yakında sorun olabilir |
-| **Critical** | Acil müdahale gerekli; servis etkilenmiş olabilir |
-| **Emergency** | Sistem tamamen etkilenmiş; anında müdahale şart |
-
-### Adım 4: Süreyi Belirleyin
-
-Uyarının tetiklenmesi için koşulun kaç dakika boyunca sürekli sağlanması gerektiğini belirleyin. Bu, geçici dalgalanmaların yanlış alarm oluşturmasını önler.
-
-| Süre | Kullanım |
-|------|----------|
-| **1 dakika** | Anlık sorunlar için hızlı tespit |
-| **5 dakika** | Genel amaçlı; çoğu senaryo için uygun |
-| **15 dakika** | Trend bazlı sorunlar; kısa süreli dalgalanmaları filtreler |
-
-### Adım 5: Bildirim Kanalını Seçin
-
-Uyarı tetiklendiğinde hangi kanallara bildirim gönderileceğini seçin. Birden fazla kanal seçebilirsiniz.
-
-### Adım 6: Test Edin
-
-Kuralınızı kaydetmeden önce **Test** butonuyla doğrulayın. Test, sorgunuzu cluster üzerinde çalıştırarak mevcut durumda uyarının tetiklenip tetiklenmeyeceğini gösterir.
-
-### Adım 7: Kubernetes'e Deploy Edin
-
-Kaydettiğiniz kural otomatik olarak Kubernetes cluster'ına PrometheusRule CRD olarak deploy edilir ve izleme başlar.
-
----
-
-## Uyarı Şablonları
-
-DevOpsZon, sık kullanılan senaryolar için hazır uyarı şablonları sunar:
-
-| Şablon | Açıklama |
-|--------|----------|
-| **Yüksek CPU Kullanımı** | CPU limiti aşılmak üzere |
-| **Yüksek Bellek Kullanımı** | Bellek limiti aşılmak üzere |
-| **Pod Restart Döngüsü** | Pod sürekli yeniden başlatılıyor |
-| **5xx Hata Oranı** | HTTP 5xx hataları artıyor |
-| **Disk Doluluk** | Disk kapasitesi azalıyor |
-| **Veritabanı Bağlantı Havuzu** | Bağlantı havuzu dolmak üzere |
-
-> Şablonları doğrudan kullanabilir veya özelleştirerek yeni kurallar oluşturabilirsiniz.
-
----
-
-## Bildirim Kanalları
-
-Uyarı bildirimlerini şu kanallar üzerinden alabilirsiniz:
-
-| Kanal | Yapılandırma |
-|-------|-------------|
-| **E-posta** | SMTP ayarları ve alıcı adresleri |
-| **Slack** | Webhook URL ile kanal entegrasyonu |
-| **Telegram** | Bot token ve chat ID |
-| **Microsoft Teams** | Incoming webhook URL |
-| **PagerDuty** | Integration key ile olay yönetimi |
-| **SMS** | Telefon numarası ve SMS sağlayıcı ayarları |
-| **WhatsApp** | Business API entegrasyonu |
-| **Webhook** | Özel HTTP endpoint'e POST isteği |
-
-Bildirim kanallarını **Notifications** sayfasından yapılandırabilirsiniz.
-
----
-
-## Uyarı Susturma (Silence)
-
-Planlı bakım veya bilinen sorunlar sırasında belirli uyarıları geçici olarak susturabilirsiniz:
-
-1. Uyarı listesinde susturmak istediğiniz kuralın yanındaki **Sustur** butonuna tıklayın
-2. Süre belirleyin (ör: 2 saat, 1 gün)
-3. İsteğe bağlı bir açıklama ekleyin
-4. Belirlenen süre sonunda uyarı otomatik olarak tekrar aktif olur
-
----
-
-## Addon Uyarıları
-
-Yönetilen servisler (PostgreSQL, RabbitMQ, Valkey) oluşturulduğunda otomatik olarak temel uyarı kuralları tanımlanır:
-
-| Servis | Otomatik Uyarılar |
-|--------|-------------------|
-| **PostgreSQL** | Yüksek CPU, bellek, disk, bağlantı havuzu, replication lag |
-| **RabbitMQ** | Kuyruk doluluk, bellek, bağlantı sayısı |
-| **Valkey** | Bellek kullanımı, bağlantı sayısı |
-
-Bu uyarılar varsayılan olarak aktiftir ve ihtiyacınıza göre özelleştirebilirsiniz.
-
----
-
-## İpuçları
-
-- **Kademeli uyarı:** Aynı metrik için farklı eşiklerle Warning ve Critical uyarıları tanımlayın
-- **Süre ayarı:** Çok kısa süreler yanlış alarm üretir, çok uzun süreler geç tespit'e neden olur
-- **Test:** Her kuralı kaydetmeden önce mutlaka test edin
-- **Bildirim yorgunluğu:** Çok fazla uyarı, önemli uyarıların gözden kaçmasına neden olur; sadece aksiyon gerektiren uyarılar tanımlayın
+Takıldığınız adımı [sorun giderme rehberinden](alerts-troubleshooting.md) inceleyin.

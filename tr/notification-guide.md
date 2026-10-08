@@ -1,148 +1,62 @@
-# Bildirim Ayarları
+# Kanallar ve Bildirim Teslimi
 
-DevOpsZon'un bildirim sistemi, uyarılar, pipeline durumları ve önemli olaylar hakkında sizi bilgilendirmek için çoklu kanal desteği sunar. Bu rehber, bildirim kanallarınızı nasıl yapılandıracağınızı açıklar.
+Komuta Uyarılar; **E-posta, Slack ve Microsoft Teams** kanallarını kullanır. **Uyarılar → Kanallar** tanımlı kanalları ve teslim kayıtlarını gösterir. Ekleme ve değişiklikler için **Bildirim ayarlarında yönet** bağlantısıyla **Bildirimler ve Uyarılar** sayfasını açın.
 
----
+## Önce bir hedef hazırlayın
 
-## Bildirim Sistemi Genel Bakışı
+| Kanal | Gerekli yapılandırma |
+| --- | --- |
+| E-posta | Kanal adı ve en az bir geçerli alıcı adresi. Her adresi listeye ekleyip kaydedin. |
+| Slack | Hedef konuşma için oluşturulmuş Incoming Webhook adresi. Normal Slack kanal bağlantısı yeterli değildir. |
+| Microsoft Teams | Teams Workflows üzerinden oluşturulmuş HTTPS webhook adresi. Teams kanalının tarayıcı bağlantısı kullanılamaz. |
 
-DevOpsZon'daki bildirimler üç kategori altında toplanır:
+Kanal oluşturmak için bildirim oluşturma; düzenleme, açma/kapatma, silme ve **Test gönder** için bildirimleri düzenleme izni gerekir. Kanalın aktif olduğunu kontrol edin. Webhook adreslerini erişim bilgisi olarak saklayın; herkese açık dokümana, ekran görüntüsüne veya destek mesajına eklemeyin.
 
-| Kategori | Örnekler |
-|----------|----------|
-| **Uyarı Bildirimleri** | Alert kuralı tetiklendiğinde gönderilen bildirimler |
-| **Pipeline Bildirimleri** | Build başarılı/başarısız durumları |
-| **Sistem Bildirimleri** | Fatura, bakiye, bakım ve platform duyuruları |
+## E-posta: alıcıyı ekleyin, gerçek posta kutusunu kontrol edin
 
----
+Kanal türünü **E-posta** seçin, ekibinizin kullanacağı alıcıları ekleyin ve kaydedin. Bu formda müşterinin Resend anahtarı veya SMTP sunucusu girmesi gerekmez; gönderim Komuta’nın e-posta altyapısı üzerinden Resend ile yapılır.
 
-## Bildirim Kanalları
+**Test gönder** sonrasında hedef posta kutusunu, spam/karantina klasörünü ve kurumunuzun e-posta filtrelerini kontrol edin. Birden fazla alıcılı bir kanalda başarılı sonuç, her alıcıya başarı anlamına gelmeyebilir; özellikle önemli alıcıları ayrı doğrulayın.
 
-Sol menüden **Notifications** sayfasına giderek bildirim kanallarınızı yapılandırın.
+Komuta’daki e-posta teslim kaydı **sağlayıcının gönderimi kabul etmesi** düzeyindedir. Resend’in `email.sent` olayı da gönderim isteğinin kabulüyle, `email.delivered` ise alıcının posta sunucusuna teslimle ilgilidir. Bunlar mesajın gelen kutusunda görüldüğü veya okunduğu anlamına gelmez. Komuta ekranının bu sağlayıcı olaylarının tamamını gösterdiğini varsaymayın. [Resend olay açıklamaları](https://resend.com/docs/webhooks/event-types).
 
-### E-posta
+## Slack: Incoming Webhook kullanın
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Alıcı adresleri** | Bildirimin gönderileceği e-posta adresleri |
+Slack uygulamanız için Incoming Webhooks özelliğini açın, izin verilen hedef kanala bir webhook oluşturun ve üretilen adresi Komuta kanalına kaydedin. Özel bir kanala bağlanıyorsanız gerekli Slack erişiminiz de olmalıdır. [Slack’in kurulum rehberi](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/).
 
-E-posta bildirimleri varsayılan olarak hesap e-posta adresinize gönderilir. Ek alıcılar ekleyebilirsiniz.
+Test sonucunu hedef Slack kanalında doğrulayın. Webhook kaldırılır, kanal arşivlenir veya uygulama erişimi değişirse bildirim başarısız olabilir; yeni geçerli hedefle tekrar test edin.
 
-### Slack
+## Microsoft Teams: kanal bağlantısı ile webhook farklıdır
 
-Slack entegrasyonu için bir Incoming Webhook URL'si gereklidir:
+1. Teams’te hedef kanalın **Workflows** bölümünü açın.
+2. **Send webhook alerts to a channel** gibi uygun webhook şablonunu oluşturun; hedef ekip ve kanalı seçin.
+3. Kaydedip oluşturulan webhook adresini kopyalayın; Komuta’da **Microsoft Teams** kanalına yapıştırın.
+4. **Test gönder** ile deneyin; Teams kanalındaki mesajı ve gerekiyorsa workflow çalıştırma geçmişini kontrol edin.
 
-1. Slack workspace'inizde bir Incoming Webhook oluşturun
-2. Webhook URL'sini **Notifications** sayfasına girin
-3. Bildirimin gönderileceği kanalı belirleyin
-4. Test bildirimi göndererek doğrulayın
+Komuta bu bağlantıya webhook isteği gönderir; formda Microsoft kullanıcı oturumu veya OAuth bağlantısı kurmaz. Workflow’un kimlik doğrulama seçeneği bu çağrıyı kabul edebilmelidir. Kurumunuzun politikaları izin vermiyorsa Teams yöneticinizle uygun bağlantıyı belirleyin. [Microsoft’un webhook kurulum adımları](https://support.microsoft.com/en-us/workflows/send-messages-in-teams-using-incoming-webhooks).
 
-### Telegram
+Workflow’un çalışır durumda ve geçerli bir sahibinin olmasına dikkat edin. Gerekiyorsa ortak sahip ekleyin; sahibinin ayrılması akışı etkileyebilir. [Microsoft’un sahiplik ve Workflows açıklaması](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook).
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Bot Token** | Telegram BotFather'dan alınan bot token'ı |
-| **Chat ID** | Bildirimin gönderileceği chat veya grup ID'si |
+## Kuralı kanala yönlendirin
 
-### Microsoft Teams
+Uyarı oluşturma/düzenleme ekranında bildirim kanallarını açıkça seçin. Seçim boşsa uygun aktif kanallar kullanılır; “hiç kimseye gönderme” anlamına gelmez. Kanalın etkinliği ve yapılandırılmış şiddet filtresi de yönlendirmeyi etkiler.
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Webhook URL** | Teams kanalındaki Incoming Webhook URL'si |
+**Bildirimler ve Uyarılar** sayfasındaki olay-kanal matrisi platform olaylarının abonelikleri içindir. Bir uyarı kuralının kendi kanal seçimiyle aynı ayar değildir. “Dağıtım tamamlandı” bildirimi almanız, belirli bir metrik/log kuralının doğru kanala yönlendiğini kanıtlamaz.
 
-### PagerDuty
+## Test ve teslim kayıtlarını ayırın
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Integration Key** | PagerDuty servisine ait integration key |
+**Test gönder**, kanal bağlantısını dener. Kuralın metrik veya log kaynağını, yayınını, tetiklenmesini ya da çözülmesini test etmez. Test sonucu “gönderilmedi” ise kanalın aktifliğini, yapılandırmasını ve bildirim sınırlarını kontrol edin. Testin kendisi kanalın deneme istatistiklerine yansıyabilir; normal bir uyarı olayıyla aynı geçmiş satırını beklemeyin.
 
-PagerDuty entegrasyonu, uyarı şiddetine (severity) göre olay oluşturur ve olay yönetim sürecinize dahil eder.
+**Kanallar** sayfasında dönem, kanal, durum ve arama filtrelerini kullanın. Tetiklenme ve çözülme bildirimi türünü ayrı okuyun. Birden fazla aynı kayıt katlanmışsa ayrıntıları açın; bu, görüntüleme kolaylığıdır.
 
-### SMS
+| Durum | Ne doğrular? |
+| --- | --- |
+| Bekleyen/işlenen kayıt | Ürünün gönderim akışında bir kayıt var; teslim tamamlanmış sayılmaz. |
+| Başarılı/teslim edildi kaydı | Ürünün ilgili gönderim denemesi başarılı olarak kaydedilmiş. E-postada sağlayıcı kabulü; gerçek alıcı teyidi ayrıca gerekir. |
+| Başarısız kayıt | Gönderim denemesi başarısız olmuş; hata ve hedef ayarları incelenmelidir. |
+| Bastırılmış kayıt | Bildirim bir sınır veya kısıt nedeniyle gönderilmemiştir; teslim sayılmaz. |
+| Kayıt yok | Seçili dönem/filtrede kayıt yoktur; kuralın tetiklenmediğini veya kanalın sağlıklı olduğunu tek başına kanıtlamaz. |
 
-| Parametre | Açıklama |
-|-----------|----------|
-| **Telefon numarası** | Bildirimin gönderileceği telefon numarası |
+Dönemsel teslim istatistiği ile kanalın tüm zamanlar deneme sayısını karşılaştırırken kapsamı dikkate alın. Hiç deneme yoksa başarı oranı kanıtı da yoktur. Bildirim sınırları, tekrar aralıkları, susturmalar ve sağlayıcı hataları sonucu etkileyebilir; anlık, kesin veya yalnız bir kez teslim varsaymayın.
 
-### WhatsApp
-
-| Parametre | Açıklama |
-|-----------|----------|
-| **Business API** | WhatsApp Business API yapılandırması |
-
-### Webhook (Özel)
-
-Kendi sistemlerinize bildirim göndermek için özel webhook tanımlayın:
-
-| Parametre | Açıklama |
-|-----------|----------|
-| **URL** | Bildirimin POST edileceği HTTP endpoint |
-| **Headers** | İsteğe bağlı HTTP başlıkları (ör: Authorization) |
-
----
-
-## Kanal Yapılandırma
-
-### Yeni Kanal Ekleme
-
-1. **Notifications** sayfasına gidin
-2. **Yeni Kanal Ekle** butonuna tıklayın
-3. Kanal tipini seçin
-4. Gerekli bilgileri girin
-5. **Test** butonuyla deneme bildirimi gönderin
-6. **Kaydet** butonuyla kanalı kaydedin
-
-### Kanalı Uyarı Kuralına Bağlama
-
-Bildirim kanalları, uyarı kuralları ile ilişkilendirilir:
-
-1. **Alert Management** sayfasına gidin
-2. Bir uyarı kuralı oluşturun veya düzenleyin
-3. **Bildirim kanalları** bölümünde hangi kanallara bildirim gönderileceğini seçin
-4. Birden fazla kanal seçebilirsiniz (ör: hem Slack hem e-posta)
-
----
-
-## Panel İçi Bildirimler
-
-Kanal bildirimlerine ek olarak, DevOpsZon Console'da gerçek zamanlı panel içi bildirimler alırsınız:
-
-- Sağ üst köşedeki bildirim simgesi ile yeni bildirimleri görüntüleyin
-- Uyarı, pipeline ve sistem bildirimleri kronolojik sırayla listelenir
-- Bildirime tıklayarak ilgili sayfaya yönlendirilebilirsiniz
-
----
-
-## Bildirim Akışı
-
-Bir uyarı tetiklendiğinde bildirim süreci:
-
-```
-Alert Tetiklenir → Alertmanager → DevOpsZon API → Bildirim Kuyruğu → Kanal'a Gönderim
-                                       ↓
-                               Panel'de Gerçek Zamanlı
-                               Bildirim (SignalR)
-```
-
-1. Prometheus veya Loki'de kural eşiği aşılır
-2. Alertmanager uyarıyı gruplar ve DevOpsZon webhook'una gönderir
-3. DevOpsZon API, uyarıyı işler ve ilişkili bildirim kanallarını bulur
-4. Her kanal için bildirim kuyruğa eklenir (RabbitMQ)
-5. Kuyruk tüketicisi bildirimi ilgili kanala gönderir
-6. Aynı anda panel üzerinde SignalR ile gerçek zamanlı güncelleme yapılır
-
-### Retry Mekanizması
-
-Bildirim gönderimi başarısız olursa:
-- Otomatik olarak yeniden denenir
-- Birden fazla başarısız denemeden sonra Dead Letter Queue'ya (DLQ) taşınır
-- DLQ'daki mesajlar manuel olarak yeniden işlenebilir
-
----
-
-## İpuçları
-
-- **Çoklu kanal:** Kritik uyarılar için birden fazla bildirim kanalı tanımlayın (ör: Slack + E-posta + PagerDuty)
-- **Severity bazlı:** Warning uyarıları Slack'e, Critical uyarıları PagerDuty'ye yönlendirin
-- **Test:** Her yeni kanalı ekledikten sonra test bildirimi göndererek doğrulayın
-- **Bildirim yorgunluğu:** Çok fazla bildirim, önemli bildirimlerin gözden kaçmasına neden olur; yalnızca aksiyon gerektiren olaylar için bildirim ayarlayın
+Sonraki adım: [Bildirim gelmiyorsa](alerts-troubleshooting.md) · [İlk uyarıyı oluştur](alerts-quick-start.md)
