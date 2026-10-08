@@ -142,6 +142,10 @@ Open a finding to read its source, severity, affected operation, first and last 
 
 An urgent filter or a partial set of loaded records can narrow the list. Expand the range or load more records when the investigation requires it. A missing row can be a filtering, permission or source-availability issue.
 
+![Service finding showing the policy block, decision provenance and event times](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Open the relevant record from Findings. This example from the admin test environment shows the policy block for `/tmp/komuta-dropped`, its source and last-seen time in the Turkish UI. We matched the test application's denial to this record; the “Threat” review label alone is not evidence of blocking.*
+
 ### Runtime observation review
 
 Applicable services also show recorded file writes, process execution and network attempts with existing review history. Filter **All**, **Pending**, **Allowed**, **Blocked** or **Dismissed** to focus your review.

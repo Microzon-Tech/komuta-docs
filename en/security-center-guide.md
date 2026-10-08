@@ -28,6 +28,16 @@ Detailed usage guides are under **Services → Service Security**:
 
 > **Start with the right context:** confirm the organization, service, time window and freshness of the evidence. A saved protection setting describes intent; application status and observed outcomes tell you what happened.
 
+### A real runtime finding
+
+In this example, **komuta-test-app** in the admin test environment attempted to execute a program it had placed in a temporary directory. The Komuta finding reports that a policy blocked the operation and shows when it was last seen. Match the test result to its source, operation and time when investigating.
+
+![Komuta finding details showing a runtime policy block and last-seen time](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Real test on 8 October 2026, shown in the Turkish UI: execution of `/tmp/komuta-dropped` was denied. A deduplicated finding can have an older first-seen date; check last-seen time for this run. This result verifies only the operation and rule scope shown.*
+
+Continue to [Runtime Security](runtime-security-guide.md) to compare the test screen with its evidence, or [Service Security](service-security-guide.md) for the steps to open finding details.
+
 ## Choose your starting point
 
 | Your goal | Start here |

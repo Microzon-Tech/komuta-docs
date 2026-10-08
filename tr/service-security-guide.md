@@ -142,6 +142,10 @@ Kaynak, önem derecesi, etkilenen işlem, ilk ve son görülme bilgisi ile sunul
 
 Acil filtresi veya kayıtların yalnız bir bölümünün yüklenmiş olması listeyi daraltabilir. İnceleme gerektiriyorsa zaman aralığını genişletin veya daha fazla kayıt yükleyin. Eksik satırın nedeni filtre, izin veya kaynak kullanılabilirliği olabilir.
 
+![Servis bulgusunda politika engeli, karar kökeni ve olay zamanları](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Bulgular listesinden ilgili kaydı açın. Admin test ortamındaki bu örnekte `/tmp/komuta-dropped` için politika engeli, kaynak ve son görülme zamanı birlikte gösterilir. Test uygulamasındaki ret sonucunu bu kayıtla eşleştirdik; yalnızca “Tehdit” inceleme etiketi bir engelleme kanıtı değildir.*
+
 ### Çalışma zamanı gözlem incelemesi
 
 Uygun servislerde kaydedilmiş dosya yazmaları, işlem çalıştırmaları ve ağ girişimleri, mevcut inceleme geçmişiyle birlikte görünür. İncelemeyi daraltmak için **Tümü**, **Beklemede**, **İzinli**, **Engelli** veya **Gözardı** filtrelerini kullanın.

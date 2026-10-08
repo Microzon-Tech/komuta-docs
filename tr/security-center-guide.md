@@ -28,6 +28,16 @@ Ayrıntılı kullanım rehberleri **Servislerim → Servis Güvenliği** altınd
 
 > **Doğru bağlamla başlayın:** organizasyonu, servisi, zaman aralığını ve kanıtın güncelliğini doğrulayın. Kaydedilmiş koruma ayarı amacı gösterir; uygulama durumu ve gözlenen sonuçlar ne olduğunu açıklar.
 
+### Gerçek bir çalışma zamanı bulgusu
+
+Aşağıdaki örnekte admin test ortamındaki **komuta-test-app**, geçici dizine bıraktığı programı çalıştırmayı denedi. Komuta'daki bulgu, ilgili işlemin politika tarafından engellendiğini ve son görülme zamanını gösterir. Böylece test sonucunu kaynak, işlem ve zamanla eşleştirerek inceleyebilirsiniz.
+
+![Komuta bulgu ayrıntısında çalışma zamanı politika engeli ve son görülme zamanı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*8 Ekim 2026 tarihli gerçek test: `/tmp/komuta-dropped` çalıştırma girişimi reddedildi. Tekilleştirilmiş bulgunun ilk görülmesi daha eski olabilir; bu koşu için son görülme zamanını kontrol edin. Bu sonuç yalnızca ilgili işlem ve kural kapsamını doğrular.*
+
+Test ekranı ile kanıtı karşılaştırmak için [Çalışma Zamanı Güvenliği](runtime-security-guide.md), bulgu ayrıntısını açma adımları için [Servis Güvenliği](service-security-guide.md) rehberine geçin.
+
 ## Nereden başlamalısınız?
 
 | Amacınız | Başlangıç noktası |
