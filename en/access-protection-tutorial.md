@@ -158,7 +158,7 @@ Goal: a customer outside the organization sees only the `/reports` pages, and on
 
 **Why** — Giving access outside the organization is a deliberate decision; that's why this setting is **off by default** and lives at organization level.
 
-**Effect** — The **A linked organization** and **An email address** share types become available on all of the organization's protected services. If you turn the setting off later, those shares become **Suspended** and the people who came in through them lose access.
+**Effect** — The **A linked organization** and **An email address** share types, and **Everyone at a domain** for domains your organization hasn't verified, become available on all of the organization's protected services. If you turn the setting off later, those shares become **Suspended** and the people who came in through them lose access.
 
 ### Step 2.2 — Add the customer by email address
 
@@ -178,7 +178,7 @@ Goal: a customer outside the organization sees only the `/reports` pages, and on
 
 **Effect**
 
-- The customer opens the service, signs in to Komuta (creating an account with Google or GitHub in seconds if needed), chooses **Email me a code** in the **Shared with your email address?** section of the **You don't have access** page, enters the 8-digit code sent to the address and gets in with **Verify and continue**.
+- The customer opens the service, signs in to Komuta (creating an account with Google or GitHub in seconds if needed), chooses **Email me a code** in the **Shared with your email address or company domain?** section of the **You don't have access** page, enters the 8-digit code sent to the address and gets in with **Verify and continue**.
 - If they open a page outside `/reports`, they see **This page is not shared with you** and the list of pages they can open.
 - On the end date, access ends on its own; the share stays in the list with an **Expired** badge.
 

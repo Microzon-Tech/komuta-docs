@@ -30,6 +30,8 @@ Access protection guides:
 | Shares | At most 200 per service |
 | Share page limit | At most 50 pages (including the "only chosen people" paths it is chosen for) |
 | Share end date | Must be in the future; no upper limit |
+| Domain shares | Domain only (no name before `@`); public mail and shared domains refused; subdomains only for a verified domain; codes for at most 3 different addresses per Komuta account and share in 24 hours; no new codes after 200 wrong codes in 24 hours |
+| Verified domains | At most 20 per organization; TXT `_komuta-verify.<domain>`; checked every 6 hours and on **Check now** (once per 10 s); lapses once the record has been missing for 2 days (at least 3 checks in a row), or after a week without a DNS answer |
 | "Only chosen people" rule | At most 200 people per rule |
 | Service tokens | At most 20 per service; name 1–64 characters; end at most 365 days away; at most 50 pages |
 | Share links | At most 50 per service; name 1–64 characters; end date required (console: 1, 7, 30 or 90 days; API: at most 365 days away); at most 50 pages |
@@ -65,7 +67,7 @@ Steps during `Enforcing` (`RouteFilter` → `PodTokenLock` → `CachePurge`): ad
 
 Expiry action (`ExpiryAction`): `KeepLocked` = **Then keep it locked** (default), `OpenToEveryone` = **Then open it to everyone**.
 
-Share kinds (`ShareKind`): `OwnOrganization` = **Your organization**, `Member` = **A member**, `LinkedOrganization` = **A linked organization**, `Email` = **An email address**.
+Share kinds (`ShareKind`): `OwnOrganization` = **Your organization**, `Member` = **A member**, `LinkedOrganization` = **A linked organization**, `Email` = **An email address**, `EmailDomain` = **Everyone at a domain**.
 
 Combination (`Combine`): `All` = **Require both**, `Any` = **Either is enough**.
 
@@ -264,6 +266,13 @@ Messages shown when an action is refused in the console or the API. Values in cu
 | `DevOpsZon:AccessProtectionShare:LinkedOrganizationIsOwn` | This is your own organization. Share with your organization instead. |
 | `DevOpsZon:AccessProtectionShare:OrganizationRequired` | Open an organization to manage access sharing. |
 | `DevOpsZon:AccessProtection:ExternalSharingDisabled` | Sharing outside the organization is turned off. |
+| `DevOpsZon:AccessProtection:DomainInvalid` | '{Domain}' is not a domain name such as example.com. |
+| `DevOpsZon:AccessProtection:DomainOpenToAnyone` | Anyone can get an e-mail address at '{Domain}', so a share for it would let anyone in. Share with single e-mail addresses instead. |
+| `DevOpsZon:AccessProtection:DomainSubdomainsNeedVerification` | Subdomains of '{Domain}' can only be included once the organization has verified the domain. |
+| `DevOpsZon:AccessProtection:DomainSharesNotAvailable` | Sharing with everyone at a domain is not available yet. |
+| `DevOpsZon:AccessProtection:VerifiedDomainExists` | '{Domain}' is already on the organization's list. |
+| `DevOpsZon:AccessProtection:VerifiedDomainNotFound` | This domain is not on the organization's list. |
+| `DevOpsZon:AccessProtection:TooManyVerifiedDomains` | An organization can verify at most {Max} domains. |
 | `DevOpsZon:AccessProtection:ShareInvalid` | The share details are not valid for the '{Kind}' share type. |
 | `DevOpsZon:AccessProtection:ShareNotFound` | The share was not found. |
 | `DevOpsZon:AccessProtection:ShareScopeInvalid` | The page '{Prefix}' in this share's scope is not valid, or the scope lists more than 50 pages. |
@@ -386,9 +395,10 @@ Protection isn't affected; the new version goes live with the same protection.
 | **Gateway** | The Komuta layer that internet traffic to your service passes through; the check happens here. |
 | **Pod lock** | A protected service's pods accepting only requests from the gateway that passed the check. It prevents bypassing the check. |
 | **Komuta sign-in** | A visitor signing in with a Komuta account. |
-| **Share** | Permission for a person, organization or email address to sign in to the service. |
-| **External sharing** | Sharing outside the organization (a linked organization or an email address). Allowed by an organization setting. |
-| **Suspended** | A share that temporarily doesn't work because external sharing was turned off or the organization link was broken. |
+| **Share** | Permission for a person, organization, email address or everyone at a domain to sign in to the service. |
+| **External sharing** | Sharing outside the organization (a linked organization, an email address, or a domain the organization hasn't verified). Allowed by an organization setting. |
+| **Verified domain** | A domain an organization proved it owns with a DNS TXT record; shares under it count as the organization's own. |
+| **Suspended** | A share that temporarily doesn't work because external sharing was turned off, the organization link was broken, or its domain is no longer verified. |
 | **Page limit (scope)** | A share, token or share link opening only certain paths. |
 | **Share link** | A link with an end date that lets whoever holds it in without a Komuta account. |
 | **Session length** | How long a sign-in lasts (**Stay signed in for**); 12 hours by default. |

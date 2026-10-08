@@ -10,7 +10,7 @@ Erişim koruması tüm planlara dahildir.
 
 Erişim korumasıyla şunları yapabilirsiniz:
 
-- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar ve e-posta adresleri içeri girer.
+- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar, e-posta adresleri ve şirket alan adları içeri girer.
 - **IP adresiyle sınırlayın.** Servis yalnızca belirlediğiniz ağlardan (örneğin ofisinizden) açılır. Giriş ile birlikte "ikisi birden" ya da "biri yeterli" olarak kullanılabilir.
 - **Yol yol koruyun.** Site açıkken `/admin`'i yalnızca giriş yapanlara açın, `/internal`'ı tamamen kapatın, `/raporlar`'ı yalnızca seçtiğiniz kişilere belirli saatlerde açın.
 - **Paylaşım bağlantısı gönderin.** Komuta hesabı olmayan birini — bir müşteri demosu ya da dışarıdan test eden biri — kendiliğinden sona eren bir bağlantıyla bir süreliğine içeri alın.
@@ -223,9 +223,10 @@ Erişim kaydı koruma kapalıyken tutulmaz ve görüntülenemez; daha önceki ka
 
 ## Organizasyon ayarları
 
-**Hesap → Organizasyonlar** sayfasındaki üç ayar organizasyonun tüm servisleri için geçerlidir. Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
+**Hesap → Organizasyonlar** sayfasındaki bu ayarlar organizasyonun tüm servisleri için geçerlidir. Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
 
 - **Dış paylaşıma izin ver** — servislerin bağlı organizasyonlarla ve e-posta adresleriyle paylaşılıp paylaşılamayacağı (bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#dış-paylaşım-izni)).
+- **Doğrulanmış alan adları** — organizasyonunuzun sahibi olduğunu kanıtladığı alan adları; bu alan adlarındaki herkesle yapılan paylaşımlar kendi paylaşımınız sayılır (bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#doğrulanmış-alan-adları)).
 - **Yeni servisleri koru** — varsayılan olarak kapalıdır. Açıkken genel adresi olan her yeni servis Komuta girişi ve bir **Organizasyonunuz** paylaşımıyla başlar; koruma, servisin ilk dağıtımından birkaç dakika sonra devreye girer. Her servisin koruması sonradan ayrı ayrı değiştirilebilir ya da kaldırılabilir. Mevcut servisler değişmez. Şunlar kendiliğinden korunmaz: API gateway'ler, iş (job) ve zamanlanmış iş (cronjob) servisleri, genel adresi olmayan servisler, kendi kümelerinizdeki servisler, özel ağı açık servisler (platform özel ağ ile korumayı birlikte kullanamıyorsa) ve kendi `access` bloğunu tanımlayan Stack servisleri.
 - **Erişim kaydı saklama süresi** — 30 (varsayılan), 90 ya da 365 gün (bkz. [Erişim Kaydı](access-protection-activity.md#saklama-süresi)).
 

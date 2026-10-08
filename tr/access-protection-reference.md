@@ -30,6 +30,8 @@ Erişim koruması rehberleri:
 | Paylaşım | Serviste en fazla 200 |
 | Paylaşımın sayfa sınırı | En fazla 50 sayfa (seçildiği "yalnızca seçilen kişiler" yolları dahil) |
 | Paylaşım bitişi | Gelecekte olmalı; üst sınır yok |
+| Alan adı paylaşımı | Yalnız alan adı (`@` öncesinde ad yok); genel e-posta ve ortak alan adları reddedilir; alt alan adları yalnız doğrulanmış alan adında; Komuta hesabı ve paylaşım başına 24 saatte en fazla 3 farklı adrese kod; 24 saatte 200 yanlış koddan sonra yeni kod yok |
+| Doğrulanmış alan adları | Organizasyon başına en fazla 20; TXT `_komuta-verify.<alan adı>`; 6 saatte bir ve **Şimdi denetle** ile (10 sn'de bir) denetlenir; kayıt 2 gün boyunca bulunamazsa (art arda en az 3 denetim) ya da bir hafta DNS cevabı alınamazsa düşer |
 | "Yalnızca seçilen kişiler" kuralı | Kural başına en fazla 200 kişi |
 | Servis token'ı | Serviste en fazla 20; ad 1–64 karakter; bitiş en fazla 365 gün; en fazla 50 sayfa |
 | Paylaşım bağlantısı | Serviste en fazla 50; ad 1–64 karakter; bitiş zorunlu (konsolda 1, 7, 30 ya da 90 gün; API'de en fazla 365 gün sonrası); en fazla 50 sayfa |
@@ -65,7 +67,7 @@ Erişim koruması rehberleri:
 
 Bitiş davranışı (`ExpiryAction`): `KeepLocked` = **Sonra kilitli kalsın** (varsayılan), `OpenToEveryone` = **Sonra herkese açılsın**.
 
-Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**.
+Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**, `EmailDomain` = **Bir alan adındaki herkes**.
 
 Birleşim (`Combine`): `All` = **İkisi birden gereksin**, `Any` = **Biri yeterli**.
 
@@ -264,6 +266,13 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtectionShare:LinkedOrganizationIsOwn` | Bu sizin kendi organizasyonunuz. Bunun yerine kendi organizasyonunuzla paylaşın. |
 | `DevOpsZon:AccessProtectionShare:OrganizationRequired` | Erişim paylaşımını yönetmek için bir organizasyon açın. |
 | `DevOpsZon:AccessProtection:ExternalSharingDisabled` | Organizasyon dışına paylaşım kapalı. |
+| `DevOpsZon:AccessProtection:DomainInvalid` | '{Domain}' example.com gibi bir alan adı değil. |
+| `DevOpsZon:AccessProtection:DomainOpenToAnyone` | '{Domain}' adresinde herkes e-posta adresi alabilir; bu alan adıyla paylaşım herkesi içeri alır. Bunun yerine tek tek e-posta adresleriyle paylaşın. |
+| `DevOpsZon:AccessProtection:DomainSubdomainsNeedVerification` | '{Domain}' alan adının alt alan adları ancak organizasyon alan adını doğruladıktan sonra eklenebilir. |
+| `DevOpsZon:AccessProtection:DomainSharesNotAvailable` | Bir alan adındaki herkesle paylaşım henüz kullanılamıyor. |
+| `DevOpsZon:AccessProtection:VerifiedDomainExists` | '{Domain}' zaten organizasyonun listesinde. |
+| `DevOpsZon:AccessProtection:VerifiedDomainNotFound` | Bu alan adı organizasyonun listesinde yok. |
+| `DevOpsZon:AccessProtection:TooManyVerifiedDomains` | Bir organizasyon en fazla {Max} alan adı doğrulayabilir. |
 | `DevOpsZon:AccessProtection:ShareInvalid` | Paylaşım bilgileri '{Kind}' paylaşım türü için geçerli değil. |
 | `DevOpsZon:AccessProtection:ShareNotFound` | Paylaşım bulunamadı. |
 | `DevOpsZon:AccessProtection:ShareScopeInvalid` | Bu paylaşımın kapsamındaki '{Prefix}' sayfası geçersiz ya da kapsamda 50'den fazla sayfa var. |
@@ -386,9 +395,10 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Ağ geçidi (gateway)** | Servisinize internetten gelen trafiğin geçtiği Komuta katmanı; kontrol burada yapılır. |
 | **Pod kilidi** | Korunan servisin pod'larının yalnızca ağ geçidinden, kontrolü geçmiş istekleri kabul etmesi. Kontrolün atlanmasını önler. |
 | **Komuta girişi** | Ziyaretçinin Komuta hesabıyla giriş yapması. |
-| **Paylaşım** | Bir kişiye, organizasyona ya da e-posta adresine servise giriş izni. |
-| **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon ya da e-posta). Organizasyon ayarıyla izin verilir. |
-| **Askıda** | Dış paylaşım kapatıldığı ya da organizasyon bağı koptuğu için geçici olarak çalışmayan paylaşım. |
+| **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine ya da bir alan adındaki herkese servise giriş izni. |
+| **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
+| **Doğrulanmış alan adı** | Organizasyonun bir DNS TXT kaydıyla sahibi olduğunu kanıtladığı alan adı; altındaki paylaşımlar organizasyonun kendi paylaşımı sayılır. |
+| **Askıda** | Dış paylaşım kapatıldığı, organizasyon bağı koptuğu ya da alan adı artık doğrulanmış sayılmadığı için geçici olarak çalışmayan paylaşım. |
 | **Sayfa sınırı (kapsam)** | Bir paylaşımın, token'ın ya da paylaşım bağlantısının yalnızca belirli yolları açması. |
 | **Paylaşım bağlantısı** | Elinde tutan herkesi Komuta hesabı olmadan içeri alan, bitiş tarihi olan bağlantı. |
 | **Oturum süresi** | Bir girişin ne kadar sürdüğü; varsayılan 12 saat. |

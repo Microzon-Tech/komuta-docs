@@ -158,7 +158,7 @@ Hedef: organizasyon dışındaki bir müşteri, yalnızca `/raporlar` sayfaları
 
 **Neden** — Organizasyon dışına erişim vermek bilinçli bir karardır; bu yüzden ayar **varsayılan olarak kapalıdır** ve organizasyon düzeyindedir.
 
-**Etkisi** — Organizasyonun tüm korunan servislerinde **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşım türleri kullanılabilir hale gelir. İleride bu ayarı kapatırsanız bu tür paylaşımlar **Askıda** olur ve bunlarla girenlerin erişimi biter.
+**Etkisi** — Organizasyonun tüm korunan servislerinde **Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşım türleri ile organizasyonunuzun doğrulamadığı alan adları için **Bir alan adındaki herkes** kullanılabilir hale gelir. İleride bu ayarı kapatırsanız bu tür paylaşımlar **Askıda** olur ve bunlarla girenlerin erişimi biter.
 
 ### Adım 2.2 — Müşteriyi e-posta adresiyle ekleyin
 
@@ -178,7 +178,7 @@ Hedef: organizasyon dışındaki bir müşteri, yalnızca `/raporlar` sayfaları
 
 **Etkisi**
 
-- Müşteri servisi açar, Komuta'ya giriş yapar (hesabı yoksa Google ya da GitHub ile saniyeler içinde açar), **Erişiminiz yok** sayfasındaki **E-posta adresinizle mi paylaşıldı?** bölümünden **Bana kod gönder** der, adresine gelen 8 haneli kodu girer ve **Doğrula ve devam et** ile içeri girer.
+- Müşteri servisi açar, Komuta'ya giriş yapar (hesabı yoksa Google ya da GitHub ile saniyeler içinde açar), **Erişiminiz yok** sayfasındaki **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümünden **Bana kod gönder** der, adresine gelen 8 haneli kodu girer ve **Doğrula ve devam et** ile içeri girer.
 - `/raporlar` dışındaki bir sayfayı açarsa **Bu sayfaya erişiminiz yok** sayfasını ve açabileceği sayfaların listesini görür.
 - Bitiş tarihinde erişim kendiliğinden biter; paylaşım listede **Süresi doldu** etiketiyle kalır.
 
