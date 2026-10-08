@@ -4,6 +4,8 @@ Komuta Security Center; güvenlik bulgularını, servis korumasını, erişim et
 
 Risk özetinden ilgili bulguya geçebilir, bulguyu servis trafiği ve koruma durumuyla karşılaştırabilir, politika önerilerini değerlendirebilir ve bir kararın arkasındaki kayıtları takip edebilirsiniz. Aynı çalışma alanı bu incelemeleri denetim geçmişi, derleme ve imaj kanıtları, kontrollü güvenlik senaryoları ve bildirim akışlarıyla ilişkilendirir.
 
+> Görseller, 8 Ekim 2026 tarihinde Komuta arayüzündeki test ortamından alınmıştır. Gösterilen durumlar örnektir; kendi servisinizin güncel durumunu kontrol edin.
+
 ## Çalışma Zamanı Güvenliği: çalışan servislerinizi anlayın ve koruyun
 
 Çalışma Zamanı Güvenliği, uygulamanız çalışırken gerçekleşen davranışları incelemenizi ve desteklenen koruma kontrollerini yönetmenizi sağlar. Komuta; işlem çalıştırma, dosya erişimi ve ağ bağlantılarıyla ilgili mevcut kanıtları bulgular, kurallar ve servis duruşuyla ilişkilendirir. Böylece şüpheli davranıştan ilgili servise, incelemeden hedefli müdahaleye ilerleyebilirsiniz.
@@ -82,6 +84,10 @@ Genel Bakış, **hangi servislerin neden dikkat gerektirdiğini** anlamanıza ya
 Ana risk kartı, özetteki en yüksek riskli servisin anlık değerlendirmesini yansıtır; servis adını ve hesaplama zamanını okuyun. Risk puanı önceliklendirme aracıdır; uyumluluk sertifikası değildir. Güvenlik duruşu göstergesi değerlendirilen ayarları, gözlem sayısı kaydedilmiş davranışları anlatır. Bunların hiçbiri saldırı sayacı veya tüm koruma katmanlarının etkili olduğunun kanıtı değildir.
 
 Bir özetten filtrelenmiş listeye geçtiğinizde hangi filtrelerin taşındığını kontrol edin. Özetleri ve ayrıntıları aynı kapsam ve zaman aralığında karşılaştırın; farklı kaynaklar farklı zamanlarda güncellenebilir.
+
+![Güvenlik Merkezi genel bakışında öncelikli işler, risk ve kritik bulgular](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/security-center-overview.jpg)
+
+*Genel bakış, inceleme bekleyen işleri risk ve kanıt güncelliğiyle birlikte gösterir. Bu örnekte düşük risk puanının yanında eski ve zayıflamış kanıt durumu da görünür.*
 
 ## Bulgular: sinyali incelemeye dönüştürün
 
@@ -183,6 +189,10 @@ Her adım için hedefi, önkoşulu, beklenen sonucu ve sorumlu kişiyi belirleyi
 Çalıştırmadan önce hedef servisi, senaryonun kullanılabilirliğini, çalışma ortamı desteğini, beklenen sinyali, uygulamaya olası etkisini ve toparlanma planını doğrulayın. Listelenen senaryo veya geçmiş başarılı çalışma, güncel hazır oluşu göstermez.
 
 Sonrasında çalışma durumunu, eşleşen bulguyu ve tespit süresini aynı hedef için karşılaştırın. Beklenen kanıt eksikse yalnız işlemin tamamlanması yeterli değildir. Sonuç test edilen senaryo ve zaman aralığı için geçerlidir; her saldırının önlendiğini veya her koruma katmanının etkili engelleme yaptığını göstermez.
+
+![Sentetik saldırılar ekranında senaryo uygunluğu ve tatbikat geçmişi](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/scenario-applicability.jpg)
+
+*Sentetik saldırılar ekranı senaryo kataloğunu ve tatbikat geçmişini birleştirir. Görüntüdeki çalışma zamanı için otomatik senaryolar uygulanamaz; bu durum başarılı bir saldırı testi sonucu değildir.*
 
 ## Tedarik zinciri: kanıtı imajla eşleştirin
 

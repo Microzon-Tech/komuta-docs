@@ -6,6 +6,8 @@ Kuruluş genelinde önceliklendirme için [Güvenlik Merkezi](security-center-gu
 
 > **İyi bir inceleme üç adımdan oluşur:** servis ve kanıt kapsamını kontrol edin, ilgili kayıtları karşılaştırın, ardından yetkili değişikliğin sonucunu doğrulayın. Kaydedilen ayar niyeti gösterir; güncel uygulama durumu ve davranış kanıtı ne olduğunu ortaya koyar.
 
+> Görseller, 8 Ekim 2026 tarihinde Komuta arayüzündeki test ortamından alınmıştır. Gösterilen durumlar örnektir; kendi servisinizin güncel durumunu kontrol edin.
+
 ## İlk kullanım
 
 1. Doğru kuruluşu seçin ve incelemek istediğiniz servisi açın.
@@ -28,6 +30,10 @@ Rolünüz de önemlidir. Bulguları okumak, olay zaman çizelgesini görmek, gü
 | **Bulgular** | Bulguları, çalışma zamanı gözlemlerini ve kanıt zaman çizelgesini araştırmak | Kaynak, olay zamanı ve ilgili davranış |
 
 Olay müdahalesi kartı çalışma alanında sekmeler arasında da görünür; inceleme yaparken izolasyon durumunu kontrol edebilirsiniz.
+
+![komuta-test-app servisinin güvenlik özeti ve dört güvenlik sekmesi](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-overview.jpg)
+
+*komuta-test-app üzerindeki Güvenlik ekranı: Genel bakış, Trafik, Koruma ve Bulgular sekmeleri aynı servis bağlamında çalışır. Üst kart mevcut duruşu, olay müdahalesi kartı ise izolasyon durumunu gösterir.*
 
 ## Genel bakış: önceliği belirleyin
 
@@ -92,6 +98,10 @@ Capability değerleri uygulamaya belirli ayrıcalıklar verir. Kart, kullanılab
 
 Capability yönetimi izniyle gereken ekleme veya çıkarmaları inceleyin, gerekçe girin ve kaydedin. Ayrıcalık eklemek onay gerektirir. Değişiklik sonraki dağıtımda etkili olur; kayıt sonucunu okuyun ve o dağıtımdan sonra uygulama sağlığı ile canlı duruşu doğrulayın.
 
+![Koruma sekmesindeki Linux capability izin listesi](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/linux-capabilities.jpg)
+
+*Koruma sekmesindeki Linux capability kartında mevcut eklemeleri ve platform varsayılanlarını karşılaştırabilirsiniz. Görüntüdeki izinler test servisine aittir; uygulamanız için önerilen bir izin listesi değildir.*
+
 ### Yazılabilir yollar
 
 **Yazılabilir yollar** kartı, kök dosya sistemi salt okunur olduğunda uygulamanın yazması gereken dizinleri tanımlar. Tanınan uygulama çatısı için otomatik sağlanan yollar varsa bunları da gösterir; bu yollar bu karttan düzenlenemez.
@@ -99,6 +109,10 @@ Capability yönetimi izniyle gereken ekleme veya çıkarmaları inceleyin, gerek
 Yazılabilir yol yönetimi izniyle yalnız gerekli mutlak uygulama dizinlerini ekleyin, gerekçe girin ve onayı inceleyin. İzin verilen yol kuralları geçerliliğini korur. Mevcut ayarlar yüklenemiyorsa düzenlemeden önce başarıyla yenileyin.
 
 Yazılabilir dizin, kendiliğinden kalıcı depolama anlamına gelmez. Kalıcılık seçeneği sunuluyorsa kapsamını okuyun ve uygulamanın dağıtımlar arasında neyi koruması gerektiğini değerlendirin. Her yazılabilir yolun kalıcı olduğunu varsaymadan servisin sonucunu doğrulayın.
+
+![Koruma sekmesindeki yazılabilir yollar ve gerekçe alanı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/writable-paths.jpg)
+
+*Yazılabilir yollar kartı, ek dizinleri ve değişiklik gerekçesini aynı yerde gösterir. Ekrandaki /app/App_Data bir giriş örneğidir; kaydedilmiş bir yol değildir.*
 
 ### Root olarak çalışma izni
 
