@@ -228,7 +228,7 @@ Hedef: ofis ağından gelenler giriş yapmadan girsin; evden ya da yoldan bağla
 - Diğer herkes Seviye 1 ve 2'deki gibi giriş yapar; paylaşımlar aynen geçerlidir.
 - Ofis adresinden gelenler, daha önce giriş yapmış olsalar bile, bu sayfalarda erişim kaydına yazılmaz ve uygulamaya kimlikleri bildirilmez: istek IP adresiyle geçtiği için oturumlarına bakılmaz. Bu, Seviye 7'de önemlidir.
 
-**Doğrulayın** — **Erişim önizlemesi**'nde **Bir sayfayı kim açar** görünümünü seçin, **Sayfa** `/` iken **Nereden geliyor**'u **Tüm listelerdeki bir adresten** yapın: giriş yapmamış biri için **İzinli bir ağdan girer** görmelisiniz. **İzinli ağların dışından** seçince aynı satır **Giriş yapması gerekiyor (site geneli)** demeli.
+**Doğrulayın** — **Erişim önizlemesi**'nde **Bir sayfayı kim açar** görünümünü seçin, **Sayfa** `/` iken **Nereden geliyor**'u **Belirli bir adresten** yapıp ofis adresinizi yazın: giriş yapmamış biri için **İzinli bir ağdan girer** görmelisiniz. **İzinli ağların dışından** seçince aynı satır **Giriş yapması gerekiyor (site geneli)** demeli.
 
 ---
 
@@ -267,7 +267,7 @@ Hedef: `/admin` yalnızca iki kişiye açık olsun, `/internal` kimseye açık o
 - Saat aralığı her istekte kontrol edilir; aralık bitince açık oturumlar dahil yol birkaç saniye içinde kapanır.
 - Servis token'ları bu yolu hiçbir zaman açamaz.
 
-**Doğrulayın** — **Erişim önizlemesi → Bir sayfayı kim açar** görünümünde **Sayfa** alanına `/admin` yazın: iki kişi için yeşil onay, organizasyon paylaşımı ve diğer üye paylaşımları için **/admin için seçilen kişiler arasında değil**, müşterinin paylaşımı için **Kendisiyle paylaşılan sayfaların dışında**, giriş yapmamış biri için **Giriş yapması gerekiyor (site geneli)** görmelisiniz. **Nereden geliyor**'u **Tüm listelerdeki bir adresten** yaparsanız giriş yapmamış biri için **Giriş yapması gerekiyor (/admin)** görünür: ofisten gelen biri de bu yolda giriş yapmalıdır. `/internal` yazınca herkes için **/internal kuralı engelliyor** görünmeli.
+**Doğrulayın** — **Erişim önizlemesi → Bir sayfayı kim açar** görünümünde **Sayfa** alanına `/admin` yazın: iki kişi için yeşil onay, organizasyon paylaşımı ve diğer üye paylaşımları için **/admin için seçilen kişiler arasında değil**, müşterinin paylaşımı için **Kendisiyle paylaşılan sayfaların dışında**, giriş yapmamış biri için **Giriş yapması gerekiyor (site geneli)** görmelisiniz. **Nereden geliyor**'u **Belirli bir adresten** yapıp ofis adresinizi yazarsanız giriş yapmamış biri için **Giriş yapması gerekiyor (/admin)** görünür: ofisten gelen biri de bu yolda giriş yapmalıdır. `/internal` yazınca herkes için **/internal kuralı engelliyor** görünmeli.
 
 ---
 
@@ -395,7 +395,7 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Yapın**
 
-1. **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir** anahtarını açın. (Bu senaryoda site Komuta girişi istediği için güvenlidir; ayrıntı için [Bitiş ve Kimlik Bildirme](access-protection-settings.md#giriş-yapanı-uygulamama-bildir) sayfasındaki notlara bakın.)
+1. **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir** anahtarını açın (ayrıntılar [Bitiş ve Kimlik Bildirme](access-protection-settings.md#giriş-yapanı-uygulamama-bildir) sayfasında).
 2. Bölüm "Hazırlanıyor" notunu gösterirken birkaç dakika bekleyin.
 
 **Neden** — Komuta ziyaretçinin kim olduğunu zaten biliyor. Bu ayar, bu bilgiyi uygulamanıza her istekte başlık olarak iletir; aynı kişiyi ikinci kez doğrulamak için kod yazmanız gerekmez.
@@ -412,7 +412,7 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Neden** — Aynı kümedeki diğer servisleriniz ve özel ağdan izin verdiğiniz servisler pod'larınıza Komuta'dan geçmeden ulaşabildiği için düz başlıkları kendileri de gönderebilir. İmzalı jeton taklit edilemez. `aud` ve `sid` kontrolü, başka bir uygulamaya verilmiş geçerli bir jetonun sizin uygulamanıza tekrar gönderilmesini engeller.
 
-**Doğrulayın** — `/admin` kuralında kendinizi seçtiyseniz `/admin`'i açtığınızda uygulamanızın kaydında kendi e-postanız görünmeli. (Seçmediyseniz ofis dışından `/` sayfasını açarak deneyin.) Ayarı açmadan önce giriş yapmış olanlar, yeniden giriş yapana kadar (en fazla 12 saat) e-postasız görünür.
+**Doğrulayın** — `/admin` kuralında kendinizi seçtiyseniz `/admin`'i açtığınızda uygulamanızın kaydında kendi e-postanız görünmeli. (Seçmediyseniz ofis dışından `/` sayfasını açarak deneyin.) Ayarı açmadan önce giriş yapmış olanlar, yeniden giriş yapana kadar (en fazla oturum süresi kadar, varsayılan 12 saat) e-postasız görünür.
 
 ---
 
@@ -436,24 +436,27 @@ Hedef: `panel` uygulaması, sayfayı açan kişinin kim olduğunu ayrı bir giri
 
 **Neden** — Retler, kuralların beklediğiniz gibi çalışıp çalışmadığını gösterir: listede olmayan bir gönderici adresinden gelen webhook (**İzinli olmayan bir adresten geldi**), yanlış kişiye kapanmış bir yol (**Bu sayfa kendisiyle paylaşılmamış**), engelleme kuralına takılan bir istek (**Sayfa engelli**) ya da süresi dolmuş bir token burada görünür.
 
-**Etkisi** — Kayıt 30 gün saklanır. Giriş yapmamış ziyaretçilerin retleri kötüye kullanımı önlemek için **Herhangi bir sayfa** ve adresin ilk kısmıyla (IPv4'te `/24`, IPv6'da `/48`) görünür; engelleme kuralı ve açık yol retlerinde kuralın yolu yazar.
+**Etkisi** — Kayıt varsayılan olarak 30 gün saklanır (organizasyon 90 ya da 365 gün seçebilir); **Dışa aktar** kaydı CSV ya da JSON olarak indirir. Giriş yapmamış ziyaretçilerin retleri kötüye kullanımı önlemek için **Herhangi bir sayfa** ve adresin ilk kısmıyla (IPv4'te `/24`, IPv6'da `/48`) görünür; engelleme kuralı, açık yol ve yöntem kuralı retlerinde kuralın yolu yazar.
 
-### Adım 8.3 — Değişikliklerin herkesi etkilediğini bilin
+### Adım 8.3 — Hangi değişikliklerin oturum kapattığını bilin
 
-Şu değişiklikler, yalnızca ilgili kişinin değil **servisteki herkesin** oturumunu yaklaşık 30 saniye içinde bitirir; erişimi devam edenler bir sonraki sayfada yeniden giriş yapar (Komuta'ya giriş yapmış olanlar için bu otomatiktir, e-posta paylaşımıyla girenler yeni kod ister):
+Şu değişiklikler oturumları yaklaşık 30 saniye içinde bitirir; erişimi devam edenler bir sonraki sayfada yeniden giriş yapar (Komuta'ya giriş yapmış olanlar için bu otomatiktir, e-posta paylaşımıyla girenler yeni kod ister):
 
-- Bir paylaşımı kaldırmak.
-- Bir paylaşıma bitiş eklemek ya da bitişini öne çekmek.
-- Sayfa sınırlı bir paylaşımın sayfa listesini değiştirmek.
-- Dış paylaşımı kapatmak.
+| Değişiklik | Kimin oturumu biter |
+|---|---|
+| **Kişiler → Kimler içeride** altında bir kişinin satırında **Çıkar** | O kişinin |
+| Bir paylaşımı kaldırmak, ona bitiş eklemek ya da bitişini öne çekmek, sayfa sınırlı bir paylaşımın sayfa listesini değiştirmek | O paylaşımla açılmış oturumlar |
+| **Herkesi çıkar** | Paylaşım bağlantısıyla girenler dahil herkesin |
+| Dış paylaşımı kapatmak | Dış paylaşımı olan servislerde herkesin |
+| **Oturum süresi**'ni kısaltmak | Yeni süreden eski oturumlar |
 
-Yeni paylaşım eklemek, bitişi uzatmak ya da kural eklemek oturumları etkilemez. Bu yüzden toplu değişiklikleri yoğun olmayan bir saatte yapmak iyi bir alışkanlıktır.
+Serviste oturum takibi başladıktan sonraki ilk 12 saat 10 dakika boyunca Komuta oturumları henüz birbirinden ayırt edemez: bu sürede bir kişiyi çıkarmak ya da bir paylaşımı değiştirmek **herkesi** çıkarır ve **Kimler içeride** bölümü bunun ne zamana kadar süreceğini söyler. Yeni paylaşım eklemek, bitişi uzatmak ya da kural eklemek oturumları etkilemez.
 
 ### Adım 8.4 — Gerektiğinde korumayı kaldırın
 
 **Yapın** — **Ayarlar → Korumayı hemen kaldır → Şimdi herkese aç**.
 
-**Etkisi** — Giriş, IP listesi ve yol kuralları uygulanmaz; servis herkese açılır. Paylaşımlar, servis token'ları ve özel ağ listesi saklanır; kimlik bildirme ayarı da saklanır ve korumayı Komuta girişiyle yeniden açtığınızda kendiliğinden geri gelir. Korumayı yeniden açtığınızda Komuta girişi, IP listesi, yol kuralları, webhook yolları ve bitiş tarihini yeniden girmeniz gerekir; bu yüzden ayarlarınızı bir yere not etmeniz işinizi kolaylaştırır.
+**Etkisi** — Giriş, IP listesi ve yol kuralları uygulanmaz; servis herkese açılır. Paylaşımlar, paylaşım bağlantıları, servis token'ları ve özel ağ listesi saklanır; kimlik bildirme ayarı da saklanır ve korumayı Komuta girişiyle yeniden açtığınızda kendiliğinden geri gelir. Korumayı yeniden açtığınızda Komuta girişi, IP listesi, yol kuralları, webhook yolları ve bitiş tarihini yeniden girmeniz gerekir; bu yüzden ayarlarınızı bir yere not etmeniz işinizi kolaylaştırır.
 
 ---
 
@@ -481,27 +484,31 @@ Rehberin sonunda `panel` servisinin ayarları şöyledir:
 
 En ileri senaryoyu kendi başınıza kurabilmek için Komuta'nın her isteği hangi sırayla değerlendirdiğini bilmek yeterlidir:
 
-1. **Engelleme kuralı** — Yol bir **Tamamen engelle** kuralına giriyorsa istek reddedilir. Başka hiçbir şeye bakılmaz.
-2. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez.
-3. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez.
-4. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna ve paylaşımlarına bakılır. Paylaşımın sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
+1. **Engelleme kuralı** — Yol bir **Tamamen engelle** kuralına giriyorsa istek `403` ile reddedilir. Başka hiçbir şeye bakılmaz.
+2. **Yöntem kuralları** — Yolu kapsayan bir [yöntem kuralı](access-protection-machines.md#yöntem-kuralları) yönteme izin vermiyorsa yanıt `405`'tir. Tarayıcının CORS kontrolü, sorduğu yönteme göre değerlendirilir.
+3. **Ülkeler** — Serviste [ülke listesi](access-protection-rules.md#ülkeler) varsa, başka bir ülkeden gelen ya da ülkesi bilinmeyen ziyaretçi `403` ile reddedilir. Webhook yolları, üzerlerinde bir paylaşım bağlantısı açılmıyorsa bu adımı atlar.
+4. **Hız sınırı** — Adres [hız sınırını](access-protection-rules.md#hız-sınırı) doldurduysa yanıt `429`'dur.
+5. **Paylaşım bağlantısı** — Adreste `?komuta_link=` varsa bağlantı kontrol edilir (IP listeleri yine uygulanır) ve ziyaretçi bir oturumla aynı adrese gönderilir ya da `403` ile reddedilir.
+6. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez.
+7. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez. **CORS kontrollerine girişsiz izin ver** açıksa tarayıcının CORS kontrolü bu noktada geçer.
+8. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna (Komuta girişi ya da paylaşım bağlantısı) ve paylaşımlarına bakılır. Paylaşımın ya da bağlantının sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
 
 Bu sıraya göre örnek istekler:
 
 | İstek | Sonuç | Neden |
 |---|---|---|
-| Ofisten, giriş yapmadan `GET /` | Açılır | 3. adım: site kuralı "biri yeterli", adres listede |
-| Evden, ekip üyesi `GET /` | Giriş yapınca açılır | 3–4: adres listede değil, organizasyon paylaşımı var |
-| Ofisten `GET /admin`, seçilmemiş ekip üyesi | Giriş yaptıktan sonra **Bu sayfaya erişiminiz yok** | 4: `/admin` kişi kuralı, kişi seçilmemiş |
+| Ofisten, giriş yapmadan `GET /` | Açılır | 7. adım: site kuralı "biri yeterli", adres listede |
+| Evden, ekip üyesi `GET /` | Giriş yapınca açılır | 7–8: adres listede değil, organizasyon paylaşımı var |
+| Ofisten `GET /admin`, seçilmemiş ekip üyesi | Giriş yaptıktan sonra **Bu sayfaya erişiminiz yok** | 8: `/admin` kişi kuralı, kişi seçilmemiş |
 | Herhangi biri `GET /internal/araclar` | `403` | 1: engelleme kuralı |
-| Müşteri `GET /raporlar/2026` | E-posta koduyla açılır | 4: e-posta paylaşımı, sayfa kapsamında |
-| Müşteri `GET /` | Giriş ve e-posta kodundan sonra **Bu sayfaya erişiminiz yok** ve açabileceği sayfalar | 4: sayfa sınırı dışında |
-| GitHub `POST /webhooks/github` | Açılır (imzayı uygulama doğrular) | 2: açık yol, gönderici listede |
-| Herhangi biri `GET /webhooks/github` | Site kuralına göre | 2 atlanır (yöntem seçilmemiş), 3–4 uygulanır |
-| CI, token ile `GET /api/health` | Açılır | 3–4: token giriş yerine geçer, kapsamda |
-| CI, token ile `GET /admin` | `403` | 4: kişi kuralı token'ı kabul etmez |
+| Müşteri `GET /raporlar/2026` | E-posta koduyla açılır | 8: e-posta paylaşımı, sayfa kapsamında |
+| Müşteri `GET /` | Giriş ve e-posta kodundan sonra **Bu sayfaya erişiminiz yok** ve açabileceği sayfalar | 8: sayfa sınırı dışında |
+| GitHub `POST /webhooks/github` | Açılır (imzayı uygulama doğrular) | 6: açık yol, gönderici listede |
+| Herhangi biri `GET /webhooks/github` | Site kuralına göre | 6 atlanır (yöntem seçilmemiş), 7–8 uygulanır |
+| CI, token ile `GET /api/health` | Açılır | 7–8: token giriş yerine geçer, kapsamda |
+| CI, token ile `GET /admin` | `403` | 8: kişi kuralı token'ı kabul etmez |
 
-Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda karar bulur?" Cevaptan emin değilseniz **Erişim önizlemesi** tarayıcıyla açılan sayfalar (`GET`) için aynı sırayı gösterir; servis token'larını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
+Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda karar bulur?" Cevaptan emin değilseniz **Erişim önizlemesi** tarayıcıyla açılan sayfalar (`GET`) için aynı sırayı kişiler, servis token'ları ve paylaşım bağlantıları için gösterir; hız sınırını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
 
 ---
 
@@ -519,7 +526,12 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | Webhook'lar `403` alıyor | Gönderici listesi eksik ya da eskimiş | `https://api.github.com/meta` adresindeki `hooks` listesinin tamamını (IPv6 dahil) ekleyin; **Etkinlik**'te **İzinli olmayan bir adresten geldi** satırı reddedilen ağı gösterir. |
 | Webhook'lar `302` ya da `401` alıyor | Yöntem seçilmemiş ya da yol yanlış | Açık yolun yöntemlerini ve yolunu kontrol edin. |
 | Uygulama bazı isteklerde kimlik başlığını boş alıyor | Ziyaretçi ofis adresinden geldi (giriş yapmış olsa bile) ya da sayfa giriş gerektirmiyor | Kimlik gereken yolları bir giriş kuralıyla koruyun. |
-| Ekip bir anda yeniden giriş yapmak zorunda kaldı | Bir paylaşım kaldırıldı ya da sınırlandı | Beklenen davranıştır; bkz. Adım 8.3. |
+| Ekip bir anda yeniden giriş yapmak zorunda kaldı | Biri **Herkesi çıkar**'ı seçti ya da tek tek çıkarma henüz devrede değilken bir paylaşım kaldırıldı veya sınırlandı | Beklenen davranıştır; bkz. Adım 8.3. |
+| Başka bir sitedeki tarayıcı CORS hatası alıyor | Tarayıcının `OPTIONS` kontrolü oturum taşımıyor ve `401` alıyor | **Makineler → Yöntemler ve CORS → CORS kontrollerine girişsiz izin ver**'i açın. |
+| İstekler `405` alıyor | **Makineler** sekmesindeki bir yöntem kuralı o yolda bu yönteme izin vermiyor | Yöntemi kurala ekleyin; `Allow` başlığı yolun kabul ettiklerini listeler. |
+| İstekler `429` alıyor | Adres hız sınırını aştı | Sınırı yükseltin ya da daha uzun bir zaman aralığı seçin; giriş ve webhook isteklerinin de sayıldığını unutmayın. |
+| Hiçbir IP listesine takılmayan bir ziyaretçi **Erişim kısıtlı** görüyor | Ülkesi **Ülkeler** listesinde değil ya da anlaşılamıyor | **Etkinlik** sekmesinde "İzin verilmeyen bir ülkeden geldi" görünür; ülkeyi ekleyin. |
+| Paylaşım bağlantısıyla giren biri "The share link you opened this site with has ended." görüyor | Bağlantı silindi, süresi doldu ya da herkes çıkarıldı | Yeni bir bağlantı oluşturup yeniden gönderin. |
 
 ---
 

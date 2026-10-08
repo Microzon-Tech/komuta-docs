@@ -228,7 +228,7 @@ Goal: people coming from the office network get in without signing in; people co
 - Everyone else signs in as in Levels 1 and 2; shares apply as before.
 - People coming from the office address aren't written to the access log on these pages and aren't identified to the application, even if they signed in earlier: the request passes on its IP address, so their session isn't looked at. This matters in Level 7.
 
-**Check** — In the **Access preview**, choose the **Who can open a page** view and, with **Page** set to `/`, set **Coming from** to **An address on every list**: for someone who hasn't signed in you should see **Gets in from an allowed network**. With **Outside the allowed networks**, the same row should say **Needs to sign in (whole site)**.
+**Check** — In the **Access preview**, choose the **Who can open a page** view and, with **Page** set to `/`, set **Coming from** to **A specific address** and type your office address: for someone who hasn't signed in you should see **Gets in from an allowed network**. With **Outside the allowed networks**, the same row should say **Needs to sign in (whole site)**.
 
 ---
 
@@ -267,7 +267,7 @@ Goal: `/admin` is open to two people only, and `/internal` to nobody.
 - The time window is checked on every request; when it ends, the path closes within a few seconds, including for open sessions.
 - Service tokens can never open this path.
 
-**Check** — In **Access preview → Who can open a page**, type `/admin` in **Page**: you should see a green check for the two people, **Not among the people chosen for /admin** for the organization share and the other member shares, **Outside the pages shared with them** for the customer's share, and **Needs to sign in (whole site)** for someone who hasn't signed in. Set **Coming from** to **An address on every list** and the signed-out row turns into **Needs to sign in (/admin)**: someone in the office must sign in on this path too. For `/internal`, everyone should show **Blocked by the /internal rule**.
+**Check** — In **Access preview → Who can open a page**, type `/admin` in **Page**: you should see a green check for the two people, **Not among the people chosen for /admin** for the organization share and the other member shares, **Outside the pages shared with them** for the customer's share, and **Needs to sign in (whole site)** for someone who hasn't signed in. Set **Coming from** to **A specific address** with your office address and the signed-out row turns into **Needs to sign in (/admin)**: someone in the office must sign in on this path too. For `/internal`, everyone should show **Blocked by the /internal rule**.
 
 ---
 
@@ -395,7 +395,7 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Do**
 
-1. On the **Settings** tab, turn on **Tell my application who signed in**. (This is safe here because the site requires Komuta sign-in; for details see the notes on the [End Date and Visitor Identity](access-protection-settings.md#tell-my-application-who-signed-in) page.)
+1. On the **Settings** tab, turn on **Tell my application who signed in** (details on the [End Date and Visitor Identity](access-protection-settings.md#tell-my-application-who-signed-in) page).
 2. Wait a few minutes while the section shows the "Getting ready" note.
 
 **Why** — Komuta already knows who the visitor is. This setting passes that to your application as headers on every request; you don't need to write code to verify the same person a second time.
@@ -412,7 +412,7 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Why** — Your other services on the same cluster, and the services you allowed over the private mesh, can reach your pods without passing Komuta, so they could send the plain headers themselves. The signed token can't be faked. Checking `aud` and `sid` prevents a valid token issued to another application from being replayed to yours.
 
-**Check** — If you chose yourself on the `/admin` rule, your own email should appear in your application's log when you open `/admin`. (If you didn't, open `/` from outside the office instead.) People who signed in before you turned this on appear without their email until they sign in again (at most 12 hours).
+**Check** — If you chose yourself on the `/admin` rule, your own email should appear in your application's log when you open `/admin`. (If you didn't, open `/` from outside the office instead.) People who signed in before you turned this on appear without their email until they sign in again (at most the session length, 12 hours by default).
 
 ---
 
@@ -436,24 +436,27 @@ Goal: the `panel` application knows who opened a page without a separate sign-in
 
 **Why** — Refusals show whether the rules work the way you expect: a webhook from an address not on the sender list (**Came from an address that is not allowed**), a path closed to the wrong person (**This page is not shared with them**), a request caught by a block rule (**The page is blocked**) or an expired token shows up here.
 
-**Effect** — The log is kept for 30 days. To prevent abuse, refusals of visitors who haven't signed in appear as **Any page** with the first part of the address (`/24` for IPv4, `/48` for IPv6); refusals by a block rule or an open path show the rule's path.
+**Effect** — The log is kept for 30 days by default (an organization can choose 90 or 365 days), and **Export** downloads it as CSV or JSON. To prevent abuse, refusals of visitors who haven't signed in appear as **Any page** with the first part of the address (`/24` for IPv4, `/48` for IPv6); refusals by a block rule, an open path or a method rule show the rule's path.
 
-### Step 8.3 — Know which changes affect everyone
+### Step 8.3 — Know which changes sign people out
 
-These changes end the session of **everyone on the service**, not only the person concerned, within about 30 seconds; people who still have access sign in again on their next page (automatic for those signed in to Komuta; people who came in through an email share request a new code):
+These changes end sessions within about 30 seconds; people who still have access sign in again on their next page (automatic for those signed in to Komuta; people who came in through an email share request a new code):
 
-- Removing a share.
-- Adding an end date to a share, or bringing its end date forward.
-- Changing the page list of a page-limited share.
-- Turning off external sharing.
+| Change | Whose sessions end |
+|---|---|
+| **Sign out** on a person's row under **People → Who is signed in** | That person's |
+| Removing a share, adding an end date to it or bringing its end date forward, changing a page-limited share's page list | The sessions opened through that share |
+| **Sign everyone out** | Everyone's, share-link visitors included |
+| Turning off external sharing | Everyone's on services with an external share |
+| Shortening **Stay signed in for** | Sessions older than the new length |
 
-Adding a new share, extending an end date or adding a rule doesn't affect sessions. That's why making bulk changes at a quiet hour is a good habit.
+For the first 12 hours 10 minutes after session tracking begins on the service, Komuta can't yet tell sessions apart: signing one person out or changing a share then signs **everyone** out, and the **Who is signed in** section says until when. Adding a new share, extending an end date or adding a rule doesn't affect sessions.
 
 ### Step 8.4 — Remove protection when needed
 
 **Do** — **Settings → Remove protection now → Open to everyone now**.
 
-**Effect** — Sign-in, the IP list and path rules stop applying; the service opens to everyone. Shares, service tokens and the private mesh list are kept; the visitor identity setting is kept too and comes back on its own when you turn protection back on with Komuta sign-in. When you turn protection back on, you need to enter Komuta sign-in, the IP list, path rules, webhook paths and the end date again, so keeping a note of your settings makes it easier.
+**Effect** — Sign-in, the IP list and path rules stop applying; the service opens to everyone. Shares, share links, service tokens and the private mesh list are kept; the visitor identity setting is kept too and comes back on its own when you turn protection back on with Komuta sign-in. When you turn protection back on, you need to enter Komuta sign-in, the IP list, path rules, webhook paths and the end date again, so keeping a note of your settings makes it easier.
 
 ---
 
@@ -481,27 +484,31 @@ At the end of the guide, the `panel` service's settings are:
 
 To set up the most advanced scenario on your own, it's enough to know the order in which Komuta evaluates each request:
 
-1. **Block rule** — If the path falls under a **Block completely** rule, the request is refused. Nothing else is looked at.
-2. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply. If the address isn't on the list, the request is refused with `403`; the site's rules aren't tried.
-3. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in. If a rule can't be met even after signing in (an IP-only rule, or **Require both** from an unlisted address), the request is refused here with `403` and the **Access to this service is restricted** page; no sign-in page is shown.
-4. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session and shares are looked at. The share's page limit and the people rule's time window apply here. Without a session, `GET` and `HEAD` requests (from a browser or from `curl` alike) are sent to the sign-in page (`302`); other methods such as `POST` get `401`.
+1. **Block rule** — If the path falls under a **Block completely** rule, the request is refused with `403`. Nothing else is looked at.
+2. **Method rules** — If a [method rule](access-protection-machines.md#method-rules) covers the path and doesn't allow the method, the answer is `405`. A browser's CORS check is judged by the method it asks for.
+3. **Countries** — If the service has a [country list](access-protection-rules.md#countries), a visitor from another country, or whose country is unknown, is refused with `403`. Webhook paths skip this step, unless a share link is being opened on them.
+4. **Rate limit** — If the address has used up its [rate limit](access-protection-rules.md#rate-limit), the answer is `429`.
+5. **Share link** — If the address carries `?komuta_link=`, the link is checked (the IP lists still apply) and the visitor is sent on to the same address with a session, or refused with `403`.
+6. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply. If the address isn't on the list, the request is refused with `403`; the site's rules aren't tried.
+7. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in. If a rule can't be met even after signing in (an IP-only rule, or **Require both** from an unlisted address), the request is refused here with `403` and the **Access to this service is restricted** page; no sign-in page is shown. A browser's CORS check passes at this point if **Allow CORS checks without sign-in** is on.
+8. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session (a Komuta sign-in or a share link) and shares are looked at. The share's or link's page limit and the people rule's time window apply here. Without a session, `GET` and `HEAD` requests (from a browser or from `curl` alike) are sent to the sign-in page (`302`); other methods such as `POST` get `401`.
 
 Example requests in this order:
 
 | Request | Result | Why |
 |---|---|---|
-| From the office, without signing in, `GET /` | Opens | Step 3: site rule is "either is enough", address is listed |
-| From home, team member, `GET /` | Opens after sign-in | 3–4: address not listed, organization share exists |
-| From the office, `GET /admin`, team member not chosen | **This page is not shared with you** after signing in | 4: `/admin` people rule, person not chosen |
+| From the office, without signing in, `GET /` | Opens | Step 7: site rule is "either is enough", address is listed |
+| From home, team member, `GET /` | Opens after sign-in | 7–8: address not listed, organization share exists |
+| From the office, `GET /admin`, team member not chosen | **This page is not shared with you** after signing in | 8: `/admin` people rule, person not chosen |
 | Anyone, `GET /internal/tools` | `403` | 1: block rule |
-| Customer, `GET /reports/2026` | Opens with the email code | 4: email share, page in scope |
-| Customer, `GET /` | After sign-in and the email code, **This page is not shared with you** and the pages they can open | 4: outside the page limit |
-| GitHub, `POST /webhooks/github` | Opens (the app verifies the signature) | 2: open path, sender listed |
-| Anyone, `GET /webhooks/github` | Per the site rule | 2 is skipped (method not chosen), 3–4 apply |
-| CI with token, `GET /api/health` | Opens | 3–4: the token stands in for sign-in, in scope |
-| CI with token, `GET /admin` | `403` | 4: the people rule doesn't accept tokens |
+| Customer, `GET /reports/2026` | Opens with the email code | 8: email share, page in scope |
+| Customer, `GET /` | After sign-in and the email code, **This page is not shared with you** and the pages they can open | 8: outside the page limit |
+| GitHub, `POST /webhooks/github` | Opens (the app verifies the signature) | 6: open path, sender listed |
+| Anyone, `GET /webhooks/github` | Per the site rule | 6 is skipped (method not chosen), 7–8 apply |
+| CI with token, `GET /api/health` | Opens | 7–8: the token stands in for sign-in, in scope |
+| CI with token, `GET /admin` | `403` | 8: the people rule doesn't accept tokens |
 
-Before you add a new rule, ask yourself: "At which step is this request decided?" If you aren't sure, the **Access preview** shows the same order for pages opened in a browser (`GET`); it doesn't take service tokens, other methods such as `POST`, or the private mesh into account.
+Before you add a new rule, ask yourself: "At which step is this request decided?" If you aren't sure, the **Access preview** shows the same order for pages opened in a browser (`GET`), for people, service tokens and share links alike; it doesn't take the rate limit, other methods such as `POST`, or the private mesh into account.
 
 ---
 
@@ -519,7 +526,12 @@ Before you add a new rule, ask yourself: "At which step is this request decided?
 | Webhooks get `403` | The sender list is incomplete or out of date | Add the whole `hooks` list from `https://api.github.com/meta` (IPv6 included); the **Came from an address that is not allowed** row on **Activity** shows the refused network. |
 | Webhooks get `302` or `401` | The method isn't chosen, or the path is wrong | Check the open path's methods and path. |
 | The application gets empty identity headers on some requests | The visitor came from the office address (even if signed in), or the page doesn't need sign-in | Protect the paths that need an identity with a sign-in rule. |
-| The team suddenly had to sign in again | A share was removed or narrowed | This is expected; see Step 8.3. |
+| The team suddenly had to sign in again | Someone chose **Sign everyone out**, or a share was removed or narrowed while one-by-one sign-out wasn't active yet | This is expected; see Step 8.3. |
+| A browser on another site gets a CORS error | The browser's `OPTIONS` check carries no session and gets `401` | Turn on **Machines → Methods and CORS → Allow CORS checks without sign-in**. |
+| Requests get `405` | A method rule on the **Machines** tab doesn't allow that method on that path | Add the method to the rule; the `Allow` header lists what the path accepts. |
+| Requests get `429` | The address went over the rate limit | Raise the limit, or use a longer time window; remember that sign-in and webhooks count too. |
+| A visitor sees **Access to this service is restricted** although no IP list applies to them | Their country isn't on the **Countries** list, or it can't be told | The **Activity** tab shows "Came from a country that is not allowed"; add the country. |
+| A share-link visitor sees "The share link you opened this site with has ended." | The link was deleted or ended, or everyone was signed out | Create a new link and send it again. |
 
 ---
 

@@ -2,15 +2,16 @@
 
 Komuta sign-in is for people: a sign-in page opens in a browser and the person signs in with their account. Some requests, though, come from a program rather than a person. GitHub tells your application when someone pushes, Stripe sends a notification when a payment happens, your CI pipeline runs a health check after a deploy, a monitoring tool polls your site every minute. These programs can't use a sign-in page.
 
-Access protection offers three ways for such requests:
+Access protection offers three ways for such requests, and a section for the HTTP methods and browser CORS checks your service accepts:
 
 | Way | For | Where |
 |---|---|---|
 | **Webhook path** (open path) | Senders that can't sign in and send their own signature (such as GitHub, Stripe, Slack) | **Machines** tab → **Webhooks** |
 | **Service token** | Programs you control (CI jobs, monitoring tools, scripts) | **Machines** tab → **Service tokens** |
 | **Services that may come in over the private mesh** | Your Komuta services on other clusters reaching this service directly | **Machines** tab → **Services that may come in over the private mesh** (the private mesh itself is on the **Network** tab) |
+| **Methods and CORS** | Allowing only the HTTP methods each path needs, and letting browsers' CORS checks through before sign-in | **Machines** tab → **Methods and CORS** |
 
-The webhook and service token sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, the list appears and can be filled in as soon as you start turning protection on on the **Rules** tab (before saving).
+The webhook, service token and **Methods and CORS** sections appear only while access protection is on. If protection is off, the tab shows the **Access protection is off** notice and a **Go to Rules** button. The private mesh list is the one exception: if the service's private mesh is on, the list appears and can be filled in as soon as you start turning protection on on the **Rules** tab (before saving).
 
 ---
 
@@ -40,7 +41,8 @@ The list shows each open path with its methods, its sender list ("Only from: …
 - **Path matching is case-insensitive.** A request to `/HOOKS/x` is under `/hooks`. A request is opened only when every way its path can be read stays under the open path; `%2f`, `..` and similar tricks can't be used to escape from an open path to another path.
 - **Open paths can't be nested.** A second open path can't be opened on, or under, an existing open path.
 - **Method-override headers are ignored.** Komuta looks at the request's real method. Your application shouldn't honour headers such as `X-HTTP-Method-Override` or `X-HTTP-Method` on these paths; otherwise requests that act like `DELETE` could be sent to a path you opened only for `POST`.
-- **CORS preflight requests (`OPTIONS`) don't pass an open path.** `OPTIONS` isn't one of the methods you can choose. A webhook path isn't suitable for endpoints that a browser must call from another site.
+- **`OPTIONS` can't be opened on a webhook path.** `OPTIONS` isn't one of the methods you can choose, so a browser's CORS check to an open path is decided by the site's normal protection. For endpoints that a browser must call from another site, use [Methods and CORS](#methods-and-cors) instead.
+- **Countries don't apply, the rate limit does.** An open path is exempt from the [country list](access-protection-rules.md#countries) (its own sender list is the address check), but its requests count towards the [rate limit](access-protection-rules.md#rate-limit). Block rules and [method rules](#methods-and-cors) are checked before the open path.
 - **The access log** records every delivery to an open path as **Request on an open path** / **Delivered to an open path**, under the open path's prefix rather than the full path.
 
 ### Limits
@@ -112,6 +114,47 @@ When the first token of a service is created, Komuta refreshes the service's rou
 
 ---
 
+## Methods and CORS
+
+The **Methods and CORS** section has two settings: a switch that lets browsers' CORS checks through before sign-in, and a list of the HTTP methods each path accepts ("Let browsers send a CORS check before signing in, and allow only the HTTP methods each path needs. A request with any other method is answered 405."). Changes take effect within about a minute ("Saved. The gateway applies it within about a minute.").
+
+### Allow CORS checks without sign-in
+
+When a page on another site calls your service from the browser (for example a front end at `app.example.com` calling an API at `api.example.com`), the browser first sends a CORS check: an `OPTIONS` request without cookies. On a page that needs sign-in, that check would get `401` and the browser would never send the real request. **Allow CORS checks without sign-in** lets these checks through:
+
+- Only a real browser check passes: an `OPTIONS` request with exactly one `Origin` header and exactly one `Access-Control-Request-Method` header naming `GET`, `HEAD`, `POST`, `PUT`, `PATCH` or `DELETE`. Any other `OPTIONS` request still needs sign-in.
+- Block rules, the IP allow-list, the country list, the rate limit and the Cloudflare check still apply. (Where sign-in and an IP list are combined with **Either is enough**, the check counts as signed in, so it passes from any address; with **Require both** it must come from a listed address.)
+- Method rules are checked against the method the browser asks for, not against `OPTIONS`: with `/api` limited to `GET` and `POST`, a check for `POST` passes and a check for `DELETE` gets `405`.
+- Only the check passes. The real request that follows still needs sign-in (cookies, a service token, or an IP list that lets it in), and your application still answers the CORS headers itself.
+- It matters only while protection requires Komuta sign-in ("Only matters when Komuta sign-in is on.").
+
+### Method rules
+
+A method rule lists the HTTP methods a path accepts. A request with any other method is answered `405` with the plain text `method not allowed` and an `Allow` header listing the rule's methods (for example `Allow: GET, HEAD`), before sign-in, share links or webhook paths are looked at.
+
+1. Click **Add path**. The first row starts as `/` (the whole site) with `GET` and `HEAD`.
+2. Enter the **Path** and tick the **Allowed methods**: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`.
+3. Save with **Save methods** (or undo with **Discard**). **Remove this path** removes a row.
+
+How rules match:
+
+- A rule covers its path and everything below it; `/` covers the whole site.
+- The **longest** matching path decides. For example, `/` with `GET`, `HEAD` and `/api` with `GET`, `POST`, `OPTIONS` let `POST /api/orders` through and answer `POST /about` with `405`.
+- Paths follow the [path rule syntax](access-protection-rules.md#path-syntax), except that `/` on its own is allowed. Each path can be listed once ("Each path can be listed once."), and each needs at least one method ("Pick at least one method for every path.").
+- If a request path can be read in more than one way (encoded characters, `..` and similar), every matching rule must allow the method.
+- Komuta's own sign-in path (`/.komuta-access/callback`) is never subject to method rules.
+- If there are no method rules, every method is allowed ("Every method is allowed. Add a path to limit it.").
+- In the access log, a refusal appears as "Used a method this path does not allow", under the rule's path.
+
+### Limits and permissions
+
+- A service can have at most **50** method rules. They are a separate list and don't count towards the 50 path rules.
+- Changing these settings needs the **Manage service access protection** permission.
+
+If you don't see this section, CORS checks and method rules aren't enabled on your platform yet. If settings were saved and the feature is later switched off, the section shows them read-only: "Changing these is not available on this platform yet; the current settings stay in force."
+
+---
+
 ## Services that may come in over the private mesh
 
 Komuta's **private mesh** lets your services on different clusters reach each other without going out to the public internet. Private mesh traffic doesn't pass Komuta's access check; it goes straight to the service. That's why on a protected service you choose separately who may come in over the private mesh.
@@ -148,7 +191,7 @@ You may see two warnings in the list:
 
 ## Related Documents
 
-- [Rules](access-protection-rules.md) — protecting the site and paths.
+- [Rules](access-protection-rules.md) — protecting the site and paths, countries and the rate limit.
 - [Access Log](access-protection-activity.md) — where webhook deliveries and token use appear.
 - [End Date and Visitor Identity](access-protection-settings.md) — how a request with a token is introduced to your application.
 - [Reference](access-protection-reference.md) — all limits and responses.

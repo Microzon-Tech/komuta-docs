@@ -13,9 +13,12 @@ Erişim korumasıyla şunları yapabilirsiniz:
 - **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar ve e-posta adresleri içeri girer.
 - **IP adresiyle sınırlayın.** Servis yalnızca belirlediğiniz ağlardan (örneğin ofisinizden) açılır. Giriş ile birlikte "ikisi birden" ya da "biri yeterli" olarak kullanılabilir.
 - **Yol yol koruyun.** Site açıkken `/admin`'i yalnızca giriş yapanlara açın, `/internal`'ı tamamen kapatın, `/raporlar`'ı yalnızca seçtiğiniz kişilere belirli saatlerde açın.
+- **Paylaşım bağlantısı gönderin.** Komuta hesabı olmayan birini — bir müşteri demosu ya da dışarıdan test eden biri — kendiliğinden sona eren bir bağlantıyla bir süreliğine içeri alın.
 - **Makinelere izin verin.** GitHub, Stripe gibi webhook göndericileri için giriş istemeyen yollar açın; CI ve izleme araçlarına servis token'ı verin.
+- **Ülkeyi, yöntemi ve istek hızını sınırlayın.** Ziyaretçileri yalnızca seçtiğiniz ülkelerden kabul edin, her yolda yalnızca gereken HTTP yöntemlerine (ve tarayıcıların CORS kontrollerine) izin verin, çok fazla istek gönderen adrese `429` döndürün.
+- **Oturumları yönetin.** Bir girişin ne kadar süreceğini seçin, kimin içeride olduğunu görün, bir kişiyi ya da herkesi çıkarın.
 - **Süre koyun.** Korumayı belirli bir tarihte bitirin; bittiğinde kilitli kalsın ya da herkese açılsın.
-- **Kimin girdiğini görün.** Erişim kaydı girişleri, açılan sayfaları ve geri çevrilen ziyaretçileri gösterir.
+- **Kimin girdiğini görün.** Erişim kaydı girişleri, açılan sayfaları ve geri çevrilen ziyaretçileri gösterir; kaydı CSV ya da JSON olarak dışa aktarabilirsiniz.
 - **Uygulamanıza kim olduğunu söyleyin.** Giriş yapan ziyaretçinin e-postası ve imzalı bir kimlik kanıtı uygulamanıza başlık olarak iletilebilir.
 
 ---
@@ -25,7 +28,7 @@ Erişim korumasıyla şunları yapabilirsiniz:
 Korumalı bir servise gelen her istek, uygulamanıza ulaşmadan önce Komuta'nın ağ geçidinde bir kontrolden geçer:
 
 1. Ziyaretçi servisinizin adresini açar.
-2. Komuta isteği kurallarınıza göre değerlendirir: IP adresi listede mi, ziyaretçinin bu servis için geçerli bir oturumu var mı, açılan yol için özel bir kural var mı?
+2. Komuta isteği kurallarınıza göre değerlendirir: yol engelli mi, yönteme izin var mı, ziyaretçinin ülkesi ve istek hızı sınırlar içinde mi, IP adresi listede mi, ziyaretçinin bu servis için geçerli bir oturumu ya da paylaşım bağlantısı var mı, açılan yol için özel bir kural var mı? (Kesin sıra [Kurulum Rehberi](access-protection-tutorial.md#bir-isteğe-nasıl-karar-verilir)'nde.)
 3. Kurallar sağlanıyorsa istek uygulamanıza iletilir. Giriş gerekiyorsa ziyaretçi Komuta giriş sayfasına yönlendirilir. İzin yoksa ziyaretçi açıklayıcı bir sayfa görür ve istek uygulamanıza hiç ulaşmaz.
 
 Bu kontrolün etrafından dolaşılamaz. Koruma açıldığında Komuta servisinizin pod'larını da kilitler: pod'lar yalnızca ağ geçidinden, kontrolü geçmiş olarak gelen istekleri kabul eder. Biri ağ geçidini atlayıp doğrudan pod'a ulaşmaya çalışırsa istek reddedilir. (Aynı kümedeki kendi servisleriniz ve **Makineler** sekmesinde özel ağ için seçtiğiniz servisler pod'larınıza doğrudan ulaşmaya devam eder.)
@@ -54,6 +57,14 @@ Organizasyonunuzun tüm üyeleri Komuta hesaplarıyla giriş yapıp servisi aça
 
 Müşteri herhangi bir Komuta hesabıyla (Google ya da GitHub ile saniyeler içinde açılabilir) giriş yapar, ardından adresine gelen 8 haneli kodla adresini doğrular.
 
+### Komuta hesabı olmayan birine göstereyim
+
+1. Korumayı **Komuta girişi iste** ile açın.
+2. **Kişiler** sekmesinde **Paylaşım bağlantıları** bölümünden **Bağlantı oluştur**'u seçin, bir ad verin ve **Geçerlilik süresi**'ni seçin.
+3. Bağlantıyı kopyalayıp yalnızca ilgili kişilere gönderin.
+
+Bağlantıyı elinde tutan herkes, bağlantının süresi dolana ya da siz silene kadar giriş yapmadan girer (bkz. [Paylaşım bağlantıları](access-protection-sign-in-sharing.md#paylaşım-bağlantıları)).
+
 ### Yalnızca ofis ağından açılsın
 
 1. **Kurallar** sekmesinde korumayı açın, **Komuta girişi iste**'yi kapatın.
@@ -76,6 +87,10 @@ Listedeki adreslerden gelenler giriş yapmadan girer; diğer herkes **Erişim k�
 
 Korumalı bir serviste **Makineler** sekmesinde **Webhook'lar → Yol aç** ile `/webhooks/github` yolunu `POST` için açın ve uygulamanızda GitHub'ın imzasını (`X-Hub-Signature-256`) doğrulayın.
 
+### Her yeni servis baştan korunsun
+
+**Hesap → Organizasyonlar** sayfasında **Yeni servisleri koru**'yu açın. Genel adresi olan her yeni servis organizasyonunuz için Komuta girişiyle korunarak başlar (bkz. [Organizasyon ayarları](#organizasyon-ayarları)).
+
 ---
 
 ## Ekran: Erişim ve portlar
@@ -85,10 +100,10 @@ Erişim koruması **Servis Detay → Yapılandırma → Erişim ve portlar** say
 | Sekme | İçerik | Rehber |
 |---|---|---|
 | **Genel bakış** | Servisin şu anki erişim durumunun özeti, trafiğin servise nasıl ulaştığı ve son erişim olayları. | Bu sayfa |
-| **Kurallar** | Korumayı açma anahtarı, durum, **Kimler girebilir** (Komuta girişi, IP izin listesi), **Yol kuralları**, **Erişim önizlemesi**. | [Kurallar](access-protection-rules.md) |
-| **Kişiler** | Servisin kimlerle paylaşıldığı. | [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) |
-| **Makineler** | Servis token'ları, webhook yolları ve özel ağdan gelebilecek servisler. | [Makineler ve Özel Ağ](access-protection-machines.md) |
-| **Etkinlik** | Erişim kaydı. | [Erişim Kaydı](access-protection-activity.md) |
+| **Kurallar** | Korumayı açma anahtarı, durum, **Kimler girebilir** (Komuta girişi, IP izin listesi), **Yol kuralları**, **Ülkeler**, **Hız sınırı**, **Erişim önizlemesi**. | [Kurallar](access-protection-rules.md) |
+| **Kişiler** | Servisin kimlerle paylaşıldığı, **Paylaşım bağlantıları**, **Kimler içeride** ve bir girişin ne kadar sürdüğü. | [Giriş ve Paylaşım](access-protection-sign-in-sharing.md) |
+| **Makineler** | Servis token'ları, webhook yolları, **Yöntemler ve CORS** ve özel ağdan gelebilecek servisler. | [Makineler ve Özel Ağ](access-protection-machines.md) |
+| **Etkinlik** | Erişim kaydı ve dışa aktarımı. | [Erişim Kaydı](access-protection-activity.md) |
 | **Ağ** | Genel adresler (genel URL), portlar ve özel ağ (mesh). | [Makineler ve Özel Ağ](access-protection-machines.md#özel-ağdan-doğrudan-gelebilecek-servisler) |
 | **Ayarlar** | Koruma bitişi, uygulamaya kimlik bildirme ve **Şimdi herkese aç**. | [Bitiş ve Kimlik Bildirme](access-protection-settings.md) |
 
@@ -117,7 +132,7 @@ Korumayı servis genel bakışındaki **Servis koruması** kartından da adım a
 
 - **İlk açılış** genellikle bir iki dakika sürer. Komuta servisinizin yönlendirme ayarlarını yeniler ve pod kilidini uygular; bu bir dağıtım olarak görünebilir ama yeni bir build yapılmaz.
 - Kontrol, koruma **Uygulanıyor** durumuna geçtikten kısa süre sonra, servisin yönlendirmeleri yenilenince devreye girer. **Hazırlanıyor** sırasında servis hâlâ eski haliyle (herkese açık) çalışır.
-- **Açık bir korumada** kural, IP listesi ve paylaşım değişiklikleri genellikle birkaç saniye ile yarım dakika arasında geçerli olur. Bu sırada kart "Son değişikliğiniz uygulanıyor." der.
+- **Açık bir korumada** kural, IP listesi ve paylaşım değişiklikleri genellikle birkaç saniye ile yarım dakika arasında geçerli olur. Bu sırada kart "Son değişikliğiniz uygulanıyor." der. Ülkeler, hız sınırı ile yöntemler ve CORS yaklaşık bir dakika içinde; ziyaretçileri çıkarmak ve paylaşım bağlantılarını silmek yaklaşık 30 saniye içinde geçerli olur.
 - **Kapatma** da birkaç saniye ile bir iki dakika arasında tamamlanır; kontrol **Kapatılıyor** durumunun son adımında kalkar.
 
 ---
@@ -196,11 +211,36 @@ Kontrol **Kapatılıyor** durumunun son adımında kalkar; bundan sonra URL'e sa
 | Saklanır (korumayı yeniden açınca geçerli olur) | Yeniden girmeniz gerekir |
 |---|---|
 | Paylaşımlar (askıdakiler dahil) | Komuta girişi seçimi |
-| Servis token'ları | IP izin listesi |
+| Servis token'ları ve paylaşım bağlantıları (süresi dolmamış bağlantılar yeniden çalışır) | IP izin listesi |
 | Özel ağdan gelebilecek servisler listesi | Yol kuralları ve webhook yolları |
-| Uygulamaya kimlik bildirme ayarı (korumayı Komuta girişiyle yeniden açarsanız kendiliğinden yeniden devreye girer; giriş istemeyen bir korumada kapanır) | Koruma bitiş tarihi |
+| Ülkeler, hız sınırı, yöntem kuralları ve CORS ayarı | Koruma bitiş tarihi |
+| **Oturum süresi** seçimi | |
+| Uygulamaya kimlik bildirme ayarı (korumayı Komuta girişiyle yeniden açarsanız kendiliğinden yeniden devreye girer; giriş istemeyen bir korumada kapanır) | |
 
-Erişim kaydı koruma kapalıyken tutulmaz ve görüntülenemez; daha önceki kayıtlar 30 gün saklanır ve korumayı yeniden açarsanız **Etkinlik** sekmesinde yine görünür.
+Erişim kaydı koruma kapalıyken tutulmaz ve görüntülenemez; daha önceki kayıtlar organizasyonun saklama süresi boyunca (varsayılan 30 gün) saklanır ve korumayı yeniden açarsanız **Etkinlik** sekmesinde yine görünür.
+
+---
+
+## Organizasyon ayarları
+
+**Hesap → Organizasyonlar** sayfasındaki üç ayar organizasyonun tüm servisleri için geçerlidir. Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
+
+- **Dış paylaşıma izin ver** — servislerin bağlı organizasyonlarla ve e-posta adresleriyle paylaşılıp paylaşılamayacağı (bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#dış-paylaşım-izni)).
+- **Yeni servisleri koru** — varsayılan olarak kapalıdır. Açıkken genel adresi olan her yeni servis Komuta girişi ve bir **Organizasyonunuz** paylaşımıyla başlar; koruma, servisin ilk dağıtımından birkaç dakika sonra devreye girer. Her servisin koruması sonradan ayrı ayrı değiştirilebilir ya da kaldırılabilir. Mevcut servisler değişmez. Şunlar kendiliğinden korunmaz: API gateway'ler, iş (job) ve zamanlanmış iş (cronjob) servisleri, genel adresi olmayan servisler, kendi kümelerinizdeki servisler, özel ağı açık servisler (platform özel ağ ile korumayı birlikte kullanamıyorsa) ve kendi `access` bloğunu tanımlayan Stack servisleri.
+- **Erişim kaydı saklama süresi** — 30 (varsayılan), 90 ya da 365 gün (bkz. [Erişim Kaydı](access-protection-activity.md#saklama-süresi)).
+
+Bu ayarları görmüyorsanız erişim koruması platformunuzda henüz açık değildir ya da organizasyonu düzenleme yetkiniz yoktur.
+
+---
+
+## Güvenlik → Erişim koruması
+
+**Güvenlik → Erişim koruması** sayfası (**Servislerinize kimler ulaşabiliyor**), organizasyonun genel adresi olan tüm servislerini tek tabloda gösterir: internetteki herkesin açıp açamadığı, koruma durumu, kuralların özeti (Komuta girişi, IP kuralı sayısı, yol kuralı sayısı) ve korumanın ne zaman bittiği. Üstteki kutular **Genel servisler**, **Koruma açık**, **Herkese açık**, **Dikkat gerekiyor** ve **Reddedilen istek, 24 sa** sayılarını gösterir; **Göster** tabloyu süzer, arama kutusu servis ya da proje bulur.
+
+- Servisleri görebilen herkes sayfayı açabilir.
+- Bir servisin korumasını ya da paylaşımlarını yönetebilen (ve o servisi düzenleyebilen) kişiler o servis için verilen erişimi (kişiler ve organizasyonlar, paylaşım bağlantıları, servis token'ları), son 24 saatte izin verilen ve reddedilen istekleri ve son değişikliğin başarısız olup olmadığını da görür. Diğer kişiler bu sütunlarda "—" görür.
+- Sayfa hiçbir şeyi değiştirmez. Bir servise tıklayınca servisin **Erişim ve portlar** sayfası açılır; koruma orada değiştirilir.
+- En fazla 1.000 servis gösterilir. Erişim koruması organizasyonunuz için kullanılamıyorsa sayfa bunu belirtir.
 
 ---
 
@@ -215,7 +255,7 @@ Servis genel bakışında (dashboard) **Servis koruması** kartı korumanın dur
 5. **Süre** — koruma bitişi ve tarih geldiğinde ne olacağı (**Koruma kurallarını sürdür** ya da **Herkese aç**).
 6. **Değişiklikleri gözden geçir** — mevcut ve yeni ayarlar yan yana; **Korumayı uygula** ile kaydedilir.
 
-Gözden geçirip uygulayana kadar hiçbir ayar değişmez. Kaydetme sırasında bir adım başarısız olursa başarılı adımlar korunur ve servis hiçbir zaman kendiliğinden herkese açılmaz. Webhook yolları, servis token'ları, erişim kaydı ve kimlik bildirme yalnızca **Erişim ve portlar** sayfasındadır (pencerede **Erişim ve portlar sayfasındaki gelişmiş ayarlar** bağlantısı).
+Gözden geçirip uygulayana kadar hiçbir ayar değişmez. Kaydetme sırasında bir adım başarısız olursa başarılı adımlar korunur ve servis hiçbir zaman kendiliğinden herkese açılmaz. Webhook yolları, servis token'ları, paylaşım bağlantıları, ülkeler, hız sınırı, yöntemler ve CORS, oturumlar, erişim kaydı ve kimlik bildirme yalnızca **Erişim ve portlar** sayfasındadır (pencerede **Erişim ve portlar sayfasındaki gelişmiş ayarlar** bağlantısı).
 
 Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; bu durumda **Erişim ve portlar** sayfasını kullanın.
 
@@ -229,7 +269,9 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - **Mavi-yeşil dağıtım** — Önizleme adresi de korunur; ziyaretçi önizleme adresi için ayrıca giriş yapar.
 - **Özel ağ (mesh)** — Özel ağ trafiği ağ geçidinden geçmez. Korunan bir serviste diğer kümelerinizden kimin doğrudan gelebileceğini **Makineler** sekmesinde seçersiniz (bkz. [Makineler ve Özel Ağ](access-protection-machines.md#özel-ağdan-doğrudan-gelebilecek-servisler)).
 - **Uygulamanız** — Komuta'nın oturum çerezleri ve servis token'ı başlığı isteğinizden çıkarılır; uygulamanız bunları görmez. Her izinli istekte Komuta'nın pod kilidi için eklediği `x-komuta-access` başlığı bulunur. Bu, servisinize özel gizli bir değerdir: kullanmanız gerekmez, loglamayın ve başka bir yere iletmeyin.
-- **Desteklenmeyenler** — Tarayıcının başka bir siteden yaptığı CORS ön uçuş istekleri (`OPTIONS`) giriş gerektiren yollarda oturum taşımadığı için geçemez; webhook yollarında da `OPTIONS` seçilemez. Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı olmalıdır.
+- **CORS** — Tarayıcının başka bir siteden gönderdiği CORS kontrolü (`OPTIONS`) oturum taşımaz. Giriş isteyen bir sayfadan ancak **Makineler** sekmesinde **CORS kontrollerine girişsiz izin ver** açıksa geçer (bkz. [Yöntemler ve CORS](access-protection-machines.md#yöntemler-ve-cors)); webhook yollarında `OPTIONS` yine seçilemez.
+- **Stack'ler** — Stack'teki bir servis, Komuta girişini, organizasyon paylaşımını ve IP izin listesini manifestinde tanımlayabilir (bkz. [Stack Manifestinde Erişim Koruması](stack-manifest-access.md)).
+- **Desteklenmeyenler** — Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı ya da paylaşım bağlantısı olmalıdır.
 
 ---
 
@@ -237,13 +279,13 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 
 - Servisin genel bir URL'i ve en az bir genel adresi olmalıdır.
 - Servis, Komuta'nın paylaşımlı barındırma kümelerinde çalışmalıdır.
-- IP listesi kullanılan yerlerde isteklerin Cloudflare üzerinden gelmesi gerekir; Komuta adresleri ve Komuta'ya eklenen özel alan adları bu şekilde çalışır.
+- IP listesi, ülke listesi ya da hız sınırı kullanılan yerlerde isteklerin Cloudflare üzerinden gelmesi gerekir; Komuta adresleri ve Komuta'ya eklenen özel alan adları bu şekilde çalışır.
 - Erişim koruması organizasyonlarda varsayılan olarak açıktır. Organizasyonunuz için kapatılmışsa yeni koruma ve yeni paylaşım eklenemez ("Erişim koruması bu organizasyon için kapatılmış. Açtırmak için Komuta desteğiyle iletişime geçin."); mevcut korumalar çalışmaya devam eder.
 
 | İzin | Ne sağlar |
 |---|---|
-| **Servis erişim korumasını yönet** | Korumayı açmak ve kapatmak; Komuta girişi, IP izin listesi, yol kuralları, webhook yolları, özel ağ listesi, bitiş tarihi, kimlik bildirme; **Şimdi herkese aç**. |
-| **Korunan servisin paylaşımlarını yönet** | Paylaşımları ve servis token'larını yönetmek. |
+| **Servis erişim korumasını yönet** | Korumayı açmak ve kapatmak; Komuta girişi, IP izin listesi, yol kuralları, ülkeler, hız sınırı, webhook yolları, yöntemler ve CORS, özel ağ listesi, oturum süresi, bitiş tarihi, kimlik bildirme; **Şimdi herkese aç**. |
+| **Korunan servisin paylaşımlarını yönet** | Paylaşımları, paylaşım bağlantılarını ve servis token'larını yönetmek; ziyaretçileri oturumdan çıkarmak. |
 
 İki izinde de servisi düzenleme erişiminiz olmalıdır. İzni olmayanlar ayarları salt okunur görür ("Salt okunur — bu ayarları değiştirmek için erişim korumasını yönetme yetkisi gerekir.").
 
@@ -258,5 +300,6 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - [Erişim Kaydı](access-protection-activity.md) — **Etkinlik** sekmesi.
 - [Bitiş ve Kimlik Bildirme](access-protection-settings.md) — koruma bitişi, hatırlatmalar, uygulamaya kimlik iletme ve JWT doğrulama.
 - [Başvuru](access-protection-reference.md) — sınırlar, yanıtlar, başlıklar, hata mesajları, sık sorulan sorular, sözlük.
+- [Stack Manifestinde Erişim Koruması](stack-manifest-access.md) — girişi ve IP izin listesini Stack'te tanımlama.
 
 İlgili: [Servis Portları](services-ports.md) — **Erişim ve portlar** sayfasının port bölümü.

@@ -2,15 +2,16 @@
 
 Komuta girişi insanlar içindir: tarayıcıda bir giriş sayfası açılır, kişi hesabıyla giriş yapar. Bazı istekler ise bir insandan değil bir programdan gelir. GitHub bir push olduğunda uygulamanıza haber verir, Stripe bir ödeme olduğunda bildirim gönderir, CI hattınız deploy sonrası bir sağlık kontrolü yapar, bir izleme aracı her dakika sitenizi yoklar. Bu programlar giriş sayfasını kullanamaz.
 
-Erişim koruması bu tür istekler için üç yol sunar:
+Erişim koruması bu tür istekler için üç yol ve servisinizin kabul ettiği HTTP yöntemleri ile tarayıcı CORS kontrolleri için bir bölüm sunar:
 
 | Yol | Ne için | Nerede |
 |---|---|---|
 | **Webhook yolu** (açık yol) | Giriş yapamayan ve kendi imzasını gönderen göndericiler (GitHub, Stripe, Slack gibi) | **Makineler** sekmesi → **Webhook'lar** |
 | **Servis token'ı** | Sizin kontrol ettiğiniz programlar (CI işleri, izleme araçları, betikler) | **Makineler** sekmesi → **Servis token'ları** |
 | **Özel ağdan gelebilecek servisler** | Diğer kümelerinizdeki Komuta servislerinizin bu servise doğrudan ulaşması | **Makineler** sekmesi → **Özel ağdan doğrudan gelebilecek servisler** (özel ağın kendisi **Ağ** sekmesinde) |
+| **Yöntemler ve CORS** | Her yolda yalnızca gereken HTTP yöntemlerine izin vermek ve tarayıcıların CORS kontrollerini girişten önce geçirmek | **Makineler** sekmesi → **Yöntemler ve CORS** |
 
-Webhook ve servis token'ı bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, **Kurallar** sekmesinde korumayı açmaya başladığınızda (kaydetmeden önce) liste görünür ve doldurulabilir.
+Webhook, servis token'ı ve **Yöntemler ve CORS** bölümleri yalnızca erişim koruması açıkken görünür. Koruma kapalıysa sekmede **Erişim koruması kapalı** notu ve **Kurallara git** düğmesi görünür. Özel ağ listesi bunun tek istisnasıdır: servisin özel ağı açıksa, **Kurallar** sekmesinde korumayı açmaya başladığınızda (kaydetmeden önce) liste görünür ve doldurulabilir.
 
 ---
 
@@ -40,7 +41,8 @@ Listede her açık yol; yolu, seçili yöntemleri, gönderici listesini ("Yalnı
 - **Yol eşleşmesi büyük/küçük harf duyarsızdır.** `/HOOKS/x` isteği `/hooks` yolunun altındadır. Bir istek ancak yolunun okunabileceği her biçim açık yolun altında kalıyorsa açılır; `%2f`, `..` ya da benzeri hilelerle açık yoldan başka bir yola kaçılamaz.
 - **Açık yollar iç içe olamaz.** Bir açık yolun altına ya da aynı yola ikinci bir açık yol açılamaz.
 - **Yöntem değiştirme başlıkları dikkate alınmaz.** Komuta isteğin gerçek yöntemine bakar. Uygulamanız bu yollarda `X-HTTP-Method-Override` ya da `X-HTTP-Method` gibi başlıkları kabul etmemelidir; aksi halde yalnızca `POST` açtığınız bir yola `DELETE` gibi davranan istekler gönderilebilir.
-- **CORS ön uçuş istekleri (`OPTIONS`) açık yoldan geçmez.** Seçilebilen yöntemler arasında `OPTIONS` yoktur. Tarayıcıdan başka bir siteden çağrılması gereken uç noktalar için webhook yolu uygun değildir.
+- **Webhook yolunda `OPTIONS` açılamaz.** Seçilebilen yöntemler arasında `OPTIONS` yoktur; bu yüzden açık yola gelen tarayıcı CORS kontrolü sitenin normal korumasına göre değerlendirilir. Tarayıcıdan başka bir siteden çağrılması gereken uç noktalar için bunun yerine [Yöntemler ve CORS](#yöntemler-ve-cors) bölümünü kullanın.
+- **Ülkeler uygulanmaz, hız sınırı uygulanır.** Açık yol [ülke listesinden](access-protection-rules.md#ülkeler) muaftır (adres kontrolü kendi gönderici listesidir), ama istekleri [hız sınırına](access-protection-rules.md#hız-sınırı) dahildir. Engelleme kuralları ve [yöntem kuralları](#yöntemler-ve-cors) açık yoldan önce kontrol edilir.
 - **Erişim kaydı** açık yola gelen her teslimatı **Açık yol isteği** / **Açık yola teslim edildi** olarak, tam yol yerine açık yolun önekiyle kaydeder.
 
 ### Sınırlar
@@ -112,6 +114,47 @@ Bir serviste ilk token oluşturulduğunda Komuta, başlığın uygulamaya giden 
 
 ---
 
+## Yöntemler ve CORS
+
+**Yöntemler ve CORS** bölümünde iki ayar vardır: tarayıcıların CORS kontrollerini girişten önce geçiren bir anahtar ve her yolun kabul ettiği HTTP yöntemlerinin listesi ("Tarayıcıların girişten önce CORS kontrolü göndermesine izin verin; her yolda yalnızca gereken HTTP yöntemleri kabul edilsin. Başka bir yöntemle gelen istek 405 ile yanıtlanır."). Değişiklikler yaklaşık bir dakika içinde geçerli olur ("Kaydedildi. Ağ geçidi yaklaşık bir dakika içinde uygular.").
+
+### CORS kontrollerine girişsiz izin ver
+
+Başka bir sitedeki bir sayfa servisinizi tarayıcıdan çağırdığında (örneğin `app.ornek.com` adresindeki bir ön yüzün `api.ornek.com` adresindeki API'yi çağırması), tarayıcı önce bir CORS kontrolü gönderir: çerezsiz bir `OPTIONS` isteği. Giriş isteyen bir sayfada bu kontrol `401` alır ve tarayıcı asıl isteği hiç göndermez. **CORS kontrollerine girişsiz izin ver** bu kontrolleri geçirir:
+
+- Yalnızca gerçek bir tarayıcı kontrolü geçer: tam olarak bir `Origin` başlığı ve `GET`, `HEAD`, `POST`, `PUT`, `PATCH` ya da `DELETE` yöntemini bildiren tam olarak bir `Access-Control-Request-Method` başlığı taşıyan bir `OPTIONS` isteği. Diğer `OPTIONS` istekleri yine giriş ister.
+- Engelleme kuralları, IP izin listesi, ülke listesi, hız sınırı ve Cloudflare kontrolü yine uygulanır. (Giriş ve IP listesinin **Biri yeterli** ile birleştiği yerlerde kontrol giriş yapmış sayılır ve her adresten geçer; **İkisi birden gereksin** seçiliyse listedeki bir adresten gelmelidir.)
+- Yöntem kuralları `OPTIONS`'a değil, tarayıcının sorduğu yönteme göre kontrol edilir: `/api` yalnızca `GET` ve `POST`'a izinliyse `POST` için gelen kontrol geçer, `DELETE` için gelen kontrol `405` alır.
+- Yalnızca kontrol geçer. Ardından gelen asıl istek yine giriş ister (çerez, servis token'ı ya da onu içeri alan bir IP listesi); CORS başlıklarını yine uygulamanız döndürür.
+- Yalnızca koruma Komuta girişi isterken anlamlıdır ("Yalnızca Komuta girişi açıkken anlamlıdır.").
+
+### Yöntem kuralları
+
+Bir yöntem kuralı, bir yolun kabul ettiği HTTP yöntemlerini listeler. Başka bir yöntemle gelen istek; giriş, paylaşım bağlantısı ya da webhook yoluna bakılmadan `405`, düz metin `method not allowed` ve kuralın yöntemlerini listeleyen bir `Allow` başlığıyla (örneğin `Allow: GET, HEAD`) yanıtlanır.
+
+1. **Yol ekle**'ye tıklayın. İlk satır `/` (sitenin tamamı) ve `GET`, `HEAD` ile başlar.
+2. **Yol**'u girin ve **İzin verilen yöntemler**'i işaretleyin: `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`.
+3. **Yöntemleri kaydet** ile kaydedin (ya da **Vazgeç** ile geri alın). **Bu yolu kaldır** bir satırı siler.
+
+Kurallar nasıl eşleşir:
+
+- Bir kural yolunu ve altındaki her şeyi kapsar; `/` sitenin tamamını kapsar.
+- Eşleşen **en uzun** yol karar verir. Örneğin `GET`, `HEAD` ile `/` ve `GET`, `POST`, `OPTIONS` ile `/api` varsa `POST /api/siparisler` geçer, `POST /hakkimizda` `405` alır.
+- Yollar [yol kurallarının yazım kurallarına](access-protection-rules.md#yol-yazım-kuralları) uyar; tek fark, tek başına `/` yazılabilmesidir. Her yol bir kez yazılabilir ("Her yol yalnızca bir kez yazılabilir.") ve her birine en az bir yöntem gerekir ("Her yol için en az bir yöntem seçin.").
+- Bir isteğin yolu birden fazla biçimde okunabiliyorsa (kodlanmış karakterler, `..` ve benzerleri), eşleşen her kural yönteme izin vermelidir.
+- Komuta'nın kendi giriş yolu (`/.komuta-access/callback`) yöntem kurallarına hiçbir zaman tabi değildir.
+- Hiç yöntem kuralı yoksa tüm yöntemlere izin verilir ("Tüm yöntemlere izin veriliyor. Sınırlamak için bir yol ekleyin.").
+- Erişim kaydında ret, kuralın yoluyla birlikte "Bu yolun izin vermediği bir yöntem kullandı" olarak görünür.
+
+### Sınırlar ve izinler
+
+- Bir serviste en fazla **50** yöntem kuralı olabilir. Ayrı bir listedir; 50 yol kuralı sınırına dahil değildir.
+- Bu ayarları değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
+
+Bu bölümü görmüyorsanız CORS kontrolleri ve yöntem kuralları platformunuzda henüz açık değildir. Ayarlar kaydedildikten sonra özellik kapatılırsa bölüm bunları salt okunur gösterir: "Bu ayarlar bu platformda henüz değiştirilemiyor; mevcut ayarlar geçerli kalır."
+
+---
+
 ## Özel ağdan doğrudan gelebilecek servisler
 
 Komuta'nın **özel ağı (mesh)**, farklı kümelerdeki servislerinizin birbirine genel internete çıkmadan ulaşmasını sağlar. Özel ağ trafiği Komuta'nın erişim kontrolünden geçmez, doğrudan servisin kendisine gider. Bu yüzden korunan bir serviste özel ağdan kimin gelebileceği ayrıca seçilir.
@@ -148,7 +191,7 @@ Listede iki uyarı görebilirsiniz:
 
 ## İlgili Dokümanlar
 
-- [Kurallar](access-protection-rules.md) — sitenin ve yolların korunması.
+- [Kurallar](access-protection-rules.md) — sitenin ve yolların korunması, ülkeler ve hız sınırı.
 - [Erişim Kaydı](access-protection-activity.md) — webhook teslimatlarının ve token kullanımının görüldüğü yer.
 - [Bitiş ve Kimlik Bildirme](access-protection-settings.md) — token'la gelen isteğin uygulamaya nasıl tanıtıldığı.
 - [Başvuru](access-protection-reference.md) — tüm sınırlar ve yanıtlar.
