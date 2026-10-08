@@ -1,369 +1,277 @@
-# Güvenlik Merkezi (Security Center)
+# Güvenlik Merkezi
 
-Komuta Güvenlik Merkezi, tüm kümeleriniz ve servisleriniz genelindeki güvenlik durumunu **tek bir konsoldan** izlemenizi ve yönetmenizi sağlar. Çalışma zamanı telemetrisine dayanır: workload'larınızın içinde gerçekte ne olduğunu (hangi process çalıştı, hangi dosyaya erişildi, hangi ağ bağlantısı kuruldu) kernel seviyesinde gözlemler, bulgulara dönüştürür ve aksiyon almanızı sağlar.
+Komuta Security Center; güvenlik bulgularını, servis korumasını, erişim etkinliğini ve inceleme kanıtlarını bir araya getirir. Organizasyonunuzda dikkat gerektiren konuları belirlemek, etkilenen servisi incelemek ve yetkili bir müdahaleyi sonucuna kadar takip etmek için kullanın.
 
-Sol menüden **Güvenlik** bölümüne tıklayarak erişirsiniz.
+Risk özetinden ilgili bulguya geçebilir, bulguyu servis trafiği ve koruma durumuyla karşılaştırabilir, politika önerilerini değerlendirebilir ve bir kararın arkasındaki kayıtları takip edebilirsiniz. Aynı çalışma alanı bu incelemeleri denetim geçmişi, derleme ve imaj kanıtları, kontrollü güvenlik senaryoları ve bildirim akışlarıyla ilişkilendirir.
 
----
+> **Doğru bağlamla başlayın:** organizasyonu, servisi, zaman aralığını ve kanıtın güncelliğini doğrulayın. Kaydedilmiş koruma ayarı amacı gösterir; uygulama durumu ve gözlenen sonuçlar ne olduğunu açıklar.
 
-## Güvenlik Merkezi Nasıl Çalışır?
+## Nereden başlamalısınız?
 
-```
-Çalışma Zamanı Sensörleri  →  Telemetri Toplama  →  Bulgu Üretimi  →  Aksiyon
-(Çalışma-zamanı Koruması,     (Komuta Telemetry     (tekilleştirme,    (karar, bildirim,
- Çalışma-zamanı İzleme,        Engine)                risk skoru)        SIEM, uyumluluk)
- Ağ Akış Gözlemi, Posture)
-```
+| Amacınız | Başlangıç noktası |
+|---|---|
+| Önce neyi inceleyeceğinize karar vermek | **Güvenlik → Genel Bakış**, ardından **Bulgular** |
+| Tek bir uygulamanın davranışını incelemek | [Servis Güvenliği](service-security-guide.md) |
+| İnternete açık uygulamaya kimlerin erişebileceğini belirlemek | **Güvenlik → Erişim koruması** ve [Erişim ve portlar](service-access-protection.md) |
+| Bir koruma değişikliğini anlamak | **Politikalar**, **Engellemeler** ve [Çalışma Zamanı Güvenliği](runtime-security-guide.md) |
+| İşlemleri veya oturum açmaları incelemek | **Denetim Kaydı** veya **Oturum Aktivitesi** |
+| Bir imajı veya saklanan denetim kanıtını değerlendirmek | **Tedarik zinciri** veya **Denetim kaydı koruması** |
 
-1. Kümelerinize kurulan **çalışma zamanı sensörleri** container içi davranışları (process, dosya, ağ) ve duruş (posture) bilgilerini toplar.
-2. Olaylar **tekilleştirilir**: aynı mantıksal olay tekrar ettiğinde yeni kayıt açılmaz, mevcut bulgunun sayacı ve "son görülme" zamanı güncellenir.
-3. Her servis için **0–100 arası risk skoru** hesaplanır ve 5 dakikada bir güncellenir.
-4. Bulgular; bildirim kanallarına, SIEM sisteminize ve uyumluluk panosuna otomatik akar.
+## İlk incelemeniz
 
-### Temel Kavramlar
+1. **Organizasyonunuzu doğrulayın.** Security Center, geçerli organizasyonda hesabınızın erişebildiği kayıtlarla çalışır. Daha dar bir inceleme için ilgili servisi açın.
+2. **Genel Bakış'ı okuyun.** Riski, açık bulguları, etkilenen servisleri, kapsamı ve veri güncelliğini birlikte değerlendirin. Sakin bir paneli sağlıklı sonuç olarak yorumlamadan önce eksik kanıtları araştırın.
+3. **Bulgular'ı açın.** Servisi ve zaman aralığını seçin; gerektiğinde kaynak, önem derecesi, tür veya durumla daraltın.
+4. **Ayrıntıyı okuyun.** Etkilenen işlemi, kaynağı, ilk ve son görülme zamanını, tekrarları ve mevcut kanıtları belirleyin. Trafik ve korumayı karşılaştırmak için servis bağlamına geçin.
+5. **Sonraki adımı seçin.** İnceleme kararını kaydedin, bir playbook'a başvurun veya gerekli yetkiniz varsa müdahale hazırlayın.
+6. **Sonucu doğrulayın.** Kaydedilen işlemi, uygulama durumunu ve ilgili davranışı ayrı ayrı kontrol edin. İncelemeyi ekip arkadaşınıza devrederken çözümlenmemiş kanıt eksiklerini görünür bırakın.
 
-Güvenlik Merkezi'nde dört ayrı kavram göreceksiniz. Aralarındaki fark önemlidir:
+Bir sayfayı okumak veya yardımını açmak servis korumasını değiştirmez. Politika uygulamak, istisna oluşturmak, senaryo çalıştırmak ve engellemeyi kaldırmak ayrı işlemlerdir.
 
-| Kavram | Ne anlama gelir? | Nerede görünür? |
-|--------|------------------|-----------------|
-| **Gözlem (Observation)** | Audit modundaki bir serviste sensörün *gördüğü* ham davranış (henüz karar verilmemiş) | Servis detayı → Güvenlik → Gözlemler |
-| **İhlal (Violation)** | Bir koruma politikasına takılan davranışların canlı akışı | Güvenlik → İhlaller |
-| **Bulgu (Finding)** | Tekilleştirilmiş, üzerinde karar alınabilir kalıcı güvenlik kaydı | Güvenlik → Bulgular |
-| **Kanıt (Evidence)** | Bir bulgu veya kararla ilişkili zaman damgalı olay geçmişi | Servis detayı → Güvenlik → Bulgular (zaman çizelgesi) |
+## Kapsam ve erişim
 
-Kısaca: **gözlemler** öğrenme aşamasının ham verisidir, **ihlaller** "şu an ne tespit ediliyor" akışıdır, **bulgular** ise yönettiğiniz iş listesidir.
+**Security Center**, hesabınızın erişebildiği servis ve kayıtların organizasyon görünümünü sunar. **Servis → Güvenlik**, açık olan servise odaklanır. **Hesap güvenliği** ise kendi hesabınızı, oturumlarınızı ve kişisel güvenlik geçmişinizi kapsar.
 
----
+Okuma yetkisi; müdahale etme, politika düzenleme, istisna yönetme, güvenlik senaryosu çalıştırma, kayıt dışa aktarma veya arşiv güvencesini inceleme yetkisini kendiliğinden vermez. Bazı özellikler servisin çalışma ortamında destek de gerektirir. Bir işlemin görünmemesi yetki veya uygulanabilirlikten kaynaklanabilir; adresi değiştirmek erişim sağlamaz.
 
-## Genel Bakış
+Organizasyonu, servisi veya filtreleri değiştirdikten sonra gösterilen bağlamı tekrar kontrol edin ve güncel görünümün yüklenmesini bekleyin. Bir bağlantı, sayaç veya eski tarayıcı sekmesi tüm organizasyon kayıtlarına erişebildiğinizin kanıtı değildir.
 
-Güvenlik Merkezi'nin açılış sayfası, tenant genelindeki güvenlik durumunu özetler.
+## Sayfaları tanıyın
 
-### Risk Skoru (0–100)
+| Grup | Sayfa | İnceleyebileceğiniz bilgiler |
+|---|---|---|
+| İzle | **Genel Bakış** | Riskler, etkilenen servisler, son bulgular ve kanıt kapsamı |
+| İzle | **Bulgular** | Aranabilir güvenlik kayıtları, ayrıntılar, inceleme kararları ve yetkili müdahale |
+| Kayıt | **Denetim Kaydı** | Kaydedilmiş işlemler, işlemi yapan kişi, zaman ve sonuç |
+| Kayıt | **Oturum Aktivitesi** | Organizasyonun oturum açma etkinliği ve beklenmeyen sonuçlar |
+| Kayıt | **Denetim kaydı koruması** | Organizasyonunuz için saklama süresi, hukuki koruma ve arşiv doğrulaması |
+| Koru | **Erişim koruması** | İnternetten erişim durumu ve servis erişim ayarlarına bağlantılar |
+| Koru | **Politikalar** | Uygulanabilir koruma kuralları ve politika önerileri |
+| Koru | **Engellemeler** | Engelleme kayıtları, uygulama durumu ve yetkili geri alma |
+| Koru | **Honey path'ler** | Desteklenen servislerde tuzak yol yapılandırması ve tespit kayıtları |
+| Koru | **Olay Müdahale Playbook'ları** | İnceleme ve müdahale yönergeleri |
+| Doğrula | **Sentetik saldırılar** | Kullanılabilir güvenlik senaryoları, çalışma geçmişi ve tespit sonuçları |
+| Doğrula | **Tedarik zinciri** | Derleme ve imaj taramaları, çıktı kanıtları ve istisnalar |
 
-Sol üstteki risk kartı tüm servislerinizin birleşik risk seviyesini gösterir. Skor **açıklanabilirdir** — kara kutu değildir; her bileşenin katkısı ayrı ayrı izlenebilir:
+Görünen sayfalar ve kontroller yetkilerinize ve özelliklerin kullanılabilirliğine bağlıdır. Bir yetenek kullanılamıyorsa sayfada gösterilen durumu ve açıklamayı esas alın.
 
-- **Bulgu şiddeti**: Critical bulgular en yüksek, Info en düşük ağırlığı taşır.
-- **Kaynak güvenilirliği**: Kernel seviyesi gözlemler, duruş (posture) kontrollerinden daha yüksek güven katsayısıyla değerlendirilir.
-- **Tazelik**: Eski bulguların etkisi zamanla azalır (24 saatlik yarılanma eğrisi).
-- **Etki alanı**: Servisin katmanı (kritiklik seviyesi), internete açık endpoint'i ve ayrıcalıklı kimlik kullanımı skoru artırır.
-- **Tekrar faktörü**: Aynı bulgunun tekrar sayısı logaritmik olarak skora eklenir.
+## Genel Bakış: bağlamla önceliklendirin
 
-Hiç bulgusu olmayan bir servis, yalnızca internete açık olduğu için "riskli" sayılmaz — skor gürültü üretmeyecek şekilde tasarlanmıştır.
+Genel Bakış, **hangi servislerin neden dikkat gerektirdiğini** anlamanıza yardımcı olur. İnceleme seçmek için risk özetini, önem derecesi dağılımını, son bulguları ve ağ tehdidi bilgilerini kullanın. Kapsamı ve veri güncelliğini bu özetlerle birlikte okuyun.
 
-### Diğer Genel Bakış Kartları
+Ana risk kartı, özetteki en yüksek riskli servisin anlık değerlendirmesini yansıtır; servis adını ve hesaplama zamanını okuyun. Risk puanı önceliklendirme aracıdır; uyumluluk sertifikası değildir. Güvenlik duruşu göstergesi değerlendirilen ayarları, gözlem sayısı kaydedilmiş davranışları anlatır. Bunların hiçbiri saldırı sayacı veya tüm koruma katmanlarının etkili olduğunun kanıtı değildir.
 
-| Kart | İçerik |
-|------|--------|
-| **Açık Bulgular** | Toplam açık bulgu sayısı + critical/high kırılımı |
-| **Kümeler / Servisler** | Bağlı küme sayısı ve senkronizasyon durumu |
-| **Kritik Bulgular** | Critical ve High şiddetindeki açık bulguların canlı listesi |
-| **En Riskli Servisler** | Risk skoruna göre sıralı servis listesi; tıklayınca servisin güvenlik sayfasına gider |
-| **Küme Güvenlik Matrisi** | Küme başına sürüm, node durumu, platform koruma katmanları (Baseline rozetleri) ve çevrimiçi durumu |
-| **Servis Sertleştirme** | Her servis için 8 koruma katmanının uygulanma yüzdesi |
+Bir özetten filtrelenmiş listeye geçtiğinizde hangi filtrelerin taşındığını kontrol edin. Özetleri ve ayrıntıları aynı kapsam ve zaman aralığında karşılaştırın; farklı kaynaklar farklı zamanlarda güncellenebilir.
 
-**Servis sertleştirme katmanları**: Ağ Politikası, Hız Limiti (Rate Limit), Çalışma-zamanı Koruması, TLS, Kaynak Kotası, Limit Aralığı, Servis Hesabı sıkılaştırması ve Root-olmayan çalıştırma. Her nokta üzerine gelerek hangi katmanın eksik olduğunu görebilirsiniz.
+## Bulgular: sinyali incelemeye dönüştürün
 
-Sayfanın sağ üstündeki **"Yakın gerçek zamanlı · telemetri temelli"** rozeti, verilerin canlı telemetri akışından geldiğini belirtir.
+Bulgular, bir güvenlik sinyalini servisi, önem derecesi, durumu ve kanıtlarıyla ilişkilendirir. Karar vermeden önce yoğun bir listeyi mevcut filtrelerle daraltın. Arama ve filtreler, görünen liste boş olsa bile kayıtları dışarıda bırakabilir. Zaman aralığı bulguları son görülme zamanına göre süzer; varsayılan olarak son yedi günle başlar.
 
----
+### Kaydı anlayın
 
-## Bulgular (Findings)
+| Alan veya kavram | Nasıl kullanılır? |
+|---|---|
+| **Kaynak** | Kaydın hangi tür kanıttan üretildiğini anlayın: örneğin çalışma zamanı davranışı, ağ etkinliği, güvenlik duruşu veya derleme güvenliği. |
+| **Önem derecesi ve güven düzeyi** | Öncelik belirleyin. Kaydı doğrulanmış olay saymadan önce etkilenen servisi ve kanıtı kontrol edin. |
+| **İlk ve son görülme** | Davranışın ne zaman başladığını ve tekrarlanıp tekrarlanmadığını belirleyin. |
+| **Tekrar** | Aynı mantıksal bulgunun tekrarlarını görün. Toplam sayı, her bir olayın kimliğini vermez. |
+| **Etkilenen işlem** | İlgili programı, yolu, bağlantıyı veya çıktıyı uygulamanın beklenen davranışıyla karşılaştırın. |
+| **Kanıt ve zaman çizelgesi** | Kaynağı, hedefi, zamanı ve sonucu ilişkilendirin. Kaydın sunduğu durumlarda ilişkili olayları veya süreç bağlamını kullanın. |
 
-Tenant genelindeki tüm güvenlik bulgularının yönetildiği ana ekrandır.
+**Gözlem**, davranış veya durum kaydeder. **Bulgu**, buna bir inceleme yaşam döngüsü ekler. **Gözlem özeti**, hesaplandığı anda inceleme bekleyen gözlemleri toplar; özeti kapatmak alttaki kayıtları incelemez veya korumayı değiştirmez.
 
-### Şiddet Seviyeleri
+Kullanılamayan ayrıntı, eksik kaynak verisi veya eski zaman damgası değerlendirmenizin parçası olarak kalmalıdır. İki kayıt ilişkili görünüyorsa açıklamalarının yanında servislerini ve zamanlarını da eşleştirin.
 
-| Seviye | Anlamı |
-|--------|--------|
-| **Critical** | Acil müdahale gerektiren, aktif istismar göstergesi olabilecek bulgu |
-| **High** | Kısa sürede ele alınması gereken önemli risk |
-| **Medium** | Planlı şekilde giderilmesi gereken risk |
-| **Low / Info** | Farkındalık amaçlı, düşük öncelikli kayıt |
+### Kararlar ve müdahaleler ayrıdır
 
-### Bulgu Yaşam Döngüsü
+| Karar | Kaydettiği anlam |
+|---|---|
+| **Onayla** | Bulgu görülmüş ve ilk değerlendirmesi yapılmıştır; Açık kuyruğundan çıkar. |
+| **İzin ver** | Gerekli gerekçeyle davranışı meşru kabul ediyorsunuz. |
+| **Tehdit olarak işaretle** | Gerekli gerekçeyle davranışı tehdit olarak sınıflandırıyorsunuz. |
+| **Yoksay** | Bulguyu geçersiz veya inceleme kapsamı dışında değerlendiriyorsunuz. |
+| **Çöz** | İncelemeyi uygun açıklamayla sonuçlandırıyorsunuz. |
 
-```
-Open ──► Acknowledged ──► Allowed / Blocked / Dismissed ──► Resolved (kapanış)
-```
+Bu kararlar ekibinizin inceleme ilerlemesini izlemesini sağlar. Tehdit olarak işaretlemek tek başına engelleme kuralı uygulamaz; İzin ver de kendiliğinden politika istisnası uygulamaz.
 
-| Karar | Ne yapar? |
-|-------|-----------|
-| **Acknowledge** | "Gördüm, inceliyorum" işareti — bulgu açık kalır |
-| **Allow** | Davranış meşru kabul edilir; **gerekçe zorunludur** |
-| **Block** | Davranışın engellenmesi gerektiği kararı; **gerekçe zorunludur** |
-| **Dismiss** | Bulgu geçersiz/önemsiz olarak kapatılır |
-| **Resolve** | Kalıcı kapanış (geri açılamaz; aynı davranış tekrar ederse yeni bulgu oluşur) |
+Kayıt bir müdahale sunuyorsa onay akışında hedefi, kapsamı, önerilen değişikliği ve gerekçeyi inceleyin. Gerçek engelleme, istisna ve servis izolasyonu kendi yetkilerini ve desteğini gerektirir. İzolasyon uygulamanın bağlantılarını kesebilir. Müdahale veya geri alma sonrasında olayı kapatmadan önce uygulama durumunu ve ilgili servis davranışını doğrulayın.
 
-Önemli noktalar:
+## Erişim koruması: uygulamaya kim ulaşabilir?
 
-- Kararlar **tekil veya toplu** verilebilir (tek seferde en fazla 200 bulgu).
-- Allow/Block kararları yalnızca yetkili rollere açıktır; **geliştirici rolü** yalnız Acknowledge ve Dismiss yapabilir.
-- Her karar, kim tarafından ve hangi gerekçeyle verildiği bilgisiyle birlikte **değiştirilemez denetim zincirine** (bkz. [Denetim Deposu](#denetim-deposu-audit-storage)) kaydedilir.
-- Aynı mantıksal bulgu tekrar tespit edildiğinde yeni satır açılmaz; **Tekrar sayısı** artar ve **Son görülme** güncellenir. Böylece 400.000 kez tekrar eden bir olay tek satırda yönetilir.
+**Güvenlik → Erişim koruması**, erişebildiğiniz servislerin internete açıklık durumunu tek bir organizasyon görünümünde toplar. Durumlarını, koruma bitiş tarihlerini ve son 24 saatte izin verilen veya reddedilen istekleri karşılaştırın. Açık, korumalı, değişiklik sürecinde veya dikkat gerektiren servisleri belirleyin; ardından servisin **Yapılandırma → Erişim ve portlar** çalışma alanını açın.
 
-### Filtreleme
+Bu çalışma alanında **Genel Bakış, Kurallar, Kişiler, Makineler, Etkinlik, Ağ ve Ayarlar** ayrılır. Desteğe ve yetkilerinize göre oturum açma ve IP koşullarını, yola özel erişimi, paylaşımları, makine erişimini ve koruma bitiş tarihlerini yapılandırabilirsiniz. **Etkinlik**, izin verilen veya reddedilen erişimi incelemeye yardımcı olur ve ilgili yönetim yetkisini gerektirir.
 
-Arama kutusu, kaynak filtresi (Çalışma-zamanı Koruması, Çalışma-zamanı İzleme, Ağ Akış Gözlemi, Posture, Identity, Küme Sağlığı) ve şiddet filtresiyle bulgu listesini daraltabilirsiniz. Üstteki istatistik çipleri (Toplam / Açık / Critical / High) anlık durumu gösterir.
+Erişim koruması uygulamaya girişle ilgilidir. Çalışma zamanı bulguları çalışan servisin çevresindeki davranışlarla, ağ politikaları izin verilen bağlantılarla ilgilidir. Bir erişim sorununu incelerken bu katmanları karşılaştırın; durumları farklı sorulara yanıt verir.
 
----
+Kurulum için [Erişim Koruması rehberini](service-access-protection.md), olayları yorumlamak için [Erişim Kaydı rehberini](access-protection-activity.md) izleyin. Yetkili değişiklik sonrasında uygulama ilerlemesini ve hedeflenen ziyaretçinin sonucunu kontrol edin; kaydedilmiş kural veya önizleme tek başına erişim testi değildir.
 
-## İhlaller (Violations)
+## Politikalar, öneriler ve istisnalar
 
-Koruma politikalarına takılan davranışların **canlı akışını** gösterir: hangi pod'da, hangi process, hangi aksiyonla (Engellendi / Denetlendi) yakalandı.
+### Koruma politikası hazırlayın
 
-- Bulgular ekranından farkı: ihlaller ham ve anlıktır; bulgular tekilleştirilmiş ve karar alınabilir kayıtlardır.
-- Sağ üstteki **zil rozeti** (tüm sayfalarda görünür) Critical + High ihlal sayacını canlı gösterir; kritik artışta anlık bildirim düşer.
+**Politikalar** sayfasında yenisini oluşturmadan önce mevcut kuralları ve hedef servislerini inceleyin. Politika sihirbazı, uygulanabilir servislerde program çalıştırma, dosya erişimi ve ilişkili davranışlar için kural hazırlamayı destekler. Kaydetmeden önce seçilen servisi, kural ayrıntılarını, Audit veya Block işlemini ve önizlemeyi kontrol edin.
 
----
+**Audit**, eşleşen davranışı gözlemleme amacını belirtir. **Block**, desteklenen koruma katmanında eşleşen davranışı önleme amacını belirtir. Kurallar eşleşme koşulları ve çalışma ortamı desteğiyle sınırlıdır; Block seçmek tüm davranışları engellemez. Uygulanabilirlik ve doğrulama için [Çalışma Zamanı Güvenliği](runtime-security-guide.md) rehberine bakın.
 
-## Politikalar
+Sihirbazda politika oluşturmak etkin bir politika kaydeder ve otomatik uygulamaya yol açabilir. Oluşturmayı etkisiz bir taslak olarak değil, koruma değişikliği olarak değerlendirin. Ayrı yayımlama kontrolü sunuluyorsa onun sonucunu da izleyin. Kaydedilmiş kayıt tek başına etkili koruma kanıtı değildir; gösterilen uygulama durumunu ve hataları kontrol edin. Kısıtlayıcı değişikliği değerlendirirken servisin normal başlangıcını, sağlık kontrollerini ve gerekli bağlantılarını kontrol edin.
 
-Tüm kümelerinizdeki güvenlik politikalarının birleşik görünümü.
+### Öneriyi değerlendirin
 
-### Politika Türleri
+Öneriler, politika değişikliklerini dayandıkları kanıtlarla ilişkilendirir. Kabul etmeden önce hedefi, güven düzeyini, gözlenen trafik veya davranışı ve önerilen kuralı inceleyin. Kullanılabilir yaşam döngüsü işlemlerini ilgili yetkiyle takip edin.
 
-| Tür | Kapsam | Durum |
-|-----|--------|-------|
-| **Çalışma-zamanı Koruması** | Container içi process/dosya/ağ davranış kuralları | Aktif |
-| **Ağ Politikası** | Servisler arası trafik kuralları | Yakında bu ekranda |
-| **Çalışma-zamanı İzleme** | Gelişmiş davranış gözlem kuralları | Yakında bu ekranda |
+Kabul, başarılı uygulama ve etkili koruma ayrı sonuçlardır. Uygulama bekliyor veya başarısızsa bu durumu incelemede koruyun. Geri alma sunulduğunda önizlemesini inceleyin ve sonrasında oluşan durumu doğrulayın.
 
-Her politika satırında servis/küme bilgisi, uygulanma durumu ve aksiyon (Block/Audit) görünür; detay panelinden kural içeriğini inceleyebilirsiniz. Politika kavramlarının ayrıntısı için bkz. [Çalışma Zamanı Koruması](runtime-security-guide.md).
+### İstisnayı dar tutun
 
-### Önerilen Politikalar (Suggested Policies)
+Uygun bir bulgudaki istisna müdahalesi, gerekçe ve süreyle politikaya izin listesi istisnası talep edebilir. Onaylamadan önce hedefi ve önizlemeyi inceleyin. Bu işlem onay gerektirebilen bir talep açar; tek başına servisi yeniden dağıtmaz veya korumanın değiştiğini kanıtlamaz. Akış bunun yerine bulguyu bastırmayı sunuyorsa bu bir yoksayma kararı kaydeder ve politika istisnası oluşturmaz.
 
-Platform, servislerinizin gerçek davranışını analiz ederek **politika önerileri** üretir. Örnek gerekçe: *"Bu serviste hassas dosya okuma girişimi son 24 saatte 47 kez engellendi — kalıcı kural önerilir."*
+Meşru davranışın gerektirdiği en küçük kapsamı kullanın. Uygulama veya süre dolumu sonrasında hem hedeflenen erişimi hem kalan korumayı doğrulayın. Risk istisnası alttaki zayıflığın giderilmesi değildir.
 
-Öneri yaşam döngüsü: **Beklemede → Kabul Edildi → Uygulandı**. Beklemedeki öneriler reddedilebilir veya 30 gün sonra otomatik olarak süresi dolar. Uygulanmış bir öneri gerektiğinde geri alınabilir (rollback). Tüm geçişler denetim zincirine yazılır.
+## Engellemeler ve toparlanma
 
-### Politika İstisnaları (Policy Exceptions)
+**Engellemeler**, etkin ve geri alınmış kayıtları, etkilenen servisleri, destekleyici kanıtları ve uygulama durumunu incelemenizi sağlar. Engelleme isteği kabul edilmiş olsa bile uygulanıyor, başarısız veya doğrulanmamış durumdaki kayıt ayrıca incelenmelidir.
 
-Meşru ama politikaya takılan bir iş akışı için **süreli istisna** tanımlayabilirsiniz (ör. bakım penceresi, üçüncü parti aracın bilinen davranışı):
+Yetkili bir geri almada onaylamadan önce önizlemeyi okuyun. Geri alma yeni bir dağıtım gerektirebilir; kabul edilen istek tamamlanmış toparlanma değildir. Hedeflenen kısıtlamanın değiştiğini ve normal uygulama davranışının döndüğünü kontrol edin. Tek bir engellenen işlemi düzeltmek için ilgisiz korumaları kaldırmayın.
 
-- İstisnalar onay akışından geçer: **Beklemede → Onaylandı → Aktif → Süresi Doldu / İptal Edildi**.
-- Azami istisna süresi **90 gündür** — kalıcı delik açılamaz.
-- Her istisna gerekçeli ve denetim zinciri kayıtlıdır.
+## Honey path'ler
 
----
+Honey path'ler, beklenmedik erişimde dikkat çekmesi amaçlanan tuzak yollardır. Sayfa, desteklenen servislerde kaydedilmiş yapılandırmayı ve tespit geçmişini gösterir. Bu yapılandırmanın kullanımda olup olmadığını değerlendirirken son dağıtımı ayrıca kontrol edin.
 
-## Denetim Kaydı (Audit Log)
+Gerekli yönetim yetkisiyle uygun servisi seçerek yol ekleyebilir, yapılandırmasını düzenleyebilir, etkinlik durumunu değiştirebilir veya kaldırabilirsiniz. İşlem sonrasında kaydedilmiş girdiyi ve tespit geçmişini inceleyin. Yolun uygulamaya uygun olduğunu ve meşru etkinlikle çakışmayacağını doğrulayın. Etkin ayar, tespit edilmiş olay değildir. Kaydedilen erişimi servisi, zamanı ve kanıtlarıyla inceleyin; olay olarak sınıflandırmadan önce bağlamını değerlendirin.
 
-Platform yönetim düzlemindeki olayların birleşik zaman çizelgesi: kim, ne zaman, hangi işlemi yaptı, sonuç ne oldu (başarılı / hata).
+Çalışıp çalışmadığını görmek için tuzak yolu açmayın veya değiştirmeyin. Açık hedefi ve beklenen sonucu olan, ayrıca onaylanmış bir senaryo kullanın.
 
-- Kaynak çipleriyle filtreleyin: Identity, Çalışma-zamanı Koruması, Ağ Akış Gözlemi, Posture, Denetim vb.
-- Şiddet alt sınırı ve tarih penceresi seçilebilir.
-- API çağrıları ve kimlik doğrulama sunucusu istekleri (4xx/5xx hatalar dahil) bu ekranda izlenir.
+## Denetim Kaydı, oturum açmalar ve kişisel güvenlik
 
----
+**Denetim Kaydı**, kaydedilen etkinliği kaynak, işlemi yapan kişi, zaman ve sonuç üzerinden yeniden değerlendirmenizi sağlar. Gruplu görünüm tekrarlayan kayıtları özetler; ham görünüm tekil olayları incelemeye yardımcı olur. Sorunuza uygun görünümü seçin ve ne kadar verinin yüklendiğini kontrol edin.
 
-## Oturum Aktivitesi (Login Activity)
+**Oturum Aktivitesi**, organizasyondaki oturum açmalarla ilgilidir. Beklenmeyen bir oturum açmada etkilenen hesabı, zamanı, sonucu ve mevcut bağlamı inceleyin. Filtreler, sayaçlar ve CSV **yüklenmiş olayları** kapsar; kapsamı anlamak için yüklenen/toplam göstergesini ve sunulan eski olay yükleme işlemini kullanın.
 
-Hesabınıza ait kimlik olaylarının kaydı:
+Kişisel hesap güvenlik kaydınız, parola ayarlarınız ve etkin oturumlarınız **Hesap güvenliği** kapsamındadır. Servis ziyaretçilerinin erişimi **Erişim ve portlar → Etkinlik** altındadır. Komuta'da oturum açma ile korunan uygulamaya yapılan istek farklı olaylardır.
 
-- Başarılı / başarısız girişler, oturum kapatmalar, hesap kilitlenmeleri
-- Her kayıtta IP adresi, tarayıcı/istemci bilgisi ve zaman damgası
-- **CSV dışa aktarma** ile kayıtları raporlayabilirsiniz
-- Şüpheli bir girişten, ilgili zaman dilimindeki diğer güvenlik olaylarına **adli inceleme bağlantısıyla** atlayabilirsiniz
+## Playbook'lar: müdahaleyi tekrarlanabilir hale getirin
 
-Bu ekran, "bu saatte kim giriş yaptı?" ve "başarısız giriş denemesi var mı?" sorularının ilk adresidir.
+**Olay Müdahale Playbook'ları**, sıralı inceleme ve müdahale yönergeleri sunar. Hazır playbook'ları okuyun; uygun yetkiyle ekibinizin süreci için bir kopyayı veya özel playbook'u yönetin.
 
----
+Her adım için hedefi, önkoşulu, beklenen sonucu ve sorumlu kişiyi belirleyin. Playbook'u açmak yönergelerini çalıştırmaz. Desteklenen işlemleri yetkili sayfa kontrollerinden yürütün ve sonucu kaydedin. Devir sırasında aynı sırayı kullanarak ekip arkadaşınızın hangi konuların açık kaldığını görmesini sağlayın.
 
-## Olay Müdahale Playbook'ları (IR Playbooks)
+## Kontrollü güvenlik senaryoları
 
-Bir güvenlik bulgusuyla karşılaştığınızda **adım adım ne yapmanız gerektiğini** anlatan hazır müdahale rehberleridir. Bulgunun şiddeti, türü ve kaynağıyla otomatik eşleşir.
+**Sentetik saldırılar**, yetkili kullanıcıların desteklenen senaryoları incelemesini, izin verilen çalışmaları başlatmasını ve sonuçları değerlendirmesini sağlar. Seçilen senaryonun tespit süresi içinde beklenen bulguyu üretip üretmediğini değerlendirmek için kullanın.
 
-Platformla birlikte gelen hazır playbook'lar:
+Çalıştırmadan önce hedef servisi, senaryonun kullanılabilirliğini, çalışma ortamı desteğini, beklenen sinyali, uygulamaya olası etkisini ve toparlanma planını doğrulayın. Listelenen senaryo veya geçmiş başarılı çalışma, güncel hazır oluşu göstermez.
 
-| Playbook | Tetikleyici | Önerilen adımlar |
-|----------|------------|------------------|
-| **Hassas dosya okuma** | Critical çalışma-zamanı bulgusu | Olay aç → Pod'u izole et → Servis sahibini çağır → Adli paket hazırla |
-| **Servis hesabı token'ı + dış trafik** | Critical çalışma-zamanı bulgusu | Olay aç → Pod'u izole et → Kimlik bilgilerini döndür → Ağ engeli öner → Sahibi çağır |
-| **Deploy sonrası shell çalıştırma** | Medium bulgu | Sağlık probe'unu doğrula → İnceleme için işaretle |
-| **Çalışma zamanında paket yöneticisi** | High bulgu | Olay aç → Engelleme kuralı öner → İnceleme için işaretle |
-| **Bulut metadata erişimi** | High ağ bulgusu | Olay aç → Ağ engeli öner → Kimlik bilgilerini döndür → Sahibi çağır |
+Sonrasında çalışma durumunu, eşleşen bulguyu ve tespit süresini aynı hedef için karşılaştırın. Beklenen kanıt eksikse yalnız işlemin tamamlanması yeterli değildir. Sonuç test edilen senaryo ve zaman aralığı için geçerlidir; her saldırının önlendiğini veya her koruma katmanının etkili engelleme yaptığını göstermez.
 
-- Hazır playbook'lar düzenlenemez; ancak **klonlayıp kendi sürecinize göre özelleştirebilirsiniz**.
-- Playbook adımları şu an **rehber niteliğindedir** — adımları ekibiniz uygular; otomatik yürütme yol haritasındadır.
+## Tedarik zinciri: kanıtı imajla eşleştirin
 
----
+**Tedarik zinciri**, derleme ve imaj güvenliği kanıtlarını incelemeye dahil eder. Tarama durumunu, zamanını, önem derecesini, etkilenen çıktıyı ve mevcut ayrıntıları değerlendirin. Sunulduğunda yazılım bileşen listesini (SBOM), zafiyet ve imza bilgisini tam olarak ilgili derleme veya imaj için inceleyin.
 
-## Uyumluluk (Compliance)
+Kanıtı servisin gerçekten kullandığı çıktıyla eşleştirin. Yeni derleme, değişen imaj veya eski tarama yeniden değerlendirme gerektirebilir. Eksik veya başarısız kanıt temiz sonuç değildir; derleme taraması çalışan servisin tüm davranışlarını da incelemez.
 
-Güvenlik bulgularınız ve koruma katmanlarınız, sektör standardı uyumluluk kontrollerine **otomatik olarak kanıt** sağlar. Ayrı bir tarama aracı kurmanız gerekmez.
+Gerekli yetkiyle seçilen servis ve belirli bir imaj sürümü için süreli risk kabul edebilir veya mevcut istisnayı iptal edebilirsiniz. Gerekçesini, imajı, bitiş zamanını ve sonraki dağıtım denemesine etkisini inceleyin. Ayrı dağıtıma kabul durumunu kontrol edin: değerlendirilmemiş, doğrulanmış, engellenmiş, istisna kapsamında veya yalnız denetim olabilir. Risk kabulü zafiyeti ortadan kaldırmaz. İmza göstergesi her çıktının imzalandığını veya her imzanın bağımsız doğrulandığını göstermez.
 
-### Desteklenen Çerçeveler
+## Denetim kaydı koruması
 
-| Çerçeve | Örnek kontroller |
-|---------|------------------|
-| **CIS Kubernetes** | Ağ politikası varlığı, ayrıcalıklı pod denetimi |
-| **NIST 800-53** | Erişim kontrolü (AC-3), denetim olayları (AU-2, AU-9), sistem izleme (SI-4) |
-| **SOC 2** | Mantıksal erişim (CC6.1), sistem izleme (CC7.2) |
-| **ISO 27001** | İzleme faaliyetleri (A.8.16), ağ güvenliği (A.8.34) |
-| **PCI-DSS** | Denetim kaydı (10.2.1), değişiklik tespiti (11.5.1) |
+Bu salt okunur sayfa, organizasyonunuzun denetim kayıtlarının korunmasını değerlendirmenize yardımcı olur. **Arşiv korumasını**, **saklama süresini**, **hukuki korumayı**, gösterilen devralınmış varsayılanları ve **güncel yapılandırmanın doğrulamasını** birlikte okuyun.
 
-### Kapsam Durumları
+| Sayfada görünen | Nasıl yorumlanır? |
+|---|---|
+| **Arşiv koruması yapılandırılmış** | Koruma yapılandırılmıştır; doğrulama sonucunu ayrıca kontrol edin. |
+| Yakın tarihli kanıtla **Doğrulandı** | Güncel dış kopyanın denetim kayıtlarına karşı doğrulandığı bildirilmiştir. Gösterilen kapsam ve zaman içinde yorumlayın. |
+| **Doğrulama bekliyor** | Güncel koruma henüz kanıtlanmamıştır. |
+| **Koruma doğrulanmadı / kullanılamıyor** | Sorun çözülene kadar dış arşiv korumasına güvenmeyin. |
+| **Hukuki koruma** | Kayıt saklama kilidinin uygulanıp uygulanmadığını gösterir; geçerli saklama süresiyle birlikte inceleyin. |
 
-Her kontrol için son çeyreklik kanıt penceresine göre durum hesaplanır:
+Korunan denetim geçmişi ile doğrulanmış dış arşiv koruması farklı güvencelerdir. Eski başarılı doğrulama, değişmiş yapılandırmayı doğrulamaz. Profil yoksa, yükleme başarısızsa veya doğrulama sonuçlanmıyorsa görünen durum ve zamanla desteğe başvurun. Bu sayfa uyumluluk sertifikası veya arşiv saklama süresini değiştirme kontrolü değildir.
 
-- **Karşılanıyor (Met)** — kontrol için yeterli kanıt mevcut
-- **Kısmen Karşılanıyor (Partially Met)** — kanıt var ama eksik
-- **Sinyal Eksik (Missing Signal)** — bu kontrol için henüz veri kaynağı bağlı değil
-- **Uygulanamaz / Değerlendirilmedi**
+## Uyarılar, kanallar ve bildirim tercihleri
 
-### Aksiyonlar
+Desteklenen uyarı akışları için **Uyarılar → Kurallar, Kanallar, Geçmiş, Sessizleştirmeler ve Şablonlar** alanlarını kullanın. Kurallar eşleşmeyi, kanallar hedefleri belirler; geçmiş kayıtlı sonuçları incelemeye yardımcı olur. Hesaptaki **Bildirimler ve Uyarılar** alanında kullanılabilir olay-kanal tercihleri ve kanal ayarları bulunur.
 
-- **Kanıt Dışa Aktar**: Denetçinize sunmak üzere JSON veya CSV formatında kanıt paketi indirin.
-- **Yeniden Değerlendir**: Bir çerçeveyi takvim dışı, anında yeniden değerlendirin (ör. denetim öncesi).
+Kullanmak istediğiniz akışın olayını, hedefini ve yetkilerini doğrulayın. Tercihler önizleme olarak gösteriliyor veya kullanılamıyorsa düzenlemenin etkin olduğunu varsaymayın. Kaydedilmiş kanal, eşleşmiş kural veya yapılandırılmış tercih mesaj teslimini kanıtlamaz; mevcut teslim sonucunu ayrıca kontrol edin.
 
----
+Uyarıyı sessizleştirmek ilgili bildirim akışını bastırır; bulguyu çözmez veya uyarıya yol açan koşulu kaldırmaz. Gelen kutusundaki öğeyi okumak veya kapatmak da sorunun giderildiğini doğrulamaz. Teslimi yalnız yetkili test işlemiyle ve kararlaştırılmış hedefe sınayın.
 
-## Bildirimler ve Yönlendirme Kuralları
+## Dışa aktarma ve inceleme devri
 
-Güvenlik bulgularının ekibinize nasıl ulaşacağını burada yapılandırırsınız.
+Yetkiniz varsa Bulgular, görünen tablo sayfasının ötesinde sunucu tarafındaki filtreler ve zaman aralığıyla CSV veya JSON dışa aktarımı sunar. Tek dışa aktarım **50.000 satırla** sınırlıdır; işleme sınırları sonucu daha da daraltabilir. Büyük bir sonuç kümesini incelemek için servis kapsamını veya zaman aralığını daraltın.
 
-### Bildirim Kanalları
+Denetim Kaydı ve Oturum Aktivitesi CSV'si, seçilen görünüme veya yüklenmiş kayıtlara bağlı farklı kapsama sahip olabilir. Dışa aktarımı eksiksiz saymadan önce sayfadaki açıklamayı, yüklenen/toplam göstergesini ve oluşan dosyayı kontrol edin.
 
-| Kanal | Açıklama |
-|-------|----------|
-| **Uygulama içi** | Konsol içinde anlık bildirim |
-| **E-posta** | Tanımlı adreslere e-posta |
-| **Slack** | Slack webhook entegrasyonu |
-| **Microsoft Teams** | Teams kanal kartı |
-| **PagerDuty** | Nöbet (on-call) tetikleme |
-| **Webhook** | Kendi sisteminize HTTPS POST |
+Devir için organizasyonu ve servisi, filtreleri ve saat dilimini, bulgu referanslarını, kanıt zamanlarını, alınan kararları ve henüz doğrulanmamış sonuçları ekleyin. Kayıtları yalnız hedeflenen alıcılarla paylaşın. Dışa aktarılmış dosya, başka bir güvenlik sistemine otomatik teslim yapıldığını göstermez.
 
-Kanal yapılandırmaları (webhook adresi, token vb.) şifrelenerek saklanır ve salt-okunur kullanıcılara gösterilmez.
+## Yardım ve isteğe bağlı AI
 
-### Yönlendirme Kuralları
+Komuta maskot menüsünü açarak geçerli sayfa için Türkçe veya İngilizce rehberi okuyun. Maskot kullanılabiliyorsa **Bu ekranı açıkla** açıklamayı konuşma balonunda da açar. İlgili servis güvenliği sekmelerinde, erişim korumasında ve yetkili erişim etkinliğinde de bağlama uygun yardım bulunur.
 
-Hangi bulgunun hangi kanala gideceğini kurallarla belirlersiniz:
+Bu statik rehber, AI sağlayıcısı etkinleştirilmeden çalışır. Dekoratif maskot kapalıyken rehber menü içinde okunabilir; konuşma balonu işlemi kullanılamaz. Amacı, sonraki adımları ve sınırları açıklar; güncel kayıtları incelemez, AI'a göndermez veya işlem yapmaz. Yüklenme ve yetki kontrolleri hangi açıklamanın kullanılabileceğini etkileyebilir.
 
-- **Şiddet eşiği**: ör. yalnız High ve üzeri
-- **Kaynak / küme / servis / sahip ekip** filtreleri
-- **Mesai saatleri penceresi**: bildirimleri çalışma saatlerinize sınırlayın (varsayılan 09:00–18:00, yerel saat)
-- **Eskalasyon**: Bulgu belirlenen süre içinde (en fazla 24 saat) çözülmezse eskalasyon kanallarına ikinci bildirim gider
-- **Tekilleştirme**: Aynı bulgu için tekrar tekrar bildirim gönderilmez
+AI yardımı kullanılabilir ve etkinse yetkili bağlam için isteğe bağlı destek olarak yararlanın. Sayfa bağlamı paylaşımı yeni oturumda kapalı başlar; açılması desteklenen sayfa özetini sorunuza ekleyebilir. İsteme hassas bilgi eklemekten kaçının; öneriyi uygulamadan önce geçerli organizasyonu, servisi ve kanıtı tekrar kontrol edin. AI açıklaması onay, doğrulanmış koruma sonucu veya doğru teşhis garantisi değildir. Değişiklikler kendi yetki ve onay akışlarını izler.
 
----
+## Yaygın inceleme senaryoları
 
-## SIEM Dışa Aktarımı
+### Kritik bir bulgu oluştu
 
-Güvenlik bulgularınızı kendi SIEM / log platformunuza otomatik aktarın. Mevcut güvenlik operasyon merkezinizle (SOC) entegrasyon için tasarlanmıştır.
+Servisi ve kanıt zamanını doğrulayın, etkilenen işlemi inceleyin ve Servis Güvenliği'nde trafik ile korumayı karşılaştırın. İlgili playbook'u kullanın, değerlendirmenizi kaydedin ve yalnız kanıta uygun müdahaleyi yapın. Sonucu kontrol ettikten sonra bulguyu kapatın veya neden ek inceleme gerektiğini kaydedin.
 
-| Şema | Uyumlu hedef örnekleri |
-|------|------------------------|
-| **OCSF** | Splunk, AWS Security Hub, Snowflake |
-| **Elastic ECS** | Elasticsearch / Kibana |
-| **OpenTelemetry** | OTel Collector, Honeycomb |
+### Müşteri korunan uygulamayı açamıyor
 
-Çalışma şekli ve güvenlik garantileri:
+Merkezi Erişim korumasından başlayın; ardından servisin Kurallar, Kişiler ve Etkinlik sekmelerine geçin. Hedeflenen ziyaretçiyi geçerli kuralla ve bildirilen erişim sonucuyla karşılaştırın. Kuralı değiştirmeden önce uygulama ilerlemesini kontrol edin; ilgili erişim yöntemini araştırmak için [Erişim Koruması rehberini](service-access-protection.md) kullanın.
 
-- Bulgular **5 dakikada bir** artımlı olarak (kaldığı yerden) hedefinize gönderilir.
-- Hedef adres **HTTPS zorunludur**; kimlik doğrulama token'ı şifrelenerek saklanır ve arayüzde asla geri gösterilmez.
-- **5 ardışık hata** sonrasında aktarım otomatik devre dışı kalır ve bildirim üretilir.
-- Yapılandırma değişikliklerinin tümü denetim zincirine kaydedilir.
+### Koruma değişikliği uygulamayı aksattı
 
----
+Son dağıtımı ilgili bulgu, istenen ayar ve gözlenen durumla karşılaştırın. İlgili en dar kuralı, yeteneği, yolu veya bağlantıyı belirleyin. Toparlanma planıyla yetkili düzeltme veya geri alma yapın; ardından uygulama sağlığını ve kalan korumayı doğrulayın.
 
-## Sentetik Saldırı Tatbikatları (Synthetic Attacks)
+### Panel sakin görünüyor
 
-Güvenlik izlemenizin **gerçekten çalıştığını kanıtlayın**. Platform, kendi workload'unuzda kontrollü ve zararsız bir "saldırı sinyali" tetikler; tespit hattının bunu yakalayıp yakalamadığını ve **ne kadar sürede yakaladığını** ölçer.
+Önce organizasyonu, zaman aralığını ve filtreleri kontrol edin. Ardından kaynak güncelliğini, çalışma ortamına uygulanabilirliği ve hataları inceleyin. Kapsam eksikse kanıt boşluğunu kaydedin; boş liste etkinliğin hiç oluşmadığını mı, yoksa gözlenmediğini mi tek başına yanıtlayamaz.
 
-### Ne işe yarar?
+## Sorun giderme
 
-Klasik güvenlik araçlarında "alarm gelmiyor" iki anlama gelebilir: ya her şey yolundadır ya da izleme bozuktur. Tatbikatlar bu belirsizliği ortadan kaldırır — **tespit kapsaması boşluklarını** saldırgan bulmadan önce siz bulursunuz.
+| Gördüğünüz durum | Sonraki adım |
+|---|---|
+| **Yükleniyor** | Sayaçları yorumlamadan önce güncel kapsamın ve yetkilerin belirlenmesini bekleyin. |
+| **Boş sonuç** | Filtreleri, zaman aralığını, erişimi ve kanıtın kullanılabilirliğini kontrol edin. |
+| **Yetki reddi veya eksik işlem** | Göreviniz için gereken belirli erişimi organizasyon yöneticinizden isteyin. |
+| **Eski veya bilinmeyen kanıt** | Zamanları ve kaynak kapsamını karşılaştırın; güncellik düzelmiyorsa destek alın. |
+| **Kullanılamıyor / uygulanamaz** | Ortam desteğini inceleyin ve diğer uygulanabilir koruma katmanlarını değerlendirin. |
+| **Uygulama başarısız veya bekliyor** | Aynı isteği yeniden oluşturmadan önce geçerli isteği ve hatayı inceleyin. |
+| **Bildirim gelmedi** | Kuralı, kanalı, tercihleri, sessizleştirmeleri ve kayıtlı teslim sonucunu karşılaştırın. |
+| **Arşiv koruması doğrulanamıyor** | Dış korumayı doğrulanmamış kabul edin; durum ve zamanla desteğe başvurun. |
 
-### Senaryo Kataloğu
+[Destek](support-tickets.md) isterken etkilenen sayfayı ve servisi, zaman aralığını, görünen durumu ve paylaşılması uygun kayıt referanslarını ekleyin. Parolaları, kimlik doğrulama bilgilerini ve gereksiz kişisel verileri dışarıda bırakın.
 
-Hazır senaryolar arasında şüpheli process çalıştırma, hassas dizine yazma, kısıtlı workload'dan dış trafik ve ayrıcalıklı pod denemesi bulunur. Her senaryonun bir **tespit SLA'sı** vardır (ör. 60 saniye).
+## Sık sorulan sorular
 
-### Tatbikat Çalıştırma
+### Düşük risk puanı servisim güvenli demek mi?
 
-1. **Sentetik Saldırılar** sayfasından bir senaryo seçin ve hedef servisinizi belirleyin.
-2. **Tatbikatı Tetikle** deyin.
-3. Sonuç panosunda izleyin: **Tespit Edildi** (SLA içinde) / **Tespit Edilemedi** (kapsama boşluğu!).
+Seçili kapsamdaki mevcut bulgu ve değerlendirmeleri önceliklendirmenize yardımcı olur. Kapsamı, güncelliği ve etkili koruma kanıtını da inceleyin.
 
-Üstteki metrik kartları toplam tatbikat sayısını, tespit oranını, SLA karşılama oranını ve ortalama tespit süresini gösterir.
+### Bulguyu tehdit olarak işaretlemek kuralı etkinleştirir mi?
 
-> Tatbikat kayıtları gerçek bulgulardan **izole** tutulur: risk skorunuzu, SIEM akışınızı ve uyumluluk kanıtlarınızı kirletmez.
+Karar, değerlendirmenizi kaydeder. Desteklenen müdahale veya politika işleminin kendi yetkisi, onayı, uygulama durumu ve sonuç doğrulaması vardır.
 
----
+### İki serviste neden farklı koruma seçenekleri var?
 
-## Honey Path'ler (Tuzak Yollar)
+Seçenekler yetkilere, etkin yeteneklere ve çalışma ortamı desteğine bağlıdır. Kata gibi yönetilen izole çalışma ortamları aynı davranış görünürlüğünü sunmaz. [Çalışma Zamanı Güvenliği](runtime-security-guide.md) rehberine bakın.
 
-Bir servisinizde **tuzak dosya yolu** tanımlayın: meşru kodunuzun asla dokunmaması gereken bir yol (ör. sahte bir kimlik bilgisi dosyası). Bu yola yapılan **herhangi bir erişim** anında Critical bulgu üretir ve ilgili olay müdahale playbook'unu önerir.
+### Her boş sonuç başarılı kontrol müdür?
 
-- Servis seçici → tuzak yolu ekleyin (ör. `/app/config/.fake-credentials`).
-- **Son tetiklenme** ve **tetiklenme sayısı** kolonlarından hangi tuzakların trafik yakaladığını izleyin.
-- Tuzak yollar, içeriden yanal hareket (lateral movement) ve otomatik tarama davranışlarını yakalamada düşük maliyetli, yüksek sinyalli bir yöntemdir.
+Hayır. Filtreler, tamamlanmamış yükleme, eksik yetkiler ve kullanılamayan kaynaklar görünürlüğü sınırlayabilir. Sonuca varmadan önce bu koşulları netleştirin.
 
----
+### Başarılı senaryo veya arşiv rozeti sertifika olarak kullanılabilir mi?
 
-## Denetim Deposu (Audit Storage)
+Senaryo sonucu belirli bir testle, arşiv güvencesi gösterilen kayıt korumasıyla ilgilidir. Hiçbiri uygulamanızı veya organizasyonunuzu tek başına sertifikalandırmaz.
 
-Güvenlikle ilgili her operatör kararı (bulgu kararları, politika önerisi geçişleri, istisnalar, SIEM yapılandırmaları, tatbikat tetiklemeleri, yetenek/yazılabilir dizin değişiklikleri) **değiştirilemez bir denetim zincirine** yazılır.
+### Security Center için AI gerekli mi?
 
-- **Eklenebilir-yalnız (append-only)**: Kayıtlar güncellenemez ve silinemez.
-- **Kriptografik zincir**: Her kayıt bir önceki kaydın özetini içerir; geçmişte tek bir kayıt değiştirilse zincirin kalanı geçersizleşir ve doğrulayıcı bunu tespit eder. Denetçiye "bu kayıtlarla oynanmadı" garantisi verirsiniz.
-- **Yasal Saklama (Legal Hold)**: Hukuki bir süreç sırasında kayıtların saklama süresi dolsa bile silinmesini engelleyin (gerekçeli aç/kapat).
-- **Arşiv hedefi**: Kayıtların uzun süreli arşiv kopyası için depolama hedefi ve saklama süresi yapılandırılabilir.
+Hayır. İnceleme sayfaları, yetkili kontroller ve statik sayfa yardımı, kendi kullanılabilirlik ve yetki koşullarıyla isteğe bağlı AI yardımından bağımsız çalışır.
 
-Bu yapı; SOC 2, ISO 27001 ve PCI-DSS denetimlerindeki "denetim kaydı bütünlüğü" gereksinimlerini doğrudan karşılamak için tasarlanmıştır.
+## Devam edin
 
----
-
-## Diğer Sayfalar
-
-| Sayfa | İçerik |
-|-------|--------|
-| **Çalışma Zamanı Yaptırımı** | Platform genelinde İzleme (Monitor) ↔ Yaptırım (Enforce) modu; mod değişimi gerekçe ister ve hazırlık kontrolünden geçer. Yöneticiler içindir. |
-| **Küme Sağlığı** | Altyapı katmanı sağlık bulguları (depolama, node bileşenleri). |
-| **Saklama Politikası** | Güvenlik verilerinin saklama süresi ve veri ikamet (residency) ayarları. Yönetici yetkisi gerektirir. |
-
----
-
-## İzinler
-
-Güvenlik Merkezi yetenekleri, **Erişim Kontrolü → Roller** üzerinden ayrı ayrı yetkilendirilir:
-
-| Yetenek | Kim kullanmalı? |
-|---------|-----------------|
-| Güvenlik Merkezi okuma (genel bakış, bulgular, ihlaller) | Tüm geliştirici ekip |
-| Bulgu kararları (Allow/Block/Resolve) | Güvenlik operatörü / takım lideri |
-| Bulgu kararları (Acknowledge/Dismiss) | Geliştirici |
-| Bildirim kanalı ve yönlendirme kuralı yönetimi | Güvenlik operatörü |
-| Politika istisnası ve önerilen politika yönetimi | Güvenlik operatörü |
-| SIEM dışa aktarım yapılandırması | Güvenlik operatörü |
-| Uyumluluk görüntüleme / kanıt dışa aktarma | Denetçi (auditor) rolü |
-| Sentetik tatbikat tetikleme, honey path yönetimi | Güvenlik operatörü |
-| Denetim deposu görüntüleme | Denetçi / güvenlik operatörü |
-| Saklama politikası, yaptırım modu, arşiv yönetimi | Platform yöneticisi |
-
-En iyi uygulama: geliştiricilere okuma + acknowledge yetkisi verin; Allow/Block gibi kalıcı kararları ve kanal/istisna yönetimini güvenlik sorumlularıyla sınırlayın.
-
----
-
-## Sık Sorulan Sorular
-
-**"Bulgular" ile "İhlaller" arasındaki fark ne?**
-İhlaller anlık ham akıştır; bulgular aynı olayın tekilleştirilmiş, karar alınabilir halidir. Günlük operasyonu Bulgular ekranından yürütün; İhlaller'i canlı gözlem için kullanın.
-
-**Risk skorum neden değişti?**
-Skor 5 dakikada bir yeniden hesaplanır. Yeni bir Critical bulgu, skoru hızla yükseltir; bulgu çözüldükçe ve zaman geçtikçe (tazelik eğrisi) skor düşer.
-
-**Bir bulguyu yanlışlıkla Resolve ettim, geri alabilir miyim?**
-Hayır — Resolve kalıcıdır. Aynı davranış tekrar tespit edilirse yeni bir bulgu oluşur. Emin olmadığınız durumda Acknowledge kullanın.
-
-**Bildirim gelmiyor.**
-Sırasıyla kontrol edin: (1) Yönlendirme kuralının şiddet eşiği ve filtreleri bulguyla eşleşiyor mu? (2) Mesai saatleri penceresi dışında mısınız? (3) Kanal testi başarılı mı? (4) Aynı bulgu için daha önce bildirim gittiyse tekilleştirme devrededir.
-
----
-
-## İlgili Dokümanlar
-
-- [Servis Güvenliği Çalışma Alanı](service-security-guide.md) — tek bir servisin güvenlik yönetimi
-- [Çalışma Zamanı Koruması](runtime-security-guide.md) — koruma modları ve politika kavramları
-- [Erişim Kontrolü](access-control-guide.md) — rol ve izin yönetimi
-- [Bildirim Yönetimi](notification-guide.md) — platform geneli bildirim kanalları
+- [Servis Güvenliği](service-security-guide.md) — tek uygulamada trafik, koruma ve bulguları inceleyin.
+- [Çalışma Zamanı Güvenliği](runtime-security-guide.md) — uygulanabilirliği anlayın ve koruma sonuçlarını doğrulayın.
+- [Erişim Koruması](service-access-protection.md) — uygulamanızı kimlerin açabileceğini yapılandırın.
+- [Erişim Kaydı](access-protection-activity.md) — ziyaretçi erişimini inceleyin.

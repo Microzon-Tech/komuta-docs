@@ -1,170 +1,240 @@
-# Servis Güvenliği Çalışma Alanı (Service Security)
+# Servis Güvenliği
 
-Her servisin detay sayfasındaki **Security** sekmesi, o servise özel güvenlik çalışma alanıdır: koruma modunu yönetir, çalışma zamanı gözlemlerini inceler, sapmaları (drift) yakalar ve servis bazlı bulguları tek yerden takip edersiniz.
+Tek bir serviste neler olduğunu anlayın, kanıtları inceleyin ve etkisini bilerek müdahale seçin. **Servis detayı → Güvenlik**, servisin bulgularını, trafiğini ve koruma durumunu aynı çalışma alanında birleştirir.
 
-Tenant genelindeki görünüm için bkz. [Güvenlik Merkezi](security-center-guide.md).
+Kuruluş genelinde önceliklendirme için [Güvenlik Merkezi](security-center-guide.md) kullanın; ardından davranışı incelemek için ilgili servisi açın. Servisin genel adresini kimlerin açabileceğini yönetmek için **Erişim ve portlar** üzerindeki [Erişim koruması](service-access-protection.md) ayarlarını kullanın.
 
----
+> **İyi bir inceleme üç adımdan oluşur:** servis ve kanıt kapsamını kontrol edin, ilgili kayıtları karşılaştırın, ardından yetkili değişikliğin sonucunu doğrulayın. Kaydedilen ayar niyeti gösterir; güncel uygulama durumu ve davranış kanıtı ne olduğunu ortaya koyar.
 
-## Koruma Modları
+## İlk kullanım
 
-Her servis bir **çalışma-zamanı koruma modunda** çalışır:
+1. Doğru kuruluşu seçin ve incelemek istediğiniz servisi açın.
+2. **Güvenlik → Genel bakış** bölümüne geçin. Özeti yorumlamadan önce çalışma ortamını, kapsamı ve veri güncelliğini kontrol edin.
+3. Acil bir bulgudan, ağ olayından veya düşen bağlantı özetinden ilgili inceleme bölümüne geçin.
+4. Olayı içeren bir zaman aralığı seçin. Etkin filtreleri kontrol edin ve sunuluyorsa ek kayıtları yükleyin.
+5. Kanıtın bir kural değişikliği, servis ayarı veya olay müdahalesi gerektirip gerektirmediğine karar vermeden önce **Koruma** bölümünü inceleyin.
 
-| Mod | Davranış | Ne zaman kullanılır? |
-|-----|----------|----------------------|
-| **Kapalı (Off)** | Koruma katmanı pasif | Önerilmez; yalnızca özel durumlar |
-| **Gölge (Shadow)** | Politika hazırlanır ama uygulanmaz | Geçiş hazırlığı |
-| **Denetim (Audit)** | Davranışlar **izlenir ve kaydedilir**, hiçbir şey engellenmez | Yeni servis devreye alma, baseline öğrenme |
-| **Engelleme (Block)** | Politika dışı davranış **kernel seviyesinde reddedilir** | Üretim ortamı hedef modu |
+Çalışma zamanı ve trafik sonuçları için servisin uygun bir dağıtımı ve kullanılabilir kanıt kaynakları olmalıdır. Henüz dağıtılmamış bir servis, çalışan bir servisle aynı kanıtı üretmeye hazır değildir.
 
-Önerilen yaşam döngüsü:
+Rolünüz de önemlidir. Bulguları okumak, olay zaman çizelgesini görmek, güvenlik duruşunu incelemek, trafiği görüntülemek ve değişiklik yapmak farklı izinler gerektirebilir. Salt okunur bir kart rolünüz için normal olabilir. Göreviniz daha fazla erişim gerektiriyorsa kuruluş yöneticinizden ekranda belirtilen ilgili izni isteyin.
 
-```
-Yeni servis → Audit modunda gözlem → Gözlemleri işle → Block'a yükselt
-```
+## Doğru sekmeyi bulun
 
-Audit modunda servisinizin gerçek davranışı öğrenilir; meşru davranışları onayladıktan sonra **Block'a Yükselt** dediğinizde koruma, uygulamanızı bozmadan devreye girer.
+| Sekme | Kullanım amacı | Başlangıç noktası |
+|---|---|---|
+| **Genel bakış** | Servisin acil bulgularını, ağ olaylarını ve kanıt eksiklerini önceliklendirmek | Servis kimliği, kapsam ve veri güncelliği |
+| **Trafik** | Akışları, olayları, düşen bağlantıları ve sunulan DNS ayrıntılarını incelemek | Kanıt zaman aralığı ve bağlantı filtreleri |
+| **Koruma** | Ağ politikalarını, canlı duruşu, çalışma zamanı modunu ve desteklenen sıkılaştırma ayarlarını okumak | Kural kapsamı ve bildirilen mevcut durum |
+| **Bulgular** | Bulguları, çalışma zamanı gözlemlerini ve kanıt zaman çizelgesini araştırmak | Kaynak, olay zamanı ve ilgili davranış |
 
----
+Olay müdahalesi kartı çalışma alanında sekmeler arasında da görünür; inceleme yaparken izolasyon durumunu kontrol edebilirsiniz.
 
-## Üst Bilgi Şeridi (Güvenlik Özeti)
+## Genel bakış: önceliği belirleyin
 
-Security sekmesinin her görünümünde üstte sabit duran özet şerit şunları gösterir:
+Genel bakış, yüksek öncelikli bulguları ağ olayları ve düşen trafik özetleriyle birleştirir. İncelemeye **Bulgular** veya **Trafik** bölümünde devam etmek için ilgili özeti açın.
 
-- **Mod rozeti** — ör. *"Runtime Protection: Audit"*. Üzerine gelince modun tam açıklamasını görürsünüz (Audit: "izler, kaydeder, engellemez"; Block: "politika dışı işlem kernel'de reddedilir").
-- **Sapma (Drift) rozeti** — çalışan pod'un güvenlik duruşu, tanımlı baseline'dan ayrıştıysa kırmızı rozet belirir. Tıklayınca ayrıntıya gidersiniz.
-- **Üç canlı istatistik** — Bekleyen gözlem sayısı · Engellenen işlem sayısı · Son 1 saatteki Critical bulgu sayısı.
-- **Sonraki adım önerisi** — bulunduğunuz duruma göre tek tıklık yönlendirme: *"Gözlemleri incele"*, *"Duruşu gözden geçir"* veya *"Block'a yükselt"*.
+Bu özetleri kapsam bilgisiyle birlikte okuyun. Kapsam, seçilen servis için hangi kanıtın uygulanabilir ve kullanılabilir olduğunu gösterir. Kullanılamayan kaynak, eski veri veya başarısız sorgu, listede satır bulunmasa bile sonucu belirsiz bırakabilir.
 
-### "Canlı posture baseline'dan saptı" uyarısı ne demek?
+Acil görünümü yalnız açık Kritik ve Yüksek önem dereceli bulguları gösterebilir. Daha geniş kayıt için **Tüm bulguları göster** seçeneğini kullanın. Sayaçlar gösterilen kapsamı anlatır; inceleme bekleyen gözlemler saldırı sayacı değildir ve bulgu bulunmaması tam bir güvenlik değerlendirmesi sayılmaz.
 
-Platform, servisinizin **çalışan halini** (canlı pod'lar) tanımlı güvenlik baseline'ı ile sürekli karşılaştırır. Tespit edilen sapma türleri:
+## Trafik: belirtiyi bağlantıyla eşleştirin
 
-| Sapma | Anlamı | Yapılacak |
-|-------|--------|-----------|
-| Baseline imza uyuşmazlığı | Çalışan yapılandırma, beklenen baseline sürümünden farklı | Servisi yeniden dağıtın |
-| Root ile çalışıyor | Servis root kullanıcıyla çalışıyor ama bunun için tanımlı bir muafiyet yok | İmajı non-root yapın veya muafiyet tanımlayın |
-| Ağ politikası eksik | Beklenen ağ politikası kümede bulunamadı | Yeniden dağıtım / destek |
-| Koruma politikası eksik | Çalışma-zamanı koruma politikası kümede bulunamadı | Yeniden dağıtım / destek |
-| Hâlâ Audit modunda | Baseline Block istiyor ama politika Audit'te kalmış | "Block'a Yükselt" akışını tamamlayın |
-| Küme sorgusu başarısız | Kümeye anlık erişilemedi (geçici olabilir) | Küme bağlantısını kontrol edin |
+### Akışlar ve DNS
 
----
+Kanıt zaman aralığını seçin; bağlantı akışını gerektiğinde protokol, sonuç ve bağlantı kaynağı veya hedefi filtreleriyle daraltın. Kaynak, hedef, yön ve portu uygulamanın beklenen davranışıyla karşılaştırın.
 
-## Sekmeler
+Akış görünümü güvenlikle ilgili bağlantıları ve sağlıklı trafiğin temsili bir örneklemini içerir. Kesin toplam veya her bağlantının eksiksiz kaydı olarak değil, inceleme için kullanın.
 
-### Genel Bakış
+Servis ve kanıt kaynağı destekliyorsa DNS ve uygulama düzeyi ayrıntılar hedefi anlamanıza yardımcı olur. Bu ayrıntıların bulunmaması, ad çözümleme veya isteğin hiç gerçekleşmediğini göstermez. Genel adres ve port ayarları için [Erişim ve portlar](services-ports.md) bölümünü kullanın.
 
-Servisin güvenlik durumunun özeti:
+### Ağ olayları
 
-- **Kritik bulgular** beslemesi (Critical + High)
-- **En çok düşürülen trafik** — son saatte ağ politikalarının engellediği trafiğin özeti (tıklayınca Ağ sekmesine gider)
-- **Aktif ağ olayları** — devam eden ağ güvenlik olayları
-- Her şey yolundaysa moda duyarlı "temiz" durum satırı görünür
+Olaylar, ilişkili ağ anormalliklerini inceleme için bir araya getirir. Davranışın beklenen bir durum mu yoksa müdahale gerektiren bir sorun mu olduğuna karar vermeden önce etkilenen servisi, destekleyici kayıtları ve güncel yaşam döngüsünü okuyun.
 
-> Servis bir kümeye bağlı değilse bu sekme sizi önce dağıtım yapmaya yönlendirir.
+Akışlar ve düşen bağlantılar seçilen kanıt zaman aralığını kullanır; olaylar ise güncel yaşam döngüsünü gösterir. Trafik zaman aralığını değiştirmek, olay listesini geçmişteki olay durumlarının anlık görüntüsüne dönüştürmez.
 
-### Ağ
+### Düşen bağlantılar
 
-Servisin ağ güvenliği görünümü, alt sekmelerle:
+Hangi bağlantıların reddedildiğini ve bildirilen nedeni görmek için düşen trafik bölümünü kullanın. Bağlantıyı **Koruma** altındaki kurallarla ve uygulamanın belirtileriyle karşılaştırın.
 
-- **Akışlar (Flows)** — servisin gerçek ağ trafiği akışı
-- **Düşürülenler (Drops)** — ağ politikasının engellediği bağlantılar (kim, nereye, hangi port)
-- **Olaylar (Incidents)** — şüpheli ağ etkinliklerinden üretilen olay kayıtları
-- **Politikalar** — servise uygulanan ağ politikası kuralları (gelen/giden kural sayıları)
+Reddedilen tek bir bağlantı, o bağlantıya ait kanıttır. Bütün yolların kapalı olduğunu, servisin tamamen izole edildiğini veya benzer her girişimin aynı sonucu vereceğini kanıtlamaz.
 
-> Uygulama katmanı (L7 — HTTP yolu/metodu seviyesinde) ayrıntılı trafik görünürlüğü **Service Insights** aboneliğinin parçasıdır; bkz. [Faturalandırma ve Planlar](billing-plans.md).
+## Koruma: mevcut güvenlik duruşunu anlayın
 
-### Politikalar
+### Ağ politikaları
 
-Servisin güvenlik duruşunu yönettiğiniz sekme. Üç ana kart içerir:
+Servisin gelen ve giden trafik kurallarını gerekli bağımlılıklarıyla karşılaştırın. Müşteri isteği, sağlık kontrolü ve dışarıya yapılan bağımlılık bağlantısı farklı izinler gerektirebilir.
 
-**1. Baseline Duruşu** — canlı duruş + sapma özeti. Sapma varsa sekme başlığında kırmızı nokta görünür.
+Rolünüz bir değişiklik veya politika akışı sunuyorsa uygulamadan önce hedefi ve önizlemeyi kontrol edin. Ardından bildirilen uygulama durumunu ve ilgili trafik sonucunu doğrulayın. Genel adreste oturum açma ve IP kısıtlamaları ayrı [Erişim koruması](service-access-protection.md) ayarlarıdır; ağ politikası ile ziyaretçi erişim kuralı farklı soruları yanıtlar.
 
-**2. Linux Yetenekleri (Capabilities)** — Servisleriniz varsayılan olarak en sıkı yetki setiyle (tüm yetenekler düşürülmüş) çalışır. Platform, yaygın uygulamaların sorunsuz başlaması için küçük ve güvenli bir varsayılan set tanımlar:
+### Temel güvenlik ve canlı duruş
 
-| Yetenek | Tipik ihtiyaç |
-|---------|---------------|
-| `CHOWN` | Başlangıçta dosya sahipliği düzenleme (ör. web sunucuları, cache dizini hazırlığı) |
-| `NET_BIND_SERVICE` | 80/443 gibi ayrıcalıklı portlara bağlanma |
-| `FSETID` / `FOWNER` | Dosya izin yönetimi |
-| `KILL` | Process sinyalleme |
+Temel güvenlik, servisten beklenen güvenlik yapılandırmasıdır. **Canlı duruş**, çalışan iş yükü için sunulan kontrolleri raporlar; beklenen bir politikanın bulunmaması veya root kullanımının onaylı ayarla uyuşmaması gibi yapılandırma sapmalarını vurgular.
 
-- Bu seti **daraltabilirsiniz** (sıkılaştırma her zaman serbesttir) veya listeden kontrollü ekleme yapabilirsiniz.
-- Ekleme yaparken onay istenir, **gerekçe zorunludur** ve değişiklik değiştirilemez denetim zincirine kaydedilir.
-- Listede olmayan (platformun güvenli bulmadığı) bir yetenek eklenemez.
+Sapmayı son dağıtım ve onaylı servis ayarlarıyla karşılaştırın. Sorgu hatası, duruşun belirlenemediği anlamına gelir; başarısız uygulama testi veya temiz sonuç değildir. Gösterilen temel durum, önizleme ve güncel çalışma zamanı kanıtı incelemenin farklı sorularını yanıtlar.
 
-**3. Baseline Geçersiz Kılmaları (Overrides)** — read-only kök dosya sistemi altında ince ayar:
+### Çalışma zamanı koruma modu
 
-- **Ekstra yazılabilir dizinler**: Kök dosya sistemi salt-okunur olduğunda uygulamanızın yazması gereken yolları tanımlayın (ör. `/app/uploads`). Hassas sistem yolları (`/etc`, `/proc`, `/sys`, servis hesabı kimlik dizini) platform tarafından **reddedilir**.
-- **Framework otomatik yolları**: Platform, tespit edilen framework'e göre gerekli yazma yollarını otomatik ekler (ör. .NET için `/app/App_Data`) — bunlar salt-okunur rozetle görünür, sizin eklemenize gerek yoktur.
-- **Framework anahtar kalıcılığı**: Varsayılan olarak framework yazma alanı geçicidir (pod yeniden başlayınca silinir). Kalıcılık anahtarını açarsanız bu alan kalıcı ve replikalar arası paylaşımlı depolamaya taşınır — ör. .NET oturum/anti-forgery anahtarlarının yeniden başlatmalarda korunması için.
-- **Ek engelli yollar / engelli çalıştırma yolları**: Baseline'ın üzerine kendi yasaklarınızı ekleyin.
-- **YAML önizleme**: Uygulanacak politikanın tam içeriğini değişiklik öncesi görüntüleyin.
+Uygun servislerde **Çalışma zamanı koruma modu**, salt okunur bir durum kartıdır. İstenen modu, gözlenen modu ve dağıtım durumunu ayrı gösterir. Modlar **Kapalı**, **Gölge**, **Denetim** ve **Zorlama** olarak görünür; anlamları için [Çalışma Zamanı Güvenliği](runtime-security-guide.md) rehberini okuyun.
 
-### Gözlemler
+| Durum | Nasıl yorumlanır? |
+|---|---|
+| **Bekliyor / sırada / uygulanıyor** | İstenen değişikliğin uygulandığı henüz doğrulanmamıştır; gözlenen modu inceleyin. |
+| **Başarısız** | Kaydedilen isteğin uygulaması tamamlanmamıştır. Yeni işlemden önce bildirilen hatayı okuyun. |
+| **Gözlenen mod** | Bildirilen güncel moddur. Etkili korumayı doğrulamak için ilgili davranış ayrıca incelenmelidir. |
+| **Kullanılamıyor veya doğrulanmamış** | Bu görünümden güncel mod belirlenememektedir. |
 
-Servis **Audit modundayken** sensörün yakaladığı tüm davranışların kuyruğu: hangi process, hangi dosya/ağ işlemi, kaç kez.
+**Denetim / Engelle** koruma eylemi, bu çalışma zamanı modlarından ayrı bir alandır. Engelle etiketi, ilgili kurallar için engelleme niyetini belirtir; her işlem için toplu bir başarı sonucu değildir.
 
-Çalışma akışı:
+### Linux capability değerleri
 
-1. Servisi Audit modunda normal yükü altında çalıştırın (önerilen: birkaç gün, tüm iş senaryoları çalışsın).
-2. Gözlemleri tek tek işleyin: **İzin Ver** (meşru davranış) / **Engelle** (istenmeyen) / **Yoksay**.
-3. Bekleyen gözlem kalmayınca üst şeritteki **Block'a Yükselt** adımıyla korumayı etkinleştirin.
+Capability değerleri uygulamaya belirli ayrıcalıklar verir. Kart, kullanılabilir izin listesini, mevcut eklemeleri ve varsayılanları gösterir. İlgisiz bir başlangıç hatasını gidermek için ayrıcalık eklemek yerine listeyi imajın ihtiyaç duyduğu ölçüde dar tutun.
 
-Sekme başlığındaki rozet, bekleyen gözlem sayısını gösterir.
+Capability yönetimi izniyle gereken ekleme veya çıkarmaları inceleyin, gerekçe girin ve kaydedin. Ayrıcalık eklemek onay gerektirir. Değişiklik sonraki dağıtımda etkili olur; kayıt sonucunu okuyun ve o dağıtımdan sonra uygulama sağlığı ile canlı duruşu doğrulayın.
 
-### Bulgular
+### Yazılabilir yollar
 
-Bu servise ait güvenlik bulguları (tenant genel listesinin servise filtrelenmiş hali) + **kanıt zaman çizelgesi**: son 7 güne ait, bulgu ve kararlarla ilişkili olay geçmişi. Bulgu kararlarının ayrıntısı için bkz. [Güvenlik Merkezi → Bulgular](security-center-guide.md#bulgular-findings).
+**Yazılabilir yollar** kartı, kök dosya sistemi salt okunur olduğunda uygulamanın yazması gereken dizinleri tanımlar. Tanınan uygulama çatısı için otomatik sağlanan yollar varsa bunları da gösterir; bu yollar bu karttan düzenlenemez.
 
----
+Yazılabilir yol yönetimi izniyle yalnız gerekli mutlak uygulama dizinlerini ekleyin, gerekçe girin ve onayı inceleyin. İzin verilen yol kuralları geçerliliğini korur. Mevcut ayarlar yüklenemiyorsa düzenlemeden önce başarıyla yenileyin.
 
-## Pratik Akışlar
+Yazılabilir dizin, kendiliğinden kalıcı depolama anlamına gelmez. Kalıcılık seçeneği sunuluyorsa kapsamını okuyun ve uygulamanın dağıtımlar arasında neyi koruması gerektiğini değerlendirin. Her yazılabilir yolun kalıcı olduğunu varsaymadan servisin sonucunu doğrulayın.
 
-### Yeni bir servisi güvenli devreye alma
+### Root olarak çalışma izni
 
-1. Servisi dağıtın — koruma **Audit** modunda başlar, hiçbir şey engellenmez.
-2. Birkaç gün normal trafikle çalıştırın; tüm iş akışlarının (cron, rapor, yedekleme vb.) en az bir kez koştuğundan emin olun.
-3. **Gözlemler** sekmesinde birikenleri işleyin: meşru olanlara İzin Ver.
-4. Gerekliyse **Politikalar** sekmesinden yazılabilir dizin/yetenek ekleyin.
-5. Üst şeritten **Block'a Yükselt** — artık politika dışı her davranış engellenir ve bulgu üretir.
+**Root olarak çalışmaya izin ver**, buna ihtiyaç duyan imajlar için ayrı ve ayrıcalıklı bir ayardır. Onay, bu gevşetmenin salt okunur kök dosya sistemi gerekliliğini de etkilediğini açıklar. Seçmeden önce imajın gerçek ihtiyacını kontrol edin; dar kapsamlı bir capability veya yazılabilir dizin, farklı bir gereksinimi daha az erişimle karşılayabilir.
 
-### Pod "Permission denied" hatası veriyor / CrashLoopBackOff oldu
+Bu ayarı değiştirmek ayrı izin ve gerekçe gerektirir. Kaydedilmiş istisna, o anda çalışan işlemin kullanıcı kimliğine dair kanıt değildir. Sonuçlanan dağıtımı ve canlı duruşu inceleyin.
 
-Muhtemelen meşru bir davranış Block modunda engellendi:
+### Önizleme ve değişiklik doğrulama
 
-1. **Bulgular** sekmesinde son Engellendi kayıtlarına bakın — hangi process, hangi yol?
-2. Yazma hatası ise: **Politikalar → Ekstra yazılabilir dizinler**'e ilgili yolu ekleyin.
-3. Yetki hatası ise: **Politikalar → Linux Yetenekleri**'nden gerekli yeteneği ekleyin.
-4. Davranış politikaya takılıyorsa: bulguda **Allow** kararı verin veya süreli bir [politika istisnası](security-center-guide.md#politika-istisnalar%C4%B1-policy-exceptions) tanımlayın.
-5. Sorunu izole edemiyorsanız servisi geçici olarak **Audit** moduna alın, gözlem toplayıp tekrar Block'a yükseltin.
+Sunuluyorsa **YAML önizlemesi** ile planlanan temel güvenlik içeriğini inceleyin. Önizleme, değişikliği kaydetmez veya uygulamaz.
 
-### Şüpheli bir bulgu gördüm
+Desteklenen servis ayarlarında şu sırayı izleyin:
 
-1. Bulgunun detayını açın — process, yol, tekrar sayısı, ilk/son görülme.
-2. Eşleşen [olay müdahale playbook'unu](security-center-guide.md#olay-m%C3%BCdahale-playbooklar%C4%B1-ir-playbooks) izleyin.
-3. Kanıt zaman çizelgesinden olayın bağlamını (öncesi/sonrası) inceleyin.
-4. Kararınızı verin (Block/Acknowledge) — karar gerekçenizle birlikte denetim zincirine işlenir.
+1. Mevcut ayarı, ilgili belirtiyi ve beklenen iyileşmeyi kaydedin.
+2. Gereken en dar kapsamı değiştirin ve anlamlı bir gerekçe yazın.
+3. Dağıtım uyarıları dahil onayı ve kayıt sonucunu okuyun.
+4. Sonuçlanan [dağıtım geçmişini](service-deployment-history.md) ve güncel duruşu kontrol edin.
+5. İstenen uygulama davranışının çalıştığını ve ilgili korumanın hâlâ destekleyici kanıta sahip olduğunu doğrulayın.
 
----
+Ayar kaydedilmiş ancak uygulama başarısız olmuş veya sırada kalmışsa olay notlarınızda bu ayrımı koruyun. Belirsiz durumu tamamlanmış gibi göstermek için aynı değişikliği tekrar tekrar kaydetmeyin.
 
-## İzinler
+## Bulgular: kanıttan karara
 
-| İşlem | Gerekli yetki |
-|-------|---------------|
-| Güvenlik sekmesini görüntüleme | Güvenlik duruşu görüntüleme |
-| Gözlem işleme, Block'a yükseltme | Güvenlik baseline yönetimi |
-| Linux yeteneği ekleme/çıkarma | Yetenek yönetimi |
-| Yazılabilir dizin yönetimi | Yazılabilir dizin yönetimi |
-| Servis bulgularında karar | Bulgu yönetimi |
+### Bulguyu araştırın
 
-Yetkiler **Erişim Kontrolü → Roller** ekranından atanır; bkz. [Erişim Kontrolü](access-control-guide.md).
+Kaynak, önem derecesi, etkilenen işlem, ilk ve son görülme bilgisi ile sunulan kanıtı okumak için bulguyu açın. Ayrıntıları incelediğiniz servis ve zaman aralığıyla karşılaştırın. Tekrar bilgisi, tek seferlik olay ile yinelenen davranışı ayırt etmeye yardımcı olur.
 
----
+Acil filtresi veya kayıtların yalnız bir bölümünün yüklenmiş olması listeyi daraltabilir. İnceleme gerektiriyorsa zaman aralığını genişletin veya daha fazla kayıt yükleyin. Eksik satırın nedeni filtre, izin veya kaynak kullanılabilirliği olabilir.
 
-## İlgili Dokümanlar
+### Çalışma zamanı gözlem incelemesi
 
-- [Güvenlik Merkezi](security-center-guide.md) — tenant geneli güvenlik konsolu
-- [Çalışma Zamanı Koruması](runtime-security-guide.md) — koruma modları ve politika kavramları
-- [Servis Yönetimi](service-guide.md) — servis yaşam döngüsü
+Uygun servislerde kaydedilmiş dosya yazmaları, işlem çalıştırmaları ve ağ girişimleri, mevcut inceleme geçmişiyle birlikte görünür. İncelemeyi daraltmak için **Tümü**, **Beklemede**, **İzinli**, **Engelli** veya **Gözardı** filtrelerini kullanın.
+
+Bu bölüm, gözlemleri ve kaydedilmiş kararları okumak içindir. İşlem gerektiren güvenlik bulgusuna yetkili Bulgular akışından karşılık verin. Gözlem otomatik olarak saldırı değildir; İzinli veya Engelli inceleme durumu, ilgili çalışma zamanı kuralının etkili olduğunu kanıtlamaz.
+
+### Kanıt zaman çizelgesi
+
+İncelediğiniz davranışın öncesi ve sonrasındaki olayları karşılaştırmak için zaman çizelgesini kullanın. Bulgu ve zaman çizelgesi erişimleri bağımsızdır; birini görme izniniz varken diğerini göremeyebilirsiniz. Sonuç çıkarırken zaman aralığını ve kayıt yükleme sınırlarını dikkate alın.
+
+### Kaydedilmiş karar ve gerçek müdahale
+
+Bulguyu gördüğünüzü belirtmek, izin vermek, tehdit olarak işaretlemek, göz ardı etmek veya çözülmüş saymak bir inceleme kararı kaydeder. Tek başına karar, trafik kuralı uygulamaz, bir işlemin reddedildiğini kanıtlamaz veya servisi izole etmez.
+
+Kullanılabilir müdahale eyleminde önizlemeyi, gerekli izni, kapsamı ve beklenen etkiyi inceleyin. Uygulanmayı ve sonucu ayrıca doğrulayın. [Güvenlik Merkezi](security-center-guide.md), bulguları, müdahale rehberlerini, önerileri ve yanıt akışlarını birlikte açıklar.
+
+## İş yükü izolasyonu ve geri dönüş
+
+İzolasyon, seçilen iş yükünün ağ bağlantılarını sınırlar; normal hizmeti ve bağımlılık erişimini kesintiye uğratabilir. Uygun iş yükü ve ayrı yetki gerektirir. Önizleme, onaydan önce önerilen kapsamı ve etkiyi gösterir.
+
+| Kapsam | Amaçlanan etki |
+|---|---|
+| **Yalnız gelen trafik** | İş yükünü gelen istekleri karşılamaktan çıkarır; giden bağlantılar açık kalır. |
+| **Gelen ve giden trafik** | Bağımlılıklara erişim dahil her iki yönü sınırlar. |
+
+Yalnız gelen trafiğin kesilmesi tam karantina değildir. Kapsamı yalnız en kısa kesintiye göre değil, olayın ihtiyacına göre seçin.
+
+1. Servisi, olay gerekçesini, beklenen etkiyi ve geri dönüş sorumlusunu doğrulayın.
+2. **Bu iş yükünü izole et…** seçeneğini açın ve önizlemeyi okuyun. Kullanılamayan veya reddedilen önizleme, başarılı kontrol sayılmaz.
+3. Yalnız yetkili olduğunuz, desteklenen kapsamı onaylayın ve gerekli gerekçeyi girin.
+4. Bildirilen sonucu inceleyin. Bekliyor durumu istenen kısıtlamanın henüz doğrulanmadığını, başarısız durumu ise izolasyon varsayılmaması gerektiğini gösterir.
+5. İlgili trafik kanıtını ve uygulama davranışını amaçlanan kısıtlamayla karşılaştırın.
+
+Müdahale tamamlandığında yetkili kullanıcı **Bu iş yükünü yeniden bağla** seçeneğini açabilir, gerekçe girip onaylayabilir. Hem kısıtlamanın kaldırıldığını hem uygulamanın sağlıklı döndüğünü doğrulayın. Yeniden bağlama da bir güvenlik kararıdır; isteğin kabulü sağlıklı geri dönüşü kanıtlamaz.
+
+## Çalışma ortamı uygunluğu
+
+Sunulan kanıt ve işlemler seçilen servisin çalışma ortamına bağlıdır. **Kata** iş yükünde bazı davranış gözlemleri ve çalışma zamanı koruma işlemleri uygulanamaz. Ağ, derleme kanıtı, sıkılaştırma ve izolasyonun her biri kendi desteği ve bildirilen durumuna göre değerlendirilmelidir.
+
+| Gösterilen koşul | İnceleme için anlamı |
+|---|---|
+| **Uygun ve güncel kanıt mevcut** | Kayıtları belirtilen kapsam ve zaman aralığında değerlendirebilirsiniz. |
+| **Uygulanamaz** | Bu katman seçilen çalışma ortamı için geçerli değildir; diğer uygun kanıtları kullanın. |
+| **Bilinmiyor / kullanılamıyor** | Destek veya güncel durum belirlenememektedir; gerekiyorsa açıklama isteyin. |
+| **Eski veri** | Kanıt, mevcut durumu değerlendirmek için gerekenden eskidir. |
+
+Sırf bir kart sağlıklı görünsün diye çalışma ortamını değiştirmeyin. Uyumluluğu ve uygulama gereksinimlerini servis sorumlunuzla veya Komuta desteğiyle doğrulayın.
+
+## Pratik incelemeler
+
+### Servis bir bağımlılığa ulaşamıyor
+
+Olayın zaman aralığında **Trafik** bölümünü açın. İlgili hedefi ve portu bulun; sonucu ve varsa düşme nedenini inceleyin. **Koruma** içindeki giden trafik kurallarıyla ve izolasyon durumuyla karşılaştırın. Değişiklik gerekiyorsa izinli en dar kuralı veya düzeltmeyi kullanın; ardından gereken bağlantının çalıştığını ve ilgisiz kısıtlamaların korunduğunu doğrulayın.
+
+### Yeni imaj dağıtımdan sonra çalışmıyor
+
+Hata zamanını dağıtım geçmişi, canlı duruş ve ilgili gözlemlerle karşılaştırın. Uygulamanın belirli bir yazılabilir dizin, capability veya root izni gerektirip gerektirmediğini belirleyin. Ayarı gevşetmeden önce imaj ve hata kanıtını kullanın. Yetkili düzeltmeden sonra hem uygulama sağlığını hem sonuçlanan güvenlik durumunu kontrol edin.
+
+### Şüpheli davranış tekrarlanıyor
+
+Bulgunun tekrar bilgisi ile ilk ve son görülme zamanlarını kontrol edin; zaman çizelgesi ve trafikle karşılaştırın. Uygun müdahale rehberini okuyun ve izinli yanıtı belirleyin. Çözülmüş inceleme kaydı, yeni olayı engellemez; davranışın veya erişim koşullarının gerçekten değişip değişmediğini araştırın.
+
+## Sorun giderme
+
+| Görülen durum | Sonraki adım |
+|---|---|
+| **Yükleniyor** | Bölümün yüklenmesini bekleyin; yer tutucular sıfır sayım değildir. |
+| **Kayıt yok** | Gözlenen olay olmadığı sonucundan önce filtreleri, yüklenen kayıtları, kapsamı ve güncelliği kontrol edin. |
+| **Eski kanıt** | Yenileyin ve son bildirilen zamanı olay aralığıyla karşılaştırın. Süren eksikliği desteğe iletin. |
+| **Kaynak kullanılamıyor / sorgu başarısız** | Sunuluyorsa yeniden deneme kontrolünü kullanın. Sorun sürerse servis, zaman ve görünen hatayı desteğe iletin. |
+| **İzin reddedildi / salt okunur** | Görevinizin gerektirdiği özel okuma veya yönetim iznini isteyin. |
+| **Ayar kaydedildi, dağıtım başarısız** | Başarısız dağıtımı inceleyin ve yetkili sorumluyla uygulamanın normal geri dönüş sürecini izleyin. |
+| **İstenen ve gözlenen mod farklı** | Geçiş ve dağıtım durumunu kontrol edin; istenen modu aktif olarak raporlamayın. |
+| **İzolasyon bekliyor veya başarısız** | Karantinayı doğrulanmamış kabul edin; sonraki müdahaleden önce işlem sonucunu inceleyin. |
+
+## Bulunduğunuz ekranda yardım
+
+Geçerli sekmeye veya desteklenen ayara uygun rehber için maskot menüsünü açın. Statik açıklamayı menü içinde okuyabilirsiniz; maskot açık ve hazırken **Bu ekranı açıkla** seçeneği açıklamayı yardım balonunda da açar. Statik yardım Türkçe ve İngilizcedir, AI kapalıyken de kullanılabilir. Okumak servis kaydı sorgulamaz, AI'a veri göndermez veya korumayı değiştirmez.
+
+AI sohbeti kullanılabilir ve etkinse izinli servis veya kuruluş kapsamınızda isteğe bağlı yardım olarak kullanın. Sayfa bağlamı ayrı ve isteğe bağlı bir ayardır; açılması geçerli sayfanın özetini sohbete ekleyebilir. Açıklama, işlem yetkisi vermez veya korumayı doğrulamaz. Sayfanın kendi izin ve onay akışını kullanın; sonrasında gerçek sonucu değerlendirin.
+
+## Sık sorulan sorular
+
+### Boş Bulgular sekmesi servisin güvenli olduğu anlamına mı gelir?
+
+Eşleşen kayıt gösterilmediği anlamına gelir. Sonucun kapsamını anlamak için kaynak kapsamını, güncelliği, filtreleri ve izinleri kontrol edin.
+
+### Bulguları okuyabiliyorum; neden zaman çizelgesini veya ayarları göremiyorum?
+
+Bu bölümlerin izinleri ayrıdır. Birine erişim, bütün kanıtlara veya yönetim kontrollerine erişim sağlamaz.
+
+### Çalışma zamanı koruma modunu buradan değiştirebilir miyim?
+
+Mod kartı durum bildirir. Desteklenen servis ayarları için rolünüze sunulan düzenleme kontrollerini kullanın; gerekli mod değişikliği için servis sorumlunuza veya Komuta desteğine başvurun.
+
+### Tehdit olarak işaretlemek davranışı hemen durdurur mu?
+
+Bulgu kararı ile uygulanmış koruma kuralı farklı kayıtlardır. Gerçek müdahale eylemini, uygulama durumunu ve ilgili gözlenen sonucu inceleyin.
+
+### Erişim koruması aynı akışın parçası mı?
+
+Genel servis adresine erişimi denetleyerek servis güvenliğini tamamlar. **Erişim ve portlar** altında yapılandırın; ziyaretçi erişimini değerlendirmek için kendi etkinlik ve durum bilgisini kullanın.
+
+## İlgili rehberler
+
+- [Güvenlik Merkezi](security-center-guide.md) — kuruluş genelinde önceliklendirme ve müdahale.
+- [Çalışma Zamanı Güvenliği](runtime-security-guide.md) — koruma katmanları, modlar ve doğrulama.
+- [Erişim koruması](service-access-protection.md) — genel servis erişim kuralları.
+- [Erişim ve portlar](services-ports.md) — servis giriş noktaları ve port ayarları.
+- [Dağıtım geçmişi](service-deployment-history.md) — değişikliği dağıtım sonucuyla karşılaştırma.

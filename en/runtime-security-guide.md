@@ -1,126 +1,196 @@
-# Runtime Protection
+# Runtime Security
 
-Komuta provides a kernel-level protection layer to protect your applications against **runtime attacks**: **Runtime Protection**. This layer observes behaviors *inside* your containers — which process is running, which file is being accessed, which network connection is being opened — and blocks out-of-policy behaviors.
+Runtime security helps you assess a service while it is running: the behavior recorded for it, the restrictions intended to protect it and the evidence that those restrictions reached the workload. Komuta brings these signals together so you can investigate suspicious activity and make targeted changes without losing sight of normal application behavior.
 
-This document explains the concepts of the protection layer. For screen usage, see [Service Security Workspace](service-security-guide.md) and [Security Center](security-center-guide.md).
+This guide explains the protection model. For the screen-by-screen workflow, read [Service Security](service-security-guide.md). For priorities and responses across your organization, start with [Security Center](security-center-guide.md).
 
----
+> **Keep three facts separate:** what is configured, what is reported as applied and what the observed outcome shows. This distinction is useful both when evaluating protection and when recovering an application after a change.
 
-## Protection Layers
+## Protection layers and what each answers
 
-Security in Komuta is enforced across multiple layers; each layer closes off a different attack surface:
+| Layer | Customer question | Evidence to review |
+|---|---|---|
+| **Public access protection** | Who may open this service's public address? | Access rules, protection status and relevant access activity |
+| **Network policies** | Which incoming and outgoing connections are permitted? | Rule scope, application state, flows and dropped connections |
+| **Workload hardening** | Which privileges and writable areas does the application need? | Approved settings, deployment result and live posture |
+| **Runtime behavior protection** | What process, file or other supported behavior was observed, and which rules apply? | Runtime eligibility, protection action, observations and finding evidence |
+| **Build and image evidence** | What did checks report about the image being delivered? | Available scan results for the relevant build and image |
 
-| Layer | Scope |
-|--------|--------|
-| **Network Policy** | Traffic between services, DNS — restricts communication *between pods* |
-| **L7 Rate Limiting** | HTTP request rate limiting |
-| **Runtime Protection** | Process / file / capability behaviors *inside the container* |
-| **Host Protection** | Critical files and processes on the node itself |
-| **Runtime Monitoring** | Advanced behavior telemetry (process lineage tree, system calls) |
+These layers complement one another. A visitor passing an access check does not establish that the application's behavior is safe. A build scan does not inspect everything that a running workload will do. Network isolation can restrict connections without explaining how an application reached its current state.
 
-Runtime Protection can block the following behaviors:
+Use [Access protection](service-access-protection.md) for visitor rules and [Access & ports](services-ports.md) for service entry points.
 
-- **Process execution**: running binaries like `apt-get`, `curl`, `nmap` inside the container
-- **File access**: reading/writing sensitive files, making the service account credential file read-only
-- **Network access**: which processes can open network connections
-- **Linux capabilities**: use of dangerous kernel privileges (raw socket, system administration, etc.)
+## Establish scope before interpreting a result
 
----
+Start with the selected organization, service, runtime and deployment. Confirm that the evidence belongs to the service and period you are assessing. Organization-wide summaries help prioritize; service evidence provides the detail needed for a specific investigation.
 
-## Automatic Setup and Platform Baselines
+Check these conditions together:
 
-The protection layer is installed **automatically** on clusters managed by Komuta — you don't need to do anything:
+- **Applicability:** does this layer support the selected runtime and service?
+- **Availability:** can the current view obtain the relevant evidence?
+- **Freshness:** is that evidence recent enough for the event or change?
+- **Permission:** can your role read the section or perform the proposed action?
 
-1. During cluster setup, the protection components are installed as the **first add-on** (security is prioritized).
-2. The **host baseline policy** protects the node's critical directories (cluster certificates, credential files, user management tools).
-3. The **cluster baseline policy** blocks known attack tools (package managers, network scanning tools) on user workloads.
-4. Areas where **platform system components** such as CNI, storage, observability, and GitOps run are **automatically excluded** — conflicts between critical infrastructure and the protection layer have been prevented based on field experience.
+### Kata and other applicability limits
 
-### Service Baseline Policy
+For a **Kata** workload, some runtime behavior observations and protection operations are not applicable. Read the service's coverage and eligibility information instead of assuming that every runtime exposes the same capabilities.
 
-The deployment pipeline automatically generates a **runtime baseline policy** for each service. This policy:
+Evaluate network rules, workload hardening, build evidence and isolation separately. A runtime restriction on one layer does not decide the support or effectiveness of another. In particular, isolation has its own eligibility check and may be available for an eligible isolated runtime.
 
-- Blocks package managers and attack tools (`apt`, `yum`, `wget`, `nc`, `nmap`, etc.)
-- Handles `curl` / `wget` **intelligently**: allows them if used in your health probes, blocks them if not
-- Blocks dangerous Linux capabilities (raw socket, system administration, kernel module, process tracing)
-- Makes the service account credential file **read-only**
+An unavailable card is not a finding, and a hidden card is not proof of complete protection. If applicability is unknown, ask the service owner or Komuta support to clarify the supported scope.
 
-Baseline policies are **managed by the platform** and are protected against manual editing. For per-service fine-tuning (adding capabilities, writable directories, additional restrictions), use the service's [Security → Policies](service-security-guide.md#politikalar) tab.
+## Runtime mode and protection action
 
----
+### Read the runtime mode
 
-## Policy Actions
+The service's **Protection** tab includes a read-only **Runtime protection mode** card for applicable workloads. It shows requested and observed state, including whether application is pending or failed.
 
-### Block (Recommended — Production Target)
+| Mode | Intended behavior of this runtime layer |
+|---|---|
+| **Off** | This runtime baseline is turned off. Other layers retain their own configuration and state. |
+| **Shadow** | Learn the workload's behavior while applying the hardening supported by this mode; do not interpret it as active behavior blocking. |
+| **Audit** | Observe and record behavior for investigation and review. |
+| **Enforce** | Apply blocking protection to the supported, configured scope when application completes. |
 
-An out-of-policy operation is **denied at the kernel level**: the system call fails, the process cannot execute the binary. Even if an attacker gets inside the container, the operation never actually happens.
+Do not assume that every service begins in the same mode or that every mode is available for every runtime. The card reports state; it is not a mode selector. For a required mode change, contact your authorized service owner or Komuta support.
 
-```
-$ apt-get update
-bash: /usr/bin/apt-get: Permission denied
-```
+### Read Audit and Block separately
 
-### Audit (Observation Mode)
+A runtime rule can also have an **Audit** or **Block** action. This action belongs to the relevant rule or protection layer; it is not the same state field as the four runtime modes.
 
-The violation is **logged but not blocked** — the application continues to run normally. Used to learn the actual behavior before putting a new service into production. Observations accumulated in Audit mode are processed in the [Observations tab](service-security-guide.md#g%C3%B6zlemler) and converted into a baseline.
+| Action | Meaning |
+|---|---|
+| **Audit** | The rule is intended to observe and record matching behavior without blocking through that rule. |
+| **Block** | The rule is intended to deny matching behavior when it is supported and effectively applied. |
 
-### Allow (Advanced — Whitelist)
+Audit does not remove network restrictions or blocking from another rule. Block does not mean all activity is denied. The matched operation, target, rule scope and runtime support determine what the rule can affect.
 
-Only explicitly permitted operations run; everything else is denied. Provides maximum security but requires extensive testing.
+A restriction on executing a program is also different from a restriction on writing to its directory. When interpreting path-based rules, confirm what operation and scope they actually describe.
 
-> Recommended path: **Start with Audit → process observations → upgrade to Block.** For the detailed flow, see [Service Security → Practical Flows](service-security-guide.md#pratik-ak%C4%B1%C5%9Flar).
+## Configuration, application and observed outcome
 
----
+Use three checkpoints to explain the state of a control:
 
-## Violation Tracking
+| Checkpoint | What it establishes | What remains to verify |
+|---|---|---|
+| **Configured** | A setting or rule was saved for a target | Whether it reached the running workload |
+| **Applied / observed** | The service reports the configuration or mode as applied | Whether the expected behavior is allowed or denied in the relevant circumstances |
+| **Observed outcome** | A specific event or connection produced the reported result | Other paths, workloads and conditions outside that evidence |
 
-Every event captured by the protection layer flows to the following surfaces:
+A preview describes intended content. Approval permits a workflow to continue. A queued deployment indicates pending work. None of these alone demonstrates effective blocking.
 
-- **Security Center → Violations**: the live violation feed across the tenant
-- **Security Center → Findings**: deduplicated, actionable records
-- **Service detail → Security**: service-specific findings and live statistics (Blocked / Critical counts for the last 1 hour in the top strip)
-- **Top bar badge**: the Critical + High violation counter is visible on every screen; an instant notification drops on a critical spike
-- **Alert rules**: ready-made alert rules for high violation rate, critical block, host violation, and sensor health are defined together with cluster setup; these are routed to your [notification channels](notification-guide.md)
+When desired and observed modes differ, read the transition and deployment state. If application failed, the saved desired setting may still be visible while the previous observed state remains relevant. If the mode is unavailable or unverified, do not fill the gap with an assumption.
 
----
+Match evidence to the configuration and deployment being assessed. A successful observation from an older version does not verify a later change. Similarly, a reconnect or rollback request needs a current result and application-health check before recovery can be considered complete.
 
-## Policy Recommendations and Exceptions
+## Baseline and application requirements
 
-- **Recommended Policies**: The platform automatically generates policy recommendations from observed behaviors ("this access was blocked 47 times on this service — a permanent rule is recommended"). You review the recommendations and apply them with a single click.
-- **Policy Exceptions**: For a legitimate workflow that gets caught by policy, you can define a **justified, approval-flow** exception for **up to 90 days**.
+The baseline expresses the expected security configuration. Live posture compares available information from the running service with those expectations and can reveal drift.
 
-Both are managed under [Security Center → Policies](security-center-guide.md#politikalar) and every transition is recorded in an immutable audit trail.
+Supported customer settings include narrowly allowed **Linux capabilities**, **writable paths** and **permission to run as root**, each with its own management permission. Their purpose is to meet an identified application requirement while keeping the remaining restrictions intact.
 
----
+### Choose the smallest necessary change
+
+For a startup failure or denied operation, first identify the process, path or connection involved. Compare it with the image's requirements, deployment history and current settings. A general permission error does not by itself establish that the application needs root or broad write access.
+
+For an authorized change, record a clear reason, read its confirmation and check the deployment result. When a root-filesystem restriction applies, a writable-path exception has a different scope from allowing root execution. A writable directory also needs a separate persistence assessment if the application must retain its contents.
+
+### Verify drift and recovery
+
+If live posture reports a missing expected policy or a mismatch, confirm that the reported evidence is current and the deployment is the one you intended. A posture query failure is a visibility gap rather than a diagnosis of the application.
+
+Use [deployment history](service-deployment-history.md) to correlate changes. After correction or recovery, check the application behavior that failed and the protection condition that motivated the original setting. A successful restart alone does not answer both questions.
+
+## Observations, findings and policy decisions
+
+Runtime observations show recorded behavior and existing review history for applicable services. Findings organize actionable security records, while the service timeline helps place them in context. The underlying sections can have different permissions and data windows.
+
+Pending observation counts describe reviews in their displayed scope. They do not measure the number of attacks or prove the outcome of a posture test. Read the actual operation and evidence before classifying it.
+
+**Allow** and **Mark as threat** are finding decisions with a required reason. They record how the finding was assessed; they do not by themselves install an allow or blocking rule. **Dismiss** concerns the finding's review status, rather than the protection policy.
+
+Where an exception request is offered, review the target, reason and duration. A request awaiting approval is not an applied exception. Where a suggestion or response offers a separate application step, inspect the preview and current policy before continuing. The [Security Center](security-center-guide.md) guide explains these workflows and their permissions.
+
+## Controlled verification
+
+A protection test is a deliberate action with its own authorization and impact. Use a supported, approved scenario for the target service; do not turn an investigation into an unplanned test against a production application.
+
+Before starting, agree on the target, applicable runtime, expected signal, allowed impact and recovery owner. Specify whether the scenario is intended to assess **detection**, **prevention** or **recovery**. These outcomes need different evidence.
+
+1. Capture the current configuration, observed mode, application health and evidence time.
+2. Use only the approved scenario and scope, with the permissions it requires.
+3. Match the resulting record to the expected source, service, operation and time window.
+4. For detection, confirm the expected observation or finding; for prevention, also verify the reported denial and the application outcome.
+5. Complete the agreed recovery and check normal behavior and protection state again.
+
+Do not access sensitive or decoy paths simply to generate a finding. A missing signal can indicate a source, permission, filter or applicability problem. Investigate that uncertainty before repeating a test.
+
+A detected scenario demonstrates the behavior observed in that scenario. It does not establish prevention of all attacks or coverage of every service.
+
+## Common scenarios
+
+### “The mode says Audit, but a request was blocked”
+
+Check which layer produced the denial. Public access rules, network policies, isolation or another applicable rule can restrict a request independently of the runtime mode. Compare the request's path and time with the relevant evidence.
+
+### “We saved a writable path, but the error continues”
+
+Read the save result and deployment state, then compare the running application's actual path with the saved directory. Confirm the error is a write-permission issue rather than a missing dependency or another startup failure. Verify the smallest authorized correction after application completes.
+
+### “We marked a finding as a threat, but it happened again”
+
+The review decision records the assessment. Inspect any separate response or policy action and its application state, then compare fresh evidence. Recurrence is a reason to continue the investigation, not proof that the decision failed to save.
+
+### “We reconnected the service, but it is still unhealthy”
+
+Check that the requested release completed and inspect the application and dependency state. Removing a network restriction does not fix the original compromise, application failure or unrelated access rules.
 
 ## Troubleshooting
 
-### The pod went into "CrashLoopBackOff" and there's a "Permission denied" error
+| Situation | Next check |
+|---|---|
+| **Loading or unavailable mode** | Wait for a verified result or retry where offered; do not reuse an uncertain state as active protection. |
+| **No observations or findings** | Inspect filters, permissions, applicability, record loading and evidence freshness. |
+| **Desired and observed state differ** | Read the application status and the latest deployment result. |
+| **Configuration drift** | Compare current posture with approved settings and the intended deployment. |
+| **Permission denied** | Request the specific read or management permission required for your task. |
+| **Kata has fewer runtime controls** | Use the service's applicability information and assess each remaining layer separately. |
+| **Application failed or recovery is incomplete** | Preserve the visible error and consult the authorized owner before another change. |
 
-A legitimate behavior of your application was likely blocked in Block mode:
+When contacting support, include the service, incident time, visible state, relevant deployment and the outcome you expected. Share only the information needed for that investigation.
 
-1. Review the recent Blocked records in the service's **Security → Findings** tab — which process, which path?
-2. If it's a write block, add an **extra writable directory**; if it's a permission block, add a **Linux capability** (Policies tab).
-3. In a complex case, temporarily switch the service to **Audit** mode, collect observations, then **upgrade back to Block**.
+## Contextual help and optional AI
 
-### A "high violation rate" alert came in
+The mascot menu contains static Turkish and English help for the current security page or supported service setting. It remains readable when AI or the decorative mascot is disabled. With the mascot enabled and ready, **Explain this screen** can also display the guidance in a help bubble.
 
-1. Filter the relevant service in **Security Center → Violations**.
-2. Find which process/policy triggered it.
-3. If it's legitimate usage: make an **Allow** decision on the finding or define a policy exception.
-4. If it's suspicious: follow the matching [incident response playbook](security-center-guide.md#olay-m%C3%BCdahale-playbooklar%C4%B1-ir-playbooks).
+Static guidance does not query service data, send it to AI or execute an action. Optional AI chat is separate. Page-context sharing is opt-in and can add a page summary when enabled; keep the conversation within your authorized scope. A recommendation does not replace evidence, page permissions or an action's confirmation and result checks.
 
-### The new policy was not applied to the cluster
+## Frequently asked questions
 
-- Make sure the policy is **active** (disabled policies are not deployed).
-- Check the deployment status field in the policy list; if there's an error, the details appear there.
-- If there appears to be a cluster connectivity issue, verify the cluster status from **Security Center → Overview → Cluster Security Matrix**.
+### Is a healthy summary enough to confirm protection?
 
----
+It helps prioritize, but the conclusion depends on source coverage and freshness. For a specific protection claim, review the target rule, its application and relevant outcome evidence.
 
-## Related Documents
+### Is Audit the same as having no security?
 
-- [Security Center](security-center-guide.md) — findings, policies, compliance, SIEM, drills
-- [Service Security Workspace](service-security-guide.md) — modes, observations, capabilities, writable directories
-- [Notification Management](notification-guide.md) — routing alerts to channels
-- [Access Control](access-control-guide.md) — security permissions
+No. Audit describes observation intent for the relevant runtime mode or rule. Other hardening and access restrictions have their own state.
+
+### Does Enforce guarantee that every unwanted behavior is stopped?
+
+It describes the intended mode for an applicable scope. Effective protection depends on the applied rules and supported behavior; evaluate it through the relevant evidence.
+
+### Can build scanning replace runtime investigation?
+
+No. Build evidence describes the checked image or build. Runtime investigation addresses what happens while the deployed application runs.
+
+### Can a finding decision or AI answer change protection automatically?
+
+A recorded finding decision or explanation is not proof of a protection change. Use the explicit, authorized application or response workflow where offered and verify its result.
+
+## Related guides
+
+- [Service Security](service-security-guide.md) — investigate and manage supported service settings.
+- [Security Center](security-center-guide.md) — organization-wide findings, decisions and response.
+- [Access protection](service-access-protection.md) — protect public service access.
+- [Access & ports](services-ports.md) — inspect entry points and port configuration.
+- [Deployment history](service-deployment-history.md) — compare requested changes with deployment results.

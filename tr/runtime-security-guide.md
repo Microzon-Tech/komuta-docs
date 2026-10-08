@@ -1,126 +1,196 @@
-# Çalışma Zamanı Koruması (Runtime Protection)
+# Çalışma Zamanı Güvenliği
 
-Komuta, uygulamalarınızı **çalışma zamanı saldırılarına** karşı korumak için kernel seviyesinde çalışan bir koruma katmanı sunar: **Çalışma-zamanı Koruması (Runtime Protection)**. Bu katman, container'larınızın *içindeki* davranışları — hangi process'in çalıştığını, hangi dosyaya erişildiğini, hangi ağ bağlantısının açıldığını — gözlemler ve politika dışı davranışları engeller.
+Çalışma zamanı güvenliği, çalışan bir servisi değerlendirmenize yardımcı olur: kaydedilmiş davranışı, koruma için planlanan kısıtlamaları ve bunların iş yüküne ulaştığına dair kanıtı birlikte incelersiniz. Komuta bu bilgileri bir araya getirir; böylece normal uygulama davranışını gözden kaçırmadan şüpheli etkinliği araştırabilir ve hedefli değişiklik yapabilirsiniz.
 
-Bu doküman koruma katmanının kavramlarını anlatır. Ekran kullanımı için bkz. [Servis Güvenliği Çalışma Alanı](service-security-guide.md) ve [Güvenlik Merkezi](security-center-guide.md).
+Bu rehber koruma modelini açıklar. Ekran üzerinden kullanım için [Servis Güvenliği](service-security-guide.md) rehberini okuyun. Kuruluş genelindeki öncelikler ve müdahaleler için [Güvenlik Merkezi](security-center-guide.md) ile başlayın.
 
----
+> **Üç bilgiyi ayrı tutun:** ne yapılandırıldı, neyin uygulandığı bildiriliyor ve gözlenen sonuç ne gösteriyor? Bu ayrım hem korumayı değerlendirirken hem değişiklik sonrasında uygulamayı normale döndürürken işe yarar.
 
-## Koruma Katmanları
+## Koruma katmanları ve yanıtladıkları sorular
 
-Komuta'da güvenlik birden fazla katmanda uygulanır; her katman farklı bir saldırı yüzeyini kapatır:
+| Katman | Müşterinin sorusu | İncelenecek kanıt |
+|---|---|---|
+| **Genel adres erişim koruması** | Bu servisin genel adresini kimler açabilir? | Erişim kuralları, koruma durumu ve ilgili erişim etkinliği |
+| **Ağ politikaları** | Hangi gelen ve giden bağlantılara izin verilir? | Kural kapsamı, uygulama durumu, akışlar ve düşen bağlantılar |
+| **İş yükü sıkılaştırması** | Uygulama hangi ayrıcalıklara ve yazılabilir alanlara ihtiyaç duyar? | Onaylı ayarlar, dağıtım sonucu ve canlı duruş |
+| **Çalışma zamanı davranış koruması** | Hangi işlem, dosya veya desteklenen diğer davranış gözlendi; hangi kurallar geçerli? | Çalışma ortamı uygunluğu, koruma eylemi, gözlemler ve bulgu kanıtı |
+| **Derleme ve imaj kanıtı** | Kontroller, sunulacak imaj hakkında ne raporladı? | İlgili derleme ve imaj için sunulan tarama sonuçları |
 
-| Katman | Kapsam |
-|--------|--------|
-| **Ağ Politikası** | Servisler arası trafik, DNS — *pod'lar arasındaki* iletişimi kısıtlar |
-| **L7 Hız Limiti** | HTTP istek hızı sınırlama |
-| **Çalışma-zamanı Koruması** | *Container içindeki* process / dosya / yetenek davranışları |
-| **Host Koruması** | Node'un kendisindeki kritik dosya ve process'ler |
-| **Çalışma-zamanı İzleme** | Gelişmiş davranış telemetrisi (process soy ağacı, sistem çağrıları) |
+Bu katmanlar birbirini tamamlar. Ziyaretçinin erişim kontrolünden geçmesi, uygulama davranışının güvenli olduğunu göstermez. Derleme taraması, çalışan iş yükünün yapacağı her şeyi incelemez. Ağ izolasyonu, uygulamanın mevcut duruma nasıl geldiğini açıklamadan bağlantıları sınırlandırabilir.
 
-Çalışma-zamanı Koruması şu davranışları engelleyebilir:
+Ziyaretçi kuralları için [Erişim koruması](service-access-protection.md), servis giriş noktaları için [Erişim ve portlar](services-ports.md) rehberini kullanın.
 
-- **Process çalıştırma**: `apt-get`, `curl`, `nmap` gibi binary'lerin container içinde çalıştırılması
-- **Dosya erişimi**: hassas dosyaların okunması/yazılması, servis hesabı kimlik dosyasının salt-okunur kılınması
-- **Ağ erişimi**: hangi process'lerin ağ bağlantısı açabileceği
-- **Linux yetenekleri**: tehlikeli kernel yetkilerinin (raw soket, sistem yönetimi vb.) kullanımı
+## Sonucu yorumlamadan önce kapsamı belirleyin
 
----
+Seçilen kuruluş, servis, çalışma ortamı ve dağıtımla başlayın. Kanıtın değerlendirdiğiniz servise ve döneme ait olduğunu doğrulayın. Kuruluş özetleri önceliklendirmeyi, servis kanıtı ise belirli bir incelemenin ayrıntılarını destekler.
 
-## Otomatik Kurulum ve Platform Baseline'ları
+Şu koşulları birlikte kontrol edin:
 
-Koruma katmanı, Komuta tarafından yönetilen kümelere **otomatik olarak** kurulur — sizin bir şey yapmanız gerekmez:
+- **Uygunluk:** bu katman seçilen çalışma ortamını ve servisi destekliyor mu?
+- **Kullanılabilirlik:** mevcut görünüm ilgili kanıta ulaşabiliyor mu?
+- **Güncellik:** kanıt, olay veya değişiklik için yeterince yeni mi?
+- **İzin:** rolünüz bölümü okuyabiliyor veya önerilen işlemi yapabiliyor mu?
 
-1. Küme kurulumunda koruma bileşenleri **ilk eklenti** olarak yüklenir (güvenlik önceliklidir).
-2. **Host baseline politikası** node'ların kritik dizinlerini (küme sertifikaları, kimlik dosyaları, kullanıcı yönetim araçları) koruma altına alır.
-3. **Küme baseline politikası** kullanıcı workload'larında bilinen saldırı araçlarını (paket yöneticileri, ağ tarama araçları) engeller.
-4. CNI, depolama, gözlemlenebilirlik ve GitOps gibi **platform sistem bileşenlerinin çalıştığı alanlar otomatik hariç tutulur** — kritik altyapının koruma katmanıyla çakışması saha deneyimiyle önlenmiştir.
+### Kata ve diğer uygunluk sınırları
 
-### Servis Baseline Politikası
+**Kata** iş yükünde bazı çalışma zamanı davranış gözlemleri ve koruma işlemleri uygulanamaz. Her çalışma ortamının aynı yetenekleri sunduğunu varsaymak yerine servisin kapsam ve uygunluk bilgisini okuyun.
 
-Dağıtım hattı, her servis için otomatik bir **çalışma-zamanı baseline politikası** üretir. Bu politika:
+Ağ kurallarını, iş yükü sıkılaştırmasını, derleme kanıtını ve izolasyonu ayrı değerlendirin. Bir katmanın çalışma ortamı kısıtı, diğerinin desteğini veya etkili olup olmadığını belirlemez. Özellikle izolasyonun kendi uygunluk kontrolü vardır; uygun bir yalıtılmış çalışma ortamında kullanılabilir.
 
-- Paket yöneticileri ve saldırı araçlarını (`apt`, `yum`, `wget`, `nc`, `nmap` vb.) engeller
-- `curl` / `wget`'i **akıllıca** ele alır: sağlık probe'larınızda kullanılıyorsa izin verir, kullanılmıyorsa engeller
-- Tehlikeli Linux yeteneklerini (raw soket, sistem yönetimi, kernel modülü, process izleme) engeller
-- Servis hesabı kimlik dosyasını **salt-okunur** yapar
+Kullanılamayan kart bulgu değildir; görünmeyen kart da tam koruma kanıtı değildir. Uygunluk bilinmiyorsa desteklenen kapsamı servis sorumlunuzla veya Komuta desteğiyle netleştirin.
 
-Baseline politikaları **platform tarafından yönetilir** ve elle düzenlemeye karşı korumalıdır. Servis bazlı ince ayar (yetenek ekleme, yazılabilir dizin, ek yasaklar) için servisin [Güvenlik → Politikalar](service-security-guide.md#politikalar) sekmesini kullanın.
+## Çalışma zamanı modu ve koruma eylemi
 
----
+### Çalışma zamanı modunu okuyun
 
-## Politika Aksiyonları
+Servisin **Koruma** sekmesi, uygun iş yüklerinde salt okunur **Çalışma zamanı koruma modu** kartını içerir. İstenen ve gözlenen durumu, uygulamanın beklemede veya başarısız olması dahil gösterir.
 
-### Block (Önerilen — Üretim Hedefi)
+| Mod | Bu çalışma zamanı katmanının amaçlanan davranışı |
+|---|---|
+| **Kapalı** | Bu çalışma zamanı temeli kapalıdır. Diğer katmanlar kendi yapılandırma ve durumlarını korur. |
+| **Gölge** | Modun desteklediği sıkılaştırmayı uygularken iş yükünün davranışını öğrenir; etkin davranış engellemesi olarak yorumlanmaz. |
+| **Denetim** | Davranışı inceleme ve değerlendirme için gözler ve kaydeder. |
+| **Zorlama** | Uygulama tamamlandığında desteklenen ve yapılandırılan kapsamda engelleyici koruma uygular. |
 
-Politika dışı işlem **kernel seviyesinde reddedilir**: sistem çağrısı başarısız olur, process binary'yi çalıştıramaz. Saldırgan container içine girse bile işlem asla gerçekleşmez.
+Her servisin aynı modda başladığını veya her modun bütün çalışma ortamlarında kullanılabildiğini varsaymayın. Kart durum bildirir; mod seçicisi değildir. Gerekli mod değişikliği için yetkili servis sorumlunuza veya Komuta desteğine başvurun.
 
-```
-$ apt-get update
-bash: /usr/bin/apt-get: Permission denied
-```
+### Denetim ve Engelle eylemlerini ayrı okuyun
 
-### Audit (Gözlem Modu)
+Bir çalışma zamanı kuralında ayrıca **Denetim** veya **Engelle** eylemi bulunabilir. Eylem ilgili kurala veya koruma katmanına aittir; dört çalışma zamanı moduyla aynı durum alanı değildir.
 
-İhlal **kaydedilir ama engellenmez** — uygulama normal çalışmaya devam eder. Yeni bir servisi üretime almadan önce gerçek davranışı öğrenmek için kullanılır. Audit modunda biriken gözlemler, [Gözlemler sekmesinde](service-security-guide.md#g%C3%B6zlemler) işlenir ve baseline'a dönüştürülür.
+| Eylem | Anlamı |
+|---|---|
+| **Denetim** | Kural, eşleşen davranışı kendisi engellemeden gözlemlemeyi ve kaydetmeyi amaçlar. |
+| **Engelle** | Kural, desteklendiğinde ve etkili biçimde uygulandığında eşleşen davranışı reddetmeyi amaçlar. |
 
-### Allow (İleri Düzey — Beyaz Liste)
+Denetim, ağ kısıtlamalarını veya başka kuralın engellemesini kaldırmaz. Engelle, bütün etkinliğin reddedileceği anlamına gelmez. Eşleşen işlem, hedef, kural kapsamı ve çalışma ortamı desteği, kuralın neyi etkileyebileceğini belirler.
 
-Yalnızca açıkça izin verilen işlemler çalışır; geri kalan her şey reddedilir. Maksimum güvenlik sağlar ancak kapsamlı test gerektirir.
+Bir programın çalıştırılmasını kısıtlamak, bulunduğu dizine yazmayı kısıtlamaktan da farklıdır. Yola dayalı kuralları yorumlarken hangi işlemi ve kapsamı tanımladığını doğrulayın.
 
-> Önerilen yol: **Audit ile başla → gözlemleri işle → Block'a yükselt.** Ayrıntılı akış için bkz. [Servis Güvenliği → Pratik Akışlar](service-security-guide.md#pratik-ak%C4%B1%C5%9Flar).
+## Yapılandırma, uygulama ve gözlenen sonuç
 
----
+Bir kontrolün durumunu üç noktada açıklayın:
 
-## İhlal İzleme
+| Kontrol noktası | Neyi gösterir? | Hâlâ ne doğrulanmalı? |
+|---|---|---|
+| **Yapılandırıldı** | Hedef için ayar veya kural kaydedildi | Çalışan iş yüküne ulaşıp ulaşmadığı |
+| **Uygulandı / gözlendi** | Servis, yapılandırmayı veya modu uygulanmış olarak bildiriyor | İlgili koşullarda beklenen davranışa izin verilip verilmediği veya davranışın reddedilip reddedilmediği |
+| **Gözlenen sonuç** | Belirli olay veya bağlantı bildirilen sonucu üretti | Bu kanıtın dışındaki yollar, iş yükleri ve koşullar |
 
-Koruma katmanının yakaladığı her olay şu yüzeylere akar:
+Önizleme amaçlanan içeriği gösterir. Onay, akışın ilerlemesine izin verir. Sıradaki dağıtım, bekleyen işi gösterir. Bunların hiçbiri tek başına etkili engellemeyi kanıtlamaz.
 
-- **Güvenlik Merkezi → İhlaller**: tenant genelindeki canlı ihlal akışı
-- **Güvenlik Merkezi → Bulgular**: tekilleştirilmiş, karar alınabilir kayıtlar
-- **Servis detayı → Security**: servise özel bulgular ve canlı istatistikler (üst şeritte son 1 saatin Engellenen / Critical sayıları)
-- **Üst çubuk rozeti**: Critical + High ihlal sayacı her ekranda görünür; kritik artışta anlık bildirim düşer
-- **Uyarı kuralları**: küme kurulumuyla birlikte yüksek ihlal oranı, kritik engelleme, host ihlali ve sensör sağlığı için hazır uyarı kuralları tanımlanır; bunlar [bildirim kanallarınıza](notification-guide.md) yönlendirilir
+İstenen ve gözlenen mod farklıysa geçiş ve dağıtım durumunu okuyun. Uygulama başarısız olduğunda kaydedilen istenen ayar görünmeye devam edebilir; önceki gözlenen durum hâlâ geçerli olabilir. Mod kullanılamıyor veya doğrulanmamışsa boşluğu varsayımla doldurmayın.
 
----
+Kanıtı değerlendirdiğiniz yapılandırma ve dağıtımla eşleştirin. Önceki sürümdeki başarılı gözlem sonraki değişikliği doğrulamaz. Benzer biçimde, yeniden bağlama veya geri alma isteğinde de geri dönüşün tamamlandığını söylemeden önce güncel sonuç ve uygulama sağlığı kontrol edilmelidir.
 
-## Politika Önerileri ve İstisnalar
+## Temel güvenlik ve uygulama gereksinimleri
 
-- **Önerilen Politikalar**: Platform, gözlenen davranışlardan otomatik politika önerileri üretir ("bu serviste şu erişim 47 kez engellendi — kalıcı kural önerilir"). Önerileri inceleyip tek tıkla uygularsınız.
-- **Politika İstisnaları**: Meşru ama politikaya takılan bir iş akışı için **en fazla 90 günlük**, gerekçeli ve onay akışlı istisna tanımlayabilirsiniz.
+Temel güvenlik, beklenen güvenlik yapılandırmasını ifade eder. Canlı duruş, çalışan servisten gelen kullanılabilir bilgiyi bu beklentiyle karşılaştırır ve sapmayı ortaya çıkarabilir.
 
-Her ikisi de [Güvenlik Merkezi → Politikalar](security-center-guide.md#politikalar) altında yönetilir ve tüm geçişler değiştirilemez denetim zincirine kaydedilir.
+Desteklenen müşteri ayarları arasında dar kapsamlı **Linux capability** izinleri, **yazılabilir yollar** ve **root olarak çalışma izni** bulunur; her birinin yönetim izni ayrıdır. Amaç, diğer kısıtlamaları koruyarak belirlenmiş uygulama ihtiyacını karşılamaktır.
 
----
+### Gereken en küçük değişikliği seçin
 
-## Sorun Giderme
+Başlangıç hatası veya reddedilen işlemde önce ilgili işlemi, yolu veya bağlantıyı belirleyin. İmaj gereksinimleri, dağıtım geçmişi ve mevcut ayarlarla karşılaştırın. Genel bir izin hatası, uygulamanın root veya geniş yazma erişimi gerektirdiğini tek başına göstermez.
 
-### Pod "CrashLoopBackOff" oldu ve "Permission denied" hatası var
+Yetkili değişiklikte açık bir gerekçe kaydedin, onayı okuyun ve dağıtım sonucunu kontrol edin. Kök dosya sistemi kısıtlaması geçerliyse yazılabilir yol istisnası, root çalıştırma izninden farklı kapsama sahiptir. Uygulamanın içeriği koruması gerekiyorsa yazılabilir dizinin kalıcılığı ayrıca değerlendirilmelidir.
 
-Muhtemelen uygulamanızın meşru bir davranışı Block modunda engellendi:
+### Sapmayı ve geri dönüşü doğrulayın
 
-1. Servisin **Güvenlik → Bulgular** sekmesinde son Engellendi kayıtlarını inceleyin — hangi process, hangi yol?
-2. Yazma engeli ise **ekstra yazılabilir dizin** ekleyin; yetki engeli ise **Linux yeteneği** ekleyin (Politikalar sekmesi).
-3. Karmaşık durumda servisi geçici **Audit** moduna alın, gözlem toplayın, sonra tekrar **Block'a yükseltin**.
+Canlı duruş, beklenen politikanın eksik olduğunu veya uyuşmazlık bulunduğunu bildiriyorsa kanıtın güncel, dağıtımın ise hedeflediğiniz dağıtım olduğunu doğrulayın. Duruş sorgusunun başarısız olması uygulama teşhisi değil, görünürlük eksikliğidir.
 
-### "Yüksek ihlal oranı" uyarısı geldi
+Değişiklikleri ilişkilendirmek için [dağıtım geçmişini](service-deployment-history.md) kullanın. Düzeltme veya geri dönüşten sonra hem başarısız olan uygulama davranışını hem ilk ayarı gerekli kılan koruma koşulunu kontrol edin. Tek başına başarılı yeniden başlatma iki soruyu birden yanıtlamaz.
 
-1. **Güvenlik Merkezi → İhlaller**'de ilgili servisi filtreleyin.
-2. Hangi process/politikanın tetiklediğini bulun.
-3. Meşru kullanım ise: bulguda **Allow** kararı verin veya politika istisnası tanımlayın.
-4. Şüpheli ise: eşleşen [olay müdahale playbook'unu](security-center-guide.md#olay-m%C3%BCdahale-playbooklar%C4%B1-ir-playbooks) izleyin.
+## Gözlemler, bulgular ve politika kararları
 
-### Yeni politika kümeye uygulanmadı
+Çalışma zamanı gözlemleri, uygun servislerde kaydedilmiş davranışı ve mevcut inceleme geçmişini gösterir. Bulgular işlem gerektiren güvenlik kayıtlarını düzenler; servis zaman çizelgesi bunları bağlama yerleştirir. İlgili bölümlerin izinleri ve veri zaman aralıkları farklı olabilir.
 
-- Politikanın **etkin** olduğundan emin olun (devre dışı politikalar dağıtılmaz).
-- Politika listesindeki dağıtım durumu alanını kontrol edin; hata varsa ayrıntı orada görünür.
-- Küme bağlantısı sorunu görünüyorsa küme durumunu **Güvenlik Merkezi → Genel Bakış → Küme Güvenlik Matrisi**'nden doğrulayın.
+Bekleyen gözlem sayıları, gösterilen kapsamdaki incelemeleri anlatır. Saldırı sayısını ölçmez veya güvenlik duruşu testinin sonucunu kanıtlamaz. Sınıflandırmadan önce gerçek işlemi ve kanıtı okuyun.
 
----
+**İzin ver** ve **Tehdit olarak işaretle**, gerekçe gerektiren bulgu kararlarıdır. Bulgunun nasıl değerlendirildiğini kaydeder; tek başına izin veya engelleme kuralı uygulamaz. **Göz ardı et** koruma politikası yerine bulgunun inceleme durumuyla ilgilidir.
 
-## İlgili Dokümanlar
+İstisna isteği sunuluyorsa hedefi, gerekçeyi ve süreyi inceleyin. Onay bekleyen istek uygulanmış istisna değildir. Bir öneri veya müdahale ayrı uygulama adımı sunuyorsa devam etmeden önce önizlemeyi ve mevcut politikayı kontrol edin. [Güvenlik Merkezi](security-center-guide.md) rehberi bu akışları ve izinlerini açıklar.
 
-- [Güvenlik Merkezi](security-center-guide.md) — bulgular, politikalar, uyumluluk, SIEM, tatbikatlar
-- [Servis Güvenliği Çalışma Alanı](service-security-guide.md) — modlar, gözlemler, yetenekler, yazılabilir dizinler
-- [Bildirim Yönetimi](notification-guide.md) — uyarıların kanallara yönlendirilmesi
-- [Erişim Kontrolü](access-control-guide.md) — güvenlik izinleri
+## Kontrollü doğrulama
+
+Koruma testi, kendi yetki ve etkisine sahip bilinçli bir işlemdir. Hedef servis için desteklenen, onaylı senaryo kullanın; incelemeyi üretim uygulamasında plansız teste dönüştürmeyin.
+
+Başlamadan önce hedef, uygun çalışma ortamı, beklenen sinyal, izin verilen etki ve geri dönüş sorumlusu üzerinde anlaşın. Senaryonun **tespit**, **önleme** veya **geri dönüş** değerlendirmesi için mi olduğunu belirleyin. Bu sonuçlar farklı kanıtlar gerektirir.
+
+1. Mevcut yapılandırmayı, gözlenen modu, uygulama sağlığını ve kanıt zamanını kaydedin.
+2. Yalnız onaylı senaryoyu ve kapsamı, gereken izinlerle kullanın.
+3. Sonuç kaydını beklenen kaynak, servis, işlem ve zaman aralığıyla eşleştirin.
+4. Tespit için beklenen gözlem veya bulguyu doğrulayın; önleme için bildirilen reddi ve uygulama sonucunu da kontrol edin.
+5. Kararlaştırılan geri dönüşü tamamlayın; normal davranışı ve koruma durumunu yeniden kontrol edin.
+
+Sırf bulgu oluşturmak için hassas veya tuzak yollara erişmeyin. Eksik sinyal; kaynak, izin, filtre veya uygunluk sorununa işaret edebilir. Testi tekrarlamadan önce belirsizliği araştırın.
+
+Tespit edilen senaryo, o senaryoda gözlenen davranışı gösterir. Bütün saldırıların önlendiğini veya her servisin kapsandığını kanıtlamaz.
+
+## Sık karşılaşılan senaryolar
+
+### “Mod Denetim görünüyor ama istek engellendi”
+
+Reddin hangi katmandan geldiğini kontrol edin. Genel erişim kuralları, ağ politikaları, izolasyon veya başka uygun kural, çalışma zamanı modundan bağımsız olarak isteği kısıtlayabilir. İsteğin yolunu ve zamanını ilgili kanıtla karşılaştırın.
+
+### “Yazılabilir yolu kaydettik ama hata sürüyor”
+
+Kayıt sonucunu ve dağıtım durumunu okuyun; ardından çalışan uygulamanın gerçek yolunu kaydedilmiş dizinle karşılaştırın. Hatanın eksik bağımlılık veya başka başlangıç sorunu yerine yazma izniyle ilgili olduğunu doğrulayın. Yetkili en küçük düzeltmenin uygulanması tamamlandıktan sonra sonucu kontrol edin.
+
+### “Bulguyu tehdit olarak işaretledik ama yeniden oldu”
+
+İnceleme kararı değerlendirmeyi kaydeder. Ayrı müdahale veya politika işlemini ve uygulama durumunu inceleyin; ardından yeni kanıtla karşılaştırın. Tekrar, incelemeyi sürdürme nedenidir; kararın kaydedilemediğinin kanıtı değildir.
+
+### “Servisi yeniden bağladık ama hâlâ sağlıklı değil”
+
+İstenen serbest bırakmanın tamamlandığını kontrol edin; uygulama ve bağımlılık durumunu inceleyin. Ağ kısıtlamasının kaldırılması, ilk güvenlik ihlalini, uygulama hatasını veya ilgisiz erişim kurallarını düzeltmez.
+
+## Sorun giderme
+
+| Durum | Sonraki kontrol |
+|---|---|
+| **Mod yükleniyor veya kullanılamıyor** | Doğrulanmış sonucu bekleyin veya sunuluyorsa yeniden deneyin; belirsiz durumu etkin koruma saymayın. |
+| **Gözlem veya bulgu yok** | Filtreleri, izinleri, uygunluğu, yüklenen kayıtları ve kanıt güncelliğini inceleyin. |
+| **İstenen ve gözlenen durum farklı** | Uygulama durumunu ve son dağıtım sonucunu okuyun. |
+| **Yapılandırma sapması** | Güncel duruşu onaylı ayarlar ve hedeflenen dağıtımla karşılaştırın. |
+| **İzin reddedildi** | Göreviniz için gereken özel okuma veya yönetim iznini isteyin. |
+| **Kata'da daha az çalışma zamanı kontrolü var** | Servisin uygunluk bilgisini kullanın; kalan her katmanı ayrı değerlendirin. |
+| **Uygulama başarısız veya geri dönüş eksik** | Görünen hatayı koruyun ve başka değişiklikten önce yetkili sorumluya başvurun. |
+
+Desteğe başvururken servisi, olay zamanını, görünen durumu, ilgili dağıtımı ve beklediğiniz sonucu belirtin. Yalnız bu inceleme için gerekli bilgiyi paylaşın.
+
+## Bağlama uygun yardım ve isteğe bağlı AI
+
+Maskot menüsü, geçerli güvenlik sayfası veya desteklenen servis ayarı için statik Türkçe ve İngilizce yardım içerir. AI veya dekoratif maskot kapalıyken de okunabilir. Maskot açık ve hazırken **Bu ekranı açıkla** rehberi yardım balonunda da gösterebilir.
+
+Statik rehber servis verisi sorgulamaz, AI'a göndermez veya işlem yürütmez. İsteğe bağlı AI sohbeti ayrıdır. Sayfa bağlamı paylaşımı isteğe bağlıdır; açıldığında sayfa özeti ekleyebilir. Sohbeti yetkili kapsamınızda tutun. Öneri; kanıtın, sayfa izinlerinin veya işlemin onay ve sonuç kontrollerinin yerine geçmez.
+
+## Sık sorulan sorular
+
+### Sağlıklı özet korumayı doğrulamak için yeterli mi?
+
+Önceliklendirmeye yardımcı olur; ancak sonuç kaynak kapsamına ve güncelliğe bağlıdır. Belirli koruma iddiası için hedef kuralı, uygulamayı ve ilgili sonuç kanıtını inceleyin.
+
+### Denetim, hiç güvenlik olmamasıyla aynı mı?
+
+Hayır. Denetim, ilgili çalışma zamanı modunun veya kuralın gözlem niyetini anlatır. Diğer sıkılaştırma ve erişim kısıtlamalarının kendi durumu vardır.
+
+### Zorlama, bütün istenmeyen davranışların durdurulmasını garanti eder mi?
+
+Uygun kapsam için amaçlanan modu tanımlar. Etkili koruma, uygulanmış kurallara ve desteklenen davranışa bağlıdır; ilgili kanıt üzerinden değerlendirin.
+
+### Derleme taraması çalışma zamanı incelemesinin yerine geçer mi?
+
+Hayır. Derleme kanıtı kontrol edilen imajı veya derlemeyi anlatır. Çalışma zamanı incelemesi, dağıtılmış uygulama çalışırken olanları ele alır.
+
+### Bulgu kararı veya AI yanıtı korumayı otomatik değiştirir mi?
+
+Kaydedilmiş bulgu kararı veya açıklama, koruma değişikliğinin kanıtı değildir. Sunuluyorsa açık ve yetkili uygulama veya müdahale akışını kullanın; sonucunu doğrulayın.
+
+## İlgili rehberler
+
+- [Servis Güvenliği](service-security-guide.md) — inceleme ve desteklenen servis ayarlarını yönetme.
+- [Güvenlik Merkezi](security-center-guide.md) — kuruluş genelinde bulgular, kararlar ve müdahale.
+- [Erişim koruması](service-access-protection.md) — genel servis erişimini koruma.
+- [Erişim ve portlar](services-ports.md) — giriş noktalarını ve port ayarlarını inceleme.
+- [Dağıtım geçmişi](service-deployment-history.md) — istenen değişikliği dağıtım sonucuyla karşılaştırma.
