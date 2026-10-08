@@ -1,196 +1,277 @@
 # Security Center
 
-Komuta Security Center brings together your organization's workload security findings, protection state and event evidence. Start from the **Security** menu; move to a service's **Security** workbench when investigating one workload.
+Komuta Security Center brings security findings, service protection, access activity and investigation evidence into one place. Use it to identify what needs attention across your organization, investigate the affected service and follow an authorized response through to its outcome.
 
-The pages and actions available to you depend on your account's permissions, the current organization and the workload runtime. Check scope, source and timestamps first. An empty result or a low risk score does not establish that a workload is safe.
+You can move from a risk summary to the underlying finding, compare it with service traffic and protection state, review policy suggestions and track the records behind a decision. The same workspace connects these investigations with audit history, build and image evidence, controlled security scenarios and notification workflows.
 
-## Which scope does each screen use?
+> **Start with the right context:** confirm the organization, service, time window and freshness of the evidence. A saved protection setting describes intent; application status and observed outcomes tell you what happened.
 
-| Screen | Scope | Purpose |
-|---|---|---|
-| Customer Console → Security | Workloads and records available to your account in the current organization | Organization-wide prioritization, investigation and permitted response |
-| Service → Security | The service currently open | Investigate traffic, protection, findings and event timeline in one service context |
-| AdminUI → Security | The displayed scope available to an authorized platform operator | Platform operations, cross-organization investigation and infrastructure security administration |
+## Choose your starting point
 
-AdminUI is the platform operator console. Being an administrator within a customer organization does not provide platform operator access. In AdminUI, **platform host scope** differs from **selected organization scope**; selecting a target on one page does not automatically select the target on another.
-
-## Customer Console pages
-
-The **Security** menu has four groups. Permissions or runtime applicability can hide some pages.
-
-| Group | Page | Where to start |
-|---|---|---|
-| Watch | **Overview** (`/security`) | Check scope, risk, open findings and evidence availability. |
-| Watch | **Findings** (`/security/findings`) | Investigate using service, source, severity and time filters. |
-| Record | **Audit Log** (`/security/audit`) | Compare recorded actions, actor and outcome. |
-| Record | **Login Activity** (`/security/login-activity`) | Investigate organization sign-in activity and unexpected outcomes. |
-| Record | **Audit record protection** (`/security/audit-storage`) | Read archive assurance and current verification for your own scope. |
-| Protect | **Policies** (`/security/policies`) | Review workload policies and suggestions with their targets. |
-| Protect | **Blocks** (`/security/blocks`) | Inspect existing blocks, affected services and evidence. |
-| Protect | **Honey paths** (`/security/honey-paths`) | Review decoy paths and detection records for supported services. |
-| Protect | **IR Playbooks** (`/security/playbooks`) | Follow investigation and response instructions. |
-| Verify | **Synthetic attacks** (`/security/synthetic-attacks`) | Review eligible scenarios, permitted drills and detection results. |
-| Verify | **Supply chain** (`/security/supply-chain`) | Inspect build and image scans, artifact evidence and exceptions. |
-
-## Observations, findings and evidence
-
-| Term | Meaning |
+| Your goal | Start here |
 |---|---|
-| **Observation** | Behavior or state recorded by a source. It does not yet establish an attack or a persistent blocking decision. |
-| **Violation** | Recorded behavior associated with a protection rule. Audit indicates observation; Block indicates the reported blocking outcome. |
-| **Finding** | A security record with an investigation lifecycle. Assess its source, severity, service context and evidence. |
-| **Recurrence** | Another occurrence of the same logical finding. Count and last-seen time do not replace an individual event identifier. |
-| **Observation summary** | An aggregate count of observations awaiting review at calculation time. It is not a new attack, failed posture check or current queue size. |
-| **Evidence** | Source, time, target and outcome information that explains a finding or action. It must be current and match the relevant scope. |
+| Decide what to investigate first | **Security → Overview**, then **Findings** |
+| Investigate one application's behavior | [Service Security](service-security-guide.md) |
+| Control who can open a public application | **Security → Access protection** and [Access & ports](service-access-protection.md) |
+| Understand a protection change | **Policies**, **Blocks** and [Runtime Security](runtime-security-guide.md) |
+| Review actions or sign-ins | **Audit Log** or **Login Activity** |
+| Assess an image or retained audit evidence | **Supply chain** or **Audit record protection** |
 
-Posture score, pending observation count and event recurrence count are separate measurements. Closing an observation summary does not review its underlying observations or change protection.
+## Your first investigation
 
-## How to interpret protection state
+1. **Confirm your organization.** Security Center works with records available to your account in the current organization. Open the intended service when you need a narrower view.
+2. **Read Overview.** Compare risk, open findings, affected services, coverage and data freshness. Investigate missing evidence before interpreting a quiet dashboard as a healthy result.
+3. **Open Findings.** Select the service and time window, then narrow source, severity, type or status as needed.
+4. **Read the detail.** Identify the affected operation, source, first and last seen, recurrence and available evidence. Follow the service context to compare traffic and protection.
+5. **Choose a next step.** Record an investigation decision, consult a playbook or prepare a response if you have the required permission.
+6. **Verify the result.** Check the saved record, application state and relevant behavior separately. Leave unresolved evidence gaps visible when handing the investigation to a teammate.
 
-| Displayed state | Meaning | Next check |
+Reading a page or opening its guide does not change service protection. Applying a policy, creating an exception, running a scenario and removing a block are separate actions.
+
+## Scope and access
+
+**Security Center** provides an organization view of the services and records your account can access. **Service → Security** focuses on the open service. **Account security** covers your own account, sessions and personal security history.
+
+Read permission does not automatically include permission to respond, edit a policy, manage an exception, run a security scenario, export records or inspect archive assurance. Some features also require support in the service's environment. A missing action can reflect permissions or applicability; changing a URL does not grant access.
+
+After switching organization, service or filters, check the displayed context again and wait for the current view to finish loading. A link, count or old browser tab is not evidence that you can access all organization records.
+
+## Find your way around
+
+| Group | Page | What you can review |
 |---|---|---|
-| **Configured / desired mode** | A rule or setting was saved. | Does it target the intended service and scope? |
-| **Pending / queued** | Application has not finished. | What is the deployment outcome and observed mode? |
-| **Applied / observed mode** | The platform reports application state at the target. | Is the data current, and does the relevant behavior have the expected outcome? |
-| **Effect verified** | Outcome evidence exists for a particular target, behavior and time window. | Does the evidence match current configuration and runtime? |
-| **Unknown / unavailable / stale** | The result cannot be verified. | Investigate source access, applicability and freshness. |
+| Watch | **Overview** | Risks, affected services, recent findings and evidence coverage |
+| Watch | **Findings** | Searchable security records, detail, investigation decisions and permitted response |
+| Record | **Audit Log** | Recorded actions, actor, time and result |
+| Record | **Login Activity** | Organization sign-in activity and unexpected outcomes |
+| Record | **Audit record protection** | Retention, legal hold and archive verification for your organization |
+| Protect | **Access protection** | Public access exposure and links to service access settings |
+| Protect | **Policies** | Applicable protection rules and policy suggestions |
+| Protect | **Blocks** | Block records, application state and permitted rollback |
+| Protect | **Honey paths** | Decoy path configuration and detection records for supported services |
+| Protect | **IR Playbooks** | Investigation and response instructions |
+| Verify | **Synthetic attacks** | Available security scenarios, run history and detection results |
+| Verify | **Supply chain** | Build and image scans, artifact evidence and exceptions |
 
-A saved Block or Enforce setting, a queued change or a healthy sensor heartbeat does not by itself prove effective workload enforcement. Missing findings do not establish that sources observe every behavior.
+The visible pages and controls depend on your permissions and feature availability. Refer to the state and explanation shown on the page when a capability is unavailable.
 
-Host sensors and runtimes with a separate guest kernel, such as Kata, have different visibility. Host runtime protection can be **not applicable** or **unavailable** in unsupported environments; assess network, posture and supply-chain features using their own eligibility. See [Runtime Security](https://komuta.io/docs/services/runtime-security-guide).
+## Overview: prioritize with context
 
-## Overview
+Overview helps answer **which services need attention and why**. Use the risk summary, severity distribution, recent findings and network threat information to choose an investigation. Read coverage and freshness alongside those summaries.
 
-Overview helps prioritize risks and workloads for investigation in your organization. Read the risk card alongside open findings; compare source coverage, time window, evidence freshness and the service's protection state.
+The main risk card reflects the highest-risk service snapshot available to the summary; read its service name and calculation time. A risk score is a prioritization aid, not a compliance certificate. A posture indicator describes assessed settings; an observation count describes recorded behavior. Neither is an attack counter or proof that every protection layer is effective.
 
-Check filters when moving from a summary card to Findings or a service. Risk scores and hardening indicators support operational prioritization; they are not compliance certification or a guarantee that all attacks are prevented.
+When a summary opens a filtered list, check which filters were carried over. Compare summaries and detail within the same scope and time window; different sources can update at different times.
 
-## Findings
+## Findings: turn signals into an investigation
 
-1. Narrow the time window, service, source, severity and status.
-2. Read first and last seen, recurrences, affected operation and evidence in the detail view.
-3. Compare traffic, protection state and event timeline in the service workbench.
-4. Select only a decision or response permitted for your account; confirm its target and required reason.
-5. Check the recorded decision separately from any deployment or response outcome.
+Findings connect a security signal with its service, severity, status and evidence. Use the available filters to narrow a busy list before making decisions. Search and filters can exclude records even when the visible list is empty. The time window filters findings by their last-seen time and starts at the last seven days by default.
 
-### Finding decisions and actual response
+### Understand the record
 
-| Decision | Meaning |
+| Field or concept | How to use it |
 |---|---|
-| **Acknowledge** | The finding is under review. |
-| **Allow** | The behavior is considered legitimate; record the required reason. |
-| **Block** | A decision that the behavior should be blocked is recorded. |
-| **Dismiss** | The finding is considered invalid or out of scope. |
-| **Resolve** | Investigation is concluded; confirm the closure reason. |
+| **Source** | Understand which kind of evidence produced the record: runtime behavior, network activity, posture or build security, for example. |
+| **Severity and confidence** | Prioritize attention. Confirm the affected service and evidence before treating the record as a confirmed incident. |
+| **First and last seen** | Establish when the behavior appeared and whether it recurred. |
+| **Recurrence** | See repeated instances of the same logical finding. A total does not identify every individual event. |
+| **Affected operation** | Compare the relevant program, path, connection or artifact with expected application behavior. |
+| **Evidence and timeline** | Connect source, target, time and outcome. Use related events or process context where the record provides them. |
 
-These decisions are separate from **creating a runtime block policy**, **applying a policy exception** and **isolating a workload**. A Block decision does not prove kernel enforcement; Allow does not prove an automatically applied allow rule. Actual response requires additional permissions, runtime eligibility, explicit confirmation and outcome checks.
+An **observation** records behavior or state. A **finding** adds an investigation lifecycle. An **observation summary** aggregates observations awaiting review at calculation time; closing that summary does not review the underlying records or alter protection.
 
-Isolation can affect application network access. Before releasing it, confirm the intended target, recorded isolation state and recovery outcome.
+Unavailable detail, incomplete source data or an old timestamp should remain part of your assessment. If two records look related, match their service and timing as well as their description.
 
-## Policies
+### Decisions and responses are separate
 
-Assess workload protection rules and **Suggestions** separately on the Policies page. Host runtime rules and network policies depend on different sources and eligibility. Platform-wide and cluster-wide administration belongs to AdminUI.
+| Decision | What it records |
+|---|---|
+| **Acknowledge** | The finding has been seen and triaged; it leaves the Open queue. |
+| **Allow** | You consider the behavior legitimate, with the required reason. |
+| **Mark as threat** | You classify the behavior as a threat, with the required reason. |
+| **Dismiss** | You consider the finding invalid or outside the investigation. |
+| **Resolve** | You conclude the investigation with an appropriate explanation. |
 
-The protection policy wizard helps select an eligible service and prepare rules for shell execution, sensitive file access, specific programs or execution from temporary directories. Cluster and namespace come from the selected service. Review target, paths, Audit/Block behavior and YAML preview before creating a policy.
+These decisions help your team track investigation progress. Mark as threat does not, by itself, apply a blocking rule; Allow does not automatically apply a policy exception.
 
-A service appearing in the wizard is not a live sensor health or effective protection check. The platform can apply a created record; check application state and evidence from an authorized test afterwards. Block can disrupt startup, health checks or maintenance.
+When the record offers a response, review its target, scope, proposed change and reason in the confirmation flow. Actual blocking, exceptions and workload isolation require their own permissions and support. Isolation can interrupt application connectivity. After a response or its reversal, verify the application state and relevant service behavior before closing the incident.
 
-### Suggested Policies
+## Access protection: who can reach the application?
 
-Review the target, supporting observations, confidence and rule changes. Track acceptance, application and rollback outcomes separately. Failed application or a pending deployment must not be interpreted as active protection. The actions available to your account require their own suggestion-management permission.
+**Security → Access protection** brings the public access state of available services into one organization view. Compare their status, protection end dates and permitted or refused requests over the last 24 hours. Use it to spot services that are open, protected, changing state or need attention, then open the service's **Configuration → Access & ports** workspace.
 
-### Policy Exceptions
+That workspace separates **Overview, Rules, People, Machines, Activity, Network and Settings**. Depending on support and your permissions, you can configure sign-in and IP requirements, path-specific access, sharing, machine access and protection end dates. **Activity** helps investigate permitted or refused access and requires the relevant management permission.
 
-An exception can relax protection for a defined reason and duration. Review scope, approval state, expiry and impact on the current policy. Filing a request, approving it or recording Allow on a finding does not establish that the exception is effectively applied to the workload.
+Access protection concerns entry to the application. Runtime findings concern behavior around a running service, and network policies govern permitted connections. Compare these layers when investigating an access problem; their statuses answer different questions.
 
-## Blocks and honey paths
+Follow the [Access Protection guide](service-access-protection.md) for setup and the [Access Log guide](access-protection-activity.md) for event interpretation. Check application progress and the intended visitor's result after a permitted change; a saved rule or preview alone is not an access test.
 
-On **Blocks**, check the affected service and supporting evidence. Removing a block is a separately permitted action; distinguish an accepted request from a healthy recovered workload.
+## Policies, suggestions and exceptions
 
-**Honey paths** monitor service paths that legitimate application behavior should not touch. Verify the target service, runtime support and installation state. An enabled setting is not detection evidence. Do not read, write or probe a decoy file to test it; use only an explicitly approved drill and target.
+### Prepare a protection policy
 
-## Audit Log and Login Activity
+On **Policies**, review existing rules and their service targets before creating another. The policy wizard supports applicable service rules for program execution, file access and related behavior. Review the selected service, rule details, Audit or Block action and preview before saving.
 
-**Audit Log** supports investigation of authorized security activity by source, time, actor and outcome. Grouped view summarizes repeated events; raw view helps inspect individual records. Check CSV scope against the selected raw or grouped view and loaded records.
+**Audit** expresses observation intent for matching behavior. **Block** expresses prevention intent for matching behavior in a supported protection layer. Rules are limited by their match conditions and runtime support; choosing Block does not block all behavior. See [Runtime Security](runtime-security-guide.md) for applicability and verification.
 
-**Login Activity** shows organization sign-in activity. Your personal account security log and active sessions are separate account screens. Verify the affected account, timestamp, result and evidence when investigating an unexpected login.
+Creating a policy in the wizard saves an enabled policy and may lead to automatic application. Treat creation as a protection change, not an inactive draft. If a separate publication control is offered, follow its result as well. A saved record alone is not proof of effective protection; check the displayed application state and errors. Check a service's normal startup, health checks and required connections when evaluating a restrictive change.
 
-Login Activity filters, counters and CSV cover **loaded events**. Check the loaded/total indicator; loading older events extends the investigation range. A loading error does not mean no activity occurred.
+### Evaluate a suggestion
 
-## IR Playbooks
+Suggestions connect proposed policy changes with their supporting evidence. Review the target, confidence, observed traffic or behavior, and proposed rule before accepting. Follow the available lifecycle actions with the dedicated permission.
 
-Playbooks provide ordered investigation and response instructions. Review built-in guidance and, when permitted, manage a copy or a custom playbook for your team's process.
+Acceptance, successful application and effective protection are separate outcomes. If application is pending or failed, retain that status in the investigation. When rollback is available, review its preview and verify the resulting state afterwards.
 
-Check each step's prerequisites and expected evidence. Opening a guide does not automatically isolate workloads, rotate credentials or send notifications. Execute supported response only through separate authorized page controls and verify the result.
+### Keep exceptions narrow
 
-## Synthetic attacks
+From an eligible finding, the exception response can request a policy allowlist exception with a reason and duration. Review its target and preview before confirming. This opens a request that may need approval; it does not itself redeploy the service or prove that protection changed. If the flow instead offers finding suppression, that records a dismissal and does not create a policy exception.
 
-Drills help evaluate the detection pipeline for a selected target and scenario. A visible or enabled scenario has not necessarily run. Execution requires a separate permission and an explicit action.
+Use the smallest scope needed for the legitimate behavior. Confirm both the intended access and the remaining protection after application or expiry. A risk exception is not a fix for the underlying weakness.
 
-Confirm the target service, runtime, expected signal source, scenario effects and recovery plan first. Compare the run record, expected finding and detection timing afterwards. Detecting one scenario does not prove that every attack class is prevented or that blocking is effective. Platform-wide scenario availability is administered in the AdminUI catalogue.
+## Blocks and recovery
 
-## Supply chain
+**Blocks** helps review active and rolled-back records, their affected services, supporting evidence and application status. An applying, failed or unverified record requires further investigation even if the block request was accepted.
 
-Review the scanned artifact, scan time, severity and available evidence when assessing build and image security. Match any SBOM, vulnerability scan or signature information to the relevant build and image; do not rely on evidence for another artifact.
+For an authorized rollback, read the preview before confirming. A rollback may involve a new deployment; an accepted request is not completed recovery. Check that the intended restriction changed and that normal application behavior returned. Do not remove unrelated protection to resolve one blocked operation.
 
-Missing, stale or failed scans are not clean results. Review the reason, scope and expiry of any exception. Accepting a risk does not fix a vulnerability; a signature record does not prove that every build is signed or that its signature was independently verified.
+## Honey paths
+
+Honey paths are decoy paths intended to attract attention when accessed unexpectedly. For a supported service, the page shows saved configuration and detection history. Check the latest deployment separately when assessing whether that configuration is in use.
+
+With the required management permission, select an eligible service to add a path, edit its configuration, change its enabled state or remove it. Review the saved entry and detection history after the action. Confirm that the path is suitable for the application and will not overlap legitimate activity. An enabled setting is not a detected event. Investigate a recorded hit using its service, time and evidence; it still needs context before being classified as an incident.
+
+Do not open or modify a decoy path merely to check whether it works. Use a separately approved scenario with an explicit target and expected outcome.
+
+## Audit Log, sign-ins and personal security
+
+**Audit Log** helps reconstruct recorded activity by source, actor, time and outcome. Grouped views summarize repeated records; raw views help inspect individual events. Select the view appropriate to the question and check how much data is loaded.
+
+**Login Activity** concerns organization sign-ins. Review the affected account, timestamp, outcome and available context when an unexpected login appears. Its filters, counters and CSV describe **loaded events**; use the loaded/total indicator and available older-event loading to understand coverage.
+
+Your personal account security log, password settings and active sessions belong to **Account security**. Service visitor access belongs to **Access & ports → Activity**. A sign-in to Komuta and a request to a protected application are different events.
+
+## Playbooks: make response repeatable
+
+**IR Playbooks** provides ordered investigation and response guidance. Read built-in playbooks and, with the appropriate permission, manage a copy or custom playbook for your team's process.
+
+For each step, identify the target, prerequisite, expected result and responsible person. Opening a playbook does not execute its instructions. Carry out supported actions through the authorized page controls and record the outcome. Use the same sequence during handover so that another teammate can see what remains unresolved.
+
+## Controlled security scenarios
+
+**Synthetic attacks** lets authorized users review supported scenarios, start permitted runs and inspect their results. Use it to evaluate whether the selected scenario produces the expected finding within its detection window.
+
+Before a run, confirm the target service, scenario availability, runtime support, expected signal, possible application impact and recovery plan. A listed scenario or a successful historical run does not establish current readiness.
+
+Afterwards, compare the run state, matching finding and detection timing for that target. A completed action alone is insufficient if expected evidence is missing. Results apply to the tested scenario and window; they do not establish prevention of every attack or effective blocking by every protection layer.
+
+## Supply chain: connect evidence to the image
+
+**Supply chain** brings build and image security evidence into the investigation. Review scan status, scan time, severity, the affected artifact and available detail. Where provided, inspect the software bill of materials (SBOM), vulnerability and signature information for that exact build or image.
+
+Match the evidence to the artifact actually used by the service. A newer build, changed image or stale scan may require a fresh assessment. Missing or failed evidence is not a clean result; a build scan also does not inspect every behavior of a running service.
+
+With the required permission, you can accept risk for a selected service and a specific image version for a limited time, or revoke an existing exception. Review its reason, image, expiry and impact on the next deployment attempt. Check the separate deployment admission status: it may be unevaluated, verified, blocked, covered by an exception or audit-only. Accepted risk does not remove a vulnerability. A signature indicator does not establish that every artifact is signed or that every signature has been independently verified.
 
 ## Audit record protection
 
-The customer view provides **archive protection assurance for your own scope**. Review retention, legal hold, inherited platform settings, external immutability status and current verification together.
+This read-only page helps you assess the protection of your organization's audit records. Review **archive protection**, **retention**, **legal hold**, inherited defaults where shown, and **verification of the current configuration** together.
 
-A configured archive is separate from **verification of the current configuration**. Pending, catching-up, failed, unknown or unavailable verification is not current immutability evidence. Check the last successful verification timestamp.
-
-Append-only audit records and a cryptographic chain are different guarantees from external **WORM / Object Lock** storage. Storage immutability and any signature verification depend on actual configuration and relevant proof. Operational controls such as bucket, archive destination, legal hold administration and cross-organization selection belong to AdminUI.
-
-## Alerts, notifications and export
-
-Follow security notifications through **Alerts → Rules, Channels, History, Silences and Templates**. Rule matching, channel configuration and actual message delivery are distinct outcomes. Silencing an alert does not resolve a finding or remove its underlying security risk.
-
-Permitted **CSV/JSON finding exports** are prepared server-side using filters and the time window, beyond the current on-screen page. A file contains at most **50,000 rows**; scan limits can also narrow results. Do not treat a capped export as a complete set of all matches; narrow the time window or service scope. Check loaded-record scope separately for Audit Log and Login Activity CSV. Verify file scope, timestamps and records against your investigation purpose.
-
-An exported file is not proof of automated SIEM transfer or notification delivery. If your organization uses an integration, verify its destination, schema, access and delivery evidence separately. This guide does not promise automatic SIEM delivery for every organization or a fixed delivery interval.
-
-## Operator pages in AdminUI
-
-Platform operators use these pages under **Security**, subject to their permissions and the displayed scope. The Customer Console organization view does not replace these administration screens.
-
-| Page | Operator responsibility |
+| What the page shows | How to interpret it |
 |---|---|
-| **Security Findings** | Review permitted cross-organization finding, forensic and telemetry tabs |
-| **Observations** | Inspect baseline observations across organizations |
-| **Network Incidents** | Inspect permitted cross-organization network incidents |
-| **Audit Logs** | Review API audit summaries across organizations |
-| **Security signal coverage** | Review source mappings to framework controls in the displayed scope |
-| **Service baseline administration** | Manage baseline observations, protection mode and operations for an explicitly selected service |
-| **Infrastructure health findings** | Inspect infrastructure findings in platform host scope |
-| **Security retention policy** | Manage retention windows and legal hold policy for the displayed scope |
-| **Runtime protection controls** | Manage configured enforcement, eligibility and platform controls |
-| **Audit storage administration** | Manage archive configuration and verification for the selected scope |
-| **Security scenario catalogue** | Manage platform-wide scenario availability and source readiness |
+| **Archive protection configured** | Protection is configured; check the verification result separately. |
+| **Verified** with a recent proof | The current external copy has reported verification against the audit records. Interpret it within the displayed scope and time. |
+| **Verification pending** | Current protection has not yet been proven. |
+| **Protection not verified / unavailable** | Do not rely on external archive protection until the issue is resolved. |
+| **Legal hold** | Shows whether a hold applies; review it alongside the applicable retention period. |
 
-## Page help with the Komuta mascot
+A protected audit history and verified external archive protection are distinct assurances. An old successful verification does not validate a changed configuration. If no profile is available, loading fails or verification remains unresolved, contact support with the displayed status and time. This page is not a compliance certification or a control for changing archive retention.
 
-In the Customer Console, select **Explain this screen** from the mascot menu. Guidance explains the current security page or service tab, where to start and its limits in Turkish or English. Relevant alert and account security screens also have contextual explanations.
+## Alerts, channels and notification preferences
 
-The AI provider does not need to be enabled for this explanation. Page guidance is also available when the decorative mascot is disabled. Static help does not read security records, send data to AI or perform an action. It explains when access is still loading or your permission for the page has not been verified.
+Use **Alerts → Rules, Channels, History, Silences and Templates** to manage supported alert workflows. Rules determine when an alert matches, channels determine destinations, and history helps investigate recorded results. Account **Notifications & Alerts** contains available event-to-channel preferences and channel settings.
 
-In AdminUI, the mascot icon opens **Komuta page guide**, which describes the supported security screen's purpose, prerequisites, next step and limits. This operator guide is not an automatically acting chat or an animated response system.
+Confirm the event, destination and permissions for the workflow you intend to use. If preferences are shown as a preview or unavailable, do not assume that editing is active. A saved channel, matched rule or configured preference does not prove message delivery; check the available delivery result separately.
 
-Keep secrets out of the separate AI chat. AI explanations and recommendations do not replace recorded action results, current authorization, effective protection or compliance evidence. Security changes still require the page's own permissions, confirmations and outcome checks.
+Silencing an alert suppresses the relevant notification workflow; it does not resolve a finding or remove the condition that caused it. Reading or dismissing an inbox item likewise does not confirm remediation. Test delivery only through an authorized test action to an agreed destination.
 
-## A practical investigation flow
+## Exports and investigation handover
 
-1. Confirm the current organization and service under investigation.
-2. Check source coverage and data freshness on Overview.
-3. Narrow Findings by service, source and time.
-4. Compare traffic, protection and evidence in Service Security.
-5. Use a playbook and **Explain this screen** when needed.
-6. Explicitly execute only an authorized response; verify its record and actual outcome.
-7. Escalate infrastructure, source health, retention or archive issues to a platform operator.
+Where authorized, Findings offers CSV or JSON exports using server-side filters and a time window, beyond the visible table page. One export is limited to **50,000 rows**, and processing limits can further restrict results. Narrow service scope or time window when you need to review a large result set.
 
-## Related documents
+Audit Log and Login Activity CSV can have a different scope tied to the selected view or loaded records. Check the page's export description, loaded/total indicator and resulting file before calling an export complete.
 
-- [Service Security Workbench](https://komuta.io/docs/services/service-security-guide)
-- [Runtime Security](https://komuta.io/docs/services/runtime-security-guide)
-- [Service access protection](https://komuta.io/docs/services/service-access-protection)
+For handover, include the organization and service, filters and time zone, finding references, evidence timestamps, decisions made and outcomes still unverified. Share records only with the intended recipients. An exported file does not establish automated delivery to another security system.
+
+## Help and optional AI
+
+Open the Komuta mascot menu to read Turkish or English guidance on the current page. When the mascot is available, **Explain this screen** also opens the explanation in its speech bubble. Relevant service security tabs, access protection and authorized access activity also have contextual help.
+
+This static guide works without enabling an AI provider. When the decorative mascot is disabled, guidance remains readable inside the menu; the speech-bubble action is unavailable. It explains purpose, next steps and limits; it does not inspect current records, send them to AI or execute actions. Loading and permission checks can affect which explanation is available.
+
+If AI assistance is available and enabled, use it as optional help for the authorized context. Page-context sharing starts off in a new session; turning it on can include the supported page summary with your question. Avoid including sensitive information in a prompt and recheck the current organization, service and evidence before acting on a recommendation. An AI explanation is not an approval, verified protection result or guarantee of a correct diagnosis. Changes still follow their own permission and confirmation flows.
+
+## Common investigation scenarios
+
+### A critical finding appears
+
+Confirm the service and evidence time, inspect the affected operation, and compare traffic and protection in Service Security. Use the relevant playbook, record your assessment and perform only the response appropriate to the evidence. Close the finding after checking the outcome, or record why further investigation is needed.
+
+### A customer cannot open a protected application
+
+Start with central Access protection, then the service's Rules, People and Activity tabs. Compare the intended visitor with the applicable rule and reported access outcome. Check application progress before changing the rule; use the [Access Protection guide](service-access-protection.md) to investigate the specific access method.
+
+### A protection change disrupts an application
+
+Compare the last deployment with the relevant finding, desired setting and observed state. Identify the smallest rule, capability, path or connection involved. Use a permitted correction or rollback with a recovery plan, then verify application health and the remaining protection.
+
+### The dashboard looks quiet
+
+Check the organization, time range and filters first. Then inspect source freshness, runtime applicability and errors. If coverage is incomplete, record an evidence gap; an empty list cannot answer whether activity was absent or unobserved.
+
+## Troubleshooting
+
+| What you see | Next step |
+|---|---|
+| **Loading** | Wait for current scope and permissions to resolve before interpreting counts. |
+| **Empty result** | Check filters, time range, access and evidence availability. |
+| **Permission denied or missing action** | Ask an organization administrator for the specific access your task needs. |
+| **Stale or unknown evidence** | Compare timestamps and source coverage; seek support if freshness does not recover. |
+| **Unavailable / not applicable** | Review environment support and assess the other applicable protection layers. |
+| **Application failed or still pending** | Inspect the current request and error before submitting a duplicate. |
+| **No notification arrived** | Compare rule, channel, preferences, silences and recorded delivery result. |
+| **Archive protection cannot be verified** | Treat external protection as unverified and contact support with status and time. |
+
+When contacting [support](support-tickets.md), include the affected page and service, time window, visible status and safe record references. Exclude passwords, authentication material and unnecessary personal data.
+
+## Frequently asked questions
+
+### Does a low risk score mean my service is secure?
+
+It helps prioritize the findings and assessments available in the selected scope. Review coverage, freshness and effective protection evidence as well.
+
+### Does marking a finding as a threat activate a rule?
+
+The decision records your assessment. A supported response or policy action has its own permission, confirmation, application status and outcome verification.
+
+### Why do two services show different protection options?
+
+Options depend on permissions, enabled capabilities and runtime support. Managed isolated runtimes such as Kata do not offer identical behavior visibility. See [Runtime Security](runtime-security-guide.md).
+
+### Is every empty result a successful check?
+
+No. Filters, incomplete loading, missing permissions and unavailable sources can all limit what is visible. Resolve those conditions before drawing a conclusion.
+
+### Can I use a successful scenario or archive badge as a certification?
+
+A scenario result concerns a particular test; archive assurance concerns the displayed record protection. Neither independently certifies your application or organization.
+
+### Do I need AI to use Security Center?
+
+No. Investigation pages, authorized controls and static page help work independently of optional AI assistance, subject to their own availability and permissions.
+
+## Continue learning
+
+- [Service Security](service-security-guide.md) — investigate traffic, protection and findings for one application.
+- [Runtime Security](runtime-security-guide.md) — understand applicability and verify protection outcomes.
+- [Access Protection](service-access-protection.md) — configure who can open your application.
+- [Access Log](access-protection-activity.md) — investigate visitor access.
