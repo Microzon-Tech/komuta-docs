@@ -6,6 +6,8 @@ This guide explains the protection model. For the screen-by-screen workflow, rea
 
 > **Keep three facts separate:** what is configured, what is reported as applied and what the observed outcome shows. This distinction is useful both when evaluating protection and when recovering an application after a change.
 
+> Screenshots were captured from the Turkish Komuta UI in the test environment on 8 October 2026. They illustrate the interface; check your own service for its current state.
+
 ## Protection layers and what each answers
 
 | Layer | Customer question | Evidence to review |
@@ -38,6 +40,10 @@ For a **Kata** workload, some runtime behavior observations and protection opera
 Evaluate network rules, workload hardening, build evidence and isolation separately. A runtime restriction on one layer does not decide the support or effectiveness of another. In particular, isolation has its own eligibility check and may be available for an eligible isolated runtime.
 
 An unavailable card is not a finding, and a hidden card is not proof of complete protection. If applicability is unknown, ask the service owner or Komuta support to clarify the supported scope.
+
+![Supported service security capabilities in a managed isolated runtime](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*The komuta-test-app overview lists network detection, workload isolation, supply chain and application-layer capabilities applicable to this runtime. Supported (Destekleniyor) is not a test result proving effective protection.*
 
 ## Runtime mode and protection action
 
@@ -94,6 +100,10 @@ Supported customer settings include narrowly allowed **Linux capabilities**, **w
 For a startup failure or denied operation, first identify the process, path or connection involved. Compare it with the image's requirements, deployment history and current settings. A general permission error does not by itself establish that the application needs root or broad write access.
 
 For an authorized change, record a clear reason, read its confirmation and check the deployment result. When a root-filesystem restriction applies, a writable-path exception has a different scope from allowing root execution. A writable directory also needs a separate persistence assessment if the application must retain its contents.
+
+![Linux capabilities card for service runtime requirements](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/linux-capabilities.jpg)
+
+*The Linux capabilities card under Service Security → Protection makes current privileges and defaults visible. Compare the image requirements with this list; do not copy the test service settings directly.*
 
 ### Verify drift and recovery
 

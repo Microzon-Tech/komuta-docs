@@ -6,6 +6,8 @@ Use [Security Center](security-center-guide.md) to prioritize across your organi
 
 > **A useful investigation follows three steps:** check the service and evidence coverage, compare the relevant records, then verify the outcome of any authorized change. A saved setting describes intent; current application and behavior evidence establish what happened.
 
+> Screenshots were captured from the Turkish Komuta UI in the test environment on 8 October 2026. They illustrate the interface; check your own service for its current state.
+
 ## Your first visit
 
 1. Select the intended organization and open the service you want to investigate.
@@ -28,6 +30,10 @@ Your role also matters. Reading findings, reading the event timeline, inspecting
 | **Findings** | Investigate findings, runtime observations and the evidence timeline | Source, event time and affected behavior |
 
 The incident-response card remains available across the workspace so you can inspect isolation state while moving between tabs.
+
+![Security summary and four security tabs for komuta-test-app](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-overview.jpg)
+
+*The Security screen for komuta-test-app keeps Overview (Genel bakış), Traffic (Trafik), Protection (Koruma) and Findings (Bulgular) in the same service context. The top card reports posture; the incident-response card reports isolation status.*
 
 ## Overview: decide what needs attention
 
@@ -92,6 +98,10 @@ Capabilities grant specific privileges to the application. The card shows the av
 
 With capability-management permission, review the required additions or removals, enter a reason and save. Adding privileges requires confirmation. The change affects a subsequent deployment; read the save result and verify application health and live posture after that deployment.
 
+![Linux capability allowlist in the Protection tab](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/linux-capabilities.jpg)
+
+*The Linux capabilities card in Protection lets you compare current additions with platform defaults. The permissions shown belong to the test service; they are not a recommended allowlist for your application.*
+
 ### Writable paths
 
 The **Writable paths** card defines directories the application needs to write to when the root filesystem is read-only. It also shows automatically provided paths for a recognized application framework, when available; those paths cannot be edited in this card.
@@ -99,6 +109,10 @@ The **Writable paths** card defines directories the application needs to write t
 With writable-path management permission, add only the necessary absolute application directories, enter a reason and review the confirmation. The allowed path rules still apply. If current settings cannot be loaded, refresh successfully before editing them.
 
 A writable directory is not automatically persistent storage. Where a persistence option is offered, read its scope and consider what the application must retain across deployments. Verify the result for your service without assuming that every writable path persists.
+
+![Writable paths and reason field in the Protection tab](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/writable-paths.jpg)
+
+*The Writable paths (Yazılabilir yollar) card displays additional directories and the change reason together. The /app/App_Data text is an input example, not a saved path.*
 
 ### Permission to run as root
 

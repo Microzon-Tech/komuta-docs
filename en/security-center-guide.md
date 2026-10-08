@@ -4,6 +4,8 @@ Komuta Security Center brings security findings, service protection, access acti
 
 You can move from a risk summary to the underlying finding, compare it with service traffic and protection state, review policy suggestions and track the records behind a decision. The same workspace connects these investigations with audit history, build and image evidence, controlled security scenarios and notification workflows.
 
+> Screenshots were captured from the Turkish Komuta UI in the test environment on 8 October 2026. They illustrate the interface; check your own service for its current state.
+
 ## Runtime Security: understand and protect running services
 
 Runtime Security helps you investigate what your application does while it is running and manage supported protection controls. Komuta connects available evidence about process execution, file access and network connections with findings, rules and service posture. You can move from suspicious behavior to the affected service, then from investigation to a targeted response.
@@ -82,6 +84,10 @@ Overview helps answer **which services need attention and why**. Use the risk su
 The main risk card reflects the highest-risk service snapshot available to the summary; read its service name and calculation time. A risk score is a prioritization aid, not a compliance certificate. A posture indicator describes assessed settings; an observation count describes recorded behavior. Neither is an attack counter or proof that every protection layer is effective.
 
 When a summary opens a filtered list, check which filters were carried over. Compare summaries and detail within the same scope and time window; different sources can update at different times.
+
+![Security Center overview with prioritized work, risk and critical findings](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/security-center-overview.jpg)
+
+*The overview combines pending investigations with risk and evidence freshness. In this example, the low risk score appears alongside stale and degraded evidence.*
 
 ## Findings: turn signals into an investigation
 
@@ -183,6 +189,10 @@ For each step, identify the target, prerequisite, expected result and responsibl
 Before a run, confirm the target service, scenario availability, runtime support, expected signal, possible application impact and recovery plan. A listed scenario or a successful historical run does not establish current readiness.
 
 Afterwards, compare the run state, matching finding and detection timing for that target. A completed action alone is insufficient if expected evidence is missing. Results apply to the tested scenario and window; they do not establish prevention of every attack or effective blocking by every protection layer.
+
+![Synthetic attacks screen showing scenario applicability and drill history](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/scenario-applicability.jpg)
+
+*The Synthetic attacks screen brings together the scenario catalog and drill history. Automated scenarios are not applicable to the runtime shown here; this is not a successful attack-test result.*
 
 ## Supply chain: connect evidence to the image
 

@@ -6,6 +6,8 @@ Bu rehber koruma modelini açıklar. Ekran üzerinden kullanım için [Servis G�
 
 > **Üç bilgiyi ayrı tutun:** ne yapılandırıldı, neyin uygulandığı bildiriliyor ve gözlenen sonuç ne gösteriyor? Bu ayrım hem korumayı değerlendirirken hem değişiklik sonrasında uygulamayı normale döndürürken işe yarar.
 
+> Görseller, 8 Ekim 2026 tarihinde Komuta arayüzündeki test ortamından alınmıştır. Gösterilen durumlar örnektir; kendi servisinizin güncel durumunu kontrol edin.
+
 ## Koruma katmanları ve yanıtladıkları sorular
 
 | Katman | Müşterinin sorusu | İncelenecek kanıt |
@@ -38,6 +40,10 @@ Seçilen kuruluş, servis, çalışma ortamı ve dağıtımla başlayın. Kanıt
 Ağ kurallarını, iş yükü sıkılaştırmasını, derleme kanıtını ve izolasyonu ayrı değerlendirin. Bir katmanın çalışma ortamı kısıtı, diğerinin desteğini veya etkili olup olmadığını belirlemez. Özellikle izolasyonun kendi uygunluk kontrolü vardır; uygun bir yalıtılmış çalışma ortamında kullanılabilir.
 
 Kullanılamayan kart bulgu değildir; görünmeyen kart da tam koruma kanıtı değildir. Uygunluk bilinmiyorsa desteklenen kapsamı servis sorumlunuzla veya Komuta desteğiyle netleştirin.
+
+![Yönetilen izole çalışma zamanında desteklenen servis güvenliği yetenekleri](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*komuta-test-app genel bakışında bu çalışma ortamına uygulanabilen ağ tespiti, iş yükü izolasyonu, tedarik zinciri ve uygulama katmanı yetenekleri listelenir. Destekleniyor etiketi, korumanın etkinliğine ilişkin bir test sonucu değildir.*
 
 ## Çalışma zamanı modu ve koruma eylemi
 
@@ -94,6 +100,10 @@ Desteklenen müşteri ayarları arasında dar kapsamlı **Linux capability** izi
 Başlangıç hatası veya reddedilen işlemde önce ilgili işlemi, yolu veya bağlantıyı belirleyin. İmaj gereksinimleri, dağıtım geçmişi ve mevcut ayarlarla karşılaştırın. Genel bir izin hatası, uygulamanın root veya geniş yazma erişimi gerektirdiğini tek başına göstermez.
 
 Yetkili değişiklikte açık bir gerekçe kaydedin, onayı okuyun ve dağıtım sonucunu kontrol edin. Kök dosya sistemi kısıtlaması geçerliyse yazılabilir yol istisnası, root çalıştırma izninden farklı kapsama sahiptir. Uygulamanın içeriği koruması gerekiyorsa yazılabilir dizinin kalıcılığı ayrıca değerlendirilmelidir.
+
+![Servisin çalışma zamanı gereksinimleri için Linux capability kartı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/linux-capabilities.jpg)
+
+*Servis Güvenliği → Koruma içindeki Linux capability kartı, mevcut ayrıcalıkları ve varsayılanları görünür kılar. İmajın ihtiyaçlarını bu listeyle karşılaştırın; test servisinin ayarlarını doğrudan kopyalamayın.*
 
 ### Sapmayı ve geri dönüşü doğrulayın
 
