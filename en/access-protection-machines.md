@@ -6,7 +6,7 @@ Access protection offers three ways for such requests, and a section for the HTT
 
 | Way | For | Where |
 |---|---|---|
-| **Webhook path** (open path) | Senders that can't sign in and send their own signature (such as GitHub, Stripe, Slack) | **Machines** tab → **Webhooks** |
+| **Webhook path** (open path) | Senders that can't sign in and sign what they send (such as GitHub, Stripe, Slack); Komuta can check the signature | **Machines** tab → **Webhooks** |
 | **Service token** | Programs you control (CI jobs, monitoring tools, scripts) | **Machines** tab → **Service tokens** |
 | **Services that may come in over the private mesh** | Your Komuta services on other clusters reaching this service directly | **Machines** tab → **Services that may come in over the private mesh** (the private mesh itself is on the **Network** tab) |
 | **Methods and CORS** | Allowing only the HTTP methods each path needs, and letting browsers' CORS checks through before sign-in | **Machines** tab → **Methods and CORS** |
@@ -19,7 +19,7 @@ The webhook, service token and **Methods and CORS** sections appear only while a
 
 A webhook path opens a specific path of the site without Komuta sign-in. For example, while the site is open only to your team, requests GitHub sends to `/webhooks/github` reach your application without signing in.
 
-> **Important:** Komuta doesn't check who sends requests on a webhook path; it only opens the door. **Your application** must check that a request really comes from GitHub or Stripe by verifying the sender's signature. For example, GitHub sends an `X-Hub-Signature-256` header and Stripe a `Stripe-Signature` header. If your application doesn't verify the signature, anyone can send requests to this path.
+> **Important:** A webhook path lets anyone send requests without signing in. Something must check that a request really comes from GitHub or Stripe, by verifying the sender's signature (GitHub sends an `X-Hub-Signature-256` header, Stripe a `Stripe-Signature` header). Either choose a [signature check at the edge](#signature-check-at-the-edge), so Komuta refuses unsigned requests before they reach your application, or verify the signature in **your application**. Without either, anyone can send requests to this path.
 
 ### Opening a webhook path
 
@@ -28,9 +28,10 @@ A webhook path opens a specific path of the site without Komuta sign-in. For exa
    - **Path** — the path to open, for example `/webhooks/github`. This path and everything below it is opened.
    - **Methods** — the HTTP methods accepted on this path: `POST`, `PUT`, `PATCH`, `DELETE`, `GET`, `HEAD`. The default is `POST` only; at least one method must be chosen.
    - **Sender addresses (optional)** — one IP address or CIDR range per line. If you fill it in, only requests from these addresses get onto the path. If you leave it empty, requests from any address are accepted; the signature check still protects you. You can write ranges the sender publishes here, such as GitHub's webhook addresses (the window shows `140.82.112.0/20` as an example).
-3. Save with **Open the path**. The change takes effect within a few seconds ("Webhook paths are being applied").
+   - **Signature check at the edge** — **None, my app checks it** (default), **GitHub (X-Hub-Signature-256)**, **Stripe (Stripe-Signature)** or **Other HMAC-SHA256 header** (see [below](#signature-check-at-the-edge)).
+3. Save with **Open the path**. The change takes effect within a few seconds ("Webhook paths are being applied"). If you chose a signature check, add the signing secret under the path next ("After you open the path, add the signing secret under it. Until then every request to it gets 401.").
 
-The list shows each open path with its methods, its sender list ("Only from: …" or "From any address") and the service's full address. To close a path, click the trash icon on its row; it is closed immediately, without confirmation.
+The list shows each open path with its methods, its sender list ("Only from: …" or "From any address"), its signature check ("GitHub signature checked", for example) and the service's full address. To close a path, click the trash icon on its row; it is closed immediately, without confirmation.
 
 ### How webhook paths work
 
@@ -45,13 +46,65 @@ The list shows each open path with its methods, its sender list ("Only from: …
 - **Countries don't apply, the rate limit does.** An open path is exempt from the [country list](access-protection-rules.md#countries) (its own sender list is the address check), but its requests count towards the [rate limit](access-protection-rules.md#rate-limit). Block rules and [method rules](#methods-and-cors) are checked before the open path.
 - **The access log** records every delivery to an open path as **Request on an open path** / **Delivered to an open path**, under the open path's prefix rather than the full path.
 
+### Signature check at the edge
+
+With a signature check, Komuta verifies the sender's signature on the raw request body before the request reaches your application. A request without a valid signature gets `401` and never reaches your application. Your application no longer has to verify the signature, but it may keep doing so.
+
+| Choice | What Komuta checks |
+|---|---|
+| **None, my app checks it** | Nothing; your application must verify the signature. |
+| **GitHub (X-Hub-Signature-256)** | `X-Hub-Signature-256: sha256=<hex HMAC-SHA256 of the body>`. |
+| **Stripe (Stripe-Signature)** | `Stripe-Signature: t=<time>,v1=<signature>`: an HMAC-SHA256 of `<time>.<body>`. The time may differ from Komuta's clock by at most **300 seconds**, which stops old requests from being replayed. |
+| **Other HMAC-SHA256 header** | An HMAC-SHA256 of the body in the **Header** you choose: `x-hub-signature-256`, `stripe-signature`, `x-signature`, `x-signature-256` or `x-webhook-signature` (only these headers are passed through by the gateway). Optionally a **Value prefix** that comes before the signature (for example `sha256=`; at most 16 characters, no spaces or commas) and the **Encoding** of the signature: hex (default) or base64. |
+
+Rules for signed paths:
+
+- **Only `POST`, `PUT` and `PATCH`.** A signed path takes only requests with a body ("Pick POST, PUT or PATCH; a signed path only takes requests with a body.").
+- **Bodies up to 65,535 bytes (about 64 KiB).** The gateway hands at most this much of a body to the check, so a larger body can't be verified and is refused with `413`. Most webhooks are far smaller, but a large event can exceed it; for example a GitHub `push` event with many commits. If your sender sends such events, keep the check in your application instead.
+- **Other requests under a signed path get `401`.** A request under a signed path that the path doesn't take (another method such as `GET`, or a path that can be read in more than one way) is refused with `401`; it is not decided by the site's normal rules. This is so a signed path can't be reached around its check.
+- **The sender list is checked first.** If the path has **Sender addresses**, a request from another address gets `403` before the signature is looked at.
+- **Replays.** GitHub and other HMAC signatures carry no time, so Komuta can't stop someone from re-sending a request they captured, within the time the sender would retry it. Stripe's signature carries a time, so Komuta refuses copies older than 300 seconds. If replays matter, let your application refuse delivery ids it has already processed (GitHub sends `X-GitHub-Delivery`).
+
+What the sender gets:
+
+| Situation | Response |
+|---|---|
+| Valid signature | The request reaches your application (**Delivered to an open path**). |
+| Missing, malformed or wrong signature, or a request under a signed path that the path doesn't take | `401`, plain text `invalid webhook signature` |
+| The path has no signing secret yet | `401`, plain text `webhook signature cannot be checked` |
+| The body is larger than 65,535 bytes | `413`, plain text `webhook body too large to verify` |
+
+These refusals appear in the access log as "Sent a webhook without a valid signature", "Sent a webhook to a path that has no signing secret yet" and "Sent a webhook body larger than 64 KiB", under the path's prefix.
+
+#### Signing secrets
+
+A signed path checks signatures with the **Signing secrets** listed under it. Until it has one, every request to it gets `401` ("No secret yet. Every request to this path gets 401 until you add the secret the sender signs with.").
+
+1. Under the path, click **Add secret**.
+2. In **Where the secret comes from**, choose:
+   - **Generate a strong secret** — Komuta creates one. It is shown **only once**: copy it and paste it into the sender's webhook settings (for GitHub, the webhook's **Secret** field).
+   - **Use a secret I already have** — paste a secret the sender gave you. For Stripe this is the only choice: paste the endpoint's signing secret from the Stripe dashboard (it starts with `whsec_`).
+3. Save with **Add secret**. The secret reaches the gateway within a minute ("The secret is saved and reaches the edge within a minute").
+
+Things to know:
+
+- Komuta keeps the secret encrypted and never shows it again; the list shows only an id and when it was added.
+- A secret is 8 to 512 bytes, without spaces or control characters.
+- **At most 2 secrets per path**, so you can rotate without downtime: add the new secret, switch the sender to it, then remove the old one. Both work in between.
+- Removing a secret asks **Remove secret {key}?**; senders still signing with it are refused within a minute. Removing the last secret of a path means every request to it gets `401` until you add a new one.
+- Closing the path, or changing or removing its signature check, deletes the path's secrets; a new signed path needs a new secret.
+- Seeing and changing signing secrets needs the **Manage service access protection** permission.
+
+If the **Signature check at the edge** choice says "Signature checks at the edge aren't available on this platform yet.", signature checks aren't enabled on your platform yet; verify the signature in your application.
+
 ### Limits
 
 - A service can have at most **10** open paths. When the limit is reached, **Open a path** is disabled. Open paths also count towards the total limit of 50 path rules, together with the path rules on the **Rules** tab.
 - `/` (the whole site) and Komuta's own sign-in path (anything starting with `/.komuta-access`) can't be opened.
 - The path follows the same [syntax as path rules](access-protection-rules.md#path-syntax) (at most 256 characters). The window shows the same message for every invalid path: "Enter a path like /webhooks/github. The whole site can't be opened."
 - The sender list takes at most 100 entries and only public internet addresses. If the list has an invalid line, **Open the path** stays disabled.
-- Opening and closing webhook paths needs the **Manage service access protection** permission; others only see the list.
+- A signed path takes only `POST`, `PUT` and `PATCH`, bodies up to 65,535 bytes and at most 2 signing secrets.
+- Opening and closing webhook paths, and managing signing secrets, needs the **Manage service access protection** permission; others only see the list.
 - Protection made up only of open paths protects nothing; a webhook path makes sense while the site, or at least one path, is under some other protection.
 
 ---

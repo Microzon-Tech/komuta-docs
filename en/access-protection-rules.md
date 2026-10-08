@@ -218,6 +218,7 @@ Each row shows a green check (gets in) or a red cross (refused) and the reason:
 | **Gets in with the service token** / **Gets in with the share link** | The token or link opens this page. |
 | **Blocked by the {path} rule** | A **Block completely** rule. |
 | **This method is not allowed on {path}** | A method rule on the **Machines** tab doesn't allow `GET` here. |
+| "{path} checks webhook signatures and only takes the methods it lists; this request is refused with 401 before it reaches the app." | The page is under a webhook path with a [signature check](access-protection-machines.md#signature-check-at-the-edge); signed paths don't take `GET`. |
 | **The visitor's country is not on the list** | Refused by the country list. |
 | **Needs an allowed network ({path})** | The address isn't on the list for this path. |
 | **Needs to sign in ({path})** | Someone who hasn't signed in. |

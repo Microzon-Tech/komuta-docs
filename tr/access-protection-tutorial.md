@@ -293,7 +293,7 @@ Hedef: GitHub webhook'ları ve CI işinin sağlık kontrolü, giriş yapamadıkl
 - `GET /webhooks/github` gibi başka yöntemler açık yol yokmuş gibi değerlendirilir ve sitenin normal korumasından geçmek zorundadır.
 - Erişim kaydında teslimatlar **Açık yol isteği** / **Açık yola teslim edildi** olarak görünür.
 
-**Uygulamanızda yapmanız gereken** — Komuta bu yolda kimlik sormaz; isteğin gerçekten GitHub'dan geldiğini uygulamanız doğrulamalıdır. GitHub her isteğe `X-Hub-Signature-256` başlığını ekler: webhook gizli anahtarınızla isteğin ham gövdesinin HMAC-SHA256 özetidir. Node.js örneği:
+**Uygulamanızda yapmanız gereken** — Kenarda imza kontrolü yoksa (aşağıdaki tarife bakın) Komuta bu yolda kimlik sormaz; isteğin gerçekten GitHub'dan geldiğini uygulamanız doğrulamalıdır. GitHub her isteğe `X-Hub-Signature-256` başlığını ekler: webhook gizli anahtarınızla isteğin ham gövdesinin HMAC-SHA256 özetidir. Node.js örneği:
 
 ```javascript copy
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -310,6 +310,21 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 İmzası uymayan isteği reddedin. Ayrıca bu yolda `X-HTTP-Method-Override` gibi yöntem değiştirme başlıklarını kabul etmeyin.
 
 **Doğrulayın** — GitHub depo ayarlarındaki webhook sayfasında **Recent Deliveries** başarılı görünmeli; **Etkinlik** sekmesinde **Açık yol isteği** / **Açık yola teslim edildi** satırı çıkmalı. Kendi bilgisayarınızdan `curl -s -o /dev/null -w "%{http_code}\n" -X POST https://panel.example.com/webhooks/github` çalıştırırsanız `403` görürsünüz: adresiniz gönderici listesinde değildir. (**Erişim önizlemesi** yalnızca `GET` isteklerini hesaplar; yalnızca `POST` açtığınız bu yol için sitenin normal kuralını gösterir.)
+
+### Tarif: GitHub webhook'larını imza kontrolüyle alın
+
+GitHub'ın imzasını uygulamanızda doğrulamak yerine bunu Komuta'nın kenarda yapmasını sağlayabilirsiniz. **Kenarda imza kontrolü** seçimi bunun kullanılamadığını söylüyorsa özellik platformunuzda henüz açık değildir; kontrolü uygulamanızda tutun. Kontrol yol açılırken seçilir; `/webhooks/github` yolunu Adım 5.1'de zaten açtıysanız önce kapatın.
+
+1. **Makineler** sekmesinde **Webhook'lar → Yol aç**'a basın: **Yol** `/webhooks/github`, **Yöntemler** `POST`, **Kenarda imza kontrolü** **GitHub (X-Hub-Signature-256)**. İsterseniz **Gönderici adresleri**'ni Adım 5.1'deki gibi doldurun. **Yolu aç**'a basın.
+2. Yeni yolun altında, **İmza sırları** bölümünde **Sır ekle**'ye basın, **Güçlü bir sır üret**'i seçili bırakın, **Sır ekle**'ye basın ve gösterilen sırrı kopyalayın. Sır yalnızca bir kez gösterilir.
+3. GitHub deponuzda **Settings → Webhooks**'u açın; **Payload URL**'i `https://panel.example.com/webhooks/github`, **Content type**'ı `application/json` yapın ve sırrı **Secret** alanına yapıştırın.
+4. Sırrın ağ geçidine ulaşması için yaklaşık bir dakika bekleyin.
+
+**Etkisi** — Uygulamanıza yalnızca sırrınızla imzalanmış `POST` istekleri ulaşır; `/webhooks/github` yoluna gelen diğer her şey (`GET` dahil) `401`, 65.535 bayttan büyük bir gövde `413` alır. Büyük bir `push` olayı bu sınırı aşabilir; deponuz böyle olaylar gönderiyorsa kontrolü uygulamanızda tutun.
+
+**Doğrulayın** — GitHub'ın **Recent Deliveries** listesi başarılı görünmeli (gerekirse `ping` olayını yeniden gönderin). Listedeki bir adresten (ya da gönderici listesi boşsa herhangi bir yerden) `curl -s -o /dev/null -w "%{http_code}\n" -X POST -d '{}' https://panel.example.com/webhooks/github` çalıştırırsanız `401` görürsünüz: istek imzalı değildir. **Etkinlik** sekmesinde retler "Geçerli imzası olmayan bir webhook gönderdi" olarak görünür.
+
+**Sırrı değiştirmek** — ikinci bir sır ekleyin, GitHub'ı ona geçirin, sonra eskisini kaldırın; arada ikisi de çalışır. Bir yol en fazla 2 sır tutar.
 
 ### Adım 5.2 — CI işi için servis token'ı
 
@@ -489,7 +504,7 @@ En ileri senaryoyu kendi başınıza kurabilmek için Komuta'nın her isteği ha
 3. **Ülkeler** — Serviste [ülke listesi](access-protection-rules.md#ülkeler) varsa, başka bir ülkeden gelen ya da ülkesi bilinmeyen ziyaretçi `403` ile reddedilir. Webhook yolları, üzerlerinde bir paylaşım bağlantısı açılmıyorsa bu adımı atlar.
 4. **Hız sınırı** — Adres [hız sınırını](access-protection-rules.md#hız-sınırı) doldurduysa yanıt `429`'dur.
 5. **Paylaşım bağlantısı** — Adreste `?komuta_link=` varsa bağlantı kontrol edilir (IP listeleri yine uygulanır) ve ziyaretçi bir oturumla aynı adrese gönderilir ya da `403` ile reddedilir.
-6. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez.
+6. **Webhook (açık) yolu** — Yol bir açık yolun altındaysa ve yöntem seçilmişse, yolun kendi gönderici listesi kontrol edilir ve istek giriş istemeden geçer. Sitenin ve diğer yolların kuralları uygulanmaz. Adres listede değilse istek `403` ile reddedilir; sitenin kurallarına geçilmez. Yolda imza kontrolü varsa ardından gövdenin imzası kontrol edilir (geçerli imza yoksa `401`, 65.535 bayttan büyük gövdede `413`). İmzalı bir yolun altına gelen ama yolun kabul etmediği bir istek de burada, sitenin kurallarına geçmeden `401` alır.
 7. **Site kuralı ve eşleşen her yol kuralı** — İstek hepsini birden sağlamalıdır. IP adresi, bir kuralın IP şartını karşılayabilir; "biri yeterli" olan kurallarda listedeki adres girişin yerine geçer. Giriş yapılsa bile sağlanamayacak bir kural varsa (yalnızca IP isteyen bir kural ya da listede olmayan bir adresten **İkisi birden gereksin**), istek burada `403` ve **Erişim kısıtlı** sayfasıyla reddedilir; giriş sayfası gösterilmez. **CORS kontrollerine girişsiz izin ver** açıksa tarayıcının CORS kontrolü bu noktada geçer.
 8. **Kimlik** — Hâlâ bir kimlik gerekiyorsa: istekte servis token'ı varsa yalnızca token'a bakılır; yoksa ziyaretçinin oturumuna (Komuta girişi ya da paylaşım bağlantısı) ve paylaşımlarına bakılır. Paylaşımın ya da bağlantının sayfa sınırı ve kişi kuralının saat aralığı burada uygulanır. Oturum yoksa `GET` ve `HEAD` istekleri (tarayıcı ya da `curl` fark etmez) giriş sayfasına yönlendirilir (`302`); `POST` gibi diğer yöntemler `401` alır.
 
@@ -525,6 +540,8 @@ Yeni bir kural eklemeden önce kendinize şunu sorun: "Bu istek hangi adımda ka
 | CI token'ı `403` alıyor | Yol token'ın kapsamı dışında ya da IP kuralı "ikisi birden" | **Neleri açabilir**'i kontrol edin; site kuralını **Biri yeterli** yapın. |
 | Webhook'lar `403` alıyor | Gönderici listesi eksik ya da eskimiş | `https://api.github.com/meta` adresindeki `hooks` listesinin tamamını (IPv6 dahil) ekleyin; **Etkinlik**'te **İzinli olmayan bir adresten geldi** satırı reddedilen ağı gösterir. |
 | Webhook'lar `302` ya da `401` alıyor | Yöntem seçilmemiş ya da yol yanlış | Açık yolun yöntemlerini ve yolunu kontrol edin. |
+| İmzalı bir webhook yolu her isteğe `401` veriyor | Henüz imza sırrı yok ya da gönderici başka bir sırla imzalıyor | Yolun altına sırrı ekleyin ve göndericide aynısını kullanın; **Etkinlik**'teki nedene bakın. |
+| Bazı webhook'lar `413` alıyor | Gövde, imzalı bir yolun doğrulayabileceği en büyük boyut olan 65.535 bayttan büyük | Bu gönderici için imza kontrolünü uygulamanızda tutun. |
 | Uygulama bazı isteklerde kimlik başlığını boş alıyor | Ziyaretçi ofis adresinden geldi (giriş yapmış olsa bile) ya da sayfa giriş gerektirmiyor | Kimlik gereken yolları bir giriş kuralıyla koruyun. |
 | Ekip bir anda yeniden giriş yapmak zorunda kaldı | Biri **Herkesi çıkar**'ı seçti ya da tek tek çıkarma henüz devrede değilken bir paylaşım kaldırıldı veya sınırlandı | Beklenen davranıştır; bkz. Adım 8.3. |
 | Başka bir sitedeki tarayıcı CORS hatası alıyor | Tarayıcının `OPTIONS` kontrolü oturum taşımıyor ve `401` alıyor | **Makineler → Yöntemler ve CORS → CORS kontrollerine girişsiz izin ver**'i açın. |

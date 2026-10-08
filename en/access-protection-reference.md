@@ -23,6 +23,7 @@ Access protection guides:
 | Path rules | At most 50 per service (webhook paths included); one rule per path |
 | Path length | 2–256 characters; starts with `/`; lowercase letters, digits and `- . _ ~ ! $ & ' ( ) * + , = : @ /` |
 | Webhook (open) paths | At most 10; methods `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| Signed webhook paths | Methods `POST`, `PUT`, `PATCH` only; body at most 65,535 bytes (about 64 KiB); at most 2 signing secrets per path; secret 8–512 bytes, no whitespace or control characters; Stripe timestamps within 300 seconds; HMAC value prefix at most 16 characters |
 | Method rules | At most 50 per service (separate from path rules); methods `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`; `/` allowed; one rule per path |
 | Countries | At most 250 two-letter ISO codes; `XX` (unknown) and `T1` (Tor) can't be listed |
 | Rate limit | 10–100,000 requests per 1–3600 seconds (console: per 1, 10, 60, 600 or 3600 seconds); per address, IPv6 per `/64`; counted per gateway replica, so approximate |
@@ -99,6 +100,9 @@ The meanings of warning codes (`lastError`) are in [Access Protection → Warnin
 | Share-link visitor, page outside the link | `403` | `Your share link does not open this page.` |
 | Share-link visitor after the link was deleted or ended | `403` | `The share link you opened this site with has ended. Ask the person who sent it for a new one.` |
 | Browser CORS check while **Allow CORS checks without sign-in** is on | — | Passed to the application (the real request still needs sign-in) |
+| Signed webhook path: missing or wrong signature, or a request the path doesn't take | `401` | `invalid webhook signature` |
+| Signed webhook path without a signing secret | `401` | `webhook signature cannot be checked` |
+| Signed webhook path, body larger than 65,535 bytes | `413` | `webhook body too large to verify` |
 | Protection data temporarily unavailable | `503` | `access policy unavailable` |
 | Sign-in temporarily unavailable | `503` | `sign-in unavailable` |
 
@@ -155,6 +159,9 @@ Technical codes in the access log and their console text:
 | `method_not_allowed` | Refusal | Used a method this path does not allow |
 | `country_not_allowed` | Refusal | Came from a country that is not allowed |
 | `rate_limited` | Refusal | Sent too many requests |
+| `signature_invalid` | Refusal | Sent a webhook without a valid signature |
+| `signature_key_missing` | Refusal | Sent a webhook to a path that has no signing secret yet |
+| `webhook_body_too_large` | Refusal | Sent a webhook body larger than 64 KiB |
 | `overflow` | Total | More visits this hour, grouped together |
 
 `preflight` (a browser CORS check let through by **Allow CORS checks without sign-in**) is a reason the gateway uses, but it isn't recorded in the access log.
@@ -201,6 +208,17 @@ Messages shown when an action is refused in the console or the API. Values in cu
 | `DevOpsZon:AccessProtection:ServiceNotFound` | The service was not found or does not belong to this organization. |
 | `DevOpsZon:AccessProtection:IdentityNeedsSignIn` | The visitor's identity can only be passed to the application on a service that asks for Komuta sign-in. Turn sign-in on first. |
 | `DevOpsZon:AccessProtection:IdentityNotAvailable` | Passing the visitor's identity is not turned on on this platform yet. |
+
+### Webhook signatures
+
+| Code | Message |
+|---|---|
+| `DevOpsZon:AccessProtection:PathRuleSignatureInvalid` | The signature check on {Prefix} is not valid. A signed path is open, accepts only POST, PUT and PATCH, and uses GitHub, Stripe or an HMAC header the gateway forwards. |
+| `DevOpsZon:AccessProtection:WebhookSignaturesNotAvailable` | Webhook signature checks are not available on this platform yet. |
+| `DevOpsZon:AccessProtection:WebhookKeyPathNotSigned` | {Prefix} is not an open path with a signature check, so it cannot hold a webhook secret. |
+| `DevOpsZon:AccessProtection:TooManyWebhookKeys` | A signed path can hold at most {Max} webhook secrets; remove the old one after the sender uses the new one. |
+| `DevOpsZon:AccessProtection:WebhookKeyNotFound` | The webhook secret was not found. |
+| `DevOpsZon:AccessProtection:WebhookSecretInvalid` | A webhook secret is {Min} to {Max} bytes without spaces or control characters. |
 
 ### Countries, rate limit and methods
 
@@ -349,8 +367,11 @@ Yes: **Countries** and **Rate limit** on the **Rules** tab, and method rules und
 **How does my application learn who the visitor is?**
 Turn on **Tell my application who signed in** on the **Settings** tab and verify the `x-komuta-identity` JWT. See [End Date and Visitor Identity](access-protection-settings.md#tell-my-application-who-signed-in).
 
+**Can Komuta check webhook signatures for me?**
+Yes: choose a **Signature check at the edge** (GitHub, Stripe or another HMAC-SHA256 header) when you open the webhook path, then add the signing secret under it. Unsigned requests get `401` before they reach your application. Signed paths take only `POST`, `PUT` and `PATCH` with bodies up to 65,535 bytes. If you don't see the choice, it isn't enabled on your platform yet. See [Signature check at the edge](access-protection-machines.md#signature-check-at-the-edge).
+
 **What if a webhook sender such as GitHub changes its IP ranges?**
-The sender address list is optional; the real protection is your application's signature check. If you use the list, keep the ranges the sender publishes up to date, or leave the list empty.
+The sender address list is optional; the real protection is the signature check, at the edge or in your application. If you use the list, keep the ranges the sender publishes up to date, or leave the list empty.
 
 **What happens if I redeploy my service while protection is on?**
 Protection isn't affected; the new version goes live with the same protection.
@@ -377,7 +398,8 @@ Protection isn't affected; the new version goes live with the same protection.
 | **Require both / Either is enough** | How the IP list and sign-in are evaluated together. |
 | **Path rule** | Extra protection or a block for a specific path and everything below it. |
 | **Only chosen people** | A path rule that opens a path only to chosen shares, optionally within a time window. |
-| **Webhook path (open path)** | A path that lets requests with the chosen methods through without sign-in. The application verifies the sender's signature. |
+| **Webhook path (open path)** | A path that lets requests with the chosen methods through without sign-in. Komuta (with a signature check) or the application verifies the sender's signature. |
+| **Signing secret** | The shared secret a webhook sender signs its requests with; Komuta keeps it encrypted and uses it to check signatures on a signed webhook path. |
 | **Service token** | A secret key that programs send as a header instead of signing in. |
 | **Private mesh** | A connection between your clusters that doesn't go out to the public internet; it doesn't pass the gateway. |
 | **Method rule** | The HTTP methods a path accepts; other methods get `405`. |

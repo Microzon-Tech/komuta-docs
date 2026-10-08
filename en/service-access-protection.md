@@ -14,7 +14,7 @@ With access protection you can:
 - **Limit by IP address.** The service opens only from networks you choose (for example your office). It can be combined with sign-in as "require both" or "either is enough".
 - **Protect path by path.** Keep the site open while `/admin` is open only to signed-in people, close `/internal` completely, or open `/reports` to chosen people at chosen times.
 - **Send a share link.** Let someone without a Komuta account in for a while — a client demo or an outside tester — with a link that ends on its own.
-- **Let machines in.** Open paths that don't ask for sign-in for webhook senders such as GitHub and Stripe; give CI and monitoring tools a service token.
+- **Let machines in.** Open paths that don't ask for sign-in for webhook senders such as GitHub and Stripe, and let Komuta check their signatures; give CI and monitoring tools a service token.
 - **Limit countries, methods and request rates.** Admit visitors only from chosen countries, allow only the HTTP methods each path needs (and browsers' CORS checks), and answer `429` to an address that sends too many requests.
 - **Control sessions.** Choose how long a sign-in lasts, see who is signed in, and sign one person or everyone out.
 - **Set an end date.** End protection on a date; when it ends, keep the service locked or open it to everyone.
@@ -85,7 +85,7 @@ Turn on **Require Komuta sign-in**, enter your office addresses in the **IP allo
 
 ### Let a GitHub webhook in too
 
-On a protected service, on the **Machines** tab, use **Webhooks → Open a path** to open `/webhooks/github` for `POST`, and verify GitHub's signature (`X-Hub-Signature-256`) in your application.
+On a protected service, on the **Machines** tab, use **Webhooks → Open a path** to open `/webhooks/github` for `POST`, choose **GitHub (X-Hub-Signature-256)** as the **Signature check at the edge**, then add the signing secret under the path and paste the same secret into GitHub. Komuta then refuses unsigned requests before they reach your application. (Without the check, verify GitHub's signature in your application.)
 
 ### Protect every new service from the start
 

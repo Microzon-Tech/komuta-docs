@@ -14,7 +14,7 @@ Erişim korumasıyla şunları yapabilirsiniz:
 - **IP adresiyle sınırlayın.** Servis yalnızca belirlediğiniz ağlardan (örneğin ofisinizden) açılır. Giriş ile birlikte "ikisi birden" ya da "biri yeterli" olarak kullanılabilir.
 - **Yol yol koruyun.** Site açıkken `/admin`'i yalnızca giriş yapanlara açın, `/internal`'ı tamamen kapatın, `/raporlar`'ı yalnızca seçtiğiniz kişilere belirli saatlerde açın.
 - **Paylaşım bağlantısı gönderin.** Komuta hesabı olmayan birini — bir müşteri demosu ya da dışarıdan test eden biri — kendiliğinden sona eren bir bağlantıyla bir süreliğine içeri alın.
-- **Makinelere izin verin.** GitHub, Stripe gibi webhook göndericileri için giriş istemeyen yollar açın; CI ve izleme araçlarına servis token'ı verin.
+- **Makinelere izin verin.** GitHub, Stripe gibi webhook göndericileri için giriş istemeyen yollar açın ve imzalarını Komuta kontrol etsin; CI ve izleme araçlarına servis token'ı verin.
 - **Ülkeyi, yöntemi ve istek hızını sınırlayın.** Ziyaretçileri yalnızca seçtiğiniz ülkelerden kabul edin, her yolda yalnızca gereken HTTP yöntemlerine (ve tarayıcıların CORS kontrollerine) izin verin, çok fazla istek gönderen adrese `429` döndürün.
 - **Oturumları yönetin.** Bir girişin ne kadar süreceğini seçin, kimin içeride olduğunu görün, bir kişiyi ya da herkesi çıkarın.
 - **Süre koyun.** Korumayı belirli bir tarihte bitirin; bittiğinde kilitli kalsın ya da herkese açılsın.
@@ -85,7 +85,7 @@ Listedeki adreslerden gelenler giriş yapmadan girer; diğer herkes **Erişim k�
 
 ### GitHub webhook'u da gelebilsin
 
-Korumalı bir serviste **Makineler** sekmesinde **Webhook'lar → Yol aç** ile `/webhooks/github` yolunu `POST` için açın ve uygulamanızda GitHub'ın imzasını (`X-Hub-Signature-256`) doğrulayın.
+Korumalı bir serviste **Makineler** sekmesinde **Webhook'lar → Yol aç** ile `/webhooks/github` yolunu `POST` için açın, **Kenarda imza kontrolü** olarak **GitHub (X-Hub-Signature-256)**'ı seçin, ardından yolun altına imza sırrını ekleyip aynı sırrı GitHub'a yapıştırın. Komuta imzasız istekleri bundan sonra uygulamanıza ulaşmadan reddeder. (Kontrol seçmezseniz GitHub'ın imzasını uygulamanızda doğrulayın.)
 
 ### Her yeni servis baştan korunsun
 

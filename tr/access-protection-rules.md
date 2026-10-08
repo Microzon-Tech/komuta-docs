@@ -218,6 +218,7 @@ Her satırda yeşil onay (girer) ya da kırmızı çarpı (giremez) ve nedeni ya
 | **Servis token'ıyla girer** / **Paylaşım bağlantısıyla girer** | Token ya da bağlantı bu sayfayı açar. |
 | **{yol} kuralı engelliyor** | Bir **Tamamen engelle** kuralı. |
 | **{yol} üzerinde bu yönteme izin verilmiyor** | **Makineler** sekmesindeki bir yöntem kuralı burada `GET`'e izin vermiyor. |
+| "{yol} webhook imzasını kontrol eder ve yalnız listelediği yöntemleri kabul eder; bu istek uygulamaya ulaşmadan 401 ile reddedilir." | Sayfa, [imza kontrolü](access-protection-machines.md#kenarda-imza-kontrolü) olan bir webhook yolunun altında; imzalı yollar `GET` kabul etmez. |
 | **Ziyaretçinin ülkesi listede yok** | Ülke listesi reddediyor. |
 | **İzinli bir ağdan gelmesi gerekiyor ({yol})** | Bu yol için adres listede değil. |
 | **Giriş yapması gerekiyor ({yol})** | Giriş yapmamış biri. |

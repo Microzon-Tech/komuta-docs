@@ -65,7 +65,7 @@ Refusals of someone who hasn't signed in are recorded with less detail, so the l
 
 - The **Page** column shows **Any page** instead of the real path. This way someone scanning your site can't fill the log with thousands of different paths.
 - The **Address** column shows the first part of the network instead of the full address: `/24` for IPv4 (for example `203.0.113.0/24`), `/48` for IPv6.
-- Exception: if the refusal comes from a **Block completely** rule, an open path or a method rule, the **Page** column shows that rule's path (for example `/internal`). You chose those paths yourself, so you can see which rule was hit.
+- Exception: if the refusal comes from a **Block completely** rule, an open path (including its signature check) or a method rule, the **Page** column shows that rule's path (for example `/internal`). You chose those paths yourself, so you can see which rule was hit.
 - Refusals by the country list or the rate limit are always recorded this way, as **Not signed in**, even when the visitor had signed in: these checks run before Komuta looks at who the visitor is.
 
 Signed-in visitors' addresses are shown in full.
@@ -96,6 +96,9 @@ A visitor's address is shown when the request could be verified as coming throug
 | **Used a method this path does not allow** | Refused by a method rule (`405`). |
 | **Came from a country that is not allowed** | Refused by the country list. |
 | **Sent too many requests** | Refused by the rate limit (`429`). |
+| **Sent a webhook without a valid signature** | A signed webhook path refused a request with a missing or wrong signature, or a method the path doesn't take (`401`). |
+| **Sent a webhook to a path that has no signing secret yet** | The signed path has no signing secret (`401`). |
+| **Sent a webhook body larger than 64 KiB** | The body was too large to verify (`413`). |
 | **More visits this hour, grouped together** | The total of events that didn't fit into the log. |
 | **Refused ({code})** | A reason the console doesn't recognise; the technical code is shown in brackets. |
 

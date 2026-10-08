@@ -293,7 +293,7 @@ Goal: GitHub webhooks and the CI job's health check get in even though they can'
 - Other methods, such as `GET /webhooks/github`, are decided as if there were no open path and must pass the site's normal protection.
 - In the access log, deliveries appear as **Request on an open path** / **Delivered to an open path**.
 
-**What your application must do** — Komuta doesn't ask who sends requests on this path; your application must verify that a request really comes from GitHub. GitHub adds an `X-Hub-Signature-256` header to every request: the HMAC-SHA256 of the request's raw body with your webhook secret. A Node.js example:
+**What your application must do** — Without a signature check at the edge (see the recipe below), Komuta doesn't ask who sends requests on this path; your application must verify that a request really comes from GitHub. GitHub adds an `X-Hub-Signature-256` header to every request: the HMAC-SHA256 of the request's raw body with your webhook secret. A Node.js example:
 
 ```javascript copy
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -310,6 +310,21 @@ export function isFromGitHub(rawBody, signatureHeader, secret) {
 Refuse any request whose signature doesn't match. Also don't accept method-override headers such as `X-HTTP-Method-Override` on this path.
 
 **Check** — **Recent Deliveries** on the webhook page of your GitHub repository settings should show success, and the **Activity** tab should show a **Request on an open path** / **Delivered to an open path** row. If you run `curl -s -o /dev/null -w "%{http_code}\n" -X POST https://panel.example.com/webhooks/github` from your own computer you get `403`: your address isn't on the sender list. (The **Access preview** works out `GET` requests only, so for this `POST`-only path it shows the site's normal rule.)
+
+### Recipe: Receive GitHub webhooks with signature check
+
+Instead of verifying GitHub's signature in your application, you can let Komuta do it at the edge. If the **Signature check at the edge** choice says it isn't available, this isn't enabled on your platform yet; keep the check in your application. The check is chosen when a path is opened, so if you already opened `/webhooks/github` in Step 5.1, close it first.
+
+1. On the **Machines** tab, press **Webhooks → Open a path**: **Path** `/webhooks/github`, **Methods** `POST`, **Signature check at the edge** **GitHub (X-Hub-Signature-256)**. Fill in **Sender addresses** as in Step 5.1 if you like. Press **Open the path**.
+2. Under the new path, in **Signing secrets**, press **Add secret**, keep **Generate a strong secret**, press **Add secret** and copy the secret shown. It is shown only once.
+3. In your GitHub repository, open **Settings → Webhooks**, set **Payload URL** to `https://panel.example.com/webhooks/github`, **Content type** to `application/json` and paste the secret into **Secret**.
+4. Wait about a minute for the secret to reach the gateway.
+
+**Effect** — Only `POST` requests signed with your secret reach your application; anything else on `/webhooks/github` gets `401` (including `GET`), and a body larger than 65,535 bytes gets `413`. A large `push` event can exceed that limit; if your repository sends such events, keep the check in your application instead.
+
+**Check** — GitHub's **Recent Deliveries** should show success (redeliver the `ping` event if needed). `curl -s -o /dev/null -w "%{http_code}\n" -X POST -d '{}' https://panel.example.com/webhooks/github` from a listed address (or with an empty sender list) returns `401`: the request isn't signed. On the **Activity** tab, refusals appear as "Sent a webhook without a valid signature".
+
+**Rotating the secret** — add a second secret, switch GitHub to it, then remove the old one; both work in between. A path holds at most 2 secrets.
 
 ### Step 5.2 — A service token for the CI job
 
@@ -489,7 +504,7 @@ To set up the most advanced scenario on your own, it's enough to know the order 
 3. **Countries** — If the service has a [country list](access-protection-rules.md#countries), a visitor from another country, or whose country is unknown, is refused with `403`. Webhook paths skip this step, unless a share link is being opened on them.
 4. **Rate limit** — If the address has used up its [rate limit](access-protection-rules.md#rate-limit), the answer is `429`.
 5. **Share link** — If the address carries `?komuta_link=`, the link is checked (the IP lists still apply) and the visitor is sent on to the same address with a session, or refused with `403`.
-6. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply. If the address isn't on the list, the request is refused with `403`; the site's rules aren't tried.
+6. **Webhook (open) path** — If the path is under an open path and the method is chosen, the path's own sender list is checked and the request passes without sign-in. The rules of the site and of other paths don't apply. If the address isn't on the list, the request is refused with `403`; the site's rules aren't tried. If the path has a signature check, the body's signature is checked next (`401` without a valid signature, `413` for a body over 65,535 bytes). A request under a signed path that the path doesn't take gets `401` here too, instead of going on to the site's rules.
 7. **The site rule and every matching path rule** — The request must satisfy all of them. The IP address can satisfy a rule's IP condition; on rules with "either is enough", a listed address stands in for sign-in. If a rule can't be met even after signing in (an IP-only rule, or **Require both** from an unlisted address), the request is refused here with `403` and the **Access to this service is restricted** page; no sign-in page is shown. A browser's CORS check passes at this point if **Allow CORS checks without sign-in** is on.
 8. **Identity** — If an identity is still needed: if the request carries a service token, only the token is looked at; otherwise the visitor's session (a Komuta sign-in or a share link) and shares are looked at. The share's or link's page limit and the people rule's time window apply here. Without a session, `GET` and `HEAD` requests (from a browser or from `curl` alike) are sent to the sign-in page (`302`); other methods such as `POST` get `401`.
 
@@ -525,6 +540,8 @@ Before you add a new rule, ask yourself: "At which step is this request decided?
 | The CI token gets `403` | The path is outside the token's scope, or the IP rule is "require both" | Check **What it can open**; set the site rule to **Either is enough**. |
 | Webhooks get `403` | The sender list is incomplete or out of date | Add the whole `hooks` list from `https://api.github.com/meta` (IPv6 included); the **Came from an address that is not allowed** row on **Activity** shows the refused network. |
 | Webhooks get `302` or `401` | The method isn't chosen, or the path is wrong | Check the open path's methods and path. |
+| A signed webhook path answers `401` to every request | No signing secret yet, or the sender signs with another secret | Add the secret under the path and use the same one in the sender; check the **Activity** reason. |
+| Some webhooks get `413` | The body is larger than 65,535 bytes, the most a signed path can verify | Keep the signature check in your application for this sender. |
 | The application gets empty identity headers on some requests | The visitor came from the office address (even if signed in), or the page doesn't need sign-in | Protect the paths that need an identity with a sign-in rule. |
 | The team suddenly had to sign in again | Someone chose **Sign everyone out**, or a share was removed or narrowed while one-by-one sign-out wasn't active yet | This is expected; see Step 8.3. |
 | A browser on another site gets a CORS error | The browser's `OPTIONS` check carries no session and gets `401` | Turn on **Machines → Methods and CORS → Allow CORS checks without sign-in**. |

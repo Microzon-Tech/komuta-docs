@@ -65,7 +65,7 @@ Giriş yapmamış birinin geri çevrilmesi, kaydın kötüye kullanılmasını �
 
 - **Sayfa** sütununda gerçek yol yerine **Herhangi bir sayfa** yazar. Böylece sitenizi tarayan biri kaydı binlerce farklı yolla dolduramaz.
 - **Adres** sütununda tam adres yerine ağın ilk kısmı yazar: IPv4'te `/24` (örneğin `203.0.113.0/24`), IPv6'da `/48`.
-- İstisna: ret bir **Tamamen engelle** kuralından, bir açık yoldan ya da bir yöntem kuralından geliyorsa, **Sayfa** sütununda o kuralın yolu (örneğin `/internal`) görünür. Bu yolları zaten siz seçtiğiniz için hangi kuralın çalıştığını görebilirsiniz.
+- İstisna: ret bir **Tamamen engelle** kuralından, bir açık yoldan (imza kontrolü dahil) ya da bir yöntem kuralından geliyorsa, **Sayfa** sütununda o kuralın yolu (örneğin `/internal`) görünür. Bu yolları zaten siz seçtiğiniz için hangi kuralın çalıştığını görebilirsiniz.
 - Ülke listesinin ya da hız sınırının retleri, ziyaretçi giriş yapmış olsa bile her zaman bu şekilde, **Giriş yapmamış** olarak kaydedilir: bu kontroller Komuta ziyaretçinin kim olduğuna bakmadan önce yapılır.
 
 Giriş yapmış ziyaretçilerin adresi tam olarak gösterilir.
@@ -96,6 +96,9 @@ Ziyaretçinin adresi, istek Cloudflare üzerinden doğrulanabildiğinde görün�
 | **Bu yolun izin vermediği bir yöntem kullandı** | Bir yöntem kuralı reddetti (`405`). |
 | **İzin verilmeyen bir ülkeden geldi** | Ülke listesi reddetti. |
 | **Çok fazla istek gönderdi** | Hız sınırı reddetti (`429`). |
+| **Geçerli imzası olmayan bir webhook gönderdi** | İmzalı bir webhook yolu, imzası olmayan ya da yanlış olan veya yolun kabul etmediği bir yöntemle gelen isteği reddetti (`401`). |
+| **Henüz imza sırrı olmayan bir yola webhook gönderdi** | İmzalı yolun imza sırrı yok (`401`). |
+| **64 KiB'tan büyük bir webhook gövdesi gönderdi** | Gövde doğrulanamayacak kadar büyüktü (`413`). |
 | **Bu saatteki diğer ziyaretler, birlikte gruplandı** | Kayda sığmayan olayların toplamı. |
 | **Reddedildi ({kod})** | Arayüzün tanımadığı bir neden; parantez içinde teknik kod yazar. |
 

@@ -23,6 +23,7 @@ Erişim koruması rehberleri:
 | Yol kuralı | Serviste en fazla 50 (webhook yolları dahil); her yol için tek kural |
 | Yol uzunluğu | 2–256 karakter; `/` ile başlar; küçük harf, rakam ve `- . _ ~ ! $ & ' ( ) * + , = : @ /` |
 | Webhook (açık) yolu | En fazla 10; yöntemler `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE` |
+| İmzalı webhook yolu | Yalnızca `POST`, `PUT`, `PATCH`; gövde en fazla 65.535 bayt (yaklaşık 64 KiB); yol başına en fazla 2 imza sırrı; sır 8–512 bayt, boşluk ve kontrol karakteri yok; Stripe zamanı en fazla 300 saniye farklı; HMAC değer öneki en fazla 16 karakter |
 | Yöntem kuralı | Serviste en fazla 50 (yol kurallarından ayrı); yöntemler `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`; `/` yazılabilir; her yol için tek kural |
 | Ülkeler | En fazla 250 iki harfli ISO kodu; `XX` (bilinmeyen) ve `T1` (Tor) listelenemez |
 | Hız sınırı | 1–3600 saniyede 10–100.000 istek (konsolda saniyede, 10 saniyede, dakikada, 10 dakikada ya da saatte); adres başına, IPv6'da `/64` başına; her ağ geçidi kopyası ayrı saydığı için yaklaşık |
@@ -99,6 +100,9 @@ Uyarı kodlarının (`lastError`) anlamları [Erişim Koruması → Uyarılar ve
 | Bağlantıyla giren ziyaretçi, bağlantının dışındaki sayfa | `403` | `Your share link does not open this page.` |
 | Bağlantı silindikten ya da süresi dolduktan sonra bağlantıyla giren ziyaretçi | `403` | `The share link you opened this site with has ended. Ask the person who sent it for a new one.` |
 | **CORS kontrollerine girişsiz izin ver** açıkken tarayıcının CORS kontrolü | — | Uygulamaya iletilir (asıl istek yine giriş ister) |
+| İmzalı webhook yolu: imza yok ya da yanlış, ya da yolun kabul etmediği bir istek | `401` | `invalid webhook signature` |
+| İmza sırrı olmayan imzalı webhook yolu | `401` | `webhook signature cannot be checked` |
+| İmzalı webhook yolu, gövde 65.535 bayttan büyük | `413` | `webhook body too large to verify` |
 | Koruma bilgisi geçici olarak alınamıyor | `503` | `access policy unavailable` |
 | Giriş geçici olarak kullanılamıyor | `503` | `sign-in unavailable` |
 
@@ -155,6 +159,9 @@ Erişim kaydındaki teknik kodlar ve arayüzdeki karşılıkları:
 | `method_not_allowed` | Ret | Bu yolun izin vermediği bir yöntem kullandı |
 | `country_not_allowed` | Ret | İzin verilmeyen bir ülkeden geldi |
 | `rate_limited` | Ret | Çok fazla istek gönderdi |
+| `signature_invalid` | Ret | Geçerli imzası olmayan bir webhook gönderdi |
+| `signature_key_missing` | Ret | Henüz imza sırrı olmayan bir yola webhook gönderdi |
+| `webhook_body_too_large` | Ret | 64 KiB'tan büyük bir webhook gövdesi gönderdi |
 | `overflow` | Toplam | Bu saatteki diğer ziyaretler, birlikte gruplandı |
 
 `preflight` (**CORS kontrollerine girişsiz izin ver** ile geçirilen tarayıcı CORS kontrolü) ağ geçidinin kullandığı bir nedendir, ancak erişim kaydına yazılmaz.
@@ -201,6 +208,17 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtection:ServiceNotFound` | Servis bulunamadı ya da bu organizasyona ait değil. |
 | `DevOpsZon:AccessProtection:IdentityNeedsSignIn` | Ziyaretçi kimliği yalnızca Komuta girişi isteyen bir serviste uygulamaya iletilebilir. Önce girişi açın. |
 | `DevOpsZon:AccessProtection:IdentityNotAvailable` | Ziyaretçi kimliğini iletme bu platformda henüz açık değil. |
+
+### Webhook imzaları
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:PathRuleSignatureInvalid` | {Prefix} için imza kontrolü geçerli değil. İmzalı yol açık bir yoldur, yalnız POST, PUT ve PATCH kabul eder ve GitHub, Stripe ya da ağ geçidinin ilettiği bir HMAC başlığı kullanır. |
+| `DevOpsZon:AccessProtection:WebhookSignaturesNotAvailable` | Webhook imza kontrolü bu platformda henüz açık değil. |
+| `DevOpsZon:AccessProtection:WebhookKeyPathNotSigned` | {Prefix} imza kontrolü olan açık bir yol değil; webhook sırrı tutamaz. |
+| `DevOpsZon:AccessProtection:TooManyWebhookKeys` | İmzalı bir yol en fazla {Max} webhook sırrı tutabilir; gönderen yenisini kullanmaya başlayınca eskisini kaldırın. |
+| `DevOpsZon:AccessProtection:WebhookKeyNotFound` | Webhook sırrı bulunamadı. |
+| `DevOpsZon:AccessProtection:WebhookSecretInvalid` | Webhook sırrı boşluk ve kontrol karakteri içermeyen {Min} ile {Max} bayt arasında bir değerdir. |
 
 ### Ülkeler, hız sınırı ve yöntemler
 
@@ -349,8 +367,11 @@ Evet: **Kurallar** sekmesinde **Ülkeler** ve **Hız sınırı**, **Makineler** 
 **Uygulamam ziyaretçinin kim olduğunu nasıl öğrenir?**
 **Ayarlar** sekmesinde **Giriş yapanı uygulamama bildir**'i açın ve `x-komuta-identity` JWT'sini doğrulayın. Bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#giriş-yapanı-uygulamama-bildir).
 
+**Webhook imzalarını Komuta benim için kontrol edebilir mi?**
+Evet: webhook yolunu açarken bir **Kenarda imza kontrolü** (GitHub, Stripe ya da başka bir HMAC-SHA256 başlığı) seçin, ardından yolun altına imza sırrını ekleyin. İmzasız istekler uygulamanıza ulaşmadan `401` alır. İmzalı yollar yalnızca `POST`, `PUT` ve `PATCH` ile en fazla 65.535 baytlık gövdeleri kabul eder. Seçeneği görmüyorsanız platformunuzda henüz açık değildir. Bkz. [Kenarda imza kontrolü](access-protection-machines.md#kenarda-imza-kontrolü).
+
 **Webhook göndericisi GitHub'ın IP aralıklarını değiştirirse?**
-Gönderici adres listesi isteğe bağlıdır; asıl koruma uygulamanızın imza doğrulamasıdır. Listeyi kullanıyorsanız göndericinin yayımladığı aralıkları güncel tutun ya da listeyi boş bırakın.
+Gönderici adres listesi isteğe bağlıdır; asıl koruma kenarda ya da uygulamanızda yapılan imza doğrulamasıdır. Listeyi kullanıyorsanız göndericinin yayımladığı aralıkları güncel tutun ya da listeyi boş bırakın.
 
 **Koruma açıkken servisimi yeniden dağıtırsam ne olur?**
 Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
@@ -377,7 +398,8 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **İkisi birden gereksin / Biri yeterli** | IP listesi ile girişin birlikte nasıl değerlendirileceği. |
 | **Yol kuralı** | Belirli bir yol ve altındaki yollar için ek koruma ya da engelleme. |
 | **Yalnızca seçilen kişiler** | Bir yolu yalnızca seçilen paylaşımlara, isteğe bağlı saat aralığında açan yol kuralı. |
-| **Webhook yolu (açık yol)** | Seçilen yöntemlerle gelen istekleri giriş istemeden geçiren yol. Göndericinin imzasını uygulama doğrular. |
+| **Webhook yolu (açık yol)** | Seçilen yöntemlerle gelen istekleri giriş istemeden geçiren yol. Göndericinin imzasını Komuta (imza kontrolüyle) ya da uygulama doğrular. |
+| **İmza sırrı** | Webhook göndericisinin isteklerini imzaladığı ortak sır; Komuta bunu şifreli saklar ve imzalı bir webhook yolunda imzaları kontrol etmek için kullanır. |
 | **Servis token'ı** | Programların başlık olarak gönderdiği, giriş yerine geçen gizli anahtar. |
 | **Özel ağ (mesh)** | Kümeleriniz arasında genel internete çıkmayan bağlantı; ağ geçidinden geçmez. |
 | **Yöntem kuralı** | Bir yolun kabul ettiği HTTP yöntemleri; diğer yöntemler `405` alır. |
