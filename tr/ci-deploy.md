@@ -24,6 +24,19 @@ Token'lar `kmtd_` ile başlar. Bir serviste aynı anda en fazla 10 aktif token o
 
 ---
 
+## Sırsız Dağıtım (OIDC)
+
+GitHub Actions ve GitLab CI kullanıyorsanız CI'nızda hiç sır saklamadan dağıtım yapabilirsiniz. İş, CI sağlayıcısının imzaladığı kısa ömürlü bir kimlik token'ı (OIDC) sunar; Komuta imzayı sağlayıcının açık anahtarlarıyla doğrular ve isteği yalnızca güvendiğiniz depodan geliyorsa kabul eder.
+
+1. **Token oluştur**'da **CI'nız nasıl giriş yapacak** alanından **GitHub Actions OIDC** ya da **GitLab CI OIDC**'yi seçin.
+2. Depoyu girin: GitHub için `sahip/depo`, GitLab için `grup/proje`. İsterseniz bir **ortam** (ör. `production`) ekleyin; o zaman yalnızca bu ortamı kullanan işler dağıtım yapabilir.
+3. İzin verilen işlemler, dallar, imaj depoları ve IP listesi gizli token'larda olduğu gibi uygulanır. İşin çalıştığı dal da bu kurala tabidir: dal deseni girmediyseniz yalnızca servisin dalında çalışan işler, girdiyseniz desenlere uyan dallarda çalışan işler dağıtım yapabilir.
+4. Kod parçalarında **OIDC (sırsız)** seçeneğini açın.
+
+GitHub Actions işi `permissions: id-token: write` ister; GitLab CI işinde `id_tokens` altında `aud: https://api.komuta.io` olan bir `KOMUTA_ID_TOKEN` tanımlanır. Bu modda saklanacak, sızabilecek ya da yenilenmesi gereken bir sır yoktur.
+
+---
+
 ## Hazır Kod Parçaları
 
 **CI/CD entegrasyonu** sekmesi GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines ve `curl` için servisinize göre doldurulmuş, kopyalanmaya hazır örnekler verir. Her örnek deploy'u başlatır, sonucu bekler ve deploy başarısız olursa CI işini başarısız sayar. Sekmenin üstündeki **Derleyip dağıt / Hazır imaj dağıt** seçimiyle örnekler hazır imaj moduna geçer; bu modda betik, push ettiğiniz imajı digest ile `IMAGE` değişkeninden okur.
@@ -53,6 +66,16 @@ jobs:
 ```
 
 Sonucu bekleyen tam sürümü **CI/CD entegrasyonu** sekmesinden kopyalayın.
+
+---
+
+## Hazır Araçlar
+
+Kod parçalarını kopyalamak yerine resmi aracı da kullanabilirsiniz ([Microzon-Tech/komuta-deploy-action](https://github.com/Microzon-Tech/komuta-deploy-action)):
+
+- **GitHub Actions:** `uses: Microzon-Tech/komuta-deploy-action@v1` (`token` ve `service-id` girdileriyle; `token` boş bırakılırsa OIDC kullanılır).
+- **GitLab CI:** depodaki `gitlab/komuta-deploy.gitlab-ci.yml` şablonunu `include` edip `.komuta-deploy` işini genişletin.
+- **Herhangi bir CI:** `komuta-deploy.sh --service <SERVIS_ID> --ref main --wait`. `bash`, `curl` ve `jq` ister; deploy başarısız olursa sıfırdan farklı bir kodla çıkar.
 
 ---
 
@@ -134,6 +157,18 @@ Authorization: Bearer kmtd_...
 
 ---
 
+## İmzalı İmaj Zorunluluğu
+
+Hazır imaj (`image` modu) dağıtıyorsanız, servise yalnızca **sizin anahtarınızla imzalanmış** imajların dağıtılmasını zorunlu kılabilirsiniz. Ayar varsayılan olarak kapalıdır.
+
+1. Bir anahtar çifti oluşturun: `cosign generate-key-pair`. Özel anahtarı (`cosign.key`) CI'nızın gizli değişkenlerinde saklayın; Komuta'ya **asla** vermeyin.
+2. CI'da imajı push ettikten sonra digest'ini imzalayın: `cosign sign --key cosign.key registry.example.com/app@sha256:...`
+3. Servisin **Otomatik dağıtım → CI/CD entegrasyonu** sekmesindeki **İmzalı imajlar** kartına açık anahtarı (`cosign.pub`, `-----BEGIN PUBLIC KEY-----` ile başlar) yapıştırın ve ayarı açın.
+
+Ayar açıkken Komuta her `image` modu isteğinde imzayı doğrular. İmzasız ya da başka bir anahtarla imzalanmış imaj `403` ile reddedilir ve denetim kaydına geçer. İmza o an doğrulanamazsa (ör. imaj deposuna erişilemiyor) istek `503` döner; kısa süre sonra tekrar deneyin. ECDSA (cosign varsayılanı) ve en az 2048 bit RSA anahtarları kabul edilir.
+
+---
+
 ## Hata Kodları
 
 | HTTP | Ne zaman |
@@ -141,7 +176,7 @@ Authorization: Bearer kmtd_...
 | `400` | İstek geçersiz (eksik alan, tag'li imaj, sabitleme kapalıyken `commitSha`). |
 | `401` | Token geçersiz, iptal edilmiş ya da süresi dolmuş. |
 | `402` | Hesabın ödemesi askıda. |
-| `403` | İşlem, branch, imaj deposu ya da IP adresi token'ın izinleri dışında. |
+| `403` | İşlem, branch, imaj deposu ya da IP adresi token'ın izinleri dışında; ya da imzalı imaj zorunluyken imaj sizin anahtarınızla imzalanmamış. |
 | `404` | Servis bu token'a ait değil ya da deploy bulunamadı. |
 | `409` | Aynı `clientRequestId` farklı bir gövdeyle gönderildi ya da deploy artık iptal edilemiyor. |
 | `429` | İstek sınırı aşıldı. `Retry-After` başlığındaki süre kadar bekleyip tekrar deneyin. |

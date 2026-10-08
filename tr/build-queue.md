@@ -9,11 +9,11 @@ Komuta'da her deploy önce bir build ile başlar. Build'ler paylaşılan derleme
 Bir build'in hemen başlayıp başlamayacağına şu kurallar karar verir:
 
 - **Aynı servisin build'leri sırayla çalışır.** Bir servisin önceki build'i bitmeden yenisi başlamaz.
-- **Hesap kademenizin eşzamanlı build sınırı vardır.** Hesabınızda aynı anda çalışabilen build sayısı hesap kademenize bağlıdır; sınır doluysa yeni build bir slotun boşalmasını bekler. Kademeniz ve bir üst kademeye nasıl geçeceğiniz **Hesap → Cüzdan** sayfasında görünür.
+- **Hesap seviyenizin eşzamanlı build sınırı vardır.** Hesabınızda aynı anda çalışabilen build sayısı hesap seviyenize bağlıdır; sınır doluysa yeni build bir slotun boşalmasını bekler. Seviyeniz ve bir üst seviyeye nasıl geçeceğiniz **Hesap → Cüzdan** sayfasında görünür.
 - **Kiracılar arasında adil sıra uygulanır.** Bir hesabın çok sayıda build'i kuyruktayken başka bir hesabın tek build'i öne geçebilir; hiçbir hesap kuyruğu tek başına tutamaz.
 - **Derleme kapasitesi gerçek ölçüme göre açılır.** Build ancak onu taşıyabilecek boş kapasite olduğunda başlar.
 
-| Hesap kademesi | Eşzamanlı build | Kuyrukta en fazla |
+| Hesap seviyesi | Eşzamanlı build | Kuyrukta en fazla |
 |------|-----------------|-------------------|
 | Starter | 1 | 5 |
 | Verified | 1 | 10 |
@@ -30,7 +30,7 @@ Kuyruktaki her build, neden beklediğini gösterir:
 | Neden | Anlamı |
 |-------|--------|
 | Bu servisin önceki build'inin bitmesi bekleniyor | Aynı servisin bir build'i hâlâ çalışıyor. O bitince bu build başlar. |
-| Planınızın build slotu bekleniyor | Hesabınızın eşzamanlı build sınırı dolu. Bir build bitince başlar; daha fazla eşzamanlı build için hesap kademenizi yükseltebilirsiniz. |
+| Planınızın build slotu bekleniyor | Hesabınızın eşzamanlı build sınırı dolu. Bir build bitince başlar; daha fazla eşzamanlı build için hesap seviyenizi yükseltebilirsiniz. |
 | Build kapasitesinin boşalması bekleniyor | Platformdaki derleme kapasitesi o an dolu. Kapasite açıldığında başlar. |
 | Boş bir build yuvası bekleniyor | Platform genelindeki eşzamanlı build sınırı dolu. |
 | Build kapasitesi şu an okunamıyor, build'ler tek tek başlatılıyor | Kapasite geçici olarak ölçülemiyor; bu sürede build'ler tek tek başlatılır. |
@@ -51,7 +51,7 @@ Kuyruktaki build'ler için Komuta, ne zaman başlayacağını tahmin eder ("Yakl
 
 - Servisin son başarılı build'lerinin tipik süresi.
 - Hesabınızda o an çalışan build'lerin kalan süresi.
-- Hesap kademenizin eşzamanlı build sınırı ve kuyruktaki sıranız.
+- Hesap seviyenizin eşzamanlı build sınırı ve kuyruktaki sıranız.
 
 Build platform kapasitesini bekliyorsa tahmin gösterilmez; bu durumda başlama zamanı başka hesapların build'lerine bağlıdır ve güvenilir bir süre verilemez.
 

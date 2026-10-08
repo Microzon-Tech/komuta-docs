@@ -1,4 +1,6 @@
-# Ports
+# Access & Ports
+
+The **Service Detail → Configuration → Access & ports** page shows who can open the service's public URL (access protection) and which port traffic enters through. The **Public exposure** summary at the top shows step by step how traffic reaches the service (domains → gateway → access control → ports → pods).
 
 Ports determine which door traffic enters your service through and which port inside the application it's routed to. If a service is going to receive requests from outside, at least one port must be defined.
 
@@ -34,7 +36,7 @@ Once enabled, the clusters that can reach it are listed; setting up the connecti
 
 ## Access Protection
 
-The **Access protection** card on the Ports page decides who can open the service's public URL: visitors can be asked to sign in with Komuta, access can be limited to specific IP addresses, or both. See [Service Access Protection](service-access-protection.md) for details.
+The page's **Rules**, **People**, **Machines**, **Activity** and **Settings** tabs manage access protection: visitors can be asked to sign in with Komuta, access can be limited to specific IP addresses, specific paths can be protected further or closed, and webhooks and CI tools can be let in separately. Ports, the public URL and the private mesh are on the **Network** tab. See [Access Protection](service-access-protection.md) for details.
 
 ---
 
@@ -42,4 +44,4 @@ The **Access protection** card on the Ports page decides who can open the servic
 
 - [Ingress and Domains](ingress-domains.md) — Managing addresses exposed to the outside world.
 - [Service Dashboard](service-dashboard.md) — Traffic flow from ingress to pods.
-- [Service Access Protection](service-access-protection.md) — Protecting the service's public URL with sign-in and an IP allow-list.
+- [Service Access Protection](service-access-protection.md) — Protecting the service's public URL with sign-in, an IP allow-list and path rules.

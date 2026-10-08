@@ -24,6 +24,19 @@ Tokens start with `kmtd_`. A service can have at most 10 active tokens at a time
 
 ---
 
+## Deploying Without a Secret (OIDC)
+
+If you use GitHub Actions or GitLab CI, you can deploy without storing any secret in your CI. The job presents a short-lived identity token (OIDC) signed by the CI provider; Komuta verifies the signature with the provider's public keys and accepts the request only when it comes from the repository you trust.
+
+1. In **Create token**, pick **GitHub Actions OIDC** or **GitLab CI OIDC** under **How your CI signs in**.
+2. Enter the repository: `owner/repo` for GitHub, `group/project` for GitLab. Optionally add an **environment** (for example `production`); then only jobs that use that environment can deploy.
+3. Allowed actions, branches, image repositories and the IP allowlist apply as they do for secret tokens. The branch the job runs on follows the same rule: without branch patterns only jobs running on the service's branch can deploy; with patterns, jobs on matching branches can.
+4. Switch the snippets to **OIDC (no secret)**.
+
+The GitHub Actions job needs `permissions: id-token: write`; the GitLab CI job declares a `KOMUTA_ID_TOKEN` under `id_tokens` with `aud: https://api.komuta.io`. In this mode there is no secret to store, leak or rotate.
+
+---
+
 ## Ready-made Snippets
 
 The **CI/CD integration** tab provides copy-ready examples filled in for your service, for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines and `curl`. Each one starts the deploy, waits for the result, and fails the CI job if the deploy fails. The **Build and deploy / Deploy a ready-made image** switch above the snippets turns them into image mode; there the script reads the image you pushed, pinned by digest, from the `IMAGE` variable.
@@ -53,6 +66,16 @@ jobs:
 ```
 
 Copy the full version that waits for the result from the **CI/CD integration** tab.
+
+---
+
+## Ready-made Tools
+
+Instead of copying a snippet you can use the official tool ([Microzon-Tech/komuta-deploy-action](https://github.com/Microzon-Tech/komuta-deploy-action)):
+
+- **GitHub Actions:** `uses: Microzon-Tech/komuta-deploy-action@v1` with the `token` and `service-id` inputs; leave `token` empty to use OIDC.
+- **GitLab CI:** `include` the repository's `gitlab/komuta-deploy.gitlab-ci.yml` template and extend the `.komuta-deploy` job.
+- **Any CI:** `komuta-deploy.sh --service <SERVICE_ID> --ref main --wait`. It needs `bash`, `curl` and `jq`, and exits non-zero when the deploy fails.
 
 ---
 
@@ -134,6 +157,18 @@ Authorization: Bearer kmtd_...
 
 ---
 
+## Requiring Signed Images
+
+If you deploy ready-made images (`image` mode), you can require that only images **signed with your key** are deployed to the service. It is off by default.
+
+1. Create a key pair: `cosign generate-key-pair`. Keep the private key (`cosign.key`) in your CI's secrets; **never** give it to Komuta.
+2. In CI, after pushing the image, sign its digest: `cosign sign --key cosign.key registry.example.com/app@sha256:...`
+3. On the service's **Auto-deploy → CI/CD integration** tab, paste the public key (`cosign.pub`, starting with `-----BEGIN PUBLIC KEY-----`) into the **Signed images** card and turn it on.
+
+While it is on, Komuta verifies the signature of every `image` mode request. An unsigned image, or one signed with another key, is rejected with `403` and recorded in the audit log. If the signature cannot be verified right now (for example the registry is unreachable) the request returns `503`; try again shortly. ECDSA keys (the cosign default) and RSA keys of at least 2048 bits are accepted.
+
+---
+
 ## Error Codes
 
 | HTTP | When |
@@ -141,7 +176,7 @@ Authorization: Bearer kmtd_...
 | `400` | The request is invalid (missing field, image by tag, `commitSha` while pinning is off). |
 | `401` | The token is invalid, revoked or expired. |
 | `402` | The account's billing is suspended. |
-| `403` | The action, branch, image repository or IP address is outside the token's permissions. |
+| `403` | The action, branch, image repository or IP address is outside the token's permissions, or signed images are required and the image is not signed with your key. |
 | `404` | The service does not belong to this token, or the deploy was not found. |
 | `409` | The same `clientRequestId` was sent with a different body, or the deploy can no longer be cancelled. |
 | `429` | A rate limit was hit. Wait for the `Retry-After` header and try again. |

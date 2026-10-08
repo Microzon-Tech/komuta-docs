@@ -1,4 +1,6 @@
-# Portlar
+# Erişim ve Portlar
+
+**Servis Detay → Yapılandırma → Erişim ve portlar** sayfası, servisin genel URL'ini kimlerin açabileceğini (erişim koruması) ve trafiğin hangi porttan gireceğini bir arada gösterir. Sayfanın üstündeki **Genel erişim** özeti, trafiğin servise nasıl ulaştığını adım adım (alan adları → ağ geçidi → erişim kontrolü → portlar → pod'lar) gösterir.
 
 Portlar, servisinize trafiğin hangi kapıdan gireceğini ve uygulamanın içindeki hangi porta yönleneceğini belirler. Bir servis dışarıdan istek alacaksa en az bir port tanımlı olmalıdır.
 
@@ -34,7 +36,7 @@ Açıldıktan sonra hangi cluster'ların erişebildiği listelenir; bağlantı k
 
 ## Erişim Koruması
 
-Portlar sayfasındaki **Erişim koruması** kartı, servisin genel URL'ini kimlerin açabileceğini belirler: ziyaretçilerden Komuta ile giriş istenebilir, erişim belirli IP adresleriyle sınırlanabilir ya da ikisi birlikte kullanılabilir. Ayrıntılar için [Servis Erişim Koruması](service-access-protection.md) dokümanına bakın.
+Sayfanın **Kurallar**, **Kişiler**, **Makineler**, **Etkinlik** ve **Ayarlar** sekmeleri erişim korumasını yönetir: ziyaretçilerden Komuta ile giriş istenebilir, erişim belirli IP adreslerine sınırlanabilir, belirli yollar ayrıca korunabilir ya da kapatılabilir, webhook'lar ve CI araçları için ayrı izinler verilebilir. Portlar, genel URL ve özel ağ **Ağ** sekmesindedir. Ayrıntılar için [Erişim Koruması](service-access-protection.md) dokümanına bakın.
 
 ---
 
@@ -42,4 +44,4 @@ Portlar sayfasındaki **Erişim koruması** kartı, servisin genel URL'ini kimle
 
 - [Ingress ve Domainler](ingress-domains.md) — Dış dünyaya açılan adreslerin yönetimi.
 - [Servis Dashboard](service-dashboard.md) — Trafiğin ingress'ten pod'lara akışı.
-- [Servis Erişim Koruması](service-access-protection.md) — Servisin genel URL'ini giriş ve IP izin listesiyle korumak.
+- [Servis Erişim Koruması](service-access-protection.md) — Servisin genel URL'ini giriş, IP izin listesi ve yol kurallarıyla korumak.
