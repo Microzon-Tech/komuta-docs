@@ -4,6 +4,26 @@ Komuta Security Center; güvenlik bulgularını, servis korumasını, erişim et
 
 Risk özetinden ilgili bulguya geçebilir, bulguyu servis trafiği ve koruma durumuyla karşılaştırabilir, politika önerilerini değerlendirebilir ve bir kararın arkasındaki kayıtları takip edebilirsiniz. Aynı çalışma alanı bu incelemeleri denetim geçmişi, derleme ve imaj kanıtları, kontrollü güvenlik senaryoları ve bildirim akışlarıyla ilişkilendirir.
 
+## Çalışma Zamanı Güvenliği: çalışan servislerinizi anlayın ve koruyun
+
+Çalışma Zamanı Güvenliği, uygulamanız çalışırken gerçekleşen davranışları incelemenizi ve desteklenen koruma kontrollerini yönetmenizi sağlar. Komuta; işlem çalıştırma, dosya erişimi ve ağ bağlantılarıyla ilgili mevcut kanıtları bulgular, kurallar ve servis duruşuyla ilişkilendirir. Böylece şüpheli davranıştan ilgili servise, incelemeden hedefli müdahaleye ilerleyebilirsiniz.
+
+| Yetenek | Size ne sağlar? |
+|---|---|
+| **Davranış gözlemleri ve bulgular** | Kaydedilmiş program çalıştırma, dosya yazma ve ağ girişimlerini inceleyin; önem derecesini, tekrarları ve olay zaman çizelgesini birlikte değerlendirin. |
+| **Trafik görünürlüğü** | Bağlantı akışlarını, ağ olaylarını ve reddedilen bağlantıları inceleyerek servisin beklenen iletişimiyle karşılaştırın. |
+| **Davranış kuralları ve öneriler** | Desteklenen işlem ve dosya davranışları için Denetim veya Engelle kuralları tanımlayın; önerileri dayandıkları kanıtla değerlendirin ve uygulama durumunu takip edin. |
+| **Temel koruma ve canlı duruş** | Beklenen güvenlik ayarlarını çalışan servisin durumuyla karşılaştırın; izin verilen ayrıcalıkları ve yazılabilir alanları uygulamanın ihtiyacına göre dar kapsamda yönetin. |
+| **Servis izolasyonu ve geri dönüş** | Uygun bir servis için yetkili müdahale akışından bağlantıları sınırlandırın; önizlemede etkiyi değerlendirin ve yeniden bağlama sonucunu takip edin. |
+| **Kontrollü doğrulama** | Desteklenen güvenlik senaryolarıyla beklenen bulgunun oluşup oluşmadığını ve tespit zamanını inceleyin. |
+
+**Güvenlik Merkezi**, bu yeteneklerin organizasyon genelindeki risk ve bulgu görünümüdür. Belirli bir servisin trafiği, koruma ayarları ve ayrıntılı kanıtları için **Servislerim → ilgili servis → Güvenlik** alanına geçin. Kullanılabilir kontroller servis ortamına ve yetkilerinize bağlıdır; etkili korumayı uygulama durumu ve ilgili sonuç kanıtıyla değerlendirin.
+
+Ayrıntılı kullanım rehberleri **Servislerim → Servis Güvenliği** altında yer alır:
+
+- [Çalışma Zamanı Güvenliği](runtime-security-guide.md): koruma katmanları, çalışma zamanı modları, kural eylemleri, uygunluk ve doğrulama adımları.
+- [Servis Güvenliği](service-security-guide.md): Genel Bakış, Trafik, Koruma ve Bulgular sekmelerinde adım adım inceleme ve yetkili müdahale.
+
 > **Doğru bağlamla başlayın:** organizasyonu, servisi, zaman aralığını ve kanıtın güncelliğini doğrulayın. Kaydedilmiş koruma ayarı amacı gösterir; uygulama durumu ve gözlenen sonuçlar ne olduğunu açıklar.
 
 ## Nereden başlamalısınız?
