@@ -41,9 +41,21 @@ Ağ kurallarını, iş yükü sıkılaştırmasını, derleme kanıtını ve izo
 
 Kullanılamayan kart bulgu değildir; görünmeyen kart da tam koruma kanıtı değildir. Uygunluk bilinmiyorsa desteklenen kapsamı servis sorumlunuzla veya Komuta desteğiyle netleştirin.
 
-![Yönetilen izole çalışma zamanında desteklenen servis güvenliği yetenekleri](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+![Admin test servisinde host runtime tespiti ve engelleme dahil desteklenen beş yetenek](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/admin-runtime-capabilities.jpg)
 
-*komuta-test-app genel bakışında bu çalışma ortamına uygulanabilen ağ tespiti, iş yükü izolasyonu, tedarik zinciri ve uygulama katmanı yetenekleri listelenir. Destekleniyor etiketi, korumanın etkinliğine ilişkin bir test sonucu değildir.*
+*Admin test ortamındaki komuta-test-app, host runtime tespiti ve engelleme dahil beş yeteneği destekliyor. Destekleniyor etiketi, tek başına korumanın etkinliğine ilişkin bir test sonucu değildir.*
+
+### Yönetilen PaaS ile admin test ortamını ayırın
+
+**Komuta'nın yönetilen izole VM/Kata PaaS'ında host runtime süreç/dosya/sistem çağrısı tespiti, host runtime engelleme ve HoneyPath erişim tespiti desteklenmez.** Bu rehberdeki admin test servisi host tarafından gözlenebilen, Kata kullanmayan ortamda çalışır. Oradaki başarılı engellemeyi PaaS sonucu olarak sunmayın.
+
+![Yönetilen izole PaaS servisinde ağ, izolasyon, tedarik zinciri ve uygulama katmanı yetenekleri](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*Yönetilen izole çalışma zamanından ayrı bir örnek: ağ tespiti, iş yükü izolasyonu, tedarik zinciri ve uygulama katmanı gösterilir. Host runtime desteği bu listeden çıkarılamaz.*
+
+Ağ katmanı izole çalışma zamanında da uygulanabilir. Uygun müşteri servisini izole etme ve yeniden bağlama, host runtime engellemesinden bağımsızdır. Bulgu inceleme kararları mevcut kayıt ve yetkiyle kullanılabilir; kayıt bulunması, o ortamda host runtime olayının üretilebildiğini kanıtlamaz. Erişim koruması, derleme/imaj kanıtı ve sıkılaştırma kendi uygunluklarıyla değerlendirilir.
+
+Aksiyon bazında PaaS desteği ve gerçek form görselleri için [Servis Güvenliği](service-security-guide.md), HoneyPath kurulum görselleri için [Güvenlik Merkezi](security-center-guide.md) rehberine bakın.
 
 ## Çalışma zamanı modu ve koruma eylemi
 
@@ -136,6 +148,29 @@ Başlamadan önce hedef, uygun çalışma ortamı, beklenen sinyal, izin verilen
 Sırf bulgu oluşturmak için hassas veya tuzak yollara erişmeyin. Eksik sinyal; kaynak, izin, filtre veya uygunluk sorununa işaret edebilir. Testi tekrarlamadan önce belirsizliği araştırın.
 
 Tespit edilen senaryo, o senaryoda gözlenen davranışı gösterir. Bütün saldırıların önlendiğini veya her servisin kapsandığını kanıtlamaz.
+
+### Örnek: test sonucunu Komuta kanıtıyla eşleştirin
+
+8 Ekim 2026'da admin test ortamındaki **komuta-test-app** üzerinde **İkili bırak ve çalıştır** senaryosunu çalıştırdık. Senaryo, geçici dizine bir program kopyalayıp çalıştırmayı dener. Aşağıda test uygulamasının gerçek ret sonucu yer alır.
+
+![komuta-test-app içinde İkili bırak ve çalıştır senaryosunun Engellendi sonucu](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-test-result.jpg)
+
+*Test uygulaması `/tmp/komuta-dropped` için `permission denied` döndürdü. Üstteki “M2M ingest yapılandırıldı” bilgisi, kimlik doğrulamanın başarılı olduğunu göstermez; bu yerel test doğrudan sentetik veri gönderimine dayanmaz.*
+
+Ardından **Servislerim → komuta-test-app → Güvenlik → Bulgular** yolundan aynı işlemin kaydını açtık. Bulgu, politika engelini ve test saatiyle eşleşen **Son görülme** bilgisini gösteriyor. Servis Audit modundayken de mevcut, açık bir Engelle kuralı ilgili işlemi reddedebilir.
+
+![Komuta arayüzünde testle eşleşen politika engeli bulgusu](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Test sonucu ile Komuta'daki kaynak, hedef işlem ve zamanın eşleşmesi bu örneğin engelleme kanıtıdır. İlk görülme ve tekrar sayısı önceki koşuları da içerir; bunları bu koşuda üretilen olay sayısı olarak okumayın.*
+
+| Testte görülen sonuç | Nasıl yorumlanır? |
+|---|---|
+| **İzin verildi** | İşlem çalışabildi; Audit kapsamındaki bir davranış yine de bulgu üretebilir. |
+| **Engellendi / permission denied** | Ret oluştu; hangi katmanın reddettiğini Komuta'daki eşleşen kanıtla doğrulayın. |
+| **Bağlantı zaman aşımı** | Ulaşılabilirlik sorunu da olabilir; tek başına ağ politikası engeli saymayın. |
+| **Çalıştırılmadı / invalid_client** | Sentetik veri gönderimi kimlik doğrulamada durdu; tespit veya engelleme başarıyla sınanmış değildir. |
+
+Bu örnek için koruma ayarlarını değiştirmedik. Gerçek çalışma zamanı testleri ile doğrudan sentetik veri gönderimini ayrı değerlendirin; biri diğerinin toplama ve engelleme zincirini doğrulamaz.
 
 ## Sık karşılaşılan senaryolar
 

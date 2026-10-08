@@ -28,6 +28,32 @@ Detailed usage guides are under **Services → Service Security**:
 
 > **Start with the right context:** confirm the organization, service, time window and freshness of the evidence. A saved protection setting describes intent; application status and observed outcomes tell you what happened.
 
+### Which capabilities work on PaaS?
+
+**PaaS here means Komuta's managed isolated VM/Kata runtime.** The real tests below ran in the non-Kata admin environment; their host runtime results do not prove support or success on PaaS. In mixed environments, check the individual service's capability card after the organization summary.
+
+| Capability | Managed isolated PaaS |
+|---|---|
+| Reading findings; Acknowledge, Allow, Mark as threat, Dismiss and Resolve | **Supported:** subject to an existing finding, its state and permissions. |
+| Host-based process, file and system-call detection | **Unsupported / not applicable:** the host cannot observe inside the isolated guest. |
+| Host runtime blocking and active sensor enforcement | **Unsupported / not applicable.** The admin test does not validate this scope. |
+| HoneyPath / canary-file access detection | **Unsupported / not applicable:** it depends on the same host observation boundary. |
+| Network visibility, network rules and eligible network suggestions | **Supported:** relevant sources, controls and permissions must also be available. |
+| Isolating and reconnecting a customer workload's network | **Supported:** requires an eligible deployed customer service; platform services are protected. |
+| Public access protection, supply chain and workload hardening | **Assess their own conditions:** the host runtime limitation does not automatically disable them. |
+
+**Unsupported** describes a runtime capability boundary. **Unavailable** can also mean missing permission, target, deployment or prerequisites. **Stale/incomplete evidence** is a separate data condition. See [Service Security](service-security-guide.md) for action-by-action screenshots and PaaS availability.
+
+### A real runtime finding
+
+In this example, **komuta-test-app** in the admin test environment attempted to execute a program it had placed in a temporary directory. The Komuta finding reports that a policy blocked the operation and shows when it was last seen. Match the test result to its source, operation and time when investigating.
+
+![Komuta finding details showing a runtime policy block and last-seen time](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Real test on 8 October 2026, shown in the Turkish UI: execution of `/tmp/komuta-dropped` was denied. A deduplicated finding can have an older first-seen date; check last-seen time for this run. This result verifies only the operation and rule scope shown.*
+
+Continue to [Runtime Security](runtime-security-guide.md) to compare the test screen with its evidence, or [Service Security](service-security-guide.md) for the steps to open finding details.
+
 ## Choose your starting point
 
 | Your goal | Start here |
@@ -167,6 +193,26 @@ Honey paths are decoy paths intended to attract attention when accessed unexpect
 With the required management permission, select an eligible service to add a path, edit its configuration, change its enabled state or remove it. Review the saved entry and detection history after the action. Confirm that the path is suitable for the application and will not overlap legitimate activity. An enabled setting is not a detected event. Investigate a recorded hit using its service, time and evidence; it still needs context before being classified as an incident.
 
 Do not open or modify a decoy path merely to check whether it works. Use a separately approved scenario with an explicit target and expected outcome.
+
+### Read the HoneyPath screens
+
+**PaaS: unsupported on the managed isolated VM/Kata runtime.** HoneyPath is available for eligible host-observable workloads. It is a different feature from network isolation and public access protection.
+
+![HoneyPath page showing application selection and detection scope](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/honey-path-overview.jpg)
+
+*Select the correct application first. The screen distinguishes detection, blocking and notification delivery. Do not interpret an empty detection count as a safe state without checking applicability and source health.*
+
+![New HoneyPath form with the reserved path, description and Active setting](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/honey-path-create.jpg)
+
+*Filled form in the admin test environment, shown in Turkish; **not saved, deployed or accessed**. `/opt/komuta/canary/docs-example` is only a form example, not an existing test record.*
+
+1. **Absolute path:** enter a reserved path below `/opt/komuta/canary/`; do not use legitimate application files.
+2. **Description:** record the purpose, owner and intended test scope.
+3. **Active:** expresses the desired enabled state of the file and monitoring policy. A disabled entry remains in the catalog; the next configuration deployment removes its file and live monitoring policy.
+4. **Save:** does more than create a catalog entry; it queues a configuration deployment to apply the file and monitoring policy. Inspect the deployment result separately.
+5. **After a detection:** match the service, target path, time and source evidence in the finding. Distinguish an authorized test from unexpected access, then select the appropriate review decision or supported response.
+
+Editing, disabling or deleting can also affect file/policy scope; verify the target record first. These screenshots show setup previews, not a claim of successful end-to-end HoneyPath detection.
 
 ## Audit Log, sign-ins and personal security
 

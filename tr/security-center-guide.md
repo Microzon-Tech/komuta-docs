@@ -28,6 +28,32 @@ Ayrıntılı kullanım rehberleri **Servislerim → Servis Güvenliği** altınd
 
 > **Doğru bağlamla başlayın:** organizasyonu, servisi, zaman aralığını ve kanıtın güncelliğini doğrulayın. Kaydedilmiş koruma ayarı amacı gösterir; uygulama durumu ve gözlenen sonuçlar ne olduğunu açıklar.
 
+### PaaS'ta hangi yetenekler kullanılabilir?
+
+**Bu rehberde PaaS, Komuta'nın yönetilen izole VM/Kata çalışma zamanıdır.** Aşağıdaki gerçek testler, Kata kullanmayan admin ortamında yapıldı; buradaki host runtime sonuçları PaaS için destek veya başarı kanıtı değildir. Karma ortamlarda organizasyon özetinden sonra ilgili servisin yetenek kartını kontrol edin.
+
+| Yetenek | Yönetilen izole PaaS |
+|---|---|
+| Bulgu okuma; Onayla, İzin ver, Tehdit, Yoksay ve Çöz kararları | **Desteklenir:** mevcut bulgu, durum ve yetki koşullarıyla. |
+| Host üzerinden süreç, dosya ve sistem çağrısı tespiti | **Desteklenmez / uygulanamaz:** izole misafirin içi host tarafından gözlenemez. |
+| Host runtime engelleme ve sensörün aktif yaptırımı | **Desteklenmez / uygulanamaz.** Admin testindeki engelleme bu kapsamı doğrulamaz. |
+| HoneyPath / canary dosyasına erişim tespiti | **Desteklenmez / uygulanamaz:** aynı host gözlem sınırına bağlıdır. |
+| Ağ görünürlüğü, ağ kuralları ve uygun ağ önerileri | **Desteklenir:** ilgili kaynak, kontrol ve yetkilerin kullanılabilirliği ayrıca gerekir. |
+| Müşteri iş yükünü ağdan izole etme ve yeniden bağlama | **Desteklenir:** uygun ve dağıtılmış müşteri servisi gerekir; platform servisleri korunur. |
+| Erişim koruması, tedarik zinciri ve iş yükü sıkılaştırması | **Kendi koşullarıyla değerlendirilir:** host runtime kısıtı bunları otomatik olarak kapatmaz. |
+
+**Desteklenmiyor**, çalışma ortamının yetenek sınırıdır. **Kullanılamıyor**, yetki, hedef, dağıtım veya önkoşul eksikliğini de ifade edebilir. **Eski/eksik kanıt** ise destekten ayrı bir veri durumu problemidir. Ayrıntılı aksiyon görselleri ve her birinin PaaS durumu [Servis Güvenliği](service-security-guide.md) rehberindedir.
+
+### Gerçek bir çalışma zamanı bulgusu
+
+Aşağıdaki örnekte admin test ortamındaki **komuta-test-app**, geçici dizine bıraktığı programı çalıştırmayı denedi. Komuta'daki bulgu, ilgili işlemin politika tarafından engellendiğini ve son görülme zamanını gösterir. Böylece test sonucunu kaynak, işlem ve zamanla eşleştirerek inceleyebilirsiniz.
+
+![Komuta bulgu ayrıntısında çalışma zamanı politika engeli ve son görülme zamanı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*8 Ekim 2026 tarihli gerçek test: `/tmp/komuta-dropped` çalıştırma girişimi reddedildi. Tekilleştirilmiş bulgunun ilk görülmesi daha eski olabilir; bu koşu için son görülme zamanını kontrol edin. Bu sonuç yalnızca ilgili işlem ve kural kapsamını doğrular.*
+
+Test ekranı ile kanıtı karşılaştırmak için [Çalışma Zamanı Güvenliği](runtime-security-guide.md), bulgu ayrıntısını açma adımları için [Servis Güvenliği](service-security-guide.md) rehberine geçin.
+
 ## Nereden başlamalısınız?
 
 | Amacınız | Başlangıç noktası |
@@ -167,6 +193,26 @@ Honey path'ler, beklenmedik erişimde dikkat çekmesi amaçlanan tuzak yollardı
 Gerekli yönetim yetkisiyle uygun servisi seçerek yol ekleyebilir, yapılandırmasını düzenleyebilir, etkinlik durumunu değiştirebilir veya kaldırabilirsiniz. İşlem sonrasında kaydedilmiş girdiyi ve tespit geçmişini inceleyin. Yolun uygulamaya uygun olduğunu ve meşru etkinlikle çakışmayacağını doğrulayın. Etkin ayar, tespit edilmiş olay değildir. Kaydedilen erişimi servisi, zamanı ve kanıtlarıyla inceleyin; olay olarak sınıflandırmadan önce bağlamını değerlendirin.
 
 Çalışıp çalışmadığını görmek için tuzak yolu açmayın veya değiştirmeyin. Açık hedefi ve beklenen sonucu olan, ayrıca onaylanmış bir senaryo kullanın.
+
+### HoneyPath ekranını okuyun
+
+**PaaS: yönetilen izole VM/Kata çalışma zamanında desteklenmez.** HoneyPath, host tarafından gözlenebilen uygun iş yüklerinde kullanılabilir. Ağ izolasyonu veya erişim koruması ile aynı özellik değildir.
+
+![HoneyPath sayfasında uygulama seçimi ve tespit kapsamı açıklaması](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/honey-path-overview.jpg)
+
+*Önce doğru uygulamayı seçin. Ekran, tespit ile engelleme ve bildirim tesliminin ayrı sonuçlar olduğunu açıklar. Uygunluk ve kaynak sağlığı doğrulanmadan boş tespit sayısını güvenli durum olarak yorumlamayın.*
+
+![Yeni HoneyPath formunda ayrılmış yol, açıklama ve Aktif seçeneği](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/honey-path-create.jpg)
+
+*Admin test ortamındaki doldurulmuş form örneği; **kaydedilmedi, dağıtılmadı ve dosyaya erişilmedi**. `/opt/komuta/canary/docs-example` yalnızca form örneğidir; mevcut bir test kaydı değildir.*
+
+1. **Mutlak yol:** `/opt/komuta/canary/` altındaki ayrılmış bir yol girin; uygulamanın meşru dosyalarını kullanmayın.
+2. **Açıklama:** yolun amacı, sahibi ve beklenen test kapsamını yazın.
+3. **Aktif:** dosya ve izleme politikasının istenen etkinlik durumunu belirtir. Pasif kayıt katalogda kalır; sonraki yapılandırma dağıtımı dosya ve canlı izleme politikasını kaldırır.
+4. **Kaydet:** yalnız katalog kaydı oluşturmaz; dosya ve izleme politikasını uygulamak için yapılandırma dağıtımını kuyruğa alır. Dağıtımın sonucunu ayrıca inceleyin.
+5. **Tespit sonrası:** ilgili bulguda servis, hedef yol, zaman ve kaynak kanıtını karşılaştırın; yetkili testi gerçek şüpheli erişimden ayırın. Sonra uygun inceleme kararını veya desteklenen müdahaleyi seçin.
+
+Düzenleme, etkinliği değiştirme veya silme de dosya/politika kapsamını etkileyebilir; önce hedef kaydı doğrulayın. Bu görseller bir kurulum önizlemesidir, HoneyPath tespitinin uçtan uca başarıyla sınandığı iddiası değildir.
 
 ## Denetim Kaydı, oturum açmalar ve kişisel güvenlik
 

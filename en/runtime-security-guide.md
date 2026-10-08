@@ -41,9 +41,21 @@ Evaluate network rules, workload hardening, build evidence and isolation separat
 
 An unavailable card is not a finding, and a hidden card is not proof of complete protection. If applicability is unknown, ask the service owner or Komuta support to clarify the supported scope.
 
-![Supported service security capabilities in a managed isolated runtime](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+![Five supported capabilities in the admin test service, including host runtime detection and enforcement](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/admin-runtime-capabilities.jpg)
 
-*The komuta-test-app overview lists network detection, workload isolation, supply chain and application-layer capabilities applicable to this runtime. Supported (Destekleniyor) is not a test result proving effective protection.*
+*The admin test environment’s komuta-test-app supports five capabilities, including host runtime detection and enforcement. The Turkish UI’s Supported label is not, by itself, a test result proving effective protection.*
+
+### Separate managed PaaS from the admin test environment
+
+**Komuta's managed isolated VM/Kata PaaS does not support host runtime process/file/system-call detection, host runtime blocking or HoneyPath access detection.** The admin test service in this guide runs in a host-observable non-Kata environment. Do not present its successful block as a PaaS result.
+
+![Managed isolated PaaS service capabilities for network, isolation, supply chain and application layer](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/service-capabilities.jpg)
+
+*A separate example from the managed isolated runtime: network detection, workload isolation, supply chain and application layer are shown. This list does not establish host runtime support.*
+
+The network layer can still apply to an isolated runtime. Isolating and reconnecting an eligible customer service is independent of host runtime blocking. Finding decisions remain available for existing records with permission; a stored record does not prove that the environment can produce host runtime events. Public access protection, build/image evidence and hardening have their own applicability conditions.
+
+See [Service Security](service-security-guide.md) for action-specific PaaS availability and real forms, and [Security Center](security-center-guide.md) for HoneyPath setup screenshots.
 
 ## Runtime mode and protection action
 
@@ -136,6 +148,29 @@ Before starting, agree on the target, applicable runtime, expected signal, allow
 Do not access sensitive or decoy paths simply to generate a finding. A missing signal can indicate a source, permission, filter or applicability problem. Investigate that uncertainty before repeating a test.
 
 A detected scenario demonstrates the behavior observed in that scenario. It does not establish prevention of all attacks or coverage of every service.
+
+### Example: match a test result to Komuta evidence
+
+On 8 October 2026, we ran **Drop and execute a binary** on **komuta-test-app** in the admin test environment. The scenario copies a program into a temporary directory and attempts to execute it. The screenshot shows the test application's actual denial, in the Turkish UI.
+
+![Blocked result of the Drop and execute a binary scenario in komuta-test-app](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-test-result.jpg)
+
+*The test application returned `permission denied` for `/tmp/komuta-dropped`. The “M2M ingest configured” banner does not demonstrate successful authentication; this local test does not rely on direct synthetic ingestion.*
+
+We then opened the matching operation under **My Services → komuta-test-app → Security → Findings**. The finding reports a policy block and a **Last seen** time matching the test. An existing explicit Block rule can deny the operation even while the service reports Audit mode.
+
+![Matching policy-block finding in the Komuta interface](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Matching the test result to the source, target operation and time in Komuta provides the blocking evidence for this example. First-seen time and occurrence count also include earlier runs; do not interpret them as the number of events produced by this run.*
+
+| Observed test result | How to interpret it |
+|---|---|
+| **Allowed** | The operation could run; behavior within Audit scope can still produce a finding. |
+| **Blocked / permission denied** | A denial occurred; verify which layer denied it using matching Komuta evidence. |
+| **Connection timeout** | Reachability can also cause this; do not count it alone as a network-policy block. |
+| **Not run / invalid_client** | Synthetic ingestion stopped at authentication; detection or prevention was not successfully tested. |
+
+We did not change protection settings for this example. Assess real runtime tests separately from direct synthetic ingestion; neither verifies the other's collection and enforcement chain.
 
 ## Common scenarios
 

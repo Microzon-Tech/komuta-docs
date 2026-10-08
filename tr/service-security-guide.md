@@ -142,6 +142,10 @@ Kaynak, önem derecesi, etkilenen işlem, ilk ve son görülme bilgisi ile sunul
 
 Acil filtresi veya kayıtların yalnız bir bölümünün yüklenmiş olması listeyi daraltabilir. İnceleme gerektiriyorsa zaman aralığını genişletin veya daha fazla kayıt yükleyin. Eksik satırın nedeni filtre, izin veya kaynak kullanılabilirliği olabilir.
 
+![Servis bulgusunda politika engeli, karar kökeni ve olay zamanları](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/runtime-block-evidence.jpg)
+
+*Bulgular listesinden ilgili kaydı açın. Admin test ortamındaki bu örnekte `/tmp/komuta-dropped` için politika engeli, kaynak ve son görülme zamanı birlikte gösterilir. Test uygulamasındaki ret sonucunu bu kayıtla eşleştirdik; yalnızca “Tehdit” inceleme etiketi bir engelleme kanıtı değildir.*
+
 ### Çalışma zamanı gözlem incelemesi
 
 Uygun servislerde kaydedilmiş dosya yazmaları, işlem çalıştırmaları ve ağ girişimleri, mevcut inceleme geçmişiyle birlikte görünür. İncelemeyi daraltmak için **Tümü**, **Beklemede**, **İzinli**, **Engelli** veya **Gözardı** filtrelerini kullanın.
@@ -157,6 +161,82 @@ Bu bölüm, gözlemleri ve kaydedilmiş kararları okumak içindir. İşlem gere
 Bulguyu gördüğünüzü belirtmek, izin vermek, tehdit olarak işaretlemek, göz ardı etmek veya çözülmüş saymak bir inceleme kararı kaydeder. Tek başına karar, trafik kuralı uygulamaz, bir işlemin reddedildiğini kanıtlamaz veya servisi izole etmez.
 
 Kullanılabilir müdahale eyleminde önizlemeyi, gerekli izni, kapsamı ve beklenen etkiyi inceleyin. Uygulanmayı ve sonucu ayrıca doğrulayın. [Güvenlik Merkezi](security-center-guide.md), bulguları, müdahale rehberlerini, önerileri ve yanıt akışlarını birlikte açıklar.
+
+### Bulgu aksiyonları: ekran ekran
+
+**Bulgular → Yanıtla → Yanıt seç** yolunu izleyin. Aşağıdaki görseller admin test ortamındaki gerçek formlardır; kararlar uygulanmadan, son kontrol veya önizleme aşamasında alınmıştır. Ekrandaki gerekçe bir dokümantasyon örneğidir; gerçek incelemede kendi kanıtınızı ve karar nedeninizi yazın.
+
+**PaaS kapsamı:** burada PaaS, Komuta'nın yönetilen **izole VM/Kata** çalışma zamanını ifade eder. Görsellerin alındığı admin test servisi bu kapsamda değildir. Beş inceleme kararı, erişilebilir bir bulgu ve gerekli yetki varsa PaaS'ta kullanılabilir; bu, PaaS'ta süreç/dosya izleme veya engelleme desteği bulunduğu anlamına gelmez. Çözülmüş kayıtlar ve mevcut engel kuralları bazı kararları kapatabilir.
+
+**Onayla**
+
+Bulguyu gördüğünüzü ve incelediğinizi kaydeder; açık kuyruğundan çıkarır. Meşru davranış veya tehdit kararı vermez. **PaaS: desteklenir; bulgu durumu ve yetki koşulları geçerlidir.**
+
+![Onayla kararı için bulgu, gerekçe ve beklenen sonucu gösteren son kontrol ekranı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-acknowledge.jpg)
+
+*Onayla seçili son kontrol ekranı. Kararı uygula düğmesi henüz kullanılmadı.*
+
+**İzin ver**
+
+Davranışı meşru olarak değerlendirip bulguyu kapatır; gerekçe zorunludur. Çalışma zamanı izin listesi veya ağ kuralı oluşturmaz. **PaaS: desteklenir; bu işlem koruma istisnası uygulamaz.**
+
+![İzin ver kararı için bulgu, gerekçe ve beklenen sonucu gösteren son kontrol ekranı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-allow.jpg)
+
+*İzin ver seçili son kontrol ekranı. Kararı uygula düğmesi henüz kullanılmadı.*
+
+**Tehdit olarak işaretle**
+
+Davranışı tehdit olarak sınıflandırır; gerekçe zorunludur. İşlemi durdurmaz veya trafiği kesmez. Gerçek müdahale için ayrı, uygulanabilir eylemi kullanın. **PaaS: desteklenir; host runtime engellemesi sağlamaz.**
+
+![Tehdit olarak işaretle kararı için bulgu, gerekçe ve beklenen sonucu gösteren son kontrol ekranı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-threat.jpg)
+
+*Tehdit olarak işaretle seçili son kontrol ekranı. Kararı uygula düğmesi henüz kullanılmadı.*
+
+**Yoksay**
+
+Yanlış pozitif, yinelenen veya beklenen etkinlik nedeniyle bulguyu gürültü olarak kapatır. Koruma politikasını değiştirmez. **PaaS: desteklenir; önce neden gürültü olduğuna karar verin.**
+
+![Yoksay kararı için bulgu, gerekçe ve beklenen sonucu gösteren son kontrol ekranı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-dismiss.jpg)
+
+*Yoksay seçili son kontrol ekranı. Kararı uygula düğmesi henüz kullanılmadı.*
+
+**Çöz**
+
+Temel sorunun giderildiğini değerlendirerek bulguyu kapatır. Düzeltmeyi uygulamaz; örneğin imaj güncellemesini ve sağlıklı dağıtımı önceden doğrulayın. Çözülmüş bulguya yeni karar verilemeyebilir. **PaaS: desteklenir; düzeltmenin kanıtı ayrıca gereklidir.**
+
+![Çöz kararı için bulgu, gerekçe ve beklenen sonucu gösteren son kontrol ekranı](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-resolve.jpg)
+
+*Çöz seçili son kontrol ekranı. Kararı uygula düğmesi henüz kullanılmadı.*
+
+### Korumayı değiştiren ve uygunluk gerektiren aksiyonlar
+
+**Çalışma zamanında engelle:** bulgudan türetilen işlem ve hedef yolu önizlemede kontrol edin. Uygulama, ilgili çalışma zamanı kuralını ve yeniden dağıtımı gerektirebilir; ardından gerçek ret kanıtını doğrulayın. **İzole PaaS'ta desteklenmez.** Host gözlemi desteklenen bir ortamda da uygun kanıt, etkin kontrol ve yetki gerekir.
+
+![Çalışma zamanında engelle önizlemesinde işlem, hedef yol, etki ve zorunlu gerekçe](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-runtime-block.jpg)
+
+*Örnek, `/etc/hostname` yazmasını hedefleyen bir önizlemedir; kural uygulanmadı. Admin ortamındaki bu seçenek PaaS müşterisinin aynı seçeneğe sahip olduğunu göstermez.*
+
+**Geri al:** mevcut çalışma zamanı engelini kaldırma akışıdır. Kural kaldırma ve yeni dağıtım sonucunu, ardından uygulama sağlığını kontrol edin. **İzole PaaS'ta bu host runtime engelleme akışı desteklenmez.** Ağ izolasyonunu kaldırma, bundan ayrı bir işlemdir.
+
+![Mevcut çalışma zamanı engelinde yapılandırma durumu ve Geri al düğmesi](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-runtime-rollback.jpg)
+
+*Var olan engelin durum ekranı; Geri al kullanılmadı. “Kural yapılandırıldı” tek başına bütün iş yüklerinde etkin engelleme kanıtı değildir.*
+
+**İstisna ekle:** onaydan önce **İstisna türü** ve **Etki** alanlarını okuyun. Bu örnekte yalnız **Bulguyu bastır** sunuluyor; zorlama değişmiyor. **PaaS'ta mevcut bulguyu bastırma desteklenebilir; host runtime izin listesi veya engelleme desteği çıkarılamaz.** Başka kaynak ve bulgular farklı istisna türleri sunabilir.
+
+![İstisna önizlemesinde Bulguyu bastır türü ve zorlamanın değişmediği bilgisi](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-exception.jpg)
+
+*Bu örnek yalnız görünürlük istisnasıdır; uygulanmadı. İzin ver kararı ile koruma istisnası aynı işlem değildir.*
+
+**Önerilen politikayı onayla:** yalnız uygun ve mevcut bir öneri varsa kullanılabilir. Kaynağı, kapsamı ve uygulanacak kuralı inceleyin. **PaaS'ta uygun ağ politikası önerileri kullanılabilir; host runtime süreç/dosya politikası desteği yoktur.** Görselde seçenek, bu servis için öneri bulunmadığından kapalıdır.
+
+**İş yükünü izole et:** uygun müşteri servisinin ağ bağlantılarını seçilen kapsamda sınırlar. **PaaS'ta uygun, dağıtılmış müşteri iş yüklerinde desteklenir; Kata bu ağ işlemini tek başına engellemez.** Görseldeki admin servisi platform kapsamındadır ve izolasyon bu nedenle reddedilir. Bu ret, PaaS müşteri servislerinin izolasyonunun desteklenmediği anlamına gelmez.
+
+![Öneri bulunmadığı ve platform servisi korunduğu için kapalı müdahale seçenekleri](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/security/finding-action-availability.jpg)
+
+*Kapalı seçeneklerin altında nedenleri yazılıdır: önerinin bulunmaması geçici bir önkoşul eksikliği; platform servisi izolasyonu ise yapısal bir kısıttır. Bunları PaaS'ın host runtime desteğiyle karıştırmayın.*
+
+Eylem listesi bulgunun kaynağına, hedef servise, çalışma ortamına ve yetkilere göre değişir. Bu örnekte gösterilmeyen mod değişimi veya kanıt dışa aktarma seçeneklerini var saymayın; sunuldukları ekranda kapsam ve izinleri ayrıca okuyun. İzole PaaS'ta host sensörünün aktif yaptırımı desteklenmez. Bulgu ayrıntılarını okumak veya mevcut kanıtı dışa aktarmak bu desteği gerektirmez.
 
 ## İş yükü izolasyonu ve geri dönüş
 
