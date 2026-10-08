@@ -20,6 +20,21 @@ After **Send test**, check the actual inbox, spam/quarantine folders and your or
 
 Komuta’s email delivery record represents **provider acceptance**. Resend’s `email.sent` event concerns an accepted send request; `email.delivered` concerns delivery to the recipient’s mail server. Neither establishes that the message was seen in the inbox or read. Do not assume the Komuta page exposes every provider event. [Resend event definitions](https://resend.com/docs/webhooks/event-types).
 
+### Complete example: the Docs test email channel
+
+1. Open the channel creation form through **Alerts → Channels → Manage in notification settings**.
+2. Set the name to **Docs test** and type to **Email**. The name must contain at least two characters.
+3. Enter a test address you can actually check, then press **Add** or Enter. The address must appear as a separate recipient chip; do not leave it only in the input box.
+4. Optionally enter “Test destination for the documentation example” as the description. Save and confirm that the channel appears as active.
+5. Use the channel’s **Send test** action. Check both the result in Komuta and the actual mailbox. Verify every required destination when there are multiple recipients.
+6. Return to the [first alert form](alerts-quick-start.md) and select **Docs test**. A successful channel test does not automatically connect the rule to that channel.
+
+![Sample email channel form: 1 channel name, 2 email type, 3 recipient added to the list.](https://raw.githubusercontent.com/Microzon-Tech/komuta-docs/main/img/alerts/en/channel-form.png)
+
+*The real form component is rendered locally with sample data. `alerts@example.com` is illustrative; replace it with an address you can check. No channel was created and no message was sent to prepare this image.*
+
+**If a recipient will not add:** Check that the address is valid and not already listed. After pasting a list separated by commas, semicolons or lines, count the resulting chips rather than assuming every address was accepted. Remove an incorrect chip and enter the corrected address.
+
 ## Slack: use an Incoming Webhook
 
 Enable Incoming Webhooks for your Slack app, create a webhook for an authorized destination channel and save the generated URL in Komuta. You also need the appropriate Slack access for a private channel. [Slack setup guide](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/).
@@ -42,6 +57,12 @@ Keep the workflow enabled with a valid owner. Add a co-owner when appropriate: a
 Choose notification channels explicitly when creating or editing an alert. If the selection is empty, matching active channels are used; it does not mean “send to nobody.” Channel enablement and any configured severity filter also affect routing.
 
 The event-channel matrix in **Notifications & Alerts** controls subscriptions to platform events. It is separate from an alert rule’s own channel selection. Receiving a deployment-completed message does not prove that a particular metric/log rule routes to the intended channel.
+
+### Channel ready and rule connected: the final check
+
+Suppose you connected the **Warning** rule `Docs sample alert` to **Docs test**. Reopen the rule: is the correct channel selected? Is the destination active in the channel list? Does any severity filter accept Warning? Then follow the controlled example’s **History** event and its delivery.
+
+If tests arrive but actual event messages do not, inspect rule channel selection, active silences, repeat interval and failed/suppressed records before rebuilding the connection. If the test fails too, repair channel configuration first. The [decision steps](alerts-troubleshooting.md) identify the next screen for each result.
 
 ## Separate tests from delivery records
 

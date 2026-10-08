@@ -4,6 +4,25 @@ Use Komuta Alerts to monitor service metrics and logs, and configure rules that 
 
 [Create your first alert](alerts-quick-start.md) · [Choose a template](alerts-templates.md) · [Connect a channel](notification-guide.md)
 
+## Where should I start?
+
+| Your goal | Reading path | What you will be able to do |
+| --- | --- | --- |
+| Set up your first alert | [Completed log example](alerts-quick-start.md) → channel test → event and resolution | Follow one log line through to a message at the real destination. |
+| Choose a useful service condition | [Template decision table](alerts-templates.md) → normal workload → parameters | Explain the measurement unit and why you chose the threshold. |
+| Change an existing rule | [Field reference and change example](alerts-rules.md) → publication check | Distinguish saved settings from observed publication. |
+| Investigate a received message | [Sample event record](alerts-history.md) → verified scope → affected service | Identify the event and resource to investigate. |
+| Find a missing message | [Troubleshooting decisions](alerts-troubleshooting.md) | Narrow the issue to data, rule, publication or delivery. |
+| Silence maintenance notifications | [Thirty-minute maintenance example](alerts-silences.md) | Create a window for selected rules with a clear start and end. |
+
+## Essential terms
+
+**Scope** identifies the service, your own cluster or account-level record involved. A **metric** is a numerical measurement such as CPU percentage; a **log** is a text record produced by your application. A log alert turns matching records into a numerical condition too.
+
+A **threshold** is the boundary used in the comparison. The **data window** defines how far back each evaluation looks; **duration** defines how long the condition must continue before firing. **Notification interval** concerns repeats of an ongoing condition. “More than 0 matches in the last 5 minutes, continuing for 1 minute, with a 15-minute repeat interval” describes three distinct choices.
+
+**Severity** communicates priority. A **channel** is a message destination. An **event** is a firing/resolution record received by Komuta. A **silence** suppresses notifications for selected rules during a defined period. See these concepts together in the [first example’s timeline](alerts-quick-start.md).
+
 ## Four steps in an alert
 
 <ol class="docs-alert-flow" aria-label="Alert flow">
