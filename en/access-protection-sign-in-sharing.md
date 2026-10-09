@@ -204,11 +204,11 @@ If the section says "Share links aren't available on this service yet.", share l
 
 The **Who is signed in** section of the **People** tab lists the people who signed in to this service, with their Komuta account, with an email code or with your identity provider, and whose session is still open, one row per person:
 
-- The name (or the email). Someone whose name isn't known is shown as "A visitor from another organization"; people from outside your organization have an **Outside your organization** badge. If the person is signed in on several browsers or devices, "{count} sessions" is shown.
+- The name (or the email). People from outside your organization have an **Outside your organization** badge; someone from another organization whose name isn't known is shown as "A visitor from another organization" (visitors without a Komuta account have their own labels, below). If the person is signed in on several browsers or devices, "{count} sessions" is shown.
 - "Signed in … · last seen … · until …". **Last seen** comes from the access log ("not yet" if they haven't opened a recorded page since signing in).
-- Email addresses are shown only to people allowed to view users (for email-share sessions, also to people who can manage shares).
-- Someone who signed in with an email code without a Komuta account is shown by their email address, with the **Outside your organization** badge ("A visitor from another organization" to people who can't see emails). They can be signed out like anyone else.
-- Someone who signed in with your identity provider is shown by the name and email the provider sent (the email only if Komuta accepted it, see [What your application receives](#what-your-application-receives)), with the **Outside your organization** badge; to people who can neither view users nor manage shares, as "A visitor from another organization". They can be signed out like anyone else.
+- Email addresses are shown only to people allowed to view users (for sessions opened through an email, domain or identity provider share, also to people who can manage shares).
+- Someone who signed in with an email code without a Komuta account is shown by their email address, with the **Outside your organization** badge ("Signed in with an e-mail code" to people who can't see the address). They can be signed out like anyone else.
+- Someone who signed in with your identity provider is shown by the name and email the provider sent (the email only if Komuta accepted it, see [What your application receives](#what-your-application-receives)), with the **Outside your organization** badge. The name and email are shown only to people allowed to view users or manage shares; everyone else, and everyone when the provider sent neither, sees "Signed in with {provider}" ("Signed in with an identity provider" if the provider has since been removed). They can be signed out like anyone else.
 - At most **200** sessions are listed; when there are more, the section says "Showing the most recent sign-ins only."
 - Visitors who came in with a share link or a service token aren't listed.
 
@@ -255,7 +255,7 @@ The person an email address is shared with doesn't need a Komuta account with th
 Rules:
 
 - The code works only once, and only for the Komuta account that asked for it (without an account: only in the browser that asked for it). A new code is needed for every sign-in; a session opened through an email share lasts the service's **Stay signed in for** length too.
-- A code stops working after 5 wrong attempts. After 50 wrong attempts in 24 hours for the same account, service and address, no new codes are sent. After **200 wrong codes in 24 hours for one address on a service**, from anyone, with or without a Komuta account, nobody gets new codes for that address on that service until the period ends.
+- A code stops working after 5 wrong attempts. After 50 wrong attempts in 24 hours for the same account, service and address, no new codes are sent. After **200 wrong codes in 24 hours for one address on a service** from people without a Komuta account, nobody without an account gets new codes for that address on that service until the period ends. People signing in with a Komuta account aren't blocked this way: each of them still stops at 50, and 500 wrong codes for one address on a service only raise an alarm at Komuta. Wrong codes without an account never stop codes for Komuta accounts, and the other way round.
 - Code request limits: a user can request at most 20 codes per hour, and at most 5 per hour for the same address. At most 3 codes per hour are sent to an address for the same Komuta account and service; switching browser or device doesn't reset this, and beyond it the screen still says a code was sent but no email goes out. Resending waits 30, 60 and 120 seconds.
 - The screen gives the same answer whether or not the address has access ("If {email} has access to this page, we've emailed it a {length}-digit code."), so nobody can guess which addresses a service is shared with.
 - Sign-in must be completed within about 9 minutes of being sent from the protected page, so enter the code without waiting; the code screen says how many minutes are left. With less than 2 minutes left no new code is sent and the screen says "This sign-in link is about to expire."; open the protected page again and request a code.
@@ -345,7 +345,7 @@ Visitors without a Komuta account can sign in with your organization's own Micro
 
 - After you add the provider, Komuta shows its **Redirect URI**: `https://console.komuta.io/access/sso/callback/{providerId}`. Each provider has its own. Register it at your identity provider as a web redirect URI, exactly as shown and without wildcards; otherwise visitors can't finish signing in. You can copy it again from the list.
 - An organization can add at most **5** providers.
-- Later you can change the name, the client ID and the client secret. The provider type, directory, Workspace domain and issuer can't be changed; add the provider again instead.
+- Later you can change the name, the client ID, the client secret and the groups claim. Changing the groups claim signs out everyone signed in to the services that have a share limited to groups on this provider, members of your organization included; they sign in once more. The provider type, directory, Workspace domain and issuer can't be changed; add the provider again instead.
 - A provider can't be removed while shares use it ("Remove the shares that use this identity provider first.").
 
 Komuta refuses providers that would let anyone in:
@@ -362,11 +362,12 @@ On the **People** tab choose **Add share → Your identity provider** and pick t
 - **Only these groups (optional)** — one group per line, at most 20, each at most 256 characters. Leave it empty to let everyone who signs in with this provider in; with groups, only visitors whose ID token lists at least one of them in the groups claim get in.
   - Configure your provider to include the groups claim in the ID token.
   - Microsoft Entra ID sends group object IDs (GUIDs), not group names.
+  - Groups match exactly, including upper and lower case: `Admins` doesn't match `admins`.
   - Google Workspace doesn't send groups, so its shares can't be limited to groups; neither can a provider without a groups claim.
   - If a user is in too many groups, Microsoft Entra ID leaves the groups out of the token (group overage). Komuta then can't tell their groups, so group-limited shares refuse them; shares without groups still let them in.
 - **What they can open** and **Access ends** work as for other shares.
 - It counts as external sharing: it needs **Allow external sharing**, carries the **External** badge, and is **Suspended** while external sharing is off.
-- Limiting an existing share to groups, or removing or replacing one of its groups, signs everyone signed in to the service out; they sign in once more. Adding groups or clearing the list doesn't. If a provider's groups claim changes, every service with a group-limited share of that provider signs everyone out the same way.
+- Limiting an existing share to groups, or removing or replacing one of its groups, signs everyone signed in to the service out, including members of your organization; they sign in once more. Adding groups or clearing the list doesn't. If a provider's groups claim changes, every service with a group-limited share of that provider signs everyone out the same way.
 
 ### What the visitor sees
 
@@ -379,7 +380,11 @@ If it doesn't work, the page shows one of these, with a **Back to the protected 
 |---|---|
 | **This sign-in has expired** — "This sign-in has expired or was opened in another browser. Open the protected page again." | Sign-in took too long, or was finished in another browser. |
 | **Sign-in didn't complete** — "The identity provider did not sign you in." | The provider answered with an error, for example the visitor cancelled or isn't allowed to use the application. |
-| **You don't have access** — "Your account doesn't have access to this page." | No share lets them in: they aren't in the share's groups, their groups are unknown, the share has ended, or external sharing is off. |
+| **You don't have access** — "You signed in, but your account isn't in a group this page was shared with, or its share has ended. Ask the page owner to add you." | No share lets them in: they aren't in the share's groups, or the share has ended. |
+| **You don't have access** — "This page is only shared with certain groups, but your identity provider didn't send your groups, so we couldn't check them. Ask your administrator or the page owner." | The share is limited to groups and the provider didn't send the visitor's groups (for example Microsoft Entra ID group overage). |
+| **You don't have access** — "The organization this page belongs to turned off sharing outside the organization, so signing in with this provider is paused." | External sharing is off. |
+| **You don't have access** — "Your account doesn't have access to this page." | Any other refusal. If the provider's groups claim was changed while the visitor was signing in, they open the protected page and sign in again. |
+| **This sign-in isn't available anymore** — "Signing in with this provider isn't available for this page anymore." | The provider was removed, or signing in with an identity provider was switched off on Komuta. |
 | **Too many sign-in attempts** — "Too many sign-in attempts. Wait a few minutes and try again." | Over the limits below. |
 | **We couldn't sign you in** — "Something went wrong while finishing the sign-in. Open the protected page again to retry." | Anything else, for example the provider's answer couldn't be verified. |
 
@@ -391,7 +396,7 @@ Things to know:
 - The visitor isn't a Komuta user. The same account at the same provider is the same visitor on all your organization's services, and a different one in other organizations.
 - Their sessions last the service's **Stay signed in for**, but at most 12 hours.
 - At most 30 sign-in starts and 30 sign-in finishes per hour per network (an IPv4 address, or an IPv6 `/64`) and service.
-- In the access log they appear as **Someone who signed in with {provider}**; in **Who is signed in**, by the name and email the provider sent.
+- In the access log, people allowed to view users or manage shares see their accepted email, or the name the provider sent; everyone else sees **Someone who signed in with {provider}**. In **Who is signed in** they appear as described in [Who is signed in](#who-is-signed-in).
 - Removing the share, the share ending or external sharing being turned off ends their sessions within about 30 seconds, like other shares. Disabling someone at your identity provider stops their new sign-ins; a session that is already open lasts until it ends (at most 12 hours) unless you sign them out on the **People** tab.
 
 ### What your application receives
@@ -400,6 +405,7 @@ If **Tell my application who signed in** is on (see [End Date and Visitor Identi
 
 - `x-komuta-identity` carries `kind: sso`, and `x-komuta-user-id` and the JWT's `sub` are `sso:` followed by 32 lowercase hex characters.
 - `x-komuta-user-email` is filled only when the provider marks the address as verified **and** the address is at one of your organization's [verified domains](#verified-domains) (or their subdomains), or, for Google Workspace, at the Workspace domain. Otherwise it is empty and the JWT has no `email`. This way a provider can't name an address your organization doesn't own.
+- Komuta takes an email from the provider only when the ID token says it is verified (`email_verified`). Microsoft Entra ID usually doesn't send that claim, so Microsoft Entra ID visitors usually reach your application without an email; tell them apart by the `sso:` id. The name the provider sent is shown only to people allowed to view users or manage shares, in **Who is signed in** and the access log.
 
 ---
 

@@ -52,7 +52,7 @@ Dar ekranlarda yalnızca **Saat** ve **Kim** sütunları görünür; neden ve sa
 | Ad ve e-posta | Organizasyonunuzdan, giriş yapmış bir kişi. E-posta yalnızca kullanıcıları görme izni olanlara gösterilir. |
 | **Başka bir organizasyondan biri** | Organizasyonunuzun dışından giriş yapmış biri (bağlı bir organizasyon ya da e-posta paylaşımıyla gelen biri). Adı ve e-postası gösterilmez. |
 | **E-posta koduyla giriş yapan biri** | Komuta hesabı olmadan, bir paylaşımın içeri aldığı e-posta adresini kanıtlamış biri. E-postası kullanıcıları görme ya da paylaşımları yönetme izni olanlara gösterilir. |
-| **{provider} ile giriş yapan biri** | Komuta hesabı olmadan, organizasyonunuzun bu adlı kimlik sağlayıcısıyla giriş yapmış biri (bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş)). Sağlayıcı sonradan kaldırıldıysa: **Organizasyonun kimlik sağlayıcısıyla giriş yapan biri**. |
+| **{provider} ile giriş yapan biri** | Komuta hesabı olmadan, organizasyonunuzun bu adlı kimlik sağlayıcısıyla giriş yapmış biri (bkz. [Giriş ve Paylaşım](access-protection-sign-in-sharing.md#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş)). Kullanıcıları görme ya da paylaşımları yönetme izni olanlar bunun yerine kabul edilen e-postasını, kabul edilen e-posta yoksa sağlayıcının gönderdiği adı görür. Sağlayıcı sonradan kaldırıldıysa: **Organizasyonun kimlik sağlayıcısıyla giriş yapan biri**. |
 | **Servis token'ı: {ad}** | Bu adlı servis token'ını kullanan bir program. |
 | **Silinmiş bir servis token'ı** | Sonradan silinmiş bir token. |
 | **Paylaşım bağlantısı: {ad}** | Bu adlı paylaşım bağlantısıyla giren bir ziyaretçi. |
@@ -137,7 +137,7 @@ Listenin üstündeki **Dışa aktar** kaydı indirir: **CSV olarak indir (tablo)
 - En fazla **50.000** satır. Aralıkta daha fazlası varsa dışa aktarım reddedilir: "Bu aralıkta 50000 kayıttan fazlası var. Daha kısa bir aralık ya da tek bir kayıt türü seçin."
 - Organizasyon başına aynı anda tek dışa aktarım. Organizasyonunuzun başka bir dışa aktarımı sürüyorsa: "Kuruluşunuzun erişim kaydının başka bir dışa aktarımı hâlâ sürüyor. Birazdan yeniden deneyin."
 - Her dışa aktarım organizasyonunuzun denetim kaydına yazılır. Yazılamazsa dışa aktarım yapılmaz: "Dışa aktarım denetim kaydına yazılamadığı için yapılmadı. Birazdan yeniden deneyin."
-- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir (e-posta ziyaretçisinin adresi, paylaşımları yönetebiliyorsanız da).
+- Dışa aktarmak için kaydı görmekle aynı izin gerekir. E-posta adresleri yalnızca kullanıcıları görme izniniz varsa dosyaya eklenir (e-posta ya da kimlik sağlayıcısı ziyaretçisinin adresi ya da sağlayıcının gönderdiği ad, paylaşımları yönetebiliyorsanız da).
 
 CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama programları Türkçe karakterleri doğru okur) ve şu sütunları içerir:
 
@@ -147,8 +147,8 @@ CSV dosyası bir UTF-8 bayt sıra işaretiyle başlar (böylece tablolama progra
 | `count` | Kaç kez yaşandığı (**Adet**). |
 | `outcome` | `SignIn`, `Allow` ya da `Deny`. |
 | `reason` | Teknik neden kodu (bkz. [Başvuru](access-protection-reference.md#erişim-kaydı-neden-kodları)). |
-| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ya da kimlik sağlayıcısı ziyaretçisinde size gösteriliyorsa e-postası, değilse kimliği (tireli GUID); giriş yapmamış ziyaretçilerde boş. |
-| `email` | Size gösteriliyorsa ziyaretçinin e-postası. |
+| `who` | Kişinin, token'ın ya da bağlantının adı (silinmişse kimliği); e-posta ya da kimlik sağlayıcısı ziyaretçisinde size gösteriliyorsa e-postası (kabul edilen e-postası olmayan kimlik sağlayıcısı ziyaretçisinde sağlayıcının gönderdiği ad), değilse kimliği (tireli GUID); giriş yapmamış ziyaretçilerde boş. |
+| `email` | Size gösteriliyorsa ziyaretçinin e-postası; kabul edilen e-postası olmayan kimlik sağlayıcısı ziyaretçisinde sağlayıcının gönderdiği ad. |
 | `kind` | `user`, `external_user`, `email_visitor`, `sso_visitor`, `service_token`, `share_link` ya da `anonymous`. |
 | `method`, `path` | HTTP yöntemi ve yol (yol gizliyse `*`). |
 | `client_ip` | Adres; anonim retlerde `/24` / `/48` ağı. |
@@ -165,6 +165,7 @@ Kayıtlar varsayılan olarak **30 gün** saklanır; bir satır, son görüldüğ
 - Ayar: **Hesap → Organizasyonlar → Erişim kaydı saklama süresi**. Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
 - Eski kayıtlar her gece silinir. Süreyi uzatmak hemen geçerli olur. Kısaltmak **Erişim kayıtları daha kısa süre saklansın mı?** onayını ister ("Son {days} dışında kalan kayıtlar bir sonraki gece çalışmasında silinir ve geri getirilemez. Gerekiyorsa önce dışa aktarın.") ve **Kısalt ve eski kayıtları sil** ile onaylanır.
 - **Etkinlik** sekmesi kayıtların ne kadar saklandığını söyler; en uzun zaman aralığı bu ayara göre değişir.
+- Komuta hesabı olmayan ziyaretçiler (e-posta kodu ya da kimlik sağlayıcısı) için saklanan e-posta adresi ve ad da, ziyaretçi erişim kaydı saklama süresi içinde görülmediyse silinir.
 
 Bu ayarı görmüyorsanız erişim koruması platformunuzda henüz açık değildir ya da organizasyonu düzenleyemiyorsunuz.
 

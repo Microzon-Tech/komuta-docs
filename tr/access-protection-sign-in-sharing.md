@@ -204,11 +204,11 @@ Bölümde "Paylaşım bağlantıları bu serviste henüz kullanılamıyor." yaz�
 
 **Kişiler** sekmesindeki **Kimler içeride** bölümü, bu servise Komuta hesabıyla, e-posta koduyla ya da kimlik sağlayıcınızla giriş yapmış ve oturumu hâlâ açık olan kişileri, her kişi için bir satırda listeler:
 
-- Ad (ya da e-posta). Adı bilinmeyen biri "Başka bir kuruluştan bir ziyaretçi" olarak görünür; organizasyonunuzun dışından gelenlerde **Kuruluşunuz dışından** etiketi bulunur. Kişi birden fazla tarayıcıda ya da cihazda giriş yaptıysa "{count} oturum" yazar.
+- Ad (ya da e-posta). Organizasyonunuzun dışından gelenlerde **Organizasyonunuz dışından** etiketi bulunur; başka bir organizasyondan gelen ve adı bilinmeyen biri "Başka bir organizasyondan bir ziyaretçi" olarak görünür (Komuta hesabı olmayan ziyaretçilerin kendi etiketleri vardır, aşağıda). Kişi birden fazla tarayıcıda ya da cihazda giriş yaptıysa "{count} oturum" yazar.
 - "Giriş … · son görülme … · bitiş …". **Son görülme** erişim kaydından gelir (girişten sonra kaydedilen bir sayfa açmadıysa "henüz yok").
-- E-posta adresleri yalnızca kullanıcıları görme izni olanlara gösterilir (e-posta paylaşımıyla açılan oturumlarda paylaşımları yönetebilenlere de).
-- Komuta hesabı olmadan e-posta koduyla giren biri e-posta adresiyle ve **Kuruluşunuz dışından** etiketiyle görünür (e-postaları göremeyenlere "Başka bir kuruluştan bir ziyaretçi"). Diğerleri gibi çıkarılabilir.
-- Kimlik sağlayıcınızla giren biri, sağlayıcının gönderdiği ad ve e-postayla (e-posta yalnızca Komuta kabul ettiyse, bkz. [Uygulamanızın aldıkları](#uygulamanızın-aldıkları)) ve **Kuruluşunuz dışından** etiketiyle görünür; kullanıcıları göremeyen ve paylaşımları yönetemeyenlere "Başka bir kuruluştan bir ziyaretçi" olarak. Diğerleri gibi çıkarılabilir.
+- E-posta adresleri yalnızca kullanıcıları görme izni olanlara gösterilir (e-posta, alan adı ya da kimlik sağlayıcısı paylaşımıyla açılan oturumlarda paylaşımları yönetebilenlere de).
+- Komuta hesabı olmadan e-posta koduyla giren biri e-posta adresiyle ve **Organizasyonunuz dışından** etiketiyle görünür (adresi göremeyenlere "E-posta koduyla giriş yaptı"). Diğerleri gibi çıkarılabilir.
+- Kimlik sağlayıcınızla giren biri, sağlayıcının gönderdiği ad ve e-postayla (e-posta yalnızca Komuta kabul ettiyse, bkz. [Uygulamanızın aldıkları](#uygulamanızın-aldıkları)) ve **Organizasyonunuz dışından** etiketiyle görünür. Ad ve e-posta yalnızca kullanıcıları görme ya da paylaşımları yönetme izni olanlara gösterilir; diğerleri ve sağlayıcı ikisini de göndermediyse herkes "{provider} ile giriş yaptı" görür (sağlayıcı sonradan kaldırıldıysa "Bir kimlik sağlayıcısıyla giriş yaptı"). Diğerleri gibi çıkarılabilir.
 - En fazla **200** oturum listelenir; daha fazlası varsa bölüm "Yalnızca en son girişler gösteriliyor." der.
 - Paylaşım bağlantısıyla ya da servis token'ıyla girenler listelenmez.
 
@@ -255,7 +255,7 @@ E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması ge
 Kurallar:
 
 - Kod tek kullanımlıktır ve yalnızca isteyen Komuta hesabında (hesapsız istendiyse yalnızca istendiği tarayıcıda) çalışır. Her girişte yeni kod gerekir; e-posta paylaşımıyla açılan oturum da servisin **Oturum süresi** kadar sürer.
-- Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez. **Bir serviste bir adres için 24 saatte 200 yanlış kod** girilirse (kim girerse girsin, Komuta hesabıyla ya da hesapsız), süre dolana kadar o serviste o adrese kimse yeni kod alamaz.
+- Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez. Komuta hesabı olmayanlar **bir serviste bir adres için 24 saatte 200 yanlış kod** girerse, süre dolana kadar o serviste o adres için hesapsız kimse yeni kod alamaz. Komuta hesabıyla giriş yapanlar bu şekilde engellenmez: her biri yine 50'de durur, bir serviste bir adres için 500 yanlış kod ise yalnızca Komuta'da bir alarm başlatır. Hesapsız girilen yanlış kodlar Komuta hesaplarının kodlarını hiçbir zaman durdurmaz; tersi de geçerlidir.
 - Kod isteme sınırları: bir kullanıcı saatte en fazla 20 kod, aynı adres için saatte en fazla 5 kod isteyebilir. Aynı Komuta hesabıyla, aynı servis için bir adrese saatte en fazla 3 kod gönderilir; tarayıcı ya da cihaz değiştirmek bunu sıfırlamaz ve sınırdan sonra ekran yine "kod gönderdik" dese de e-posta gitmez. Yeniden göndermeden önce 30, 60 ve 120 saniye beklenir.
 - Ekran, adresin erişimi olsa da olmasa da aynı cevabı verir ("{adres} adresinin bu sayfaya erişimi varsa, adrese {uzunluk} haneli bir kod gönderdik."); böylece hangi adreslerle paylaşım yapıldığı tahmin edilemez.
 - Giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 9 dakika içinde tamamlanmalıdır; kodu beklemeden girin, kod ekranı kaç dakika kaldığını yazar. 2 dakikadan az kaldıysa yeni kod gönderilmez ve ekran "Bu giriş bağlantısının süresi dolmak üzere." der; korunan sayfayı yeniden açıp kod isteyin.
@@ -345,7 +345,7 @@ Komuta hesabı olmayan ziyaretçiler, organizasyonunuzun kendi Microsoft Entra I
 
 - Sağlayıcıyı ekledikten sonra Komuta **Yönlendirme URI'si**ni gösterir: `https://console.komuta.io/access/sso/callback/{providerId}`. Her sağlayıcının kendi URI'si vardır. Bunu kimlik sağlayıcınızda web yönlendirme URI'si olarak, tam gösterildiği gibi ve joker karakter kullanmadan kaydedin; aksi halde ziyaretçiler girişi tamamlayamaz. URI'yi listeden yeniden kopyalayabilirsiniz.
 - Bir organizasyon en fazla **5** sağlayıcı ekleyebilir.
-- Sonradan ad, istemci kimliği ve gizli anahtar değiştirilebilir. Sağlayıcı türü, dizin, Workspace alan adı ve issuer değiştirilemez; bunun yerine sağlayıcıyı yeniden ekleyin.
+- Sonradan ad, istemci kimliği, gizli anahtar ve grup claim'i değiştirilebilir. Grup claim'ini değiştirmek, bu sağlayıcıyla gruplara sınırlı paylaşımı olan servislere giriş yapmış herkesi, organizasyonunuzun üyeleri dahil, çıkarır; herkes bir kez yeniden giriş yapar. Sağlayıcı türü, dizin, Workspace alan adı ve issuer değiştirilemez; bunun yerine sağlayıcıyı yeniden ekleyin.
 - Paylaşımların kullandığı bir sağlayıcı kaldırılamaz ("Önce bu kimlik sağlayıcısını kullanan paylaşımları kaldırın.").
 
 Komuta herkesi içeri alacak sağlayıcıları reddeder:
@@ -362,11 +362,12 @@ Komuta herkesi içeri alacak sağlayıcıları reddeder:
 - **Yalnızca bu gruplar (isteğe bağlı)** — her satıra bir grup, en fazla 20, her biri en fazla 256 karakter. Bu sağlayıcıyla giriş yapan herkesin girebilmesi için boş bırakın; grup yazılırsa yalnızca ID token'ının grup claim'inde bunlardan en az biri bulunan ziyaretçiler girer.
   - Sağlayıcınızı grup claim'ini ID token'a ekleyecek şekilde yapılandırın.
   - Microsoft Entra ID grup adlarını değil, grup nesne kimliklerini (GUID) gönderir.
+  - Gruplar büyük/küçük harf dahil birebir eşleşir: `Admins`, `admins` ile eşleşmez.
   - Google Workspace grup bilgisi göndermediği için paylaşımları gruplarla sınırlanamaz; grup claim'i olmayan bir sağlayıcınınkiler de.
   - Bir kullanıcı çok fazla gruptaysa Microsoft Entra ID grupları token'a koymaz (group overage). Komuta bu durumda kişinin gruplarını bilemez; gruplarla sınırlı paylaşımlar onu reddeder, grupsuz paylaşımlar içeri almaya devam eder.
 - **Neleri açabilir** ve **Erişim bitişi** diğer paylaşımlardaki gibi çalışır.
 - Dış paylaşım sayılır: **Dış paylaşıma izin ver** gerekir, **Dış** etiketi taşır ve dış paylaşım kapalıyken **Askıda** olur.
-- Mevcut bir paylaşımı gruplarla sınırlamak ya da gruplarından birini kaldırmak veya değiştirmek, servise giriş yapmış herkesi çıkarır; herkes bir kez yeniden giriş yapar. Grup eklemek ya da listeyi temizlemek çıkarmaz. Bir sağlayıcının grup claim'i değişirse, o sağlayıcının gruplarla sınırlı paylaşımı olan her serviste herkes aynı şekilde çıkarılır.
+- Mevcut bir paylaşımı gruplarla sınırlamak ya da gruplarından birini kaldırmak veya değiştirmek, servise giriş yapmış herkesi, organizasyonunuzun üyeleri dahil, çıkarır; herkes bir kez yeniden giriş yapar. Grup eklemek ya da listeyi temizlemek çıkarmaz. Bir sağlayıcının grup claim'i değişirse, o sağlayıcının gruplarla sınırlı paylaşımı olan her serviste herkes aynı şekilde çıkarılır.
 
 ### Ziyaretçinin gördüğü
 
@@ -379,7 +380,11 @@ Olmazsa sayfa şunlardan birini, **Korumalı sayfaya dön** (ya da **Komuta'ya g
 |---|---|
 | **Bu girişin süresi doldu** — "Bu girişin süresi doldu ya da başka bir tarayıcıda açıldı. Korumalı sayfayı yeniden açın." | Giriş çok uzun sürdü ya da başka bir tarayıcıda tamamlandı. |
 | **Giriş tamamlanamadı** — "Kimlik sağlayıcısı girişinizi onaylamadı." | Sağlayıcı bir hatayla döndü; örneğin ziyaretçi vazgeçti ya da uygulamayı kullanma izni yok. |
-| **Erişiminiz yok** — "Hesabınızın bu sayfaya erişimi yok." | Onu içeri alan bir paylaşım yok: paylaşımın gruplarında değil, grupları bilinmiyor, paylaşımın süresi doldu ya da dış paylaşım kapalı. |
+| **Erişiminiz yok** — "Giriş yaptınız, ancak hesabınız bu sayfanın paylaşıldığı bir grupta değil ya da paylaşım sona erdi. Sizi eklemesi için sayfa sahibine başvurun." | Onu içeri alan bir paylaşım yok: paylaşımın gruplarında değil ya da paylaşımın süresi doldu. |
+| **Erişiminiz yok** — "Bu sayfa yalnızca belirli gruplarla paylaşıldı, ancak kimlik sağlayıcınız gruplarınızı göndermedi; bu yüzden kontrol edemedik. Yöneticinize ya da sayfa sahibine başvurun." | Paylaşım gruplarla sınırlı ve sağlayıcı ziyaretçinin gruplarını göndermedi (örneğin Microsoft Entra ID group overage). |
+| **Erişiminiz yok** — "Bu sayfanın ait olduğu organizasyon, organizasyon dışına paylaşımı kapattı; bu yüzden bu sağlayıcıyla giriş şimdilik durduruldu." | Dış paylaşım kapalı. |
+| **Erişiminiz yok** — "Hesabınızın bu sayfaya erişimi yok." | Diğer retler. Ziyaretçi giriş yaparken sağlayıcının grup claim'i değiştirildiyse, korumalı sayfayı açıp yeniden giriş yapar. |
+| **Bu giriş artık kullanılamıyor** — "Bu sağlayıcıyla giriş bu sayfa için artık kullanılamıyor." | Sağlayıcı kaldırıldı ya da kimlik sağlayıcısıyla giriş Komuta'da kapatıldı. |
 | **Çok fazla giriş denemesi** — "Çok fazla giriş denemesi yapıldı. Birkaç dakika bekleyip tekrar deneyin." | Aşağıdaki sınırlar aşıldı. |
 | **Giriş yapılamadı** — "Giriş tamamlanırken bir sorun oluştu. Tekrar denemek için korumalı sayfayı yeniden açın." | Diğer her şey; örneğin sağlayıcının yanıtı doğrulanamadı. |
 
@@ -391,7 +396,7 @@ Bilinmesi gerekenler:
 - Ziyaretçi bir Komuta kullanıcısı değildir. Aynı sağlayıcıdaki aynı hesap organizasyonunuzun tüm servislerinde aynı ziyaretçidir, başka organizasyonlarda farklıdır.
 - Oturumu servisin **Oturum süresi** kadar, ama en fazla 12 saat sürer.
 - Ağ (bir IPv4 adresi ya da bir IPv6 `/64`) ve servis başına saatte en fazla 30 giriş başlatma ve 30 giriş tamamlama.
-- Erişim kaydında **{provider} ile giriş yapan biri** olarak, **Kimler içeride** listesinde sağlayıcının gönderdiği ad ve e-postayla görünür.
+- Erişim kaydında, kullanıcıları görme ya da paylaşımları yönetme izni olanlar kabul edilen e-postasını ya da sağlayıcının gönderdiği adı görür; diğerleri **{provider} ile giriş yapan biri** görür. **Kimler içeride** listesinde [Kimler içeride](#kimler-içeride) bölümünde anlatıldığı gibi görünür.
 - Paylaşımı kaldırmak, paylaşımın süresinin dolması ya da dış paylaşımın kapatılması, diğer paylaşımlarda olduğu gibi oturumlarını yaklaşık 30 saniye içinde sonlandırır. Birini kimlik sağlayıcınızda devre dışı bırakmak yeni girişlerini durdurur; açık olan oturumu, **Kişiler** sekmesinden çıkarmazsanız süresi bitene kadar (en fazla 12 saat) sürer.
 
 ### Uygulamanızın aldıkları
@@ -400,6 +405,7 @@ Bilinmesi gerekenler:
 
 - `x-komuta-identity` `kind: sso` taşır; `x-komuta-user-id` ve JWT'deki `sub` ise `sso:` ve ardından 32 küçük harfli onaltılık karakterdir.
 - `x-komuta-user-email` yalnızca sağlayıcı adresi doğrulanmış olarak işaretlediğinde **ve** adres organizasyonunuzun [doğrulanmış alan adlarından](#doğrulanmış-alan-adları) birinde (ya da alt alan adlarında), Google Workspace'te ise Workspace alan adında olduğunda dolu gelir. Aksi halde boş gelir ve JWT'de `email` olmaz. Böylece bir sağlayıcı, organizasyonunuza ait olmayan bir adresi bildiremez.
+- Komuta sağlayıcıdan e-postayı yalnızca ID token adresin doğrulandığını söylediğinde (`email_verified`) alır. Microsoft Entra ID bu claim'i genellikle göndermez; bu yüzden Microsoft Entra ID ziyaretçileri uygulamanıza genellikle e-postasız ulaşır, onları `sso:` kimliğinden ayırt edin. Sağlayıcının gönderdiği ad yalnızca kullanıcıları görme ya da paylaşımları yönetme izni olanlara, **Kimler içeride** listesinde ve erişim kaydında gösterilir.
 
 ---
 
