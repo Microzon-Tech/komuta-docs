@@ -230,7 +230,7 @@ Her satırda yeşil onay (girer) ya da kırmızı çarpı (giremez) ve nedeni ya
 | **Servis token'ı tanınmıyor ya da süresi dolmuş** / **Paylaşım bağlantısının süresi dolmuş, bağlantı geri çekilmiş ya da henüz yürürlükte değil** | Token ya da bağlantı artık çalışmıyor. |
 | **{yol} erişimi {tarih} tarihinde başlıyor** / **{tarih} tarihinde bitti** | Kişinin saat aralığı dışında. |
 
-Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-postasını doğrulayarak)" yazar. Kaydedilen kurallar henüz yayılıyorsa önizleme bunu belirtir. Önizleme, tarayıcıyla bir sayfanın açılmasını (`GET`) hesaplar; hız sınırını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
+Bir kişi yalnızca e-posta paylaşımıyla giriyorsa satırın sonunda "(e-postasını doğrulayarak)" yazar. Yalnızca gruplarla sınırlı bir kimlik sağlayıcısı paylaşımıyla giriyorsa satırın sonunda "(yalnızca kimlik sağlayıcısı onları {groups} grubunda gösterirse)" yazar; ekran okuyucular girip giremediği yerine "Gruplarına bağlı." der. Kaydedilen kurallar henüz yayılıyorsa önizleme bunu belirtir. Önizleme, tarayıcıyla bir sayfanın açılmasını (`GET`) hesaplar; hız sınırını, `POST` gibi diğer yöntemleri ve özel ağı hesaba katmaz.
 
 Önizlemeyi görmek için **Servis erişim korumasını yönet** ya da **Korunan servisin paylaşımlarını yönet** izni gerekir.
 

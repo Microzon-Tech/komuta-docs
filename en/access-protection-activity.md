@@ -52,6 +52,7 @@ On narrow screens only **Time** and **Who** are shown; the reason and page appea
 | Name and email | A signed-in person from your organization. The email is shown only to people allowed to view users. |
 | **Someone from another organization** | A signed-in person from outside your organization (who came in through a linked organization or email share). Their name and email aren't shown. |
 | **Someone who signed in with an e-mail code** | Someone without a Komuta account who proved an email address that a share lets in. Their email is shown to people allowed to view users or to manage shares. |
+| **Someone who signed in with {provider}** | Someone without a Komuta account who signed in with your organization's identity provider of this name (see [Sign-in and Sharing](access-protection-sign-in-sharing.md#sign-in-with-your-organizations-identity-provider)). People allowed to view users or to manage shares see their accepted email instead, or the name the provider sent if there is no accepted email. If the provider has since been removed: **Someone who signed in with the organization's identity provider**. |
 | **Service token: {name}** | A program using the service token with this name. |
 | **A deleted service token** | A token that was deleted later. |
 | **Share link: {name}** | A visitor who came in with the share link with this name. |
@@ -136,7 +137,7 @@ The list doesn't refresh on its own; change a filter or reload the page to see n
 - At most **50,000** rows. If the range holds more, the export is refused: "This range holds more than 50000 entries. Choose a shorter range or one kind of entry."
 - One export at a time per organization. If another export of your organization is still running: "Another export of your organization's access log is still running. Try again in a moment."
 - Every export is recorded in your organization's audit log. If it can't be recorded, the export isn't made: "The export could not be recorded in the audit log, so it was not made. Try again in a moment."
-- Exporting needs the same permission as seeing the log. Email addresses are included only if you are allowed to view users (an email visitor's address also if you can manage shares).
+- Exporting needs the same permission as seeing the log. Email addresses are included only if you are allowed to view users (an email or identity provider visitor's address, or the name the provider sent, also if you can manage shares).
 
 The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-English letters correctly) and has these columns:
 
@@ -146,11 +147,12 @@ The CSV file starts with a UTF-8 byte order mark (so spreadsheets read non-Engli
 | `count` | How many times it happened (**Times**). |
 | `outcome` | `SignIn`, `Allow` or `Deny`. |
 | `reason` | The technical reason code (see [Reference](access-protection-reference.md#access-log-reason-codes)). |
-| `who` | The person's, token's or link's name (an id if it was deleted); for an email visitor, their email if shown to you, otherwise their id (a dashed GUID); empty for visitors who haven't signed in. |
-| `email` | The visitor's email, if shown to you. |
-| `kind` | `user`, `external_user`, `email_visitor`, `service_token`, `share_link` or `anonymous`. |
+| `who` | The person's, token's or link's name (an id if it was deleted); for an email or identity provider visitor, their email if shown to you (for an identity provider visitor without an accepted email, the name the provider sent), otherwise their id (a dashed GUID); empty for visitors who haven't signed in. |
+| `email` | The visitor's email, if shown to you; for an identity provider visitor without an accepted email, the name the provider sent. |
+| `kind` | `user`, `external_user`, `email_visitor`, `sso_visitor`, `service_token`, `share_link` or `anonymous`. |
 | `method`, `path` | The HTTP method and path (`*` when the path is hidden). |
 | `client_ip` | The address, or the `/24` / `/48` network for anonymous refusals. |
+| `provider` | For an `sso_visitor`, the name of the identity provider they signed in with; otherwise empty. |
 
 Values that start with `=`, `+`, `-`, `@`, a tab or a carriage return get a leading `'`, so a spreadsheet never runs them as formulas. The JSON file holds the same records as an array, with the API's field names.
 
@@ -163,6 +165,7 @@ Records are kept for **30 days** by default; a row is deleted once it is older t
 - Setting: **Account → Organizations → Keep access logs for**. Changing it needs permission to edit the organization.
 - Older records are deleted every night. Making the period longer takes effect immediately. Making it shorter asks **Keep access logs for less time?** ("Entries older than {days} are deleted at the next nightly run and cannot be brought back. Export them first if you need them.") and is confirmed with **Shorten and delete older entries**.
 - The **Activity** tab says how long records are kept, and its longest time range follows the setting.
+- The email address and name Komuta keeps for visitors without a Komuta account (email code or identity provider) are deleted too once the visitor hasn't been seen within the access log retention period plus 12 hours.
 
 If you don't see this setting, access protection isn't enabled on your platform yet, or you can't edit the organization.
 

@@ -38,14 +38,17 @@ Erişim koruması rehberleri:
 | Özel ağdan doğrudan gelebilecek servisler | En fazla 50; aynı organizasyon |
 | Koruma bitişi | Gelecekte, en fazla 365 gün sonra |
 | Korunan adres (host) sayısı | Servis başına en fazla 50 |
-| Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; ziyaretçi oturumları platformunuzda yönetilmiyorsa 12 saat |
+| Ziyaretçi oturumu | 15 dakika, 1 saat, 4 saat, 12 saat (varsayılan), 1 gün ya da 7 gün (**Oturum süresi**); paylaşımın, bağlantının ve "herkese açılsın" bitişinin ötesine geçmez; Komuta hesabı olmayan ziyaretçiler (e-posta kodu ya da kimlik sağlayıcısı) için en fazla 12 saat; ziyaretçi oturumları platformunuzda yönetilmiyorsa 12 saat |
 | **Kimler içeride** listesi | En fazla 200 oturum |
 | Tek tek çıkarma | Serviste oturum takibi başladıktan 12 saat 10 dakika sonra başlar; bir oturumun ömrü içinde 500'den fazla oturum tek tek kapatılırsa herkesi çıkarmaya döner |
 | Giriş bağlantısı | Yaklaşık 9 dakika (girişin bu sürede tamamlanması gerekir); 2 dakikadan az kaldıysa yeni e-posta kodu gönderilmez |
 | Giriş denemesi | Kullanıcı başına dakikada 30 |
 | E-posta doğrulama kodu | 8 hane, 10 dakika geçerli, 5 hatalı denemede geçersiz |
-| E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme) |
-| Komuta hesabı olmadan e-posta kodu | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına sayılır: saatte 60 istek, adres başına saatte 5 istek, adres başına saatte 3 gönderim, adres başına 24 saatte 50 yanlış kod; bir adrese bir serviste saatte en fazla 10, organizasyonda 30 böyle kod gider; alan adı paylaşımı bir ağdan 24 saatte en fazla 20 farklı adrese kod gönderir; yanlış kodları, alan adı paylaşımı başına, yalnız hesapsız kodları durduran ayrı bir 24 saatte 200 sınırına sayılır |
+| E-posta kodu isteme | Kullanıcı başına saatte 20; kullanıcı + adres başına saatte 5; aynı Komuta hesabı, servis ve adres için saatte 3 gönderim (30/60/120 sn bekleme); aynı hesap, servis ve adres için 24 saatte 50 yanlış koddan sonra yeni kod gönderilmez; bir serviste bir adres için 24 saatte 500 yanlış kod yalnızca Komuta'da bir alarm başlatır, engellemez |
+| Komuta hesabı olmadan e-posta kodu | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına sayılır: saatte 60 istek, adres başına saatte 5 istek, adres başına saatte 3 gönderim, adres başına 24 saatte 50 yanlış kod; bir serviste bir adres için tüm ağlardan toplam 24 saatte 200 yanlış koddan sonra orada o adres için hesapsız kimse yeni kod alamaz (Komuta hesaplarının kodları etkilenmez); bir adrese bir serviste saatte en fazla 10, organizasyonda 30 böyle kod gider; alan adı paylaşımı bir ağdan 24 saatte en fazla 20 farklı adrese kod gönderir; yanlış kodları, alan adı paylaşımı başına, yalnız hesapsız kodları durduran ayrı bir 24 saatte 200 sınırına sayılır; alan adı paylaşımı başına saatte en fazla 100 kod; IPv6 `/48` (ya da IPv4 adresi) ve servis başına saatte 240 isteklik daha geniş bir sınır |
+| Kimlik sağlayıcıları | Organizasyon başına en fazla 5; ad 1–64 karakter; grup claim'i en fazla 64 karakter |
+| Kimlik sağlayıcısı paylaşımı | Sağlayıcı ve servis başına bir tane; en fazla 20 grup, her biri en fazla 256 karakter |
+| Kimlik sağlayıcısıyla giriş | Ağ (IPv4 adresi ya da IPv6 `/64`) ve servis başına saatte 30 başlatma ve 30 tamamlama; yaklaşık 9 dakika içinde ve aynı tarayıcıda tamamlanmalı |
 | İstek yolu (yol kuralı ya da sayfa sınırı olan serviste) | En fazla 1024 bayt; aşarsa `400` |
 | Erişim kaydı | Organizasyon başına 30 (varsayılan), 90 ya da 365 gün saklanır; 15 sn'lik paketler; servis başına saatte 500 satır (girişler hariç); sayfa başına 50 kayıt |
 | Erişim kaydının dışa aktarımı | CSV ya da JSON; saklama süresi içinde; en fazla 50.000 satır; organizasyon başına aynı anda tek dışa aktarım |
@@ -68,7 +71,7 @@ Erişim koruması rehberleri:
 
 Bitiş davranışı (`ExpiryAction`): `KeepLocked` = **Sonra kilitli kalsın** (varsayılan), `OpenToEveryone` = **Sonra herkese açılsın**.
 
-Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**, `EmailDomain` = **Bir alan adındaki herkes**.
+Paylaşım türleri (`ShareKind`): `OwnOrganization` = **Organizasyonunuz**, `Member` = **Bir üye**, `LinkedOrganization` = **Bağlı bir organizasyon**, `Email` = **Bir e-posta adresi**, `EmailDomain` = **Bir alan adındaki herkes**, `IdentityProvider` = **Kimlik sağlayıcınız**.
 
 Birleşim (`Combine`): `All` = **İkisi birden gereksin**, `Any` = **Biri yeterli**.
 
@@ -118,8 +121,8 @@ Tüm ret yanıtları `Cache-Control: no-store` taşır. HTML sayfalar ziyaretçi
 | Ad | Yön | Açıklama |
 |---|---|---|
 | `x-komuta-service-token` | İstemci → Komuta | Servis token'ı (`kst_<32 onaltılık>_<43 karakter>`). Komuta kontrol ettikten sonra siler; uygulamaya ulaşmaz. |
-| `x-komuta-user-email` | Komuta → uygulama | Giriş yapan ziyaretçinin e-postası (kimlik bildirme açıkken). |
-| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği; hesapsız e-posta koduyla giren biri için `eml:<32 onaltılık>` (kimlik bildirme açıkken). |
+| `x-komuta-user-email` | Komuta → uygulama | Giriş yapan ziyaretçinin e-postası (kimlik bildirme açıkken). Kimlik sağlayıcısıyla giren ziyaretçide yalnızca doğrulanmış alan adlarınızdan birindeki doğrulanmış bir adres (Google Workspace'te Workspace alan adındaki). |
+| `x-komuta-user-id` | Komuta → uygulama | Giriş yapan ziyaretçinin Komuta kullanıcı kimliği; hesapsız e-posta koduyla giren biri için `eml:<32 onaltılık>`, kimlik sağlayıcınızla giren biri için `sso:<32 onaltılık>` (kimlik bildirme açıkken). |
 | `x-komuta-identity` | Komuta → uygulama | ES256 imzalı kimlik JWT'si (kimlik bildirme açıkken). |
 | `x-komuta-access` | Komuta → uygulama | Pod kilidi için servise özel gizli değer. Kullanmayın, loglamayın. |
 | `Cache-Control: private, no-store` | Komuta → ziyaretçi | Korunan servisin tüm yanıtlarına yazılır. |
@@ -274,6 +277,7 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtection:VerifiedDomainExists` | '{Domain}' zaten organizasyonun listesinde. |
 | `DevOpsZon:AccessProtection:VerifiedDomainNotFound` | Bu alan adı organizasyonun listesinde yok. |
 | `DevOpsZon:AccessProtection:TooManyVerifiedDomains` | Bir organizasyon en fazla {Max} alan adı doğrulayabilir. |
+| `DevOpsZon:AccessProtection:ShareGroupsInvalid` | Grup listesi geçerli değil: en fazla 256 karakterlik en fazla 20 grup, yalnız grup gönderen bir sağlayıcıda. |
 | `DevOpsZon:AccessProtection:ShareInvalid` | Paylaşım bilgileri '{Kind}' paylaşım türü için geçerli değil. |
 | `DevOpsZon:AccessProtection:ShareNotFound` | Paylaşım bulunamadı. |
 | `DevOpsZon:AccessProtection:ShareScopeInvalid` | Bu paylaşımın kapsamındaki '{Prefix}' sayfası geçersiz ya da kapsamda 50'den fazla sayfa var. |
@@ -301,6 +305,18 @@ Konsolda ya da API'de bir işlem reddedildiğinde gösterilen mesajlar. Süslü 
 | `DevOpsZon:AccessProtection:SessionLifetimeInvalid` | Oturum süresi olarak 15 dakika, 1 saat, 4 saat, 12 saat, 24 saat veya 7 gün seçin. |
 | `DevOpsZon:AccessProtection:SessionsNotAvailable` | Ziyaretçi oturumlarını yönetme bu platformda henüz açık değil. |
 | `DevOpsZon:AccessProtection:SessionNotFound` | Bu oturum zaten sona ermiş. |
+
+### Kimlik sağlayıcıları
+
+| Kod | Mesaj |
+|---|---|
+| `DevOpsZon:AccessProtection:IdentityProvidersNotAvailable` | Ziyaretçilerin kurumunuzun kimlik sağlayıcısıyla girişi henüz kullanılamıyor. |
+| `DevOpsZon:AccessProtection:IdentityProviderInvalid` | Kimlik sağlayıcısı ayarı '{Field}' geçerli değil. |
+| `DevOpsZon:AccessProtection:IdentityProviderIssuerNotAllowed` | '{Issuer}' adresinde herkes giriş yapabilir; bu sağlayıcı herkesi içeri alır. Kurumunuzun kendi kiracısını ya da alan adını kullanın. |
+| `DevOpsZon:AccessProtection:IdentityProviderDiscoveryFailed` | Komuta, kimlik sağlayıcısının '{Issuer}' adresindeki yapılandırmasını okuyamadı ({Reason}). Issuer adresini kontrol edin. |
+| `DevOpsZon:AccessProtection:TooManyIdentityProviders` | Bir organizasyonun en fazla {Max} kimlik sağlayıcısı olabilir. |
+| `DevOpsZon:AccessProtection:IdentityProviderNotFound` | Kimlik sağlayıcısı bulunamadı. |
+| `DevOpsZon:AccessProtection:IdentityProviderInUse` | '{Name}' hâlâ {Count} paylaşımda kullanılıyor. Önce bu paylaşımları kaldırın. |
 
 ### Erişim kaydı
 
@@ -332,6 +348,9 @@ Manifestin `access` bloğunun doğrulama kodları [Stack Manifestinde Erişim Ko
 | `DevOpsZon:AccessProtection:EmailChallengeInvalid` | Doğrulama kodu hatalı ya da süresi dolmuş. Yeni bir kod isteyip tekrar deneyin. |
 | `DevOpsZon:AccessProtection:EmailChallengeRateLimited` | Çok fazla doğrulama kodu istendi. Bir saat bekleyip tekrar deneyin. |
 | `DevOpsZon:AccessProtection:EmailVisitorsNotAvailable` | Bu serviste Komuta hesabı olmadan e-posta koduyla giriş kullanılamıyor. |
+| `DevOpsZon:AccessProtection:SsoVisitorsNotAvailable` | Bu serviste kurum hesabınızla giriş kullanılamıyor. |
+| `DevOpsZon:AccessProtection:SsoSignInFailed` | Kurum hesabınızla giriş tamamlanamadı ({Reason}). Tekrar deneyin ya da servisin sahibine sorun. |
+| `DevOpsZon:AccessProtection:SsoSignInExpired` | Bu girişin süresi doldu ya da başka bir tarayıcıda açıldı. Korunan sayfayı yeniden açın. |
 | `DevOpsZon:AccessProtection:CodeInvalid` | Giriş kodu geçersiz ya da süresi dolmuş. |
 | `DevOpsZon:AccessProtection:CodeAlreadyUsed` | Giriş kodu zaten kullanılmış. |
 | `DevOpsZon:AccessProtection:CodeRevoked` | Servisin erişim ayarları değiştiği için giriş kodu artık geçerli değil. |
@@ -343,10 +362,10 @@ Manifestin `access` bloğunun doğrulama kodları [Stack Manifestinde Erişim Ko
 ## Sık sorulan sorular
 
 **Ziyaretçilerin Komuta hesabı açması gerekiyor mu?**
-Komuta girişi kullanıyorsanız, onlara bir [paylaşım bağlantısı](access-protection-sign-in-sharing.md#paylaşım-bağlantıları) göndermediğiniz ya da servisi e-posta adresleriyle veya alan adlarıyla paylaşmadığınız sürece evet; paylaştıysanız [e-posta koduyla girebilirler](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan). Hesap açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. Hesap açtırmak istemiyorsanız paylaşım bağlantısı ya da IP izin listesi kullanın. Kendi kimlik sağlayıcınızla (SSO) giriş şu an desteklenmez.
+Her zaman değil. Organizasyonunuzla, bir üyeyle ya da bağlı bir organizasyonla yapılan paylaşımlar Komuta hesabı gerektirir. Servisi ziyaretçinin e-posta adresiyle ya da alan adıyla paylaşırsanız ([e-posta koduyla girer](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan)), organizasyonunuzun kimlik sağlayıcısıyla paylaşırsanız (örneğin Microsoft Entra ID, Google Workspace ya da Okta ile [orada giriş yapar](access-protection-sign-in-sharing.md#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş)) ya da ona bir [paylaşım bağlantısı](access-protection-sign-in-sharing.md#paylaşım-bağlantıları) gönderirseniz hesap gerekmez. Komuta hesabı açmak ücretsizdir ve Google ya da GitHub ile saniyeler sürer. IP izin listesi ise tek başına ya da **Biri yeterli** ile kullanıldığında listedeki adreslerden gelen ziyaretçileri hiç giriş yaptırmadan içeri alır; **İkisi birden gereksin** seçiliyse yine giriş yaparlar.
 
 **Komuta hesabı olmayan birini içeri alabilir miyim?**
-Evet: servisi e-posta adresiyle ya da şirketinin alan adıyla paylaşın; posta kutusuna gelen tek kullanımlık kodla girer ([Komuta hesabı olmadan](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan)). Ya da bir paylaşım bağlantısıyla (**Kişiler → Paylaşım bağlantıları → Bağlantı oluştur**). Bağlantıyı elinde tutan herkes giriş yapmadan, yalnızca bağlantının sayfalarına, bağlantının süresi dolana (konsolda en fazla 90 gün) ya da siz silene kadar girer. Sohbet uygulamalarındaki ve e-postadaki bağlantı önizlemelerinin de açılış sayıldığını ve bağlantının iletildiği herkesin de girebileceğini unutmayın.
+Evet: servisi e-posta adresiyle ya da şirketinin alan adıyla paylaşın; posta kutusuna gelen tek kullanımlık kodla girer ([Komuta hesabı olmadan](access-protection-sign-in-sharing.md#komuta-hesabı-olmadan)). Organizasyonunuzun kimlik sağlayıcısında hesabı varsa servisi o sağlayıcıyla paylaşın ([Organizasyonunuzun kimlik sağlayıcısıyla giriş](access-protection-sign-in-sharing.md#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş)). Ya da bir paylaşım bağlantısıyla (**Kişiler → Paylaşım bağlantıları → Bağlantı oluştur**). Bağlantıyı elinde tutan herkes giriş yapmadan, yalnızca bağlantının sayfalarına, bağlantının süresi dolana (konsolda en fazla 90 gün) ya da siz silene kadar girer. Sohbet uygulamalarındaki ve e-postadaki bağlantı önizlemelerinin de açılış sayıldığını ve bağlantının iletildiği herkesin de girebileceğini unutmayın.
 
 **Neden bir API isteğim 302 yerine 401 alıyor?**
 Giriş gerektiren bir yola oturumsuz gelen `GET` ve `HEAD` istekleri giriş sayfasına yönlendirilir (`302`); diğer yöntemler, bir programın yönlendirmeyi takip edip bir HTML sayfasını cevap sanmaması için `401` alır. Programlar için [servis token'ı](access-protection-machines.md#servis-tokenları) ya da IP listesi kullanın.
@@ -396,9 +415,11 @@ Koruma etkilenmez; yeni sürüm aynı korumayla yayına girer.
 | **Erişim koruması** | Servisin genel adresine kimin ulaşabileceğini Komuta'nın ağ geçidinde denetleyen özellik. |
 | **Ağ geçidi (gateway)** | Servisinize internetten gelen trafiğin geçtiği Komuta katmanı; kontrol burada yapılır. |
 | **Pod kilidi** | Korunan servisin pod'larının yalnızca ağ geçidinden, kontrolü geçmiş istekleri kabul etmesi. Kontrolün atlanmasını önler. |
-| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla da) giriş yapması. |
-| **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine ya da bir alan adındaki herkese servise giriş izni. |
-| **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
+| **Komuta girişi** | Ziyaretçinin Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla, kimlik sağlayıcısı paylaşımlarında organizasyonun kimlik sağlayıcısında da) giriş yapması. |
+| **Paylaşım** | Bir kişiye, organizasyona, e-posta adresine, bir alan adındaki herkese ya da bir kimlik sağlayıcısıyla giriş yapan herkese servise giriş izni. |
+| **Dış paylaşım** | Organizasyon dışına yapılan paylaşım (bağlı organizasyon, e-posta, kimlik sağlayıcısı ya da organizasyonun doğrulamadığı bir alan adı). Organizasyon ayarıyla izin verilir. |
+| **Kimlik sağlayıcısı (SSO)** | Komuta hesabı olmayan ziyaretçilerin giriş yapabildiği, organizasyonun kendi giriş servisi (Microsoft Entra ID, Google Workspace, Okta ya da başka bir OIDC sağlayıcısı). |
+| **Grup claim'i** | Kimlik sağlayıcısının ziyaretçinin gruplarını listelediği ID token claim'i; bir paylaşımı gruplarla sınırlamak için kullanılır. |
 | **Doğrulanmış alan adı** | Organizasyonun bir DNS TXT kaydıyla sahibi olduğunu kanıtladığı alan adı; altındaki paylaşımlar organizasyonun kendi paylaşımı sayılır. |
 | **Askıda** | Dış paylaşım kapatıldığı, organizasyon bağı koptuğu ya da alan adı artık doğrulanmış sayılmadığı için geçici olarak çalışmayan paylaşım. |
 | **Sayfa sınırı (kapsam)** | Bir paylaşımın, token'ın ya da paylaşım bağlantısının yalnızca belirli yolları açması. |

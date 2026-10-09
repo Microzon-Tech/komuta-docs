@@ -10,7 +10,7 @@ Erişim koruması tüm planlara dahildir.
 
 Erişim korumasıyla şunları yapabilirsiniz:
 
-- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla da) giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar, e-posta adresleri ve şirket alan adları içeri girer.
+- **Komuta ile giriş isteyin.** Ziyaretçiler Komuta hesabıyla (e-posta ve alan adı paylaşımlarında tek kullanımlık e-posta koduyla, kimlik sağlayıcısı paylaşımlarında organizasyonunuzun Microsoft Entra ID, Google Workspace, Okta ya da başka bir OIDC sağlayıcısıyla da) giriş yapar; yalnızca servisi paylaştığınız kişiler, organizasyonlar, e-posta adresleri, şirket alan adları ve kimlik sağlayıcıları içeri girer.
 - **IP adresiyle sınırlayın.** Servis yalnızca belirlediğiniz ağlardan (örneğin ofisinizden) açılır. Giriş ile birlikte "ikisi birden" ya da "biri yeterli" olarak kullanılabilir.
 - **Yol yol koruyun.** Site açıkken `/admin`'i yalnızca giriş yapanlara açın, `/internal`'ı tamamen kapatın, `/raporlar`'ı yalnızca seçtiğiniz kişilere belirli saatlerde açın.
 - **Paylaşım bağlantısı gönderin.** Komuta hesabı olmayan birini — bir müşteri demosu ya da dışarıdan test eden biri — kendiliğinden sona eren bir bağlantıyla bir süreliğine içeri alın.
@@ -272,7 +272,6 @@ Sihirbaz, servisin özel ağı (mesh) açıkken korumayı kurmaya izin vermez; b
 - **Uygulamanız** — Komuta'nın oturum çerezleri ve servis token'ı başlığı istekten çıkarılır; uygulamanız bunları görmez. Her izinli istekte Komuta'nın pod kilidi için eklediği `x-komuta-access` başlığı bulunur. Bu, servisinize özel gizli bir değerdir: kullanmanız gerekmez, loglamayın ve başka bir yere iletmeyin.
 - **CORS** — Tarayıcının başka bir siteden gönderdiği CORS kontrolü (`OPTIONS`) oturum taşımaz. Giriş isteyen bir sayfadan ancak **Makineler** sekmesinde **CORS kontrollerine girişsiz izin ver** açıksa geçer (bkz. [Yöntemler ve CORS](access-protection-machines.md#yöntemler-ve-cors)); webhook yollarında `OPTIONS` yine seçilemez.
 - **Stack'ler** — Stack'teki bir servis, Komuta girişini, organizasyon paylaşımını ve IP izin listesini manifestinde tanımlayabilir (bkz. [Stack Manifestinde Erişim Koruması](stack-manifest-access.md)).
-- **Desteklenmeyenler** — Ziyaretçinin kendi kimlik sağlayıcınızla (SSO) giriş yapması şu an desteklenmez; ziyaretçinin bir Komuta hesabı, e-posta kodu (e-posta ve alan adı paylaşımlarında) ya da paylaşım bağlantısı olmalıdır.
 
 ---
 
