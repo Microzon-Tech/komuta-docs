@@ -137,7 +137,7 @@ Her satırda paylaşımın adı, varsa sayfa sınırı ("Yalnızca: /a, /b") ve 
 - **Askıda** — dış paylaşım kapatıldığı ya da alan adı paylaşımının alan adı artık doğrulanmış sayılmadığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
 - **Süresi doldu** — bitiş zamanı geçmiş paylaşım. Listede kalır; kalem simgesiyle yeni bir bitiş verilebilir.
 
-Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak, bitişi kaldırmak ya da paylaşımı **Tüm site**'ye açmak açık oturumları etkilemez. Bitiş eklemek, bitişi öne çekmek ya da sayfa listesini değiştirmek o paylaşımla açılmış oturumları sonlandırır; serviste tek tek çıkarma henüz devrede değilse bu servisteki tüm açık oturumlar sona erer ve herkes bir kez yeniden giriş yapar (bkz. [Oturumların erken bittiği durumlar](#oturumların-erken-bittiği-durumlar)). **Bir alan adındaki herkes** paylaşımında alan adı değiştirilemez. **Alt alan adlarındaki adresler de** kapatılabilir (bu, paylaşımla açılmış oturumları sonlandırır); açmak ise yalnız doğrulanmış alan adında mümkündür. Doğrulaması düşmüş bir alan adının alt alan adlarını da kapsayan paylaşım **Askıda** kalır; pencere bu paylaşımı ancak alan adı yeniden doğrulanınca ya da alt alan adı seçeneği kapatılınca kaydeder.
+Kalem simgesi paylaşımı düzenler: tür ve kişi değiştirilemez; sayfa sınırı ve bitiş tarihi değiştirilebilir. Bitişi uzatmak, bitişi kaldırmak ya da paylaşımı **Tüm site**'ye açmak açık oturumları etkilemez. Bitiş eklemek, bitişi öne çekmek ya da sayfa listesini değiştirmek o paylaşımla açılmış oturumları sonlandırır; serviste tek tek çıkarma henüz devrede değilse bu servisteki tüm açık oturumlar sona erer ve herkes bir kez yeniden giriş yapar (bkz. [Oturumların erken bittiği durumlar](#oturumların-erken-bittiği-durumlar)). **Bir alan adındaki herkes** paylaşımında alan adı değiştirilemez. **Alt alan adlarındaki adresler de** kapatılabilir (bu, paylaşımla açılmış oturumları sonlandırır); açmak ise yalnız doğrulanmış alan adında mümkündür. Doğrulaması düşmüş bir alan adının alt alan adlarını da kapsayan paylaşım **Askıda** kalır; pencere bu paylaşımı ancak alan adı yeniden doğrulanınca ya da alt alan adı seçeneği kapatılınca kaydeder. **Kimlik sağlayıcınız** paylaşımında sağlayıcı değiştirilemez, ama grupları (**Yalnızca bu gruplar (isteğe bağlı)**) değiştirilebilir (bkz. [Servisi bir sağlayıcıyla paylaşma](#servisi-bir-sağlayıcıyla-paylaşma)).
 
 ### Paylaşımı kaldırma
 
@@ -350,7 +350,8 @@ Komuta hesabı olmayan ziyaretçiler, organizasyonunuzun kendi Microsoft Entra I
 
 Komuta herkesi içeri alacak sağlayıcıları reddeder:
 
-- Herkesin giriş yapabildiği issuer'lar: Microsoft'un ortak `common`, `organizations` ve `consumers` uç noktaları ile kişisel Microsoft hesapları, Google Workspace seçeneği dışında `accounts.google.com` ve GitHub, GitLab, Apple, Facebook, LinkedIn, Slack ya da Discord gibi genel giriş servisleri ("'{Issuer}' adresinde herkes giriş yapabilir; bu sağlayıcı herkesi içeri alır. Kurumunuzun kendi kiracısını ya da alan adını kullanın.").
+- **Okta** ve **Diğer OIDC sağlayıcısı** için herkesin giriş yapabildiği issuer'lar: Microsoft'un ortak `common`, `organizations` ve `consumers` uç noktaları ile kişisel Microsoft hesapları, `accounts.google.com` (bunun yerine Google Workspace seçeneğini kullanın) ve GitHub, GitLab, Apple, Facebook, LinkedIn, Slack ya da Discord gibi genel giriş servisleri ("'{Issuer}' adresinde herkes giriş yapabilir; bu sağlayıcı herkesi içeri alır. Kurumunuzun kendi kiracısını ya da alan adını kullanın.").
+- **Microsoft Entra ID** için kendi dizininizin kimliği olmayan bir **Dizin (kiracı) kimliği**: `common`, `organizations`, `consumers` ve kişisel Microsoft hesaplarının kiracısı geçersiz sayılarak reddedilir ("Kimlik sağlayıcısı ayarı 'Issuer' geçerli değil.").
 - Alan adıyla yazılmış düz bir `https` adresi olmayan issuer (IP adresi, port, sorgu ya da parça olamaz).
 - Google Workspace'te `gmail.com` gibi genel bir e-posta alan adı. Her Google girişi Workspace alan adına bağlıdır: başka bir Workspace'in hesabı ya da kişisel Google hesabı reddedilir.
 - Microsoft Entra ID'de başka bir dizinin hesabı reddedilir.
@@ -388,7 +389,7 @@ Olmazsa sayfa şunlardan birini, **Korumalı sayfaya dön** (ya da **Komuta'ya g
 | **Çok fazla giriş denemesi** — "Çok fazla giriş denemesi yapıldı. Birkaç dakika bekleyip tekrar deneyin." | Aşağıdaki sınırlar aşıldı. |
 | **Giriş yapılamadı** — "Giriş tamamlanırken bir sorun oluştu. Tekrar denemek için korumalı sayfayı yeniden açın." | Diğer her şey; örneğin sağlayıcının yanıtı doğrulanamadı. |
 
-Girişi başlatmak giriş sayfasında da başarısız olabilir: "Bu sağlayıcıyla giriş bu sayfa için artık kullanılamıyor." (paylaşım kaldırılmış ya da askıda) ya da "Giriş başlatılamadı. Biraz sonra tekrar deneyin."
+Girişi başlatmak giriş sayfasında da başarısız olabilir: "Bu sağlayıcıyla giriş bu sayfa için artık kullanılamıyor." (paylaşım kaldırılmış ya da askıda), "Çok fazla giriş denemesi yapıldı. Birkaç dakika bekleyip tekrar deneyin." (bir ağdan çok fazla giriş başlatıldı, bkz. aşağıda) ya da "Giriş başlatılamadı. Biraz sonra tekrar deneyin."
 
 Bilinmesi gerekenler:
 

@@ -230,7 +230,7 @@ Each row shows a green check (gets in) or a red cross (refused) and the reason:
 | **The service token is unknown or has expired** / **The share link has expired, was withdrawn, or isn't in force yet** | The token or link no longer works. |
 | **Their access to {path} starts {date}** / **ended {date}** | Outside the person's time window. |
 
-If someone gets in only through an email share, the row ends with "(by confirming their email)". If saved rules are still rolling out, the preview says so. The preview works out a browser opening a page (`GET`); it doesn't take the rate limit, other methods such as `POST`, or the private mesh into account.
+If someone gets in only through an email share, the row ends with "(by confirming their email)". If they get in only through an identity provider share limited to groups, the row ends with "(only if their identity provider lists them in {groups})", and screen readers hear "Depends on their groups." instead of whether they get in. If saved rules are still rolling out, the preview says so. The preview works out a browser opening a page (`GET`); it doesn't take the rate limit, other methods such as `POST`, or the private mesh into account.
 
 Seeing the preview needs the **Manage service access protection** or **Manage who a protected service is shared with** permission.
 

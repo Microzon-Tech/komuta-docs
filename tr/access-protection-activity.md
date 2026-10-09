@@ -165,7 +165,7 @@ Kayıtlar varsayılan olarak **30 gün** saklanır; bir satır, son görüldüğ
 - Ayar: **Hesap → Organizasyonlar → Erişim kaydı saklama süresi**. Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
 - Eski kayıtlar her gece silinir. Süreyi uzatmak hemen geçerli olur. Kısaltmak **Erişim kayıtları daha kısa süre saklansın mı?** onayını ister ("Son {days} dışında kalan kayıtlar bir sonraki gece çalışmasında silinir ve geri getirilemez. Gerekiyorsa önce dışa aktarın.") ve **Kısalt ve eski kayıtları sil** ile onaylanır.
 - **Etkinlik** sekmesi kayıtların ne kadar saklandığını söyler; en uzun zaman aralığı bu ayara göre değişir.
-- Komuta hesabı olmayan ziyaretçiler (e-posta kodu ya da kimlik sağlayıcısı) için saklanan e-posta adresi ve ad da, ziyaretçi erişim kaydı saklama süresi içinde görülmediyse silinir.
+- Komuta hesabı olmayan ziyaretçiler (e-posta kodu ya da kimlik sağlayıcısı) için saklanan e-posta adresi ve ad da, ziyaretçi erişim kaydı saklama süresi artı 12 saat içinde görülmediyse silinir.
 
 Bu ayarı görmüyorsanız erişim koruması platformunuzda henüz açık değildir ya da organizasyonu düzenleyemiyorsunuz.
 

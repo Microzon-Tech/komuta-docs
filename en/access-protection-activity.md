@@ -165,7 +165,7 @@ Records are kept for **30 days** by default; a row is deleted once it is older t
 - Setting: **Account → Organizations → Keep access logs for**. Changing it needs permission to edit the organization.
 - Older records are deleted every night. Making the period longer takes effect immediately. Making it shorter asks **Keep access logs for less time?** ("Entries older than {days} are deleted at the next nightly run and cannot be brought back. Export them first if you need them.") and is confirmed with **Shorten and delete older entries**.
 - The **Activity** tab says how long records are kept, and its longest time range follows the setting.
-- The email address and name Komuta keeps for visitors without a Komuta account (email code or identity provider) are deleted too once the visitor hasn't been seen within the access log retention period.
+- The email address and name Komuta keeps for visitors without a Komuta account (email code or identity provider) are deleted too once the visitor hasn't been seen within the access log retention period plus 12 hours.
 
 If you don't see this setting, access protection isn't enabled on your platform yet, or you can't edit the organization.
 

@@ -137,7 +137,7 @@ Each row shows the share's name, any page limit ("Only: /a, /b") and its end ("U
 - **Suspended** — a share suspended because external sharing was turned off, or because the domain of a domain share is no longer verified. Nobody gets in with it.
 - **Expired** — a share whose end time has passed. It stays in the list; give it a new end date with the pencil icon.
 
-The pencil icon edits a share: the type and person can't be changed; the page limit and end date can. Extending or removing the end date, or opening the share to the **Whole site**, doesn't affect open sessions. Adding or bringing forward an end date, or changing the page list, ends the sessions opened through that share; until one-by-one sign-out is active on the service, it ends every open session of this service and everyone signs in once more (see [When sessions end early](#when-sessions-end-early)). For an **Everyone at a domain** share the domain can't be changed. **Also addresses at its subdomains** can be turned off (this ends the sessions opened through the share), but turned on only for a verified domain. A share that covers subdomains of a domain that is no longer verified stays **Suspended**; the window saves it only once the domain is verified again or the subdomains option is turned off.
+The pencil icon edits a share: the type and person can't be changed; the page limit and end date can. Extending or removing the end date, or opening the share to the **Whole site**, doesn't affect open sessions. Adding or bringing forward an end date, or changing the page list, ends the sessions opened through that share; until one-by-one sign-out is active on the service, it ends every open session of this service and everyone signs in once more (see [When sessions end early](#when-sessions-end-early)). For an **Everyone at a domain** share the domain can't be changed. **Also addresses at its subdomains** can be turned off (this ends the sessions opened through the share), but turned on only for a verified domain. A share that covers subdomains of a domain that is no longer verified stays **Suspended**; the window saves it only once the domain is verified again or the subdomains option is turned off. For a **Your identity provider** share the provider can't be changed, but its groups (**Only these groups (optional)**) can (see [Sharing a service with a provider](#sharing-a-service-with-a-provider)).
 
 ### Removing a share
 
@@ -350,7 +350,8 @@ Visitors without a Komuta account can sign in with your organization's own Micro
 
 Komuta refuses providers that would let anyone in:
 
-- Issuers anyone can sign in at: Microsoft's shared `common`, `organizations` and `consumers` endpoints and personal Microsoft accounts, `accounts.google.com` outside the Google Workspace choice, and public sign-in services such as GitHub, GitLab, Apple, Facebook, LinkedIn, Slack or Discord ("Anyone can sign in at '{Issuer}', so it would let anyone in. Use your organization's own tenant or domain.").
+- For **Okta** and **Other OIDC provider**, issuers anyone can sign in at: Microsoft's shared `common`, `organizations` and `consumers` endpoints and personal Microsoft accounts, `accounts.google.com` (use the Google Workspace choice instead), and public sign-in services such as GitHub, GitLab, Apple, Facebook, LinkedIn, Slack or Discord ("Anyone can sign in at '{Issuer}', so it would let anyone in. Use your organization's own tenant or domain.").
+- For **Microsoft Entra ID**, a **Directory (tenant) ID** that isn't your own directory's ID: `common`, `organizations`, `consumers` and the personal Microsoft account tenant are refused as not valid ("The identity provider setting 'Issuer' is not valid.").
 - An issuer that isn't a plain `https` address with a domain name (no IP address, port, query or fragment).
 - For Google Workspace, a public mail domain such as `gmail.com`. Every Google sign-in is bound to the Workspace domain: an account from another Workspace, or a personal Google account, is refused.
 - For Microsoft Entra ID, an account from another directory is refused.
@@ -388,7 +389,7 @@ If it doesn't work, the page shows one of these, with a **Back to the protected 
 | **Too many sign-in attempts** — "Too many sign-in attempts. Wait a few minutes and try again." | Over the limits below. |
 | **We couldn't sign you in** — "Something went wrong while finishing the sign-in. Open the protected page again to retry." | Anything else, for example the provider's answer couldn't be verified. |
 
-Starting the sign-in can also fail on the sign-in page itself: "Signing in with this provider isn't available for this page anymore." (the share is gone or suspended) or "We couldn't start the sign-in. Try again in a moment."
+Starting the sign-in can also fail on the sign-in page itself: "Signing in with this provider isn't available for this page anymore." (the share is gone or suspended), "Too many sign-in attempts. Wait a few minutes and try again." (too many sign-in starts from one network, see below) or "We couldn't start the sign-in. Try again in a moment."
 
 Things to know:
 
