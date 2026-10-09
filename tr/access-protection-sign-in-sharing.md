@@ -1,6 +1,6 @@
 # Giriş ve Paylaşım
 
-**Komuta girişi** açıkken servisinizi açmak isteyen herkes önce Komuta hesabıyla ya da, servis e-posta adresiyle veya alan adıyla paylaşıldıysa, o posta kutusuna gönderilen tek kullanımlık kodla giriş yapar; yalnızca servisi paylaştığınız kişiler içeri girer. Kimlerle paylaştığınızı **Erişim ve portlar** sayfasının **Kişiler** sekmesinden yönetirsiniz.
+**Komuta girişi** açıkken servisinizi açmak isteyen herkes önce Komuta hesabıyla giriş yapar; servis e-posta adresiyle ya da alan adıyla paylaşıldıysa o posta kutusuna gönderilen tek kullanımlık kodla, organizasyonunuzun kimlik sağlayıcısıyla paylaşıldıysa oradaki hesabıyla da girebilir. Yalnızca servisi paylaştığınız kişiler içeri girer. Kimlerle paylaştığınızı **Erişim ve portlar** sayfasının **Kişiler** sekmesinden yönetirsiniz.
 
 Bu sayfa iki tarafı anlatır: servis sahibinin paylaşımları, paylaşım bağlantılarını ve ziyaretçi oturumlarını nasıl yönettiği ve ziyaretçinin giriş sırasında ne gördüğü.
 
@@ -18,18 +18,21 @@ Komuta'ya zaten giriş yapmış bir ziyaretçi 3. adımı görmez; yönlendirme 
 
 Servisin **Bir e-posta adresi** ya da **Bir alan adındaki herkes** paylaşımı varsa **Devam etmek için giriş yapın** sayfasında **Komuta ile giriş yap** düğmesinin altında **ya da** ayracı ve **E-posta adresinizle ya da şirket alan adınızla mı paylaşıldı?** bölümü de görünür: ziyaretçi Komuta hesabı olmadan, posta kutusuna gelen kodla girebilir (bkz. [Komuta hesabı olmadan](#komuta-hesabı-olmadan)).
 
+Servis organizasyonunuzun kimlik sağlayıcılarından biriyle paylaşıldıysa sayfada **Komuta ile giriş yap** düğmesinin altında her biri için bir **{name} ile devam et** düğmesi de görünür: ziyaretçi bunun yerine Microsoft Entra ID, Google Workspace, Okta ya da başka bir sağlayıcınızda giriş yapar (bkz. [Organizasyonunuzun kimlik sağlayıcısıyla giriş](#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş)).
+
 ### Oturum
 
 Başarılı bir girişten sonra ziyaretçinin tarayıcısına servisin kendi adresi için bir oturum çerezi yazılır:
 
 - Oturum, servisin **Oturum süresi** ayarı kadar sürer: 15 dakika, 1 saat, 4 saat, **12 saat** (varsayılan), 1 gün ya da 7 gün (bkz. [Kimler içeride](#kimler-içeride)). Ziyaretçinin paylaşımının bitiş zamanını ve korumanın "herkese açılsın" bitişini hiçbir zaman geçmez.
+- Komuta hesabı olmayan ziyaretçilerin (e-posta koduyla ya da kimlik sağlayıcınızla girenlerin) oturumu, **Oturum süresi** 1 gün ya da 7 gün olsa bile **en fazla 12 saat** sürer.
 - Oturum **yalnızca giriş yapılan adres için** geçerlidir. Servisin birden fazla adresi varsa (örneğin `*.komuta.app` adresi ve özel alan adınız ya da mavi-yeşil dağıtımın önizleme adresi) her biri için ayrı giriş gerekir.
 - Komuta'nın çerezleri isteğe uygulamanıza ulaşmadan önce çıkarılır; uygulamanız bu çerezleri görmez ve etkilenmez.
 - Girişin yaklaşık 9 dakika içinde tamamlanması gerekir. Ziyaretçi daha uzun beklerse konsol **Bu giriş bağlantısı geçersiz** der ya da servis kısa bir `sign-in link is invalid or expired` yanıtı verir; korunan sayfayı yeniden açması yeterlidir.
 
 ### Oturumların erken bittiği durumlar
 
-Oturumlar süreleri dolmadan da, yaklaşık 30 saniye içinde sona erebilir. Erişimi devam edenler bir sonraki sayfa açılışında yeniden giriş yapar: Komuta'ya zaten giriş yapmış olanlar için bu otomatik bir yönlendirmedir, e-posta paylaşımıyla girenler yeni bir kod ister. Bu arada tarayıcı dışı istekler (örneğin bir tek sayfa uygulamasının `POST` istekleri) sayfa yenilenene kadar `401` alabilir.
+Oturumlar süreleri dolmadan da, yaklaşık 30 saniye içinde sona erebilir. Erişimi devam edenler bir sonraki sayfa açılışında yeniden giriş yapar: Komuta'ya zaten giriş yapmış olanlar için bu otomatik bir yönlendirmedir, e-posta paylaşımıyla girenler yeni bir kod ister, kimlik sağlayıcınızla girenler ise yeniden **{name} ile devam et**'i seçer. Bu arada tarayıcı dışı istekler (örneğin bir tek sayfa uygulamasının `POST` istekleri) sayfa yenilenene kadar `401` alabilir.
 
 **Yalnızca ilgili kişiler** — serviste tek tek çıkarma devreye girdikten sonra (bkz. [Tek tek çıkarma ne zaman başlar](#tek-tek-çıkarma-ne-zaman-başlar)):
 
@@ -43,9 +46,13 @@ Tek tek çıkarma devreye girene kadar bunların her biri **bu servisteki tüm z
 
 - **Herkesi çıkar**'ı seçtiğinizde.
 - Organizasyonunuz dış paylaşımı kapattığında (dış paylaşımı olan servislerde; dış paylaşımla girenler erişimini kaybeder, diğerleri bir kez yeniden giriş yapar).
+- Mevcut bir kimlik sağlayıcısı paylaşımını gruplarla sınırladığınızda ya da listesinden bir grubu kaldırdığınızda veya değiştirdiğinizde (grup eklemek ya da listeyi temizlemek kimseyi çıkarmaz).
+- Bir kimlik sağlayıcısının grup claim'i değiştiğinde (o sağlayıcının gruplarla sınırlı paylaşımı olan servislerde).
 - Bir ziyaretçinin Komuta hesabında güvenlikle ilgili bir değişiklik olduğunda: hesap silindiğinde, kilitlendiğinde ya da devre dışı bırakıldığında, giriş bilgileri veya iki adımlı doğrulama değiştiğinde, e-posta adresi artık doğrulanmış olmadığında, hesap bağlantısı kaldırıldığında ya da organizasyonu askıya alındığında. O kişinin açabildiği servislerdeki tüm ziyaretçiler yeniden giriş yapar (bu bir dakikayı biraz aşabilir).
 
 **Oturum süresi**'ni kısaltmak da yeni süreden eski oturumları hemen sonlandırır.
+
+Komuta hesabı olmadan e-posta koduyla giriş ya da kimlik sağlayıcılarıyla giriş platformunuzda kapatılırsa (ya da servis artık Komuta girişi istemezse) o türden yeni girişler hemen durur. Zaten açık olan oturumlar en geç 12 saat içinde sona erer; hemen bitirmek için **Herkesi çıkar**'ı seçin.
 
 ### Giriş yapamayanlar
 
@@ -103,8 +110,9 @@ Bu sayfa ziyaretçiye neden giremediğini ve ne yapabileceğini gösterir:
 | **Bağlı bir organizasyon** | Üyesi olduğunuz başka bir organizasyondaki herkes; sonradan katılanlar dahil. Yalnızca sizin de üyesi olduğunuz organizasyonlar seçilebilir. |
 | **Bir e-posta adresi** | Organizasyonlarınızın dışındaki biri. Adresi, bu adrese gönderilen tek kullanımlık kodla doğrular; herhangi bir Komuta hesabıyla giriş yaptıktan sonra ya da hesapsız. |
 | **Bir alan adındaki herkes** | `@example.com` gibi bir alan adında (istenirse alt alan adlarında da) e-posta adresi olan herkes. O alan adındaki adresini tek kullanımlık kodla doğrular; Komuta hesabıyla ya da hesapsız. Bkz. [Alan adı paylaşımı](#alan-adı-paylaşımı). |
+| **Kimlik sağlayıcınız** | Organizasyonunuzun kimlik sağlayıcılarından biriyle (Microsoft Entra ID, Google Workspace, Okta ya da başka bir OIDC sağlayıcısı) giriş yapan herkes; istenirse yalnızca seçilen grupların üyeleri. Komuta hesabı gerekmez. Listede **{provider} ile giriş yapan herkes** olarak görünür. Bkz. [Organizasyonunuzun kimlik sağlayıcısıyla giriş](#organizasyonunuzun-kimlik-sağlayıcısıyla-giriş). |
 
-**Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları listede **Dış** etiketiyle görünür ve organizasyonunuzun dış paylaşıma izin vermesini gerektirir (aşağıya bakın). **Bir alan adındaki herkes** paylaşımı da dış paylaşım sayılır; alan adı organizasyonunuzun doğruladığı bir alan adıysa sayılmaz (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)) ve bunun yerine **Doğrulanmış alan adı** etiketi taşır.
+**Bağlı bir organizasyon**, **Bir e-posta adresi** ve **Kimlik sağlayıcınız** paylaşımları listede **Dış** etiketiyle görünür ve organizasyonunuzun dış paylaşıma izin vermesini gerektirir (aşağıya bakın). **Bir alan adındaki herkes** paylaşımı da dış paylaşım sayılır; alan adı organizasyonunuzun doğruladığı bir alan adıysa sayılmaz (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)) ve bunun yerine **Doğrulanmış alan adı** etiketi taşır.
 
 Zaten paylaşılmış bir kişi, organizasyon ya da adres yeniden eklenemez (pencere "Zaten paylaşıldı." der); bitişini ya da sayfa sınırını listedeki kalem simgesiyle değiştirin.
 
@@ -124,7 +132,7 @@ Zaten paylaşılmış bir kişi, organizasyon ya da adres yeniden eklenemez (pen
 
 Her satırda paylaşımın adı, varsa sayfa sınırı ("Yalnızca: /a, /b") ve bitiş ("… tarihine kadar" ya da **Bitiş yok**) yazar. Etiketler:
 
-- **Dış** — bağlı organizasyon, e-posta paylaşımı ya da organizasyonunuzun doğrulamadığı bir alan adının paylaşımı.
+- **Dış** — bağlı organizasyon, e-posta ya da kimlik sağlayıcısı paylaşımı veya organizasyonunuzun doğrulamadığı bir alan adının paylaşımı.
 - **Doğrulanmış alan adı** — organizasyonunuzun doğruladığı bir alan adının paylaşımı; organizasyonunuzun kendi paylaşımı sayılır.
 - **Askıda** — dış paylaşım kapatıldığı ya da alan adı paylaşımının alan adı artık doğrulanmış sayılmadığı için askıya alınmış paylaşım. Bu paylaşımla kimse giremez.
 - **Süresi doldu** — bitiş zamanı geçmiş paylaşım. Listede kalır; kalem simgesiyle yeni bir bitiş verilebilir.
@@ -194,12 +202,13 @@ Bölümde "Paylaşım bağlantıları bu serviste henüz kullanılamıyor." yaz�
 
 ## Kimler içeride
 
-**Kişiler** sekmesindeki **Kimler içeride** bölümü, bu servise Komuta hesabıyla ya da e-posta koduyla giriş yapmış ve oturumu hâlâ açık olan kişileri, her kişi için bir satırda listeler:
+**Kişiler** sekmesindeki **Kimler içeride** bölümü, bu servise Komuta hesabıyla, e-posta koduyla ya da kimlik sağlayıcınızla giriş yapmış ve oturumu hâlâ açık olan kişileri, her kişi için bir satırda listeler:
 
 - Ad (ya da e-posta). Adı bilinmeyen biri "Başka bir kuruluştan bir ziyaretçi" olarak görünür; organizasyonunuzun dışından gelenlerde **Kuruluşunuz dışından** etiketi bulunur. Kişi birden fazla tarayıcıda ya da cihazda giriş yaptıysa "{count} oturum" yazar.
 - "Giriş … · son görülme … · bitiş …". **Son görülme** erişim kaydından gelir (girişten sonra kaydedilen bir sayfa açmadıysa "henüz yok").
 - E-posta adresleri yalnızca kullanıcıları görme izni olanlara gösterilir (e-posta paylaşımıyla açılan oturumlarda paylaşımları yönetebilenlere de).
 - Komuta hesabı olmadan e-posta koduyla giren biri e-posta adresiyle ve **Kuruluşunuz dışından** etiketiyle görünür (e-postaları göremeyenlere "Başka bir kuruluştan bir ziyaretçi"). Diğerleri gibi çıkarılabilir.
+- Kimlik sağlayıcınızla giren biri, sağlayıcının gönderdiği ad ve e-postayla (e-posta yalnızca Komuta kabul ettiyse, bkz. [Uygulamanızın aldıkları](#uygulamanızın-aldıkları)) ve **Kuruluşunuz dışından** etiketiyle görünür; kullanıcıları göremeyen ve paylaşımları yönetemeyenlere "Başka bir kuruluştan bir ziyaretçi" olarak. Diğerleri gibi çıkarılabilir.
 - En fazla **200** oturum listelenir; daha fazlası varsa bölüm "Yalnızca en son girişler gösteriliyor." der.
 - Paylaşım bağlantısıyla ya da servis token'ıyla girenler listelenmez.
 
@@ -217,7 +226,7 @@ Koruma Komuta girişi istemiyorsa bölüm "Bu servise kimse giriş yapmıyor; i�
 **Oturum süresi** bir girişin ne kadar süreceğini belirler: **15 dakika**, **1 saat**, **4 saat**, **12 saat** (varsayılan), **1 gün** ya da **7 gün**. Seçtiğiniz anda kaydedilir ("Yeni girişler artık {length} sürecek. Açık oturumlar bu süreyi aşacaksa daha erken kapanır.").
 
 - Daha kısa bir süre eski oturumları da hemen sonlandırır; daha uzun bir süre zaten açık olan oturumları uzatmaz.
-- E-posta paylaşımıyla ve paylaşım bağlantısıyla açılan oturumlar için de geçerlidir.
+- E-posta paylaşımıyla ve paylaşım bağlantısıyla açılan oturumlar için de geçerlidir. Komuta hesabı olmayan ziyaretçilerin (e-posta kodu ya da kimlik sağlayıcısı) oturumu, daha uzun bir ayarda bile en fazla 12 saat sürer.
 - Değiştirmek için **Servis erişim korumasını yönet** izni gerekir.
 
 ### Tek tek çıkarma ne zaman başlar
@@ -246,7 +255,7 @@ E-posta adresiyle paylaşılan kişinin, o adresle bir Komuta hesabı olması ge
 Kurallar:
 
 - Kod tek kullanımlıktır ve yalnızca isteyen Komuta hesabında (hesapsız istendiyse yalnızca istendiği tarayıcıda) çalışır. Her girişte yeni kod gerekir; e-posta paylaşımıyla açılan oturum da servisin **Oturum süresi** kadar sürer.
-- Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez.
+- Bir kod 5 hatalı denemeden sonra geçersiz olur. Aynı hesap, servis ve adres için 24 saatte 50 hatalı denemeden sonra yeni kod gönderilmez. **Bir serviste bir adres için 24 saatte 200 yanlış kod** girilirse (kim girerse girsin, Komuta hesabıyla ya da hesapsız), süre dolana kadar o serviste o adrese kimse yeni kod alamaz.
 - Kod isteme sınırları: bir kullanıcı saatte en fazla 20 kod, aynı adres için saatte en fazla 5 kod isteyebilir. Aynı Komuta hesabıyla, aynı servis için bir adrese saatte en fazla 3 kod gönderilir; tarayıcı ya da cihaz değiştirmek bunu sıfırlamaz ve sınırdan sonra ekran yine "kod gönderdik" dese de e-posta gitmez. Yeniden göndermeden önce 30, 60 ve 120 saniye beklenir.
 - Ekran, adresin erişimi olsa da olmasa da aynı cevabı verir ("{adres} adresinin bu sayfaya erişimi varsa, adrese {uzunluk} haneli bir kod gönderdik."); böylece hangi adreslerle paylaşım yapıldığı tahmin edilemez.
 - Giriş, korunan sayfadan yönlendirildiğiniz andan itibaren yaklaşık 9 dakika içinde tamamlanmalıdır; kodu beklemeden girin, kod ekranı kaç dakika kaldığını yazar. 2 dakikadan az kaldıysa yeni kod gönderilmez ve ekran "Bu giriş bağlantısının süresi dolmak üzere." der; korunan sayfayı yeniden açıp kod isteyin.
@@ -272,6 +281,7 @@ Bilinmesi gerekenler:
 Hesapsız girişte sınırlar hesap başına değil ağ başına (bir IPv4 adresi ya da bir IPv6 `/64`) sayılır:
 
 - Ağ ve servis başına saatte en fazla 60, aynı adres için saatte en fazla 5 kod isteği. Bir ağdan bir adrese saatte en fazla 3 kod gönderilir.
+- Daha geniş bir sınır IPv6 `/48` bloğunun tamamını (ya da IPv4 adresini) sayar: servis başına saatte en fazla 240 kod isteği; böylece ziyaretçi kendi aralığında adres değiştirerek sınırları aşamaz.
 - Bir adrese bir serviste hesapsız ziyaretçilerden saatte en fazla 10, organizasyonunuzun tamamında 30 kod gider; sonrasında ekran yine "kod gönderdik" der ama e-posta gitmez. Bu sınırlar Komuta ile giriş yapanları etkilemez.
 - Kısa sürede çok fazla istek gönderen bir ağ bir süre reddedilir (kod isteğinde ekran "Çok fazla kod istendi. Bir saat bekleyip tekrar deneyin." der; genellikle bir dakika yeterlidir).
 - Aynı ağ, servis ve adres için 24 saatte 50 hatalı koddan sonra yeni kod gönderilmez.
@@ -294,6 +304,7 @@ Alan adındaki posta kutularını korumak için ek sınırlar:
 - Bir alan adı paylaşımında 24 saatte **200 yanlış kod** girilirse, süre dolana kadar o paylaşım için yeni kod gönderilmez.
 - Bu iki sınır, kendi **Bir e-posta adresi** paylaşımı da olan kişiyi etkilemez; o kişi kodlarını o paylaşım üzerinden (o paylaşımın sınırları içinde) almaya devam eder.
 - Komuta hesabı olmadan isteyen, ziyaretçinin ağıdır; bu yüzden tek adres arkasındaki bir ofis 3 ile sınırlanmaz: bir ağdan bir alan adı paylaşımının 24 saatte **20 farklı adresine** kod gider. Hesapsız girilen yanlış kodlar ayrı sayılır: 200 yanlış kod yalnızca hesapsız ziyaretçilerin kodlarını durdurur, Komuta ile giriş yapanları asla.
+- Komuta hesabı olmayan ziyaretçilere bir alan adı paylaşımı için, tüm ağları ve adresleri birlikte, saatte en fazla **100 kod** gider.
 - E-posta paylaşımında olduğu gibi ekran, adresin erişimi olsa da olmasa da aynı cevabı verir.
 
 ## Doğrulanmış alan adları
@@ -313,24 +324,104 @@ Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırı
 
 ---
 
+## Organizasyonunuzun kimlik sağlayıcısıyla giriş
+
+Komuta hesabı olmayan ziyaretçiler, organizasyonunuzun kendi Microsoft Entra ID, Google Workspace, Okta ya da başka bir OpenID Connect (OIDC) sağlayıcısıyla giriş yapabilir. Sağlayıcıyı organizasyon için bir kez eklersiniz, ardından servisleri **{provider} ile giriş yapan herkes** ile, istenirse yalnızca belirli gruplarla paylaşırsınız.
+
+### Sağlayıcı ekleme
+
+- Ayar: **Hesap → Organizasyonlar → Kimlik sağlayıcınızla ziyaretçi girişi**. Değiştirmek için organizasyonu düzenleme izni gerekir. Ayarı görmüyorsanız platformunuzda henüz açık değildir.
+- Önce kimlik sağlayıcınızda bir uygulama (OIDC istemcisi) oluşturun, ardından **Kimlik sağlayıcısı ekle**'yi seçip bilgilerini girin:
+
+| Alan | İçerik |
+|---|---|
+| **Sağlayıcı** | **Microsoft Entra ID**, **Google Workspace**, **Okta** ya da **Diğer OIDC sağlayıcısı**. |
+| **Ad** | Ziyaretçiler bunu giriş sayfasında "{name} ile devam et" olarak görür. En fazla 64 karakter. |
+| **Dizin (kiracı) kimliği** (Microsoft Entra ID) | Uygulama kaydınızın genel bakış sayfasındaki Dizin (kiracı) kimliği ya da v2.0 issuer URL'si. Yalnızca bu dizinin hesapları giriş yapabilir. |
+| **Workspace alan adı** (Google Workspace) | `example.com` gibi Google Workspace alan adınız. Yalnızca bu Workspace'in hesapları giriş yapabilir. |
+| **Issuer URL'si** (Okta, diğer sağlayıcılar) | `https` ile başlayan issuer URL'si; Okta'da yetkilendirme sunucunuzun issuer'ı, örneğin `https://your-org.okta.com/oauth2/default`. Sağlayıcıyı eklediğinizde Komuta yapılandırmasını `/.well-known/openid-configuration` adresinden okur. |
+| **İstemci kimliği (Client ID)**, **İstemci gizli anahtarı (Client secret)** | Oluşturduğunuz uygulamanınkiler. Gizli anahtar şifrelenerek saklanır ve bir daha gösterilmez; süresi dolduğunda sağlayıcıyı düzenleyip yenisini girin (mevcut anahtarı korumak için alanı boş bırakın). |
+| **Grup claim'i** | İsteğe bağlı; Google Workspace için yoktur. Ziyaretçinin gruplarını listeleyen ID token claim'i; boş bırakılırsa `groups`. |
+
+- Sağlayıcıyı ekledikten sonra Komuta **Yönlendirme URI'si**ni gösterir: `https://console.komuta.io/access/sso/callback/{providerId}`. Her sağlayıcının kendi URI'si vardır. Bunu kimlik sağlayıcınızda web yönlendirme URI'si olarak, tam gösterildiği gibi ve joker karakter kullanmadan kaydedin; aksi halde ziyaretçiler girişi tamamlayamaz. URI'yi listeden yeniden kopyalayabilirsiniz.
+- Bir organizasyon en fazla **5** sağlayıcı ekleyebilir.
+- Sonradan ad, istemci kimliği ve gizli anahtar değiştirilebilir. Sağlayıcı türü, dizin, Workspace alan adı ve issuer değiştirilemez; bunun yerine sağlayıcıyı yeniden ekleyin.
+- Paylaşımların kullandığı bir sağlayıcı kaldırılamaz ("Önce bu kimlik sağlayıcısını kullanan paylaşımları kaldırın.").
+
+Komuta herkesi içeri alacak sağlayıcıları reddeder:
+
+- Herkesin giriş yapabildiği issuer'lar: Microsoft'un ortak `common`, `organizations` ve `consumers` uç noktaları ile kişisel Microsoft hesapları, Google Workspace seçeneği dışında `accounts.google.com` ve GitHub, GitLab, Apple, Facebook, LinkedIn, Slack ya da Discord gibi genel giriş servisleri ("'{Issuer}' adresinde herkes giriş yapabilir; bu sağlayıcı herkesi içeri alır. Kurumunuzun kendi kiracısını ya da alan adını kullanın.").
+- Alan adıyla yazılmış düz bir `https` adresi olmayan issuer (IP adresi, port, sorgu ya da parça olamaz).
+- Google Workspace'te `gmail.com` gibi genel bir e-posta alan adı. Her Google girişi Workspace alan adına bağlıdır: başka bir Workspace'in hesabı ya da kişisel Google hesabı reddedilir.
+- Microsoft Entra ID'de başka bir dizinin hesabı reddedilir.
+
+### Servisi bir sağlayıcıyla paylaşma
+
+**Kişiler** sekmesinde **Paylaşım ekle → Kimlik sağlayıcınız**'ı seçin ve **Kimlik sağlayıcısı** alanında sağlayıcıyı seçin. Organizasyonunuz henüz sağlayıcı eklemediyse pencere **Hesap → Organizasyonlar** bağlantısını gösterir. Bir serviste her sağlayıcı için bir paylaşım olabilir.
+
+- **Yalnızca bu gruplar (isteğe bağlı)** — her satıra bir grup, en fazla 20, her biri en fazla 256 karakter. Bu sağlayıcıyla giriş yapan herkesin girebilmesi için boş bırakın; grup yazılırsa yalnızca ID token'ının grup claim'inde bunlardan en az biri bulunan ziyaretçiler girer.
+  - Sağlayıcınızı grup claim'ini ID token'a ekleyecek şekilde yapılandırın.
+  - Microsoft Entra ID grup adlarını değil, grup nesne kimliklerini (GUID) gönderir.
+  - Google Workspace grup bilgisi göndermediği için paylaşımları gruplarla sınırlanamaz; grup claim'i olmayan bir sağlayıcınınkiler de.
+  - Bir kullanıcı çok fazla gruptaysa Microsoft Entra ID grupları token'a koymaz (group overage). Komuta bu durumda kişinin gruplarını bilemez; gruplarla sınırlı paylaşımlar onu reddeder, grupsuz paylaşımlar içeri almaya devam eder.
+- **Neleri açabilir** ve **Erişim bitişi** diğer paylaşımlardaki gibi çalışır.
+- Dış paylaşım sayılır: **Dış paylaşıma izin ver** gerekir, **Dış** etiketi taşır ve dış paylaşım kapalıyken **Askıda** olur.
+- Mevcut bir paylaşımı gruplarla sınırlamak ya da gruplarından birini kaldırmak veya değiştirmek, servise giriş yapmış herkesi çıkarır; herkes bir kez yeniden giriş yapar. Grup eklemek ya da listeyi temizlemek çıkarmaz. Bir sağlayıcının grup claim'i değişirse, o sağlayıcının gruplarla sınırlı paylaşımı olan her serviste herkes aynı şekilde çıkarılır.
+
+### Ziyaretçinin gördüğü
+
+1. Ziyaretçi **Devam etmek için giriş yapın** sayfasında **{name} ile devam et**'i seçer ve kimlik sağlayıcınıza yönlendirilir (Microsoft ve Google hangi hesabın kullanılacağını sorar).
+2. Orada giriş yaptıktan sonra Komuta konsolunda **Girişiniz tamamlanıyor** ekranını görür ve açmak istediği sayfaya döner.
+
+Olmazsa sayfa şunlardan birini, **Korumalı sayfaya dön** (ya da **Komuta'ya git**) düğmesiyle gösterir:
+
+| Sayfa | Ne zaman |
+|---|---|
+| **Bu girişin süresi doldu** — "Bu girişin süresi doldu ya da başka bir tarayıcıda açıldı. Korumalı sayfayı yeniden açın." | Giriş çok uzun sürdü ya da başka bir tarayıcıda tamamlandı. |
+| **Giriş tamamlanamadı** — "Kimlik sağlayıcısı girişinizi onaylamadı." | Sağlayıcı bir hatayla döndü; örneğin ziyaretçi vazgeçti ya da uygulamayı kullanma izni yok. |
+| **Erişiminiz yok** — "Hesabınızın bu sayfaya erişimi yok." | Onu içeri alan bir paylaşım yok: paylaşımın gruplarında değil, grupları bilinmiyor, paylaşımın süresi doldu ya da dış paylaşım kapalı. |
+| **Çok fazla giriş denemesi** — "Çok fazla giriş denemesi yapıldı. Birkaç dakika bekleyip tekrar deneyin." | Aşağıdaki sınırlar aşıldı. |
+| **Giriş yapılamadı** — "Giriş tamamlanırken bir sorun oluştu. Tekrar denemek için korumalı sayfayı yeniden açın." | Diğer her şey; örneğin sağlayıcının yanıtı doğrulanamadı. |
+
+Girişi başlatmak giriş sayfasında da başarısız olabilir: "Bu sağlayıcıyla giriş bu sayfa için artık kullanılamıyor." (paylaşım kaldırılmış ya da askıda) ya da "Giriş başlatılamadı. Biraz sonra tekrar deneyin."
+
+Bilinmesi gerekenler:
+
+- Sağlayıcınızdaki adım dahil giriş, yaklaşık 9 dakika içinde ve aynı tarayıcıda tamamlanmalıdır.
+- Ziyaretçi bir Komuta kullanıcısı değildir. Aynı sağlayıcıdaki aynı hesap organizasyonunuzun tüm servislerinde aynı ziyaretçidir, başka organizasyonlarda farklıdır.
+- Oturumu servisin **Oturum süresi** kadar, ama en fazla 12 saat sürer.
+- Ağ (bir IPv4 adresi ya da bir IPv6 `/64`) ve servis başına saatte en fazla 30 giriş başlatma ve 30 giriş tamamlama.
+- Erişim kaydında **{provider} ile giriş yapan biri** olarak, **Kimler içeride** listesinde sağlayıcının gönderdiği ad ve e-postayla görünür.
+- Paylaşımı kaldırmak, paylaşımın süresinin dolması ya da dış paylaşımın kapatılması, diğer paylaşımlarda olduğu gibi oturumlarını yaklaşık 30 saniye içinde sonlandırır. Birini kimlik sağlayıcınızda devre dışı bırakmak yeni girişlerini durdurur; açık olan oturumu, **Kişiler** sekmesinden çıkarmazsanız süresi bitene kadar (en fazla 12 saat) sürer.
+
+### Uygulamanızın aldıkları
+
+**Giriş yapanı uygulamama bildir** açıksa (bkz. [Bitiş ve Kimlik Bildirme](access-protection-settings.md#uygulamanızın-aldığı-başlıklar)):
+
+- `x-komuta-identity` `kind: sso` taşır; `x-komuta-user-id` ve JWT'deki `sub` ise `sso:` ve ardından 32 küçük harfli onaltılık karakterdir.
+- `x-komuta-user-email` yalnızca sağlayıcı adresi doğrulanmış olarak işaretlediğinde **ve** adres organizasyonunuzun [doğrulanmış alan adlarından](#doğrulanmış-alan-adları) birinde (ya da alt alan adlarında), Google Workspace'te ise Workspace alan adında olduğunda dolu gelir. Aksi halde boş gelir ve JWT'de `email` olmaz. Böylece bir sağlayıcı, organizasyonunuza ait olmayan bir adresi bildiremez.
+
+---
+
 ## Dış paylaşım izni
 
-**Bağlı bir organizasyon** ve **Bir e-posta adresi** paylaşımları organizasyon dışına erişim verir. Bunlar için organizasyonunuzun dış paylaşıma izin vermesi gerekir:
+**Bağlı bir organizasyon**, **Bir e-posta adresi** ve **Kimlik sağlayıcınız** paylaşımları organizasyon dışına erişim verir. Bunlar için organizasyonunuzun dış paylaşıma izin vermesi gerekir:
 
 - Ayar: **Hesap → Organizasyonlar → Dış paylaşıma izin ver**.
 - **Varsayılan olarak kapalıdır.**
 - Değiştirmek için organizasyonu düzenleme yetkisi gerekir.
 - Açmak hemen geçerlidir. Kapatmak bir onay ister (**Dış paylaşım kapatılsın mı?**).
 
-İzin kapalıyken **Paylaşım ekle** penceresinde bu iki tür seçilemez ve liste bunu söyler. Ayarı değiştirme yetkiniz varsa **Organizasyon ayarlarını aç** düğmesi ayarı yeni sekmede vurgulanmış olarak açar; ayarı açıp geri döndüğünüzde seçenekler sayfa yenilemeden etkinleşir. Yetkiniz yoksa bir organizasyon yöneticisinden bu ayarı açmasını isteyin. **Bir alan adındaki herkes** kapalıyken de seçilebilir, ancak yalnız organizasyonunuzun doğruladığı bir alan adı için; bu paylaşımlar organizasyonunuzun kendi paylaşımı sayılır ve bu izni gerektirmez (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)).
+İzin kapalıyken **Paylaşım ekle** penceresinde bu türler seçilemez ve liste bunu söyler. Ayarı değiştirme yetkiniz varsa **Organizasyon ayarlarını aç** düğmesi ayarı yeni sekmede vurgulanmış olarak açar; ayarı açıp geri döndüğünüzde seçenekler sayfa yenilemeden etkinleşir. Yetkiniz yoksa bir organizasyon yöneticisinden bu ayarı açmasını isteyin. **Bir alan adındaki herkes** kapalıyken de seçilebilir, ancak yalnız organizasyonunuzun doğruladığı bir alan adı için; bu paylaşımlar organizasyonunuzun kendi paylaşımı sayılır ve bu izni gerektirmez (bkz. [Doğrulanmış alan adları](#doğrulanmış-alan-adları)).
 
 İzni kapatırsanız:
 
-- Organizasyonun tüm korunan servislerindeki bağlı organizasyon ve e-posta paylaşımları **Askıda** olur; organizasyonunuzun doğrulamadığı alan adlarının paylaşımları da.
+- Organizasyonun tüm korunan servislerindeki bağlı organizasyon, e-posta ve kimlik sağlayıcısı paylaşımları **Askıda** olur; organizasyonunuzun doğrulamadığı alan adlarının paylaşımları da. Kendi doğrulanmış alan adlarınızın paylaşımları çalışmaya devam eder.
 - Bu paylaşımlarla girenlerin erişimi yaklaşık 30 saniye içinde sona erer; bu servislerdeki diğer ziyaretçiler de bir kez yeniden giriş yapar.
+- **{name} ile devam et** düğmeleri giriş sayfasından kalkar.
 - Yeni dış paylaşım eklenemez.
 
-İzni yeniden açarsanız e-posta ve alan adı paylaşımları geri gelir (doğrulanmamış bir alan adının alt alan adlarını da kapsayan paylaşım hariç; o, alan adı yeniden doğrulanana kadar askıda kalır); bağlı organizasyon paylaşımları ise iki organizasyon arasındaki bağ hâlâ sürüyorsa geri gelir. Komuta bağı 5 dakikada bir denetler; bağ koptuysa (iki organizasyon arasında birbirine bağlı ve aktif hiçbir kullanıcı hesabı kalmadıysa) bağlı organizasyon paylaşımı askıya alınır.
+İzni yeniden açarsanız e-posta, alan adı ve kimlik sağlayıcısı paylaşımları geri gelir (doğrulanmamış bir alan adının alt alan adlarını da kapsayan paylaşım hariç; o, alan adı yeniden doğrulanana kadar askıda kalır); bağlı organizasyon paylaşımları ise iki organizasyon arasındaki bağ hâlâ sürüyorsa geri gelir. Komuta bağı 5 dakikada bir denetler; bağ koptuysa (iki organizasyon arasında birbirine bağlı ve aktif hiçbir kullanıcı hesabı kalmadıysa) bağlı organizasyon paylaşımı askıya alınır.
 
 ---
 
@@ -350,4 +441,5 @@ Bir alan adı doğrulandığında, doğrulaması düştüğünde ya da kaldırı
 - [Erişim Koruması](service-access-protection.md) — genel bakış.
 - [Kurallar](access-protection-rules.md) — Komuta girişinin hangi yollarda istendiği.
 - [Erişim Kaydı](access-protection-activity.md) — kimin giriş yaptığı ve kimin paylaşım bağlantısı kullandığı.
+- [Bitiş ve Kimlik Bildirme](access-protection-settings.md) — uygulamanızın aldığı başlıklar.
 - [Başvuru](access-protection-reference.md) — giriş hata mesajları.

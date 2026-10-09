@@ -38,14 +38,17 @@ Access protection guides:
 | Services that may come in over the private mesh | At most 50; same organization |
 | Protection end date | In the future, at most 365 days away |
 | Protected addresses (hosts) | At most 50 per service |
-| Visitor session | 15 minutes, 1 hour, 4 hours, 12 hours (default), 1 day or 7 days (**Stay signed in for**); never past the share end, the link end or an "open to everyone" end; 12 hours while visitor sessions aren't managed on your platform |
+| Visitor session | 15 minutes, 1 hour, 4 hours, 12 hours (default), 1 day or 7 days (**Stay signed in for**); never past the share end, the link end or an "open to everyone" end; at most 12 hours for visitors without a Komuta account (email code or identity provider); 12 hours while visitor sessions aren't managed on your platform |
 | **Who is signed in** list | At most 200 sessions |
 | One-by-one sign-out | Starts 12 hours 10 minutes after session tracking began on the service; falls back to signing everyone out if more than 500 sessions are ended one by one within a session's lifetime |
 | Sign-in link | About 9 minutes (sign-in must be completed within this time); no new email code with less than 2 minutes left |
 | Sign-in attempts | 30 per user per minute |
 | Email verification code | 8 digits, valid 10 minutes, invalid after 5 wrong attempts |
-| Email code requests | 20 per user per hour; 5 per user and address per hour; 3 sends per hour per Komuta account, service and address (30/60/120 s waits) |
-| Email codes without a Komuta account | Counted per network (IPv4 address or IPv6 `/64`) and service: 60 requests per hour, 5 per address per hour, 3 sends per address per hour, 50 wrong codes per address in 24 hours; an address receives at most 10 such codes per hour per service and 30 across the organization; a domain share sends codes to at most 20 different addresses per network in 24 hours; their wrong codes count toward a separate 200-in-24-hours limit per domain share that pauses only codes without an account |
+| Email code requests | 20 per user per hour; 5 per user and address per hour; 3 sends per hour per Komuta account, service and address (30/60/120 s waits); after 200 wrong codes in 24 hours for one address on a service, nobody gets new codes for it there |
+| Email codes without a Komuta account | Counted per network (IPv4 address or IPv6 `/64`) and service: 60 requests per hour, 5 per address per hour, 3 sends per address per hour, 50 wrong codes per address in 24 hours; an address receives at most 10 such codes per hour per service and 30 across the organization; a domain share sends codes to at most 20 different addresses per network in 24 hours; their wrong codes count toward a separate 200-in-24-hours limit per domain share that pauses only codes without an account; at most 100 codes per hour per domain share; a wider limit of 240 requests per hour per IPv6 `/48` (or IPv4 address) and service |
+| Identity providers | At most 5 per organization; name 1–64 characters; groups claim at most 64 characters |
+| Identity provider shares | One per provider and service; at most 20 groups, each at most 256 characters |
+| Identity provider sign-in | 30 starts and 30 finishes per hour per network (IPv4 address or IPv6 `/64`) and service; must be completed within about 9 minutes in the same browser |
 | Request path (on a service with path rules or page limits) | At most 1024 bytes; longer gets `400` |
 | Access log | Kept 30 (default), 90 or 365 days, per organization; 15 s batches; 500 rows per service per hour (sign-ins excluded); 50 records per page |
 | Access log export | CSV or JSON; inside the retention period; at most 50,000 rows; one export per organization at a time |
@@ -68,7 +71,7 @@ Steps during `Enforcing` (`RouteFilter` → `PodTokenLock` → `CachePurge`): ad
 
 Expiry action (`ExpiryAction`): `KeepLocked` = **Then keep it locked** (default), `OpenToEveryone` = **Then open it to everyone**.
 
-Share kinds (`ShareKind`): `OwnOrganization` = **Your organization**, `Member` = **A member**, `LinkedOrganization` = **A linked organization**, `Email` = **An email address**, `EmailDomain` = **Everyone at a domain**.
+Share kinds (`ShareKind`): `OwnOrganization` = **Your organization**, `Member` = **A member**, `LinkedOrganization` = **A linked organization**, `Email` = **An email address**, `EmailDomain` = **Everyone at a domain**, `IdentityProvider` = **Your identity provider**.
 
 Combination (`Combine`): `All` = **Require both**, `Any` = **Either is enough**.
 
@@ -118,8 +121,8 @@ Every refusal carries `Cache-Control: no-store`. HTML pages appear in Turkish or
 | Name | Direction | Description |
 |---|---|---|
 | `x-komuta-service-token` | Client → Komuta | The service token (`kst_<32 hex>_<43 characters>`). Komuta removes it after checking; it never reaches the application. |
-| `x-komuta-user-email` | Komuta → application | The signed-in visitor's email (while visitor identity is on). |
-| `x-komuta-user-id` | Komuta → application | The signed-in visitor's Komuta user id, or `eml:<32 hex>` for someone who signed in with an email code without an account (while visitor identity is on). |
+| `x-komuta-user-email` | Komuta → application | The signed-in visitor's email (while visitor identity is on). For an identity provider visitor, only a verified address at one of your verified domains (Google Workspace: at the Workspace domain). |
+| `x-komuta-user-id` | Komuta → application | The signed-in visitor's Komuta user id; `eml:<32 hex>` for someone who signed in with an email code without an account, `sso:<32 hex>` for someone who signed in with your identity provider (while visitor identity is on). |
 | `x-komuta-identity` | Komuta → application | The ES256-signed identity JWT (while visitor identity is on). |
 | `x-komuta-access` | Komuta → application | A secret value specific to the service, used for the pod lock. Don't use or log it. |
 | `Cache-Control: private, no-store` | Komuta → visitor | Written on every response of a protected service. |
@@ -274,6 +277,7 @@ Messages shown when an action is refused in the console or the API. Values in cu
 | `DevOpsZon:AccessProtection:VerifiedDomainExists` | '{Domain}' is already on the organization's list. |
 | `DevOpsZon:AccessProtection:VerifiedDomainNotFound` | This domain is not on the organization's list. |
 | `DevOpsZon:AccessProtection:TooManyVerifiedDomains` | An organization can verify at most {Max} domains. |
+| `DevOpsZon:AccessProtection:ShareGroupsInvalid` | The group list is not valid: at most 20 groups of up to 256 characters, and only for a provider that sends groups. |
 | `DevOpsZon:AccessProtection:ShareInvalid` | The share details are not valid for the '{Kind}' share type. |
 | `DevOpsZon:AccessProtection:ShareNotFound` | The share was not found. |
 | `DevOpsZon:AccessProtection:ShareScopeInvalid` | The page '{Prefix}' in this share's scope is not valid, or the scope lists more than 50 pages. |
@@ -301,6 +305,18 @@ Messages shown when an action is refused in the console or the API. Values in cu
 | `DevOpsZon:AccessProtection:SessionLifetimeInvalid` | Choose a session length of 15 minutes, 1 hour, 4 hours, 12 hours, 24 hours or 7 days. |
 | `DevOpsZon:AccessProtection:SessionsNotAvailable` | Managing visitor sessions is not turned on on this platform yet. |
 | `DevOpsZon:AccessProtection:SessionNotFound` | That session has already ended. |
+
+### Identity providers
+
+| Code | Message |
+|---|---|
+| `DevOpsZon:AccessProtection:IdentityProvidersNotAvailable` | Signing in visitors with your organization's identity provider is not available yet. |
+| `DevOpsZon:AccessProtection:IdentityProviderInvalid` | The identity provider setting '{Field}' is not valid. |
+| `DevOpsZon:AccessProtection:IdentityProviderIssuerNotAllowed` | Anyone can sign in at '{Issuer}', so it would let anyone in. Use your organization's own tenant or domain. |
+| `DevOpsZon:AccessProtection:IdentityProviderDiscoveryFailed` | Komuta could not read the identity provider's configuration at '{Issuer}' ({Reason}). Check the issuer address. |
+| `DevOpsZon:AccessProtection:TooManyIdentityProviders` | An organization can have at most {Max} identity providers. |
+| `DevOpsZon:AccessProtection:IdentityProviderNotFound` | The identity provider was not found. |
+| `DevOpsZon:AccessProtection:IdentityProviderInUse` | '{Name}' is still used by {Count} share(s). Remove those shares first. |
 
 ### Access log
 
@@ -332,6 +348,9 @@ The validation codes of the manifest's `access` block are listed in [Access Prot
 | `DevOpsZon:AccessProtection:EmailChallengeInvalid` | The verification code is wrong or has expired. Request a new code and try again. |
 | `DevOpsZon:AccessProtection:EmailChallengeRateLimited` | Too many verification codes were requested. Wait an hour and try again. |
 | `DevOpsZon:AccessProtection:EmailVisitorsNotAvailable` | Signing in with an e-mail code without a Komuta account is not available for this service. |
+| `DevOpsZon:AccessProtection:SsoVisitorsNotAvailable` | Signing in with your organization's account is not available for this service. |
+| `DevOpsZon:AccessProtection:SsoSignInFailed` | Signing in with your organization's account did not work ({Reason}). Try again, or ask the service's owner. |
+| `DevOpsZon:AccessProtection:SsoSignInExpired` | This sign-in has expired or was opened in another browser. Open the protected page again. |
 | `DevOpsZon:AccessProtection:CodeInvalid` | The sign-in code is invalid or expired. |
 | `DevOpsZon:AccessProtection:CodeAlreadyUsed` | The sign-in code has already been used. |
 | `DevOpsZon:AccessProtection:CodeRevoked` | The sign-in code is no longer valid because the service's access settings changed. |
@@ -343,10 +362,10 @@ The validation codes of the manifest's `access` block are listed in [Access Prot
 ## Frequently asked questions
 
 **Do visitors need to create a Komuta account?**
-If you use Komuta sign-in, yes, unless you send them a [share link](access-protection-sign-in-sharing.md#share-links) or share the service with their email address or domain: then they can [get in with an email code](access-protection-sign-in-sharing.md#without-a-komuta-account). Creating an account is free and takes seconds with Google or GitHub. If you don't want visitors to create accounts, use a share link or the IP allow-list. Signing in with your own identity provider (SSO) is not supported at the moment.
+Not necessarily. Shares with your organization, a member or a linked organization need a Komuta account. Visitors don't need one if you share the service with their email address or domain (they [get in with an email code](access-protection-sign-in-sharing.md#without-a-komuta-account)), with your organization's identity provider (they [sign in there](access-protection-sign-in-sharing.md#sign-in-with-your-organizations-identity-provider), for example with Microsoft Entra ID, Google Workspace or Okta), or send them a [share link](access-protection-sign-in-sharing.md#share-links). Creating a Komuta account is free and takes seconds with Google or GitHub. The IP allow-list lets visitors in without signing in at all.
 
 **Can I let in someone without a Komuta account?**
-Yes: share the service with their email address or their company's domain, and they get in with a one-time code sent to the mailbox ([Without a Komuta account](access-protection-sign-in-sharing.md#without-a-komuta-account)). Or with a share link (**People → Share links → Create link**). Whoever holds the link gets in without signing in, only on the link's pages, until the link ends (at most 90 days in the console) or you delete it. Remember that link previews in chat apps and mail count as openings, and that anyone the link is forwarded to gets in too.
+Yes: share the service with their email address or their company's domain, and they get in with a one-time code sent to the mailbox ([Without a Komuta account](access-protection-sign-in-sharing.md#without-a-komuta-account)). If they have an account at your organization's identity provider, share the service with that provider ([Sign in with your organization's identity provider](access-protection-sign-in-sharing.md#sign-in-with-your-organizations-identity-provider)). Or with a share link (**People → Share links → Create link**). Whoever holds the link gets in without signing in, only on the link's pages, until the link ends (at most 90 days in the console) or you delete it. Remember that link previews in chat apps and mail count as openings, and that anyone the link is forwarded to gets in too.
 
 **Why does my API request get 401 instead of 302?**
 `GET` and `HEAD` requests without a session to a path that requires sign-in are redirected to the sign-in page (`302`); other methods get `401`, so that a program doesn't follow the redirect and mistake an HTML page for the answer. For programs, use a [service token](access-protection-machines.md#service-tokens) or the IP list.
@@ -396,9 +415,11 @@ Protection isn't affected; the new version goes live with the same protection.
 | **Access protection** | The feature that controls, at the Komuta gateway, who can reach a service's public address. |
 | **Gateway** | The Komuta layer that internet traffic to your service passes through; the check happens here. |
 | **Pod lock** | A protected service's pods accepting only requests from the gateway that passed the check. It prevents bypassing the check. |
-| **Komuta sign-in** | A visitor signing in with a Komuta account (or, for email and domain shares, with a one-time email code). |
-| **Share** | Permission for a person, organization, email address or everyone at a domain to sign in to the service. |
-| **External sharing** | Sharing outside the organization (a linked organization, an email address, or a domain the organization hasn't verified). Allowed by an organization setting. |
+| **Komuta sign-in** | A visitor signing in with a Komuta account (or, for email and domain shares, with a one-time email code; for identity provider shares, at the organization's identity provider). |
+| **Share** | Permission for a person, organization, email address, everyone at a domain or everyone who signs in with an identity provider to sign in to the service. |
+| **External sharing** | Sharing outside the organization (a linked organization, an email address, an identity provider, or a domain the organization hasn't verified). Allowed by an organization setting. |
+| **Identity provider (SSO)** | The organization's own sign-in service (Microsoft Entra ID, Google Workspace, Okta or another OIDC provider) that visitors without a Komuta account can sign in with. |
+| **Groups claim** | The ID token claim in which an identity provider lists the visitor's groups; used to limit a share to groups. |
 | **Verified domain** | A domain an organization proved it owns with a DNS TXT record; shares under it count as the organization's own. |
 | **Suspended** | A share that temporarily doesn't work because external sharing was turned off, the organization link was broken, or its domain is no longer verified. |
 | **Page limit (scope)** | A share, token or share link opening only certain paths. |

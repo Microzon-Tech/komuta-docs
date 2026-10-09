@@ -84,7 +84,7 @@ Turn the switch on; the setting is saved immediately ("The visitor will be named
 | Header | Contents |
 |---|---|
 | `x-komuta-user-email` | The visitor's verified email address. |
-| `x-komuta-user-id` | The visitor's Komuta user id (a GUID); for someone who signed in with an email code without a Komuta account, `eml:` and 32 lowercase hex characters. |
+| `x-komuta-user-id` | The visitor's Komuta user id (a GUID); for someone who signed in with an email code without a Komuta account, `eml:` and 32 lowercase hex characters; for someone who signed in with your identity provider, `sso:` and 32 lowercase hex characters. |
 | `x-komuta-identity` | A proof of the visitor's identity signed by Komuta (a JWT). |
 
 Things to know:
@@ -92,13 +92,14 @@ Things to know:
 - **The headers are filled only on requests that need sign-in.** On the open parts of the site, where the IP list lets visitors in without sign-in, and on webhook paths, the headers are empty even if the visitor has signed in.
 - **On requests with a service token** only `x-komuta-identity` is filled; its `kind` is `service_token` and its `sub` is the token's id: the 32 hex characters after `kst_` in the token value, written as a dashed GUID. The other two headers are empty.
 - **On requests from someone who signed in with an email code without a Komuta account** all three headers are filled: `x-komuta-user-email` is the proven address, `x-komuta-user-id` and the JWT's `sub` are `eml:<32 hex>`, and `kind` is `email`. This id is per organization: the same address has the same id on all your organization's services and a different one elsewhere. So `x-komuta-user-id` isn't always a GUID; if your application parses it as one, check `kind` first.
+- **On requests from someone who signed in with your organization's identity provider** `x-komuta-user-id` and the JWT's `sub` are `sso:<32 hex>` and `kind` is `sso`. The id is per organization: the same account at the same provider has the same id on all your organization's services. `x-komuta-user-email` (and the JWT's `email`) is filled only when the provider marks the address as verified and the address is at one of your organization's verified domains, or, for Google Workspace, at the Workspace domain; otherwise it is empty. See [Sign in with your organization's identity provider](access-protection-sign-in-sharing.md#what-your-application-receives).
 - **On requests from a share-link visitor** only `x-komuta-identity` is filled; its `kind` is `share_link`, its `sub` is the link's id (a dashed GUID) and it has no `email`. The other two headers are empty.
 - **Visitors who signed in before you turned this on** are named without their email until they sign in again (at most the service's session length, see [Sign-in and Sharing](access-protection-sign-in-sharing.md#stay-signed-in-for)): `x-komuta-user-email` is empty and the JWT has no `email` claim.
 - Unless the section says "Getting ready" or that the routes haven't been updated yet, headers with the same names that a visitor sends themselves are removed while passing through Komuta and rewritten with the right value (or empty); nobody on the internet can fake these headers. While it is getting ready, don't trust the plain headers; the signed `x-komuta-identity` can always be verified.
 
 ### Which header to trust
 
-Your services on the same cluster, and the services you chose for the private mesh on the **Machines** tab, can reach your pods without passing Komuta, so they could send these headers themselves. If that matters to you, trust only the **signed `x-komuta-identity` header**, not the plain headers, and verify it on every request. The plain headers are a convenience. Check `kind` too: a `share_link` visitor is whoever holds the link, not a known person, and an `email` visitor is someone who proved an email address, not a Komuta account.
+Your services on the same cluster, and the services you chose for the private mesh on the **Machines** tab, can reach your pods without passing Komuta, so they could send these headers themselves. If that matters to you, trust only the **signed `x-komuta-identity` header**, not the plain headers, and verify it on every request. The plain headers are a convenience. Check `kind` too: a `share_link` visitor is whoever holds the link, not a known person, an `email` visitor is someone who proved an email address, not a Komuta account, and an `sso` visitor is someone your organization's identity provider signed in, not a Komuta account.
 
 ### Proof of identity (JWT)
 
@@ -110,9 +111,9 @@ Header: `{"alg": "ES256", "typ": "JWT", "kid": "<key id>"}`
 |---|---|
 | `iss` | Always `komuta-access`. |
 | `aud` | The address (host) the visitor opened, for example `panel.example.com`. Each address of the service (custom domain, `*.komuta.app` address, blue-green preview address) is a separate `aud` value. |
-| `sub` | The Komuta user id; for a service token, the token's id; for a share link, the link's id; for an email visitor without an account, `eml:<32 hex>`. |
-| `kind` | `user`, `email`, `service_token` or `share_link`. |
-| `email` | The visitor's email. Present only for `user` and `email`, and when the email is known. |
+| `sub` | The Komuta user id; for a service token, the token's id; for a share link, the link's id; for an email visitor without an account, `eml:<32 hex>`; for an identity provider visitor, `sso:<32 hex>`. |
+| `kind` | `user`, `email`, `sso`, `service_token` or `share_link`. |
+| `email` | The visitor's email. Present only for `user`, `email` and `sso`, and when the email is known (for `sso`, see above). |
 | `sid` | The service id. In the console it is the `/services/<id>` part of the service's address. |
 | `tid` | The organization (tenant) id. |
 | `iat` | When it was signed (Unix seconds). |
