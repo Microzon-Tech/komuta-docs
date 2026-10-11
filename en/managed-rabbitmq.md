@@ -186,7 +186,7 @@ Message durability is the broker's and the application's job, not the backup's. 
 ### Schedule and Retention Period
 
 - The backup time is given as a five-field cron expression — `0 3 * * *` means every day at 03:00 UTC.
-- The retention period is given in days and can be between 1 and 365 days; the default is 7 days.
+- The retention period is given in days and can be between 2 and 365 days; the default is 7 days.
 - A manual backup can be taken outside the scheduled one. This doesn't replace the daily backup; it produces an extra copy alongside it. It's the right move when a protection point is needed right before a major change to queue and policy definitions.
 
 Changing the backup time doesn't affect the retention period; the retention period only updates when it's explicitly changed. The last backup being older than 26 hours is flagged separately — that means the daily schedule has fallen behind.

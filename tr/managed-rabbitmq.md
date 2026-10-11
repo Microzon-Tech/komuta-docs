@@ -32,7 +32,7 @@ Bir instance oluşturulduğunda Komuta seçilen bölgede bir RabbitMQ kümesi ku
 
 ### Instance, plan ve bölge
 
-Bir **instance**, kendi kimlik bilgisi ve yedek zinciriyle çalışan bağımsız bir RabbitMQ brokerıdır. CPU, bellek, disk ve düğüm sayısı bağlı olduğu **plandan** gelir; plandaki bellek aynı zamanda brokerın yayıncıları yavaşlatmaya başladığı eşiği belirler (bkz. [Broker Sınırları](#broker-snrlar)).
+Bir **instance**, kendi kimlik bilgisi ve yedek zinciriyle çalışan bağımsız bir RabbitMQ brokerıdır. CPU, bellek, disk ve düğüm sayısı bağlı olduğu **plandan** gelir; plandaki bellek aynı zamanda brokerın yayıncıları yavaşlatmaya başladığı eşiği belirler (bkz. [Broker Sınırları](#broker-sınırları)).
 
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance kurmaktır.
 
@@ -178,7 +178,7 @@ Günde bir kez yedek alınır ve nesne depolamasında tutulur. Yedek yalnız **y
 
 Mesaj dayanıklılığı yedeğin değil brokerın ve uygulamanın işidir. Kaybedilmemesi gereken mesajlar için dört şey birlikte gerekir:
 
-- Kuyruklar quorum tipinde tanımlanır (bkz. [Kuyruk Dayanıklılığı](#kuyruk-dayankll)).
+- Kuyruklar quorum tipinde tanımlanır (bkz. [Kuyruk Dayanıklılığı](#kuyruk-dayanıklılığı)).
 - Mesajlar `persistent` olarak yayınlanır.
 - Yayıncı onayı (publisher confirm) kullanılır; onay gelmeyen mesaj yayınlanmış sayılmaz.
 - İşlenmesi kritik olan mesajların kaydı uygulamanın kendi veritabanında da tutulur.
@@ -186,7 +186,7 @@ Mesaj dayanıklılığı yedeğin değil brokerın ve uygulamanın işidir. Kayb
 ### Zamanlama ve saklama süresi
 
 - Yedeğin saati beş alanlı bir cron ifadesiyle verilir — `0 3 * * *` her gün UTC 03:00 demektir.
-- Saklama süresi gün olarak yazılır ve 1 ile 365 gün arasında olabilir; varsayılan 7 gündür.
+- Saklama süresi gün olarak yazılır ve 2 ile 365 gün arasında olabilir; varsayılan 7 gündür.
 - Planlı yedeğin dışında elle yedek alınabilir. Bu, günlük yedeğin yerine geçmez; ona ek bir kopya üretir. Kuyruk ve politika tanımlarında kapsamlı bir değişiklikten hemen önce bir koruma noktası isteniyorsa doğru yol budur.
 
 Yedek saatini değiştirmek saklama süresini etkilemez; saklama süresi yalnız açıkça değiştirildiğinde güncellenir. Son yedeğin 26 saatten eski olması ayrıca işaretlenir — bu, günlük zamanlamanın geciktiği anlamına gelir.
@@ -210,7 +210,7 @@ Bunların dışındaki hiçbir yol yedeklere dokunmaz. Instance hata durumuna d�
 
 ## Plan Değişikliği
 
-Plan değişikliği CPU, bellek, disk ve düğüm sayısını hedef planın değerlerine taşır. Bellek değiştiği için brokerın yayıncıları yavaşlattığı eşik de aynı oranda değişir (bkz. [Broker Sınırları](#broker-snrlar)).
+Plan değişikliği CPU, bellek, disk ve düğüm sayısını hedef planın değerlerine taşır. Bellek değiştiği için brokerın yayıncıları yavaşlattığı eşik de aynı oranda değişir (bkz. [Broker Sınırları](#broker-sınırları)).
 
 Hedef plan seçildiğinde bir etki önizlemesi hesaplanır: değişikliğin türü (yükseltme, düşürme, topoloji değişikliği), tahmini kesinti, kaynak değişiklikleri ve varsa uyarılar. Önizleme uygulanamaz bir değişiklik bildirdiğinde işlem başlatılamaz.
 

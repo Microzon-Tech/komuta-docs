@@ -6,7 +6,7 @@ Valkey, Komuta'nın kurup işlettiği bellek içi bir anahtar-değer deposudur. 
 
 ## Valkey Nedir?
 
-Valkey, veriyi diskte değil bellekte tutan bir anahtar-değer (key-value) deposudur. Her kayda bir anahtar üzerinden erişilir ve işlem doğrudan bellekte yapıldığı için yanıt süresi milisaniyenin altında kalır — ilişkisel bir veritabanının indeks okuyup diske gitmesi gereken yerde Valkey tek adımda cevap verir. Bunun karşılığı kapasitedir: veri diskle değil bellekle sınırlıdır (bkz. [Kullanılabilir Bellek](#kullanlabilir-bellek)).
+Valkey, veriyi diskte değil bellekte tutan bir anahtar-değer (key-value) deposudur. Her kayda bir anahtar üzerinden erişilir ve işlem doğrudan bellekte yapıldığı için yanıt süresi milisaniyenin altında kalır — ilişkisel bir veritabanının indeks okuyup diske gitmesi gereken yerde Valkey tek adımda cevap verir. Bunun karşılığı kapasitedir: veri diskle değil bellekle sınırlıdır (bkz. [Kullanılabilir Bellek](#kullanılabilir-bellek)).
 
 ### Ne tutabilir
 
@@ -22,13 +22,13 @@ Bu yapılar üzerindeki işlemler sunucu tarafında yapılır: bir listeye elema
 - **Sayaç ve oran sınırlama.** Atomik artırma ile TTL bir araya geldiğinde "bu IP'den dakikada kaç istek geldi" gibi sayaçlar tek komutla tutulabilir.
 - **Pub/sub.** Bir kanala yayınlanan mesaj, o kanalı dinleyen tüm istemcilere iletilir; anlık bildirim ve önbellek geçersizleştirme gibi işler için kullanılır.
 
-Bu kullanımların hangisi seçilirse seçilsin, bellek dolduğunda ne olacağı [tahliye politikasına](#tahliye-politikas) bağlıdır — ve doğru politika kullanıma göre değişir.
+Bu kullanımların hangisi seçilirse seçilsin, bellek dolduğunda ne olacağı [tahliye politikasına](#tahliye-politikası) bağlıdır — ve doğru politika kullanıma göre değişir.
 
 ### Redis ile ilişkisi
 
 Valkey, Redis'in 7.2.4 sürümünden Mart 2024'te ayrılmış bir çatallamadır (fork). Redis'in lisansı açık kaynak olmayan bir modele geçtiğinde, projenin uzun süreli geliştiricileri kod tabanını BSD 3-Clause lisansı altında sürdürmek üzere Linux Foundation çatısı altında Valkey'i kurdu; AWS, Google Cloud, Oracle, Ericsson ve Snap projeye destek veren kuruluşlar arasındadır.
 
-Pratikte bunun karşılığı, protokolün ve komut kümesinin korunmuş olmasıdır. Mevcut Redis istemcileri, sürücüleri ve araçları — `redis-cli`, ioredis, `redis-py`, Spring Data Redis — Valkey'e bağlanmak için değişiklik gerektirmez; değişen tek şey bağlantı adresi ve şemasıdır (bkz. [Bağlanma](#balanma)).
+Pratikte bunun karşılığı, protokolün ve komut kümesinin korunmuş olmasıdır. Mevcut Redis istemcileri, sürücüleri ve araçları — `redis-cli`, ioredis, `redis-py`, Spring Data Redis — Valkey'e bağlanmak için değişiklik gerektirmez; değişen tek şey bağlantı adresi ve şemasıdır (bkz. [Bağlanma](#bağlanma)).
 
 ---
 
@@ -38,7 +38,7 @@ Bir instance oluşturulduğunda Komuta seçilen bölgede bir Valkey kümesi kura
 
 ### Instance, plan ve bölge
 
-Bir **instance**, kendi belleği, kendi kimlik bilgisi ve kendi yedek zinciriyle çalışan bağımsız bir Valkey sunucusudur. CPU, bellek, disk ve sunucu (replika) sayısı bağlı olduğu **plandan** gelir. Plandaki bellek yalnız bir fiyat farkı değil, verinin ne kadar yer bulacağını belirleyen değerdir (bkz. [Kullanılabilir Bellek](#kullanlabilir-bellek)).
+Bir **instance**, kendi belleği, kendi kimlik bilgisi ve kendi yedek zinciriyle çalışan bağımsız bir Valkey sunucusudur. CPU, bellek, disk ve sunucu (replika) sayısı bağlı olduğu **plandan** gelir. Plandaki bellek yalnız bir fiyat farkı değil, verinin ne kadar yer bulacağını belirleyen değerdir (bkz. [Kullanılabilir Bellek](#kullanılabilir-bellek)).
 
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance kurmaktır.
 
@@ -77,7 +77,7 @@ Veri için kullanılabilecek bellek, planın toplam belleğinin **%75'idir.** Ka
 | 4 GB | ~3 GB |
 | 8 GB | ~6 GB |
 
-Sınıra ulaşıldığında ne olacağını instance'ın tahliye politikası belirler; iki davranıştan biri geçerlidir (bkz. [Tahliye Politikası](#tahliye-politikas)).
+Sınıra ulaşıldığında ne olacağını instance'ın tahliye politikası belirler; iki davranıştan biri geçerlidir (bkz. [Tahliye Politikası](#tahliye-politikası)).
 
 ---
 
@@ -162,7 +162,7 @@ Günde bir kez tam yedek alınır ve nesne depolamasında tutulur. Yedek, alınd
 ### Zamanlama ve saklama süresi
 
 - Yedeğin saati beş alanlı bir cron ifadesiyle verilir — `0 3 * * *` her gün UTC 03:00 demektir.
-- Saklama süresi gün olarak yazılır ve 1 ile 365 gün arasında olabilir; varsayılan 7 gündür.
+- Saklama süresi gün olarak yazılır ve 2 ile 365 gün arasında olabilir; varsayılan 7 gündür.
 - Planlı yedeğin dışında elle yedek alınabilir. Bu, günlük yedeğin yerine geçmez; ona ek bir kopya üretir. Riskli bir işlemden hemen önce bir koruma noktası isteniyorsa doğru yol budur.
 
 Yedek saatini değiştirmek saklama süresini etkilemez; saklama süresi yalnız açıkça değiştirildiğinde güncellenir. Son yedeğin 26 saatten eski olması ayrıca işaretlenir — bu, günlük zamanlamanın geciktiği anlamına gelir.
@@ -184,7 +184,7 @@ Bunların dışındaki hiçbir yol yedeklere dokunmaz. Instance hata durumuna d�
 
 ## Plan Değişikliği
 
-Plan değişikliği CPU, bellek, disk ve sunucu sayısını hedef planın değerlerine taşır. Bellek değiştiği için veri için kullanılabilir alan da aynı oranda değişir (bkz. [Kullanılabilir Bellek](#kullanlabilir-bellek)).
+Plan değişikliği CPU, bellek, disk ve sunucu sayısını hedef planın değerlerine taşır. Bellek değiştiği için veri için kullanılabilir alan da aynı oranda değişir (bkz. [Kullanılabilir Bellek](#kullanılabilir-bellek)).
 
 Hedef plan seçildiğinde bir etki önizlemesi hesaplanır: değişikliğin türü (yükseltme, düşürme, topoloji değişikliği), tahmini kesinti, kaynak değişiklikleri ve varsa uyarılar. Önizleme uygulanamaz bir değişiklik bildirdiğinde işlem başlatılamaz.
 
