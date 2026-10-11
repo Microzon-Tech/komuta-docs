@@ -48,4 +48,4 @@ Each probe is performed using one of three methods:
 ## Related Documents
 
 - [Service Dashboard](service-dashboard.md) — The service's live health status and pods.
-- [Autoscaling](autoscaling.md) — Adjusting replica count based on load.
+- [Autoscaling](services-autoscaling.md) — Adjusting replica count based on load.

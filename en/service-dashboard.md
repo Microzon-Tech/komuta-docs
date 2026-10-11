@@ -119,7 +119,6 @@ The **Restart** button on the panel recreates all of the service's active pods.
 
 ## Related Documents
 
-- [Deploy Strategies](deployment-strategies.md) — How Blue-Green, Canary, and Auto Promote work.
-- [Service Management](service-guide.md) — Service tabs other than the dashboard.
+- [Deployment History](service-deployment-history.md) — Deployment strategies, released versions, and rollback.
 - [MCP Setup](mcp-setup.md) — Connecting your coding agent to Komuta.
-- [Monitoring and Logs](monitoring-logs.md) — Log search, metric history, and alerts.
+- [Logs](service-logs.md) — Searching and filtering the service's logs.

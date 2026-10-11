@@ -22,8 +22,6 @@ The strategy determines how the new version is rolled out to live. Which strateg
 | **Auto Promote** | Hands-off flows | Same as Blue-Green, but the switch happens automatically once the new version is ready. |
 | **Canary** | Advanced use | Gradually shifts traffic to the new version. Promoting the new version requires manual management. |
 
-See the [Deploy Strategies](deployment-strategies.md) page for details.
-
 ---
 
 ## Rollout Actions
@@ -52,6 +50,5 @@ Every deployment record has a **Rollback** action. Once confirmed, the service r
 
 ## Related Documents
 
-- [Deploy Strategies](deployment-strategies.md) — How Blue-Green, Canary, and Auto Promote work.
-- [Pipelines](pipeline-guide.md) — The build and release process that produces a deployment.
+- [Pipelines](service-pipeline-guide.md) — The build and release process that produces a deployment.
 - [Service Dashboard](service-dashboard.md) — Deploying a new version and live rollout status.

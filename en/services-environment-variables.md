@@ -42,4 +42,4 @@ Variables can be downloaded or copied to the clipboard in `.env`, JSON, YAML, CS
 ## Related Documents
 
 - [Service Dashboard](service-dashboard.md) — Overall service status and deploy actions.
-- [Pipelines](pipeline-guide.md) — How the build stage works.
+- [Pipelines](service-pipeline-guide.md) — How the build stage works.

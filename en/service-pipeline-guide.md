@@ -54,7 +54,7 @@ If automatic cancellation is enabled, the new version is withdrawn and **the sta
 
 ## Related Documents
 
-- [Deploy Strategies](deployment-strategies.md) — How the deployment stage works under Blue-Green, Canary, and Auto Promote.
+- [Deployment History](service-deployment-history.md) — Deployment strategies, released versions, and rollback.
 - [Service Dashboard](service-dashboard.md) — Deploying a new version and monitoring rollout status.
 - [MCP Setup](mcp-setup.md) — Connecting your coding agent to Komuta.
-- [Monitoring and Logs](monitoring-logs.md) — Service logs and alerts.
+- [Logs](service-logs.md) — Service logs.

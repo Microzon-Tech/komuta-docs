@@ -42,4 +42,4 @@ Değişkenler `.env`, JSON, YAML, CSV, shell ve Kubernetes manifest formatların
 ## İlgili Dokümanlar
 
 - [Servis Dashboard](service-dashboard.md) — Servisin genel durumu ve deploy işlemleri.
-- [Pipeline'lar](pipeline-guide.md) — Build aşamasının nasıl işlediği.
+- [Pipeline'lar](service-pipeline-guide.md) — Build aşamasının nasıl işlediği.

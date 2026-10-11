@@ -16,4 +16,4 @@ Settings you can configure:
 ## Related Documents
 
 - [Service Dashboard](service-dashboard.md) — The service's resource package and live usage.
-- [Deployment History](deployment-history.md) — Running replica count and version information.
+- [Deployment History](service-deployment-history.md) — Running replica count and version information.

@@ -54,7 +54,7 @@ Otomatik iptal devredeyse yeni sürüm geri çekilir ve **stabil sürüm trafiğ
 
 ## İlgili Dokümanlar
 
-- [Deploy Stratejileri](deployment-strategies.md) — Dağıtım aşamasının Blue-Green, Canary ve Auto Promote'ta nasıl işlediği.
+- [Dağıtım Geçmişi](service-deployment-history.md) — Dağıtım stratejileri, yayına alınan sürümler ve geri alma.
 - [Servis Dashboard](service-dashboard.md) — Yeni sürüm dağıtma ve rollout durumunu izleme.
 - [MCP Kurulumu](mcp-setup.md) — Kod ajanınızı Komuta'ya bağlama.
-- [İzleme ve Loglar](monitoring-logs.md) — Servis logları ve uyarılar.
+- [Loglar](service-logs.md) — Servis logları.

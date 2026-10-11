@@ -42,6 +42,5 @@ The page's **Rules**, **People**, **Machines**, **Activity** and **Settings** ta
 
 ## Related Documents
 
-- [Ingress and Domains](ingress-domains.md) — Managing addresses exposed to the outside world.
 - [Service Dashboard](service-dashboard.md) — Traffic flow from ingress to pods.
 - [Service Access Protection](service-access-protection.md) — Protecting the service's public URL with sign-in, an IP allow-list and path rules.
