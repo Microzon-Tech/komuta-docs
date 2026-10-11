@@ -1,6 +1,6 @@
 # Deploying from CI
 
-Your own CI pipeline (GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket…) can call Komuta as its last step, after its tests and approvals pass. Komuta builds the branch you send and releases it; your CI can wait for the result and pass or fail its own job accordingly.
+Your own CI pipeline (GitHub Actions, GitLab CI, Jenkins, Azure Pipelines…) can call Komuta as its last step, after its tests and approvals pass. Komuta builds the branch you send and releases it; your CI can wait for the result and pass or fail its own job accordingly.
 
 This works with a **deploy token**. A deploy token is bound to a single service, can only do what you allow, and cannot be mixed up with your account's general API keys.
 
@@ -39,7 +39,7 @@ The GitHub Actions job needs `permissions: id-token: write`; the GitLab CI job d
 
 ## Ready-made Snippets
 
-The **CI/CD integration** tab provides copy-ready examples filled in for your service, for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines and `curl`. Each one starts the deploy, waits for the result, and fails the CI job if the deploy fails. The **Build and deploy / Deploy a ready-made image** switch above the snippets turns them into image mode; there the script reads the image you pushed, pinned by digest, from the `IMAGE` variable.
+The **CI/CD integration** tab provides copy-ready examples filled in for your service, for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines and `curl`. Each one starts the deploy, waits for the result, and fails the CI job if the deploy fails. The **Build and deploy / Deploy a ready-made image** switch above the snippets turns them into image mode; there the script reads the image you pushed, pinned by digest, from the `IMAGE` variable.
 
 The shortest GitHub Actions example. It only **starts** the deploy and does not wait for the result, so the CI job passes as soon as Komuta accepts the request:
 

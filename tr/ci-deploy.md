@@ -1,6 +1,6 @@
 # CI'dan Deploy Tetikleme
 
-Kendi CI hattınız (GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket…) testlerini ve onaylarını bitirdikten sonra son adımda Komuta'yı çağırabilir. Komuta gönderilen branch'i derleyip yayına alır; CI de deploy'un sonucunu bekleyip kendi işini başarılı ya da başarısız sayar.
+Kendi CI hattınız (GitHub Actions, GitLab CI, Jenkins, Azure Pipelines…) testlerini ve onaylarını bitirdikten sonra son adımda Komuta'yı çağırabilir. Komuta gönderilen branch'i derleyip yayına alır; CI de deploy'un sonucunu bekleyip kendi işini başarılı ya da başarısız sayar.
 
 Bu yol **dağıtım token'ı** ile çalışır. Dağıtım token'ı tek bir servise bağlıdır, yalnızca izin verdiğiniz işlemleri yapabilir ve hesabınızın genel API anahtarlarıyla karıştırılamaz.
 
@@ -39,7 +39,7 @@ GitHub Actions işi `permissions: id-token: write` ister; GitLab CI işinde `id_
 
 ## Hazır Kod Parçaları
 
-**CI/CD entegrasyonu** sekmesi GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, Bitbucket Pipelines ve `curl` için servisinize göre doldurulmuş, kopyalanmaya hazır örnekler verir. Her örnek deploy'u başlatır, sonucu bekler ve deploy başarısız olursa CI işini başarısız sayar. Sekmenin üstündeki **Derleyip dağıt / Hazır imaj dağıt** seçimiyle örnekler hazır imaj moduna geçer; bu modda betik, push ettiğiniz imajı digest ile `IMAGE` değişkeninden okur.
+**CI/CD entegrasyonu** sekmesi GitHub Actions, GitLab CI, Jenkins, Azure Pipelines ve `curl` için servisinize göre doldurulmuş, kopyalanmaya hazır örnekler verir. Her örnek deploy'u başlatır, sonucu bekler ve deploy başarısız olursa CI işini başarısız sayar. Sekmenin üstündeki **Derleyip dağıt / Hazır imaj dağıt** seçimiyle örnekler hazır imaj moduna geçer; bu modda betik, push ettiğiniz imajı digest ile `IMAGE` değişkeninden okur.
 
 GitHub Actions için en kısa örnek. Bu örnek deploy'u yalnızca **başlatır**, sonucunu beklemez; Komuta isteği kabul ettiği anda CI işi başarılı biter:
 

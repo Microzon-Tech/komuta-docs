@@ -10,7 +10,7 @@ Bir instance oluşturulduğunda Komuta seçilen bölgede bir PostgreSQL kümesi 
 
 ### Instance, plan ve bölge
 
-Bir **instance**, kendi diski, kendi kullanıcısı ve kendi yedek zinciriyle çalışan bağımsız bir veritabanı sunucusudur. CPU, bellek, disk ve sunucu (replika) sayısı bağlı olduğu **plandan** gelir; sunucu parametreleri de plandan hesaplanır ve elle ayarlanamaz (bkz. [Otomatik uygulanan sınırlar](#otomatik-uygulanan-snrlar)).
+Bir **instance**, kendi diski, kendi kullanıcısı ve kendi yedek zinciriyle çalışan bağımsız bir veritabanı sunucusudur. CPU, bellek, disk ve sunucu (replika) sayısı bağlı olduğu **plandan** gelir; sunucu parametreleri de plandan hesaplanır ve elle ayarlanamaz (bkz. [Otomatik uygulanan sınırlar](#otomatik-uygulanan-sınırlar)).
 
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance oluşturup veriyi aktarmaktır.
 
@@ -39,7 +39,7 @@ Yeni bir instance, PostgreSQL listesindeki **Yeni PostgreSQL örneği** butonund
 
 ### 1. Bölge ve Plan
 
-Bölge ve plan bu adımda seçilir. Plan seçimi sadece kaynak miktarını değil, otomatik uygulanan bağlantı sınırlarını ve sorgu zaman aşımlarını da belirler — küçük planlarda bu süreler oldukça kısadır. Toplu veri yükleme ya da raporlama yapılacaksa plan [Otomatik uygulanan sınırlar](#otomatik-uygulanan-snrlar) bölümündeki değerlere göre seçilmelidir.
+Bölge ve plan bu adımda seçilir. Plan seçimi sadece kaynak miktarını değil, otomatik uygulanan bağlantı sınırlarını ve sorgu zaman aşımlarını da belirler — küçük planlarda bu süreler oldukça kısadır. Toplu veri yükleme ya da raporlama yapılacaksa plan [Otomatik uygulanan sınırlar](#otomatik-uygulanan-sınırlar) bölümündeki değerlere göre seçilmelidir.
 
 ### 2. Ad, Sürüm ve Veritabanı
 
@@ -84,7 +84,7 @@ Yönetici yetkisi gerektiren işlemler desteklenmez: sunucu düzeyi parametreler
 
 Parolalar platform tarafında şifrelenmiş saklanır ve yalnız bu ekran açıldığında çözülür. **Her görüntüleme; instance, kullanıcı ve zaman bilgisiyle denetim kaydına yazılır.** Kimlik bilgisi paylaşmak yerine ekip üyelerine kendi hesaplarından erişim verilmesi önerilir.
 
-Instance'ın özel ağ yolu varsa bağlantı dizeleri listesinin sonunda **Bağlantı Dizesi (özel ağ)** ayrıca yer alır. Bu adres genel adresle aynı şey değildir; hangisinin kullanılacağı [Ağ erişimi](#a-eriimi) bölümündeki moda bağlıdır.
+Instance'ın özel ağ yolu varsa bağlantı dizeleri listesinin sonunda **Bağlantı Dizesi (özel ağ)** ayrıca yer alır. Bu adres genel adresle aynı şey değildir; hangisinin kullanılacağı [Ağ erişimi](#ağ-erişimi) bölümündeki moda bağlıdır.
 
 ![Genel Bakış sekmesi](https://cdn.komuta.io/docs/tr/images/postgresql/dashboard.png)
 
