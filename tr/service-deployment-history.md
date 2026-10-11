@@ -22,8 +22,6 @@ Strateji, yeni sürümün canlıya nasıl alınacağını belirler. Servisin han
 | **Auto Promote** | Müdahalesiz akış isteyenler | Blue-Green ile aynı, ancak yeni sürüm hazır olduğunda geçiş otomatik yapılır. |
 | **Canary** | Gelişmiş kullanım | Trafiği yeni sürüme kademeli aktarır. Yeni sürüme geçiş manuel yönetim gerektirir. |
 
-Ayrıntılar için [Deploy Stratejileri](deployment-strategies.md) sayfasına bakılabilir.
-
 ---
 
 ## Rollout İşlemleri
@@ -52,6 +50,5 @@ Her dağıtım kaydında **Geri al** işlemi bulunur. Onaylandığında servis o
 
 ## İlgili Dokümanlar
 
-- [Deploy Stratejileri](deployment-strategies.md) — Blue-Green, Canary ve Auto Promote'un nasıl işlediği.
-- [Pipeline'lar](pipeline-guide.md) — Dağıtımı üreten derleme ve yayınlama süreci.
+- [Pipeline'lar](service-pipeline-guide.md) — Dağıtımı üreten derleme ve yayınlama süreci.
 - [Servis Dashboard](service-dashboard.md) — Yeni sürüm dağıtma ve anlık rollout durumu.

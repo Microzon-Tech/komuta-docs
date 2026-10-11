@@ -16,4 +16,4 @@ Düzenlenebilecek ayarlar:
 ## İlgili Dokümanlar
 
 - [Servis Dashboard](service-dashboard.md) — Servisin kaynak paketi ve anlık kullanımı.
-- [Dağıtım Geçmişi](deployment-history.md) — Çalışan replika sayısı ve sürüm bilgisi.
+- [Dağıtım Geçmişi](service-deployment-history.md) — Çalışan replika sayısı ve sürüm bilgisi.

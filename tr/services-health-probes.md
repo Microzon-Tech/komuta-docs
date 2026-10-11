@@ -48,4 +48,4 @@ Her kontrol üç yöntemden biriyle yapılır:
 ## İlgili Dokümanlar
 
 - [Servis Dashboard](service-dashboard.md) — Servisin anlık sağlık durumu ve pod'lar.
-- [Otomatik Ölçekleme](autoscaling.md) — Replika sayısının yüke göre ayarlanması.
+- [Otomatik Ölçekleme](services-autoscaling.md) — Replika sayısının yüke göre ayarlanması.

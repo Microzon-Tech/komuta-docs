@@ -119,7 +119,6 @@ Panelin **Yeniden Başlat** butonu servisin aktif pod'larının tamamını yenid
 
 ## İlgili Dokümanlar
 
-- [Deploy Stratejileri](deployment-strategies.md) — Blue-Green, Canary ve Auto Promote'un nasıl işlediği.
-- [Servis Yönetimi](service-guide.md) — Dashboard dışındaki servis sekmeleri.
+- [Dağıtım Geçmişi](service-deployment-history.md) — Dağıtım stratejileri, yayına alınan sürümler ve geri alma.
 - [MCP Kurulumu](mcp-setup.md) — Kod ajanınızı Komuta'ya bağlama.
-- [İzleme ve Loglar](monitoring-logs.md) — Log arama, metrik geçmişi ve uyarılar.
+- [Loglar](service-logs.md) — Servis loglarında arama ve filtreleme.

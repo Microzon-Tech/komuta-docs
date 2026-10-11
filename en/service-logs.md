@@ -177,5 +177,4 @@ Not every line in the list is application output; Komuta also writes its own lin
 ## Related Documents
 
 - [Service Dashboard](service-dashboard.md) — the service's live status; clicking a pod in the topology opens this same log panel.
-- [Observability Guide](observability-guide.md) — traces, RED metrics, and data health.
 - [Alert Guide](alert-guide.md) — management of log alerts and other rules.

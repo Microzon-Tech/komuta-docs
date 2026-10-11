@@ -69,6 +69,6 @@ The decision made for every incoming push is logged along with its commit. If an
 
 ## Related Documents
 
-- [Pipelines](pipeline-guide.md) — The build and release process for a triggered deployment.
-- [Deployment History](deployment-history.md) — Released versions and rollback.
+- [Pipelines](service-pipeline-guide.md) — The build and release process for a triggered deployment.
+- [Deployment History](service-deployment-history.md) — Released versions and rollback.
 - [Service Dashboard](service-dashboard.md) — Changing the branch the service tracks.

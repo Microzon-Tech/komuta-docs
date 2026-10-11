@@ -69,6 +69,6 @@ Gelen her push için verilen karar commit'iyle birlikte kaydedilir. Beklenen bir
 
 ## İlgili Dokümanlar
 
-- [Pipeline'lar](pipeline-guide.md) — Tetiklenen dağıtımın derleme ve yayınlama süreci.
-- [Dağıtım Geçmişi](deployment-history.md) — Yayına alınan sürümler ve geri alma.
+- [Pipeline'lar](service-pipeline-guide.md) — Tetiklenen dağıtımın derleme ve yayınlama süreci.
+- [Dağıtım Geçmişi](service-deployment-history.md) — Yayına alınan sürümler ve geri alma.
 - [Servis Dashboard](service-dashboard.md) — Servisin takip ettiği branch'i değiştirme.

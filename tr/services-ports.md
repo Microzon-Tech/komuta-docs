@@ -42,6 +42,5 @@ Sayfanın **Kurallar**, **Kişiler**, **Makineler**, **Etkinlik** ve **Ayarlar**
 
 ## İlgili Dokümanlar
 
-- [Ingress ve Domainler](ingress-domains.md) — Dış dünyaya açılan adreslerin yönetimi.
 - [Servis Dashboard](service-dashboard.md) — Trafiğin ingress'ten pod'lara akışı.
 - [Servis Erişim Koruması](service-access-protection.md) — Servisin genel URL'ini giriş, IP izin listesi ve yol kurallarıyla korumak.

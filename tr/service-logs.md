@@ -177,5 +177,4 @@ Listedeki her satır uygulamanın çıktısı değildir; Komuta da kendi satırl
 ## İlgili Dokümanlar
 
 - [Servis Dashboard](service-dashboard.md) — servisin anlık durumu; topolojideki bir pod'a tıklandığında aynı log paneli açılır.
-- [Observability Rehberi](observability-guide.md) — trace, RED metrikleri ve veri sağlığı.
 - [Alarm Rehberi](alert-guide.md) — log alarmlarının ve diğer kuralların yönetimi.
