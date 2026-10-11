@@ -22,6 +22,8 @@ Giriş yap:
 claude mcp login komuta
 ```
 
+![Claude Code terminalinde Komuta MCP sunucusunun eklenmesi ve tarayıcı üzerinden giriş yapılması](https://cdn.komuta.io/docs/tr/images/mcp/claude-code-mcp-setup.gif)
+
 ### Claude Desktop
 
 1. `Settings` → `Connectors` → `Add` → `Custom Connector` yoluna git.
@@ -52,6 +54,8 @@ claude mcp login komuta
    ```bash copy
    codex mcp login komuta
    ```
+
+![Terminalde Codex CLI kurulumu, Komuta MCP sunucusunun config.toml dosyasına eklenmesi ve giriş yapılması](https://cdn.komuta.io/docs/tr/images/mcp/codex-mcp-setup.gif)
 
 ## Bağlantının doğrulanması
 

@@ -22,6 +22,8 @@ Log in:
 claude mcp login komuta
 ```
 
+![Adding the Komuta MCP server in the Claude Code terminal and logging in through the browser](https://cdn.komuta.io/docs/en/images/mcp/claude-code-mcp-setup.gif)
+
 ### Claude Desktop
 
 1. Go to `Settings` → `Connectors` → `Add` → `Custom Connector`.
@@ -52,6 +54,8 @@ claude mcp login komuta
    ```bash copy
    codex mcp login komuta
    ```
+
+![Installing the Codex CLI in the terminal, adding the Komuta MCP server to config.toml and logging in](https://cdn.komuta.io/docs/en/images/mcp/codex-mcp-setup.gif)
 
 ## Verify the connection
 
