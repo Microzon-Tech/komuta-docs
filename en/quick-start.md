@@ -9,19 +9,39 @@ Everything you need on Komuta, from shipping your code to spinning up your datab
 
 ---
 
+## Before You Start
+
+**Account.** Sign up at [console.komuta.io](https://console.komuta.io) with an email address and password, or with your Google or GitHub account. If you signed up with email, confirm your address with the link we send you. No credit card is needed to sign up.
+
+**Organization.** Signing up creates an organization that belongs to you, with you as its admin. Services, managed services, the wallet and the spending limit all belong to the organization. Invite teammates as **Member** or **Admin** from the **Access Control** page; an invitation is valid for 72 hours. If you belong to more than one organization, switch between them from the user menu in the top right.
+
+**Git account.** Services are built from a Git repo. Before your first service, connect your GitHub, GitLab or Azure DevOps account on the **Integrations** page; public repos are deployed through a connected account too.
+
+**Starting for free.** The organization created at sign-up gets a USD 10 welcome credit, valid for 30 days. Each organization can run one service on the free package; a free service sleeps after a while without traffic and wakes on the first request. Every billing cycle includes 2,000 build minutes at no cost. PostgreSQL, Valkey, RabbitMQ and API Gateway are paid. The free plan rules and all prices are on the [Pricing](https://www.komuta.io/pricing) page.
+
+**Cost.** Prices are in USD and exclude tax; usage is metered by the hour. You see the price before you create anything paid: the service wizard shows each package's price, and the managed service wizard and the Stack plan show the **Estimated monthly cost**. Organization admins see spending so far under **Account → Current Spend** and issued statements under **Account → Statements**; a statement is issued on the 6th of every month.
+
+**Spending limit.** A new organization starts with a USD 20 monthly resource limit. If creating something, or moving it to a bigger plan, would take the monthly estimate over the limit, the action is refused; usage that is already running is not stopped. The limit goes up as you verify a card, add funds and pay statements; your current level is under **Account → Wallet**.
+
+---
+
 ## Publishing a Service
 
-This is how you build and deploy an app from your Git repo. The flow starts with **New Project** on the [**Apps**](https://console.komuta.io/services) page and goes through four steps: the project and infrastructure the service will run on (**Komuta PaaS** or your own cluster), the Git account and the registry the image will be pushed to, configuring the services found in the repo, and deploying the service.
+This is how you build and deploy an app from your Git repo. The flow starts with **New App** on the [**Apps**](https://console.komuta.io/services) page and has three steps:
 
-> **Note:** In the **Configure** step, Komuta scans the repo and finds services from Dockerfiles; if there's no Dockerfile in the repo, it generates one automatically for the build. **Deploy** builds the code and takes the service live.
+1. **Project** — The project the service is added to and the region it runs in.
+2. **Connect** — The Git account, repo and branch, and the container registry the built image is pushed to. Komuta's own registry is ready to use; you can add your own on the **Integrations** page.
+3. **Configure** — Settings for the services found in the repo. The final button builds the code and takes the service live.
 
-![New project wizard's Configure step — services found in the repo, listed](https://cdn.komuta.io/docs/tr/images/services/quick-start-create-service.png)
+> **Note:** Komuta scans the repo and finds services from their Dockerfiles. If the repo has no Dockerfile, AI generates one and opens it as a pull request on your repo; merge that pull request into your branch, or later builds will fail. If there is a `komuta.yaml` at the repo root, the flow switches to creating a Stack.
+
+![New app wizard's Configure step — services found in the repo, listed](https://cdn.komuta.io/docs/tr/images/services/quick-start-create-service.png)
 
 ---
 
 ## Jobs and CronJobs
 
-A Job is a one-off task that runs once and finishes; a CronJob ties the same task to a schedule. Both are created from the [**Jobs and CronJobs**](https://console.komuta.io/jobs) page, and their flows only diverge at the scheduling step: Job selects **I'll run it manually**, CronJob selects **Attach to schedule**.
+A Job is a one-off task that runs once and finishes; a CronJob ties the same task to a schedule. Both are created from the [**Jobs & CronJobs**](https://console.komuta.io/jobs) page, and their flows only diverge at the scheduling step: Job selects **I'll run it myself**, CronJob selects **On a schedule**.
 
 What the job runs is chosen from three sources — a project in the repo (which gets built), a short script written directly (Bash, Python, or Node), or a ready-made container image. A published Job is triggered manually whenever needed; a CronJob runs on its own according to its schedule, and run history is kept on the same page.
 

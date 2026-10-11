@@ -9,13 +9,33 @@ Komuta'da kodunuzu yayına almaktan veritabanınızı ayağa kaldırmaya kadar i
 
 ---
 
+## Başlamadan Önce
+
+**Hesap.** [console.komuta.io](https://console.komuta.io) adresinden e-posta ve şifreyle ya da Google veya GitHub hesabınızla kayıt olun. E-postayla kayıt olduysanız gelen bağlantıyla adresinizi doğrulayın. Kayıt için kredi kartı gerekmez.
+
+**Organizasyon.** Kayıt olunca size ait bir organizasyon açılır ve yöneticisi siz olursunuz. Servisler, yönetilen servisler, cüzdan ve harcama limiti organizasyona aittir. Ekip arkadaşlarınızı **Erişim Yönetimi** sayfasından **Üye** ya da **Yönetici** olarak davet edebilirsiniz; davet 72 saat geçerlidir. Birden fazla organizasyona üyeyseniz sağ üstteki kullanıcı menüsünden aralarında geçiş yaparsınız.
+
+**Git hesabı.** Servisler Git reposundan build edilir. İlk servisten önce **Entegrasyonlar** sayfasından GitHub, GitLab ya da Azure DevOps hesabınızı bağlayın; herkese açık bir repo da bağlı bir hesap üzerinden yayınlanır.
+
+**Ücretsiz başlangıç.** Kayıtla açılan organizasyona 30 gün geçerli 10 USD hoş geldin kredisi yüklenir. Her organizasyon bir servisi ücretsiz pakette çalıştırabilir; ücretsiz servis bir süre trafik almazsa uyur ve ilk istekle uyanır. Her fatura döneminde 2.000 build dakikası ücretsizdir. PostgreSQL, Valkey, RabbitMQ ve API Gateway ücretlidir. Ücretsiz planın kuralları ve fiyatlar [Fiyatlandırma](https://www.komuta.io/pricing) sayfasındadır.
+
+**Maliyet.** Fiyatlar USD cinsindendir ve vergi hariçtir; kullanım saatlik ölçülür. Ücretli bir şeyi oluşturmadan önce fiyatı görürsünüz: servis sihirbazında paketlerin fiyatı, yönetilen servis sihirbazında ve Stack planında **Tahmini aylık maliyet** gösterilir. Organizasyon yöneticileri o ana kadarki harcamayı **Hesap → Güncel Harcama**, kesilen ekstreleri **Hesap → Ekstreler** sayfasında görür; ekstre her ayın 6'sında kesilir.
+
+**Harcama limiti.** Yeni bir organizasyon aylık 20 USD'lik kaynak limitiyle başlar. Yeni bir şey oluşturduğunuzda ya da planını büyüttüğünüzde aylık tahmin bu limiti aşacaksa işlem yapılmaz; zaten çalışan kullanım ise durdurulmaz. Kart doğruladıkça, bakiye yükledikçe ve ekstre ödedikçe limit yükselir; güncel seviye **Hesap → Cüzdan** sayfasındadır.
+
+---
+
 ## Servis Yayınlama
 
-Git reponuzdaki bir uygulamayı build edip canlıya almanın yolu budur. Akış [**Uygulamalar**](https://console.komuta.io/services) sayfasındaki **Yeni Proje** ile başlar ve dört adımdan geçer: servisin çalışacağı proje ve altyapı (**Komuta PaaS** ya da kendi cluster'ınız), Git hesabı ile imajın gönderileceği registry, repodan bulunan servislerin yapılandırması ve servisin yayınlanması.
+Git reponuzdaki bir uygulamayı build edip canlıya almanın yolu budur. Akış [**Uygulamalar**](https://console.komuta.io/services) sayfasındaki **Yeni Uygulama** ile başlar ve üç adımdan geçer:
 
-> **Not:** Komuta **Yapılandır** adımında repoyu tarar ve Dockerfile'lardan servisleri bulur; repoda Dockerfile yoksa build için otomatik olarak bir tane üretir. **Deploy** ile kod build edilir ve servis canlıya alınır.
+1. **Proje** — Servisin ekleneceği proje ve çalışacağı bölge.
+2. **Bağlan** — Git hesabı, repo, branch ve build edilen imajın gönderileceği konteyner kayıt defteri. Komuta'nın kendi kayıt defteri hazır gelir; isterseniz **Entegrasyonlar** sayfasından kendinizinkini ekleyebilirsiniz.
+3. **Yapılandır** — Repoda bulunan servislerin ayarları. Son düğmeyle kod build edilir ve servis canlıya alınır.
 
-![Yeni proje sihirbazının Yapılandır adımı — repodan bulunan servisler listeli](https://cdn.komuta.io/docs/tr/images/services/quick-start-create-service.png)
+> **Not:** Komuta repoyu tarar ve servisleri Dockerfile'lardan bulur. Repoda Dockerfile yoksa yapay zekâ bir tane üretir ve reponuza pull request olarak açar; sonraki build'lerin çalışması için bu pull request'i branch'inize merge etmeniz gerekir. Repo kökünde `komuta.yaml` varsa akış Stack oluşturmaya geçer.
+
+![Yeni uygulama sihirbazının Yapılandır adımı — repoda bulunan servisler listeli](https://cdn.komuta.io/docs/tr/images/services/quick-start-create-service.png)
 
 ---
 
