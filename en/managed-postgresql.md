@@ -107,7 +107,7 @@ The application doesn't connect to the database directly but through a connectio
 
 Because the pool runs in transaction mode, the server connection passes to another client when a transaction ends. A session-level `SET` therefore doesn't carry over to the next transaction: set it inside the transaction with `SET LOCAL`, or make it the user's default with `ALTER ROLE ... SET` (it applies to the connections the pool opens afterwards).
 
-When more concurrent connections are needed, the only way is to move to a higher plan; this limit can't be raised separately.
+Client connections grow with the plan's vCPU, while the database's own limit stops at 100 from 2 GB up: a larger plan adds client connections, CPU and memory rather than concurrent database connections. Neither limit can be raised separately.
 
 ### Query Timeouts
 
@@ -319,7 +319,7 @@ Restarting, credential rotation, and deletion are all gathered on the **Operatio
 - **Soft suspend** cuts incoming connections but keeps the server running; resuming takes seconds.
 - **Fully suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
 
-Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks the spending limit, the same way creating a new instance does; a fully suspended instance takes a few minutes to come back and takes a fresh backup when it does. An instance that the account's billing suspension stopped comes back by itself when that suspension is lifted.
+Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks that the compute it brings back fits the spending limit (the disk is already counted); a fully suspended instance takes a few minutes to come back and takes a fresh backup when it does. An instance that the account's billing suspension stopped comes back by itself when that suspension is lifted.
 
 ### Password Rotation
 
@@ -418,7 +418,7 @@ No. The user provided has full privileges on the database, but the server's admi
 
 ### Can the connection limit be raised separately?
 
-No. The database connection limit is fixed per plan (512 MB: 50, 1 GB: 60, 2 GB and up: 100); thanks to the connection pool the application can open far more connections than that. If more concurrent work is needed, move to a higher plan.
+No. The database connection limit is fixed per plan (512 MB: 50, 1 GB: 60, 2 GB and up: 100); thanks to the connection pool the application can open far more connections than that. From 2 GB up a larger plan adds client connections, CPU and memory, not database connections.
 
 ### Does restoring break the existing instance?
 

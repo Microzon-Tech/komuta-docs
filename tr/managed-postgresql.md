@@ -107,7 +107,7 @@ Uygulama veritabanına doğrudan değil, araya giren bir bağlantı havuzu (PgBo
 
 Havuz transaction modunda çalıştığı için bir transaction bittiğinde sunucu bağlantısı başka bir istemciye geçer. Oturum düzeyindeki `SET` bu yüzden bir sonraki transaction'a taşınmaz: ayarı transaction içinde `SET LOCAL` ile verin ya da kullanıcının varsayılanı olarak `ALTER ROLE ... SET` ile kalıcı hale getirin (havuzun bundan sonra açtığı bağlantılarda geçerli olur).
 
-Daha fazla eşzamanlı bağlantıya ihtiyaç duyulduğunda tek yol daha yüksek bir plana geçmektir; bu sınır ayrı olarak yükseltilemez.
+İstemci bağlantısı planın vCPU'suyla büyür; veritabanının kendi sınırı ise 2 GB ve üstünde 100'de kalır: daha büyük bir plan eşzamanlı veritabanı bağlantısı değil, istemci bağlantısı, CPU ve bellek ekler. İki sınır da ayrı olarak yükseltilemez.
 
 ### Sorgu zaman aşımları
 
@@ -319,7 +319,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 - **Soft askıya al** dışarıdan gelen bağlantıları keser ama sunucuyu çalışır tutar; geri açmak saniyeler sürer.
 - **Tamamen askıya al** sunucuyu durdurur; disk ve yedekler korunur, geri açmak birkaç dakika sürer.
 
-İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, yeni bir instance oluştururken olduğu gibi harcama limiti kontrol edilir; tamamen askıdaki bir instance birkaç dakikada açılır ve açılınca taze bir yedek alır. Hesabın faturalama askısı yüzünden durmuş bir instance, askı kalkınca kendiliğinden geri açılır.
+İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, geri gelen işlem gücünün harcama limitine sığdığı kontrol edilir (disk zaten hesaba katılıdır); tamamen askıdaki bir instance birkaç dakikada açılır ve açılınca taze bir yedek alır. Hesabın faturalama askısı yüzünden durmuş bir instance, askı kalkınca kendiliğinden geri açılır.
 
 ### Parola yenileme
 
@@ -418,7 +418,7 @@ Alınamaz. Verilen kullanıcı veritabanı üzerinde tam yetkilidir ama sunucunu
 
 ### Bağlantı sınırı ayrı olarak yükseltilebilir mi?
 
-Yükseltilemez. Veritabanı bağlantı sınırı plana göre sabittir (512 MB: 50, 1 GB: 60, 2 GB ve üstü: 100); uygulama tarafında bağlantı havuzu sayesinde bundan çok daha fazla bağlantı açılabilir. Daha fazla eşzamanlı iş gerekiyorsa daha yüksek bir plana geçilir.
+Yükseltilemez. Veritabanı bağlantı sınırı plana göre sabittir (512 MB: 50, 1 GB: 60, 2 GB ve üstü: 100); uygulama tarafında bağlantı havuzu sayesinde bundan çok daha fazla bağlantı açılabilir. 2 GB ve üstünde daha büyük bir plan veritabanı bağlantısı değil, istemci bağlantısı, CPU ve bellek ekler.
 
 ### Geri yükleme mevcut instance'ı bozar mı?
 
