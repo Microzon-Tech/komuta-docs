@@ -22,7 +22,7 @@ An instance can optionally be attached to a **project**.
 |---|---|
 | **Provisioning** | Setup is in progress; connection info isn't ready yet. |
 | **Active** | Running and accepting connections. |
-| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place. |
+| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place. Only the disk is billed while suspended — see [Suspending](#suspending). |
 | **Upgrading** | A plan change is being applied. |
 | **Upgrade Failed** | The plan change couldn't complete; the instance is **live** on its old plan and its data is intact. |
 | **Restoring** | A restore operation is in progress. |
@@ -96,29 +96,42 @@ If the instance has a private network path, a **Connection String (private netwo
 
 Server parameters are computed from the plan's resources; they can't be tuned by hand.
 
-| Parameter | Calculation | Bounds |
-|---|---|---|
-| Database connections | vCPU × 100 | min 100, max 1,000 |
-| Client connections | 5× database connections | 500 – 5,000 |
-| `shared_buffers` | RAM × 0.25 | — |
-| `effective_cache_size` | RAM × 0.75 | — |
+| Parameter | Value |
+|---|---|
+| Database connections | 512 MB: 50 · 1 GB: 60 · 2 GB and up: 100 |
+| Client connections | 512 MB and 1 GB: 200 · other plans: vCPU × 500 (500 – 5,000) |
+| `shared_buffers` | RAM × 0.25 |
+| `effective_cache_size` | RAM × 0.75 |
 
-Because a connection pool sits in front, the number of client-side connections can be higher than the actual number of database-side connections. Even so, the application's pool size should stay under the client limit in the table.
+The application doesn't connect to the database directly but through a connection pool in front of it (PgBouncer, transaction mode). That's why the number of client-side connections can be much higher than the actual number of database-side connections; even so, the application's pool size should stay under the client limit in the table.
 
-When more concurrent connections are needed, the only way is to move to a plan with a higher vCPU count; this limit can't be raised separately.
+Because the pool runs in transaction mode, the server connection passes to another client when a transaction ends. A session-level `SET` therefore doesn't carry over to the next transaction: set it inside the transaction with `SET LOCAL`, or make it the user's default with `ALTER ROLE ... SET`.
+
+When more concurrent connections are needed, the only way is to move to a higher plan; this limit can't be raised separately.
 
 ### Query Timeouts
 
-Automatic timeouts are applied based on the plan to keep a query or an open transaction from locking up the database. These values aren't user-configurable.
+Automatic timeouts are applied based on the plan to keep a query or an open transaction from locking up the database.
 
-| Plan RAM | Query duration | Idle transaction | Lock wait | Temp file |
-|---|---|---|---|---|
-| ≤ 4 GB | 30s | 30s | 10s | 512 MB – 1 GB |
-| ≤ 8 GB | 60s | 60s | 15s | 2 GB |
-| ≤ 16 GB | 120s | 120s | 30s | unlimited |
-| > 16 GB | unlimited | 300s | 60s | unlimited |
+| Plan RAM | Query duration | Idle transaction | Lock wait | Temp file | Ceiling |
+|---|---|---|---|---|---|
+| 512 MB – 1 GB | 30s | 5 min | 10s | 512 MB | 30 min |
+| 2 – 4 GB | 30s | 5 min | 10s | 512 MB – 1 GB | 1 h |
+| ≤ 8 GB | 60s | 5 min | 15s | 2 GB | 1 h |
+| ≤ 16 GB | 120s | 5 min | 30s | unlimited | 2 h |
+| > 16 GB | unlimited | 5 min | 60s | unlimited | 2 h |
 
-A query that exceeds its duration is canceled and the application gets an error. In addition, a check that runs every 5 minutes on every instance terminates queries and idle transactions that have exceeded roughly 5x these limits.
+A query that exceeds its duration is canceled and the application gets error `57014` (`query_canceled`); the connection stays open. A session that exceeds the idle-transaction limit is closed.
+
+In addition, a platform check runs every 5 minutes on every instance. It first **cancels** a query that has run past roughly 5× the query limit (at least 1 minute, 1 hour when there's no limit, never more than the plan ceiling), and closes the connection only if the query keeps running for 5 more minutes despite the cancel. It closes a session that has stayed idle in a transaction for 5× the idle limit. The check also catches sessions that lift the limit themselves, e.g. with `SET statement_timeout = 0`. Every action it takes is written to the database log as a line starting with `Komuta guardrail:` and shows up on the **Logs** tab.
+
+#### Changing the limits
+
+The query duration and idle-transaction limits can be changed from the **Query limits** card on the **Operations** tab, anywhere between 1 second and the plan ceiling. The change applies without a restart; **Back to plan values** returns to the plan's own values. A plan change keeps the chosen value, lowered to the new plan's ceiling if it's above it.
+
+#### Maintenance window
+
+For a long migration, a large index build or a `pg_dump`, the same card opens a 1–4 hour **maintenance window**. During the window the platform check leaves the instance alone, and the window closes by itself when it ends; **Close now** ends it early. The database's own limits still apply during the window — raise them for the session with `SET statement_timeout` for the long job (`pg_dump` does this itself).
 
 > **Warning:** Bulk data loads, large index builds, and reporting queries hit timeouts on smaller plans. Work like this should be split into chunks, run during off-peak hours, or run on a higher plan.
 
@@ -126,7 +139,7 @@ A query that exceeds its duration is canceled and the application gets an error.
 
 Data files and the WAL share the same disk; roughly 10% of the disk is reserved for WAL, and the rest goes to data.
 
-**When disk usage passes 80%, the database switches to read-only mode**: queries keep running, but write attempts fail. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
+**When disk usage passes 95%, or less than 5 GB of the disk is left free, the database switches to read-only mode** (on 10 GB disks the threshold is a tenth of the disk plus 512 MB free, about 85%): queries keep running, but write attempts fail. The disk alerts fire before this point. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
 
 ---
 
@@ -299,6 +312,13 @@ Restarting, credential rotation, and deletion are all gathered on the **Operatio
 
 **Restart** restarts servers one at a time; plans with a replica see no downtime. It's only available on instances that are running or whose upgrade has failed.
 
+### Suspending
+
+- **Soft suspend** cuts incoming connections but keeps the server running; resuming takes seconds.
+- **Fully suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
+
+Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks the spending limit, the same way creating a new instance does.
+
 ### Password Rotation
 
 **Rotate database password** generates a new password for the application user and **drops all existing connections.** The application gets errors until it reconnects with the new password.
@@ -396,7 +416,7 @@ No. The user provided has full privileges on the database, but the server's admi
 
 ### Can the connection limit be raised separately?
 
-No. The connection count is computed from the plan's vCPU; the only way to raise it is to move to a plan with a higher vCPU count.
+No. The database connection limit is fixed per plan (512 MB: 50, 1 GB: 60, 2 GB and up: 100); thanks to the connection pool the application can open far more connections than that. If more concurrent work is needed, move to a higher plan.
 
 ### Does restoring break the existing instance?
 
