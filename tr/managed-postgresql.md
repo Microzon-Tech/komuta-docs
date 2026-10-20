@@ -99,7 +99,7 @@ Sunucu parametreleri planın kaynaklarından hesaplanır; elle ayarlanmaz.
 | Parametre | Değer |
 |---|---|
 | Veritabanı bağlantısı | 512 MB: 50 · 1 GB: 60 · 2 GB ve üstü: 100 |
-| İstemci bağlantısı | 512 MB ve 1 GB: 200 · diğer planlar: vCPU × 500 (500 – 5.000) |
+| İstemci bağlantısı | 512 MB ve 1 GB: 200 · diğer planlar: vCPU × 1.000 (1.000 – 10.000) |
 | `shared_buffers` | RAM × 0,25 |
 | `effective_cache_size` | RAM × 0,75 |
 
@@ -319,7 +319,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 - **Soft askıya al** dışarıdan gelen bağlantıları keser ama sunucuyu çalışır tutar; geri açmak saniyeler sürer.
 - **Tamamen askıya al** sunucuyu durdurur; disk ve yedekler korunur, geri açmak birkaç dakika sürer.
 
-İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, yeni bir instance oluştururken olduğu gibi harcama limiti kontrol edilir.
+İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, yeni bir instance oluştururken olduğu gibi harcama limiti kontrol edilir; tamamen askıdaki bir instance birkaç dakikada açılır ve açılınca taze bir yedek alır. Hesabın faturalama askısı yüzünden durmuş bir instance, askı kalkınca kendiliğinden geri açılır.
 
 ### Parola yenileme
 
@@ -335,7 +335,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 
 İki yol vardır ve sonuçları farklıdır:
 
-- **Silmeyi planla** instance'ı 7 günlük bir bekleme süresinin sonunda silinmek üzere işaretler. Süre dolmadan **Planlı silmeyi iptal et** ile geri alınabilir; instance bu süre boyunca çalışmaya ve faturalanmaya devam eder.
+- **Silmeyi planla** instance'ı erişime kapatır (soft askıda olduğu gibi bağlantılar kesilir) ve 7 günlük bekleme süresinin sonunda siler; bu sürede faturalama yapılmaz. Süre dolmadan **Planlı silmeyi iptal et** instance'ı askıda geri getirir — 7 günden uzun süredir askıdaysa tamamen askıda — ve **Devam et** ile açılır. Instance kurulurken, değiştirilirken ya da geri yüklenirken silme planlanamaz.
 - **Kalıcı silme** instance'ı ve **yedekler dahil tüm verisini** anında yok eder.
 
 > **Uyarı:** Kalıcı silmenin geri dönüşü yoktur ve yedekler de silindiği için veri destek üzerinden de kurtarılamaz. Verinin bir süre daha durması isteniyorsa doğru seçim planlı silmedir.

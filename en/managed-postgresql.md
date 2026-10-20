@@ -99,7 +99,7 @@ Server parameters are computed from the plan's resources; they can't be tuned by
 | Parameter | Value |
 |---|---|
 | Database connections | 512 MB: 50 · 1 GB: 60 · 2 GB and up: 100 |
-| Client connections | 512 MB and 1 GB: 200 · other plans: vCPU × 500 (500 – 5,000) |
+| Client connections | 512 MB and 1 GB: 200 · other plans: vCPU × 1,000 (1,000 – 10,000) |
 | `shared_buffers` | RAM × 0.25 |
 | `effective_cache_size` | RAM × 0.75 |
 
@@ -319,7 +319,7 @@ Restarting, credential rotation, and deletion are all gathered on the **Operatio
 - **Soft suspend** cuts incoming connections but keeps the server running; resuming takes seconds.
 - **Fully suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
 
-Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks the spending limit, the same way creating a new instance does.
+Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks the spending limit, the same way creating a new instance does; a fully suspended instance takes a few minutes to come back and takes a fresh backup when it does. An instance that the account's billing suspension stopped comes back by itself when that suspension is lifted.
 
 ### Password Rotation
 
@@ -335,7 +335,7 @@ This operation should be done during a maintenance window, with the new password
 
 There are two paths, with different outcomes:
 
-- **Schedule deletion** flags the instance for deletion at the end of a 7-day grace period. It can be reversed with **Cancel scheduled deletion** before the period ends; the instance keeps running and being billed throughout.
+- **Schedule deletion** takes the instance offline (connections are cut, as with a soft suspension) and deletes it at the end of a 7-day grace period; nothing is billed meanwhile. **Cancel scheduled deletion** before the period ends brings it back suspended — fully suspended if it has been suspended for more than 7 days — and **Resume** brings it online. It can't be scheduled while the instance is being set up, changed or restored.
 - **Permanent deletion** instantly destroys the instance and **all of its data, including backups.**
 
 > **Warning:** Permanent deletion can't be undone, and since backups are deleted too, the data can't be recovered through support either. If the data needs to stick around a bit longer, scheduled deletion is the right choice.
