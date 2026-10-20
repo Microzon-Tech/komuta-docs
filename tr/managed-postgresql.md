@@ -335,7 +335,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 
 İki yol vardır ve sonuçları farklıdır:
 
-- **Silmeyi planla** instance'ı erişime kapatır (soft askıda olduğu gibi bağlantılar kesilir) ve 7 günlük bekleme süresinin sonunda siler; bu sürede faturalama yapılmaz. Süre dolmadan **Planlı silmeyi iptal et** instance'ı askıda geri getirir — 7 günden uzun süredir askıdaysa tamamen askıda — ve **Devam et** ile açılır. Instance kurulurken, değiştirilirken ya da geri yüklenirken silme planlanamaz.
+- **Silmeyi planla** instance'ı erişime kapatır (soft askıda olduğu gibi bağlantılar kesilir) ve 7 günlük bekleme süresinin sonunda siler; bu sürede faturalama yapılmaz. Süre dolmadan **Planlı silmeyi iptal et** instance'ı askıda geri getirir ve **Devam et** ile açılır. 7 günden uzun süredir askıda olan bir instance, silmesi beklerken de tamamen askıya alınır. Instance kurulurken, değiştirilirken ya da geri yüklenirken silme planlanamaz.
 - **Kalıcı silme** instance'ı ve **yedekler dahil tüm verisini** anında yok eder.
 
 > **Uyarı:** Kalıcı silmenin geri dönüşü yoktur ve yedekler de silindiği için veri destek üzerinden de kurtarılamaz. Verinin bir süre daha durması isteniyorsa doğru seçim planlı silmedir.

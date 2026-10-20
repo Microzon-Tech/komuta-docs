@@ -335,7 +335,7 @@ This operation should be done during a maintenance window, with the new password
 
 There are two paths, with different outcomes:
 
-- **Schedule deletion** takes the instance offline (connections are cut, as with a soft suspension) and deletes it at the end of a 7-day grace period; nothing is billed meanwhile. **Cancel scheduled deletion** before the period ends brings it back suspended — fully suspended if it has been suspended for more than 7 days — and **Resume** brings it online. It can't be scheduled while the instance is being set up, changed or restored.
+- **Schedule deletion** takes the instance offline (connections are cut, as with a soft suspension) and deletes it at the end of a 7-day grace period; nothing is billed meanwhile. **Cancel scheduled deletion** before the period ends brings it back suspended, and **Resume** brings it online. An instance suspended for more than 7 days is fully suspended even while its deletion is pending. It can't be scheduled while the instance is being set up, changed or restored.
 - **Permanent deletion** instantly destroys the instance and **all of its data, including backups.**
 
 > **Warning:** Permanent deletion can't be undone, and since backups are deleted too, the data can't be recovered through support either. If the data needs to stick around a bit longer, scheduled deletion is the right choice.
