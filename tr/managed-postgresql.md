@@ -105,7 +105,7 @@ Sunucu parametreleri planın kaynaklarından hesaplanır; elle ayarlanmaz.
 
 Uygulama veritabanına doğrudan değil, araya giren bir bağlantı havuzu (PgBouncer, transaction modu) üzerinden bağlanır. Bu yüzden istemci tarafındaki bağlantı sayısı veritabanı tarafındaki gerçek bağlantı sayısından çok daha yüksek olabilir; yine de uygulamanın havuz boyutu tablodaki istemci sınırının altında kalmalıdır.
 
-Havuz transaction modunda çalıştığı için bir transaction bittiğinde sunucu bağlantısı başka bir istemciye geçer. Oturum düzeyindeki `SET` bu yüzden bir sonraki transaction'a taşınmaz: ayarı transaction içinde `SET LOCAL` ile verin ya da kullanıcının varsayılanı olarak `ALTER ROLE ... SET` ile kalıcı hale getirin.
+Havuz transaction modunda çalıştığı için bir transaction bittiğinde sunucu bağlantısı başka bir istemciye geçer. Oturum düzeyindeki `SET` bu yüzden bir sonraki transaction'a taşınmaz: ayarı transaction içinde `SET LOCAL` ile verin ya da kullanıcının varsayılanı olarak `ALTER ROLE ... SET` ile kalıcı hale getirin (havuzun bundan sonra açtığı bağlantılarda geçerli olur).
 
 Daha fazla eşzamanlı bağlantıya ihtiyaç duyulduğunda tek yol daha yüksek bir plana geçmektir; bu sınır ayrı olarak yükseltilemez.
 
@@ -131,7 +131,7 @@ Sorgu süresi ve boşta transaction sınırı, **İşlemler** sekmesindeki **Sor
 
 #### Bakım penceresi
 
-Uzun bir migration, büyük bir index oluşturma ya da `pg_dump` için aynı karttan 1–4 saatlik **bakım penceresi** açılabilir. Pencere boyunca platform denetimi bu instance'a dokunmaz ve süre dolunca kendiliğinden kapanır; **Şimdi kapat** ile erken kapatılabilir. Veritabanının kendi sınırları pencere boyunca da geçerlidir — uzun iş için oturumda `SET statement_timeout` ile yükseltilir (`pg_dump` bunu kendisi yapar).
+Uzun bir migration, büyük bir index oluşturma ya da `pg_dump` için aynı karttan 1–4 saatlik **bakım penceresi** açılabilir. Pencere boyunca platform denetimi bu instance'a dokunmaz ve süre dolunca kendiliğinden kapanır; **Şimdi kapat** ile erken kapatılabilir. Veritabanının kendi sınırları pencere boyunca da geçerlidir ve oturum düzeyindeki `SET` bağlantı havuzundan geçmez — `pg_dump`'ın kendi gönderdiği `SET statement_timeout = 0` da dahil. Bu yüzden uzun bir işten önce sınırları karttan (plan tavanına kadar) yükseltin. Tavandan uzun sürmesi gereken bir ifade, sınırını kendi transaction'ı içinde kaldırabilir: `BEGIN; SET LOCAL statement_timeout = 0; …; COMMIT;`. `pg_dump -j`, paralel bağlantılar bitene kadar ana bağlantısını transaction içinde boşta tutar; boşta transaction sınırını da yükseltin ya da `-j` olmadan dump alın.
 
 > **Uyarı:** Toplu veri yükleme, büyük index oluşturma ve raporlama sorguları küçük planlarda zaman aşımına takılır. Bu tür işler parçalara bölünerek, yoğun olmayan saatlerde ya da daha yüksek bir planda çalıştırılmalıdır.
 
@@ -139,7 +139,7 @@ Uzun bir migration, büyük bir index oluşturma ya da `pg_dump` için aynı kar
 
 Veri dosyaları ve işlem günlüğü aynı diski paylaşır; işlem günlüğü için diskin yaklaşık %10'u ayrılır, kalanı veriye kalır.
 
-Disk doluluğu **%95'i geçtiğinde ya da diskte 5 GB'tan az yer kaldığında veritabanı salt-okunur moda geçer** (10 GB'lık disklerde bu sınır diskin onda biri artı 512 MB boş alandır, yani yaklaşık %85): sorgular çalışmaya devam eder, yazma denemeleri hata alır. Disk uyarıları bu noktadan önce tetiklenir. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
+**Disk doluluğu eşiğe ulaştığında veritabanı salt-okunur moda geçer: 10 GB'lık disklerde yaklaşık %85, 40 GB'ta %87, 80 GB'ta %93, 160 GB ve üstünde %95** (%95'te ya da boş alan 5 GB'ın altına inecekse daha önce; 15 GB'tan küçük disklerde diskin onda biri artı 512 MB). Sorgular çalışmaya devam eder, yazma denemeleri hata alır. Disk uyarıları eşikten birkaç puan önce tetiklenir. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
 
 ---
 
@@ -150,6 +150,8 @@ Disk doluluğu **%95'i geçtiğinde ya da diskte 5 GB'tan az yer kaldığında v
 Her yeni veritabanında şu eklentiler kurulu gelir; ayrıca bir işlem gerekmez:
 
 `pgcrypto` · `citext` · `pg_trgm` · `unaccent` · `pgaudit` · `hstore` · `uuid-ossp` · `dblink` · `postgres_fdw`
+
+`dblink` ve `postgres_fdw` aynı instance'taki diğer veritabanlarına bağlanır; başka sunuculara bağlantı varsayılan olarak kapalıdır. Gerekirse destek talebi açılmalıdır.
 
 Sunucu imajı destekliyorsa vektör arama eklentileri (`vector` / `pgvector` ve `vectorscale`) de kurulur. Sorgu istatistikleri için `pg_stat_statements`, **İçgörü** sekmesi ilk açıldığında devreye girer.
 

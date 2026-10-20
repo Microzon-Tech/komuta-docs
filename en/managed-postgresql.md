@@ -105,7 +105,7 @@ Server parameters are computed from the plan's resources; they can't be tuned by
 
 The application doesn't connect to the database directly but through a connection pool in front of it (PgBouncer, transaction mode). That's why the number of client-side connections can be much higher than the actual number of database-side connections; even so, the application's pool size should stay under the client limit in the table.
 
-Because the pool runs in transaction mode, the server connection passes to another client when a transaction ends. A session-level `SET` therefore doesn't carry over to the next transaction: set it inside the transaction with `SET LOCAL`, or make it the user's default with `ALTER ROLE ... SET`.
+Because the pool runs in transaction mode, the server connection passes to another client when a transaction ends. A session-level `SET` therefore doesn't carry over to the next transaction: set it inside the transaction with `SET LOCAL`, or make it the user's default with `ALTER ROLE ... SET` (it applies to the connections the pool opens afterwards).
 
 When more concurrent connections are needed, the only way is to move to a higher plan; this limit can't be raised separately.
 
@@ -131,7 +131,7 @@ The query duration and idle-transaction limits can be changed from the **Query l
 
 #### Maintenance window
 
-For a long migration, a large index build or a `pg_dump`, the same card opens a 1–4 hour **maintenance window**. During the window the platform check leaves the instance alone, and the window closes by itself when it ends; **Close now** ends it early. The database's own limits still apply during the window — raise them for the session with `SET statement_timeout` for the long job (`pg_dump` does this itself).
+For a long migration, a large index build or a `pg_dump`, the same card opens a 1–4 hour **maintenance window**. During the window the platform check leaves the instance alone, and the window closes by itself when it ends; **Close now** ends it early. The database's own limits still apply during the window, and a session-level `SET` doesn't survive the connection pool — not even the `SET statement_timeout = 0` that `pg_dump` sends itself. So raise the limits on the card before a long job (up to the plan ceiling). A statement that has to run longer than the ceiling can lift its limit inside its own transaction: `BEGIN; SET LOCAL statement_timeout = 0; …; COMMIT;`. `pg_dump -j` keeps its main connection idle in a transaction until the parallel connections finish, so raise the idle-transaction limit too, or dump without `-j`.
 
 > **Warning:** Bulk data loads, large index builds, and reporting queries hit timeouts on smaller plans. Work like this should be split into chunks, run during off-peak hours, or run on a higher plan.
 
@@ -139,7 +139,7 @@ For a long migration, a large index build or a `pg_dump`, the same card opens a 
 
 Data files and the WAL share the same disk; roughly 10% of the disk is reserved for WAL, and the rest goes to data.
 
-**When disk usage passes 95%, or less than 5 GB of the disk is left free, the database switches to read-only mode** (on 10 GB disks the threshold is a tenth of the disk plus 512 MB free, about 85%): queries keep running, but write attempts fail. The disk alerts fire before this point. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
+**The database switches to read-only mode when the disk fills up to its threshold: about 85% on 10 GB disks, 87% on 40 GB, 93% on 80 GB and 95% from 160 GB up** (at 95%, or earlier if less than 5 GB would be left free; on disks under 15 GB, a tenth of the disk plus 512 MB). Queries keep running, but write attempts fail. The disk alerts fire a few points before the threshold. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
 
 ---
 
@@ -150,6 +150,8 @@ Data files and the WAL share the same disk; roughly 10% of the disk is reserved 
 Every new database comes with the following extensions already installed; no extra action is needed:
 
 `pgcrypto` · `citext` · `pg_trgm` · `unaccent` · `pgaudit` · `hstore` · `uuid-ossp` · `dblink` · `postgres_fdw`
+
+`dblink` and `postgres_fdw` reach other databases on the same instance; connections to other servers are closed by default. If one is needed, open a support ticket.
 
 If the server image supports them, vector search extensions (`vector` / `pgvector` and `vectorscale`) are also installed. `pg_stat_statements`, used for query statistics, kicks in the first time the **Insights** tab is opened.
 
