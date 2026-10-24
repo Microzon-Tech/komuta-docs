@@ -22,11 +22,11 @@ Instance isteğe bağlı olarak bir **projeye** bağlanabilir.
 |---|---|
 | **Hazırlanıyor** | Kurulum sürüyor; bağlantı bilgisi henüz hazır değildir. |
 | **Aktif** | Çalışıyor ve bağlantı kabul ediyor. |
-| **Askıda** / **Tamamen Askıda** | Elle askıya alınmış; verisi yerindedir. |
+| **Askıda** / **Tamamen Askıda** | Elle askıya alınmış; verisi yerindedir. Askıdayken yalnız disk faturalanır — bkz. [Askıya alma](#askıya-alma). |
 | **Yükseltiliyor** | Plan değişikliği uygulanıyor. |
 | **Yükseltme Başarısız** | Plan değişikliği tamamlanamadı; instance eski planıyla **canlıdır** ve verisi yerindedir. |
 | **Geri Yükleniyor** | Bir geri yükleme işlemi sürüyor. |
-| **Silinmeyi Bekliyor** | Silme planlanmış; süre dolmadan iptal edilebilir. |
+| **Silinmeyi Bekliyor** | Silme planlanmış; süre dolmadan iptal edilebilir. O zamana kadar yalnız disk faturalanır. |
 | **Hata** | Kurulum tamamlanamamış instance. Bu durumdaki instance'lar platform tarafından otomatik temizlenir; yedekleri saklama süresi boyunca yerinde kalır. |
 
 ![PostgreSQL listesi](https://cdn.komuta.io/docs/tr/images/postgresql/postgresql-home-page.png)
@@ -96,29 +96,42 @@ Instance'ın özel ağ yolu varsa bağlantı dizeleri listesinin sonunda **Bağl
 
 Sunucu parametreleri planın kaynaklarından hesaplanır; elle ayarlanmaz.
 
-| Parametre | Hesaplama | Sınırlar |
-|---|---|---|
-| Veritabanı bağlantısı | vCPU × 100 | en az 100, en çok 1.000 |
-| İstemci bağlantısı | Veritabanı bağlantısının 5 katı | 500 – 5.000 |
-| `shared_buffers` | RAM × 0,25 | — |
-| `effective_cache_size` | RAM × 0,75 | — |
+| Parametre | Değer |
+|---|---|
+| Veritabanı bağlantısı | 512 MB: 50 · 1 GB: 60 · 2 GB ve üstü: 100 |
+| İstemci bağlantısı | 512 MB ve 1 GB: 200 · diğer planlar: vCPU × 1.000 (1.000 – 10.000) |
+| `shared_buffers` | RAM × 0,25 |
+| `effective_cache_size` | RAM × 0,75 |
 
-Araya bir bağlantı havuzu (connection pool) girdiği için istemci tarafındaki bağlantı sayısı veritabanı tarafındaki gerçek bağlantı sayısından yüksek olabilir. Yine de uygulamanın havuz boyutu tablodaki istemci sınırının altında kalmalıdır.
+Uygulama veritabanına doğrudan değil, araya giren bir bağlantı havuzu (PgBouncer, transaction modu) üzerinden bağlanır. Bu yüzden istemci tarafındaki bağlantı sayısı veritabanı tarafındaki gerçek bağlantı sayısından çok daha yüksek olabilir; yine de uygulamanın havuz boyutu tablodaki istemci sınırının altında kalmalıdır.
 
-Daha fazla eşzamanlı bağlantıya ihtiyaç duyulduğunda tek yol daha yüksek vCPU'lu bir plana geçmektir; bu sınır ayrı olarak yükseltilemez.
+Havuz transaction modunda çalıştığı için bir transaction bittiğinde sunucu bağlantısı başka bir istemciye geçer. Oturum düzeyindeki `SET` bu yüzden bir sonraki transaction'a taşınmaz: ayarı transaction içinde `SET LOCAL` ile verin ya da kullanıcının varsayılanı olarak `ALTER ROLE ... SET` ile kalıcı hale getirin (havuzun bundan sonra açtığı bağlantılarda geçerli olur).
+
+İstemci bağlantısı planın vCPU'suyla büyür; veritabanının kendi sınırı ise 2 GB ve üstünde 100'de kalır: daha büyük bir plan eşzamanlı veritabanı bağlantısı değil, istemci bağlantısı, CPU ve bellek ekler. İki sınır da ayrı olarak yükseltilemez.
 
 ### Sorgu zaman aşımları
 
-Bir sorgunun ya da açık kalmış bir transaction'ın veritabanını kilitlemesini önlemek için plana göre otomatik zaman aşımları uygulanır. Bu değerler kullanıcı ayarı değildir.
+Bir sorgunun ya da açık kalmış bir transaction'ın veritabanını kilitlemesini önlemek için plana göre otomatik zaman aşımları uygulanır.
 
-| Plan RAM | Sorgu süresi | Boşta transaction | Kilit bekleme | Geçici dosya |
-|---|---|---|---|---|
-| ≤ 4 GB | 30 sn | 30 sn | 10 sn | 512 MB – 1 GB |
-| ≤ 8 GB | 60 sn | 60 sn | 15 sn | 2 GB |
-| ≤ 16 GB | 120 sn | 120 sn | 30 sn | sınırsız |
-| > 16 GB | sınırsız | 300 sn | 60 sn | sınırsız |
+| Plan RAM | Sorgu süresi | Boşta transaction | Kilit bekleme | Geçici dosya | Tavan |
+|---|---|---|---|---|---|
+| 512 MB – 1 GB | 30 sn | 5 dk | 10 sn | 512 MB | 30 dk |
+| 2 – 4 GB | 30 sn | 5 dk | 10 sn | 512 MB – 1 GB | 1 sa |
+| ≤ 8 GB | 60 sn | 5 dk | 15 sn | 2 GB | 1 sa |
+| ≤ 16 GB | 120 sn | 5 dk | 30 sn | sınırsız | 2 sa |
+| > 16 GB | sınırsız | 5 dk | 60 sn | sınırsız | 2 sa |
 
-Süreyi aşan sorgu iptal edilir ve uygulama hata alır. Ayrıca her instance'ta 5 dakikada bir çalışan bir denetim, bu sınırların yaklaşık 5 katını aşmış sorguları ve boşta bekleyen transaction'ları sonlandırır.
+Süreyi aşan sorgu iptal edilir ve uygulama `57014` (`query_canceled`) hatası alır; bağlantı açık kalır. Boşta transaction sınırını aşan oturum ise kapatılır.
+
+Ayrıca her instance'ta 5 dakikada bir çalışan bir platform denetimi vardır. Bu denetim, sorgu sınırının yaklaşık 5 katını (en az 1 dakika, sınır yoksa 1 saat; hiçbir zaman plan tavanından fazla değil) aşmış bir sorguyu **iptal eder**; o noktadan 5 dakika sonra hâlâ çalışan bir sorgunun bağlantısını kapatır — iptale rağmen süren ya da ancak o kadar geç fark edilen, örneğin bakım penceresi biter bitmez yakalanan bir sorgunun. Boşta transaction sınırının 5 katını aşan oturumu kapatır. Denetim, oturumda `SET statement_timeout = 0` gibi sınırı kaldıran ayarları da yakalar. Yaptığı her işlem veritabanı loguna `Komuta guardrail:` ile başlayan bir satırla yazılır ve **Loglar** sekmesinde görünür.
+
+#### Sınırları değiştirmek
+
+Sorgu süresi ve boşta transaction sınırı, **İşlemler** sekmesindeki **Sorgu sınırları** kartından 1 saniye ile plan tavanı arasında değiştirilebilir. Değişiklik yeniden başlatma olmadan uygulanır; **Plan değerlerine dön** ile plan değerine geri dönülür. Plan değiştiğinde seçilen değer korunur; yeni planın tavanını aşıyorsa tavana çekilir.
+
+#### Bakım penceresi
+
+Uzun bir migration, büyük bir index oluşturma ya da `pg_dump` için aynı karttan 1–4 saatlik **bakım penceresi** açılabilir. Pencere boyunca platform denetimi bu instance'a dokunmaz ve süre dolunca kendiliğinden kapanır; **Şimdi kapat** ile erken kapatılabilir. Pencere kapandığında sınırları aşmış olarak hâlâ çalışan bir iş, bir sonraki denetimde durdurulur. Veritabanının kendi sınırları pencere boyunca da geçerlidir ve oturum düzeyindeki `SET` bağlantı havuzundan geçmez — `pg_dump`'ın kendi gönderdiği `SET statement_timeout = 0` da dahil. Bu yüzden uzun bir işten önce sınırları karttan (plan tavanına kadar) yükseltin. Tavandan uzun sürmesi gereken bir ifade, sınırını kendi transaction'ı içinde kaldırabilir: `BEGIN; SET LOCAL statement_timeout = 0; …; COMMIT;`. `pg_dump -j`, paralel bağlantılar bitene kadar ana bağlantısını transaction içinde boşta tutar; boşta transaction sınırını da yükseltin ya da `-j` olmadan dump alın.
 
 > **Uyarı:** Toplu veri yükleme, büyük index oluşturma ve raporlama sorguları küçük planlarda zaman aşımına takılır. Bu tür işler parçalara bölünerek, yoğun olmayan saatlerde ya da daha yüksek bir planda çalıştırılmalıdır.
 
@@ -126,7 +139,7 @@ Süreyi aşan sorgu iptal edilir ve uygulama hata alır. Ayrıca her instance'ta
 
 Veri dosyaları ve işlem günlüğü aynı diski paylaşır; işlem günlüğü için diskin yaklaşık %10'u ayrılır, kalanı veriye kalır.
 
-Disk doluluğu **%80'i geçtiğinde veritabanı salt-okunur moda geçer**: sorgular çalışmaya devam eder, yazma denemeleri hata alır. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
+**Disk doluluğu eşiğe ulaştığında veritabanı salt-okunur moda geçer: 10 GB'lık disklerde yaklaşık %85, 40 GB'ta %87, 80 GB'ta %93, 160 GB ve üstünde %95** (%95'te ya da boş alan 5 GB'ın altına inecekse daha önce; 15 GB'tan küçük disklerde diskin onda biri artı 512 MB). Sorgular çalışmaya devam eder, yazma denemeleri hata alır. Disk uyarıları eşikten birkaç puan önce tetiklenir. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
 
 ---
 
@@ -137,6 +150,8 @@ Disk doluluğu **%80'i geçtiğinde veritabanı salt-okunur moda geçer**: sorgu
 Her yeni veritabanında şu eklentiler kurulu gelir; ayrıca bir işlem gerekmez:
 
 `pgcrypto` · `citext` · `pg_trgm` · `unaccent` · `pgaudit` · `hstore` · `uuid-ossp` · `dblink` · `postgres_fdw`
+
+`dblink` ve `postgres_fdw` aynı instance'taki diğer veritabanlarına bağlanır; başka sunuculara bağlantı varsayılan olarak kapalıdır. Gerekirse destek talebi açılmalıdır.
 
 Sunucu imajı destekliyorsa vektör arama eklentileri (`vector` / `pgvector` ve `vectorscale`) de kurulur. Sorgu istatistikleri için `pg_stat_statements`, **İçgörü** sekmesi ilk açıldığında devreye girer.
 
@@ -299,6 +314,13 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 
 **Yeniden başlat**, sunucuları sırayla yeniden başlatır; replikası olan planlarda kesinti oluşmaz. Yalnız çalışır durumdaki ve yükseltmesi başarısız olmuş instance'larda kullanılabilir.
 
+### Askıya alma
+
+- **Soft askıya al** dışarıdan gelen bağlantıları keser ama sunucuyu çalışır tutar; geri açmak saniyeler sürer.
+- **Hard askıya al** sunucuyu durdurur; disk ve yedekler korunur, geri açmak birkaç dakika sürer.
+
+İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, geri gelen işlem gücünün harcama limitine sığdığı kontrol edilir (disk zaten hesaba katılıdır); tamamen askıdaki bir instance birkaç dakikada açılır ve açılınca taze bir yedek alır. Hesabın faturalama askısı yüzünden durmuş bir instance, askı kalkınca kendiliğinden geri açılır.
+
 ### Parola yenileme
 
 **Veritabanı parolasını rotate et**, uygulama kullanıcısına yeni bir parola üretir ve **mevcut tüm bağlantıları koparır.** Uygulama yeni parolayla yeniden bağlanana kadar hata alır.
@@ -313,7 +335,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 
 İki yol vardır ve sonuçları farklıdır:
 
-- **Silmeyi planla** instance'ı 7 günlük bir bekleme süresinin sonunda silinmek üzere işaretler. Süre dolmadan **Planlı silmeyi iptal et** ile geri alınabilir; instance bu süre boyunca çalışmaya ve faturalanmaya devam eder.
+- **Silmeyi planla** instance'ı erişime kapatır (soft askıda olduğu gibi bağlantılar kesilir) ve 7 günlük bekleme süresinin sonunda siler; bu sürede yalnız disk faturalanır. Süre dolmadan **Planlı silmeyi iptal et** instance'ı askıda geri getirir ve **Devam et** ile açılır. 7 günden uzun süredir askıda olan bir instance, silmesi beklerken de tamamen askıya alınır. Instance kurulurken, değiştirilirken ya da geri yüklenirken silme planlanamaz.
 - **Kalıcı silme** instance'ı ve **yedekler dahil tüm verisini** anında yok eder.
 
 > **Uyarı:** Kalıcı silmenin geri dönüşü yoktur ve yedekler de silindiği için veri destek üzerinden de kurtarılamaz. Verinin bir süre daha durması isteniyorsa doğru seçim planlı silmedir.
@@ -396,7 +418,7 @@ Alınamaz. Verilen kullanıcı veritabanı üzerinde tam yetkilidir ama sunucunu
 
 ### Bağlantı sınırı ayrı olarak yükseltilebilir mi?
 
-Yükseltilemez. Bağlantı sayısı plandaki vCPU'dan hesaplanır; artırmanın tek yolu daha yüksek vCPU'lu bir plana geçmektir.
+Yükseltilemez. Veritabanı bağlantı sınırı plana göre sabittir (512 MB: 50, 1 GB: 60, 2 GB ve üstü: 100); uygulama tarafında bağlantı havuzu sayesinde bundan çok daha fazla bağlantı açılabilir. 2 GB ve üstünde daha büyük bir plan veritabanı bağlantısı değil, istemci bağlantısı, CPU ve bellek ekler.
 
 ### Geri yükleme mevcut instance'ı bozar mı?
 
