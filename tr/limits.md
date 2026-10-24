@@ -187,7 +187,7 @@ PostgreSQL, Valkey ve RabbitMQ'da CPU, bellek, disk ve sunucu sayısını plan b
 | Sınır | Değer | Not |
 |---|---|---|
 | Yedek saklama süresi | 2–365 gün, varsayılan 7 gün | Üç serviste aynı. Süreyi kısaltmak geri alınamaz: yeni pencerenin dışında kalan yedekler silinir. |
-| Planlı silme | 7 gün | Süre dolmadan iptal edilebilir; bu sürede servis çalışmaya ve faturalanmaya devam eder. |
+| Planlı silme | 7 gün | Süre dolmadan iptal edilebilir. Valkey ve RabbitMQ bu sürede çalışmaya ve faturalanmaya devam eder; PostgreSQL erişime kapanır ve yalnız diski faturalanır. |
 
 Ayrıntılar: [PostgreSQL](managed-postgresql.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md).
 
