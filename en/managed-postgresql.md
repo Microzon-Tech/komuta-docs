@@ -317,7 +317,7 @@ Restarting, credential rotation, and deletion are all gathered on the **Operatio
 ### Suspending
 
 - **Soft suspend** cuts incoming connections but keeps the server running; resuming takes seconds.
-- **Fully suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
+- **Hard suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
 
 Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks that the compute it brings back fits the spending limit (the disk is already counted); a fully suspended instance takes a few minutes to come back and takes a fresh backup when it does. An instance that the account's billing suspension stopped comes back by itself when that suspension is lifted.
 

@@ -186,6 +186,7 @@ For PostgreSQL, Valkey and RabbitMQ, the plan sets the CPU, memory, disk and ser
 
 | Limit | Value | Notes |
 |---|---|---|
+| PostgreSQL databases on the 512 MB and 1 GB plans | 5 per organization | Counted in every state, suspended and pending deletion included. Larger plans have no such limit. |
 | Backup retention | 2–365 days, 7 days by default | The same for all three services. Shortening it cannot be undone: backups outside the new window are deleted. |
 | Scheduled deletion | 7 days | Can be cancelled before the period ends. Valkey and RabbitMQ keep running and being billed meanwhile; PostgreSQL is taken offline and only its disk is billed. |
 

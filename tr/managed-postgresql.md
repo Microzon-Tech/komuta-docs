@@ -317,7 +317,7 @@ Yeniden başlatma, kimlik bilgisi yenileme ve silme **İşlemler** sekmesinde to
 ### Askıya alma
 
 - **Soft askıya al** dışarıdan gelen bağlantıları keser ama sunucuyu çalışır tutar; geri açmak saniyeler sürer.
-- **Tamamen askıya al** sunucuyu durdurur; disk ve yedekler korunur, geri açmak birkaç dakika sürer.
+- **Hard askıya al** sunucuyu durdurur; disk ve yedekler korunur, geri açmak birkaç dakika sürer.
 
 İki durumda da askı süresince **yalnız disk faturalanır** ve SQL konsolu kullanılamaz. Soft askı 7 günü geçerse instance kendiliğinden tamamen askıya alınır. **Devam et** ile geri açarken, geri gelen işlem gücünün harcama limitine sığdığı kontrol edilir (disk zaten hesaba katılıdır); tamamen askıdaki bir instance birkaç dakikada açılır ve açılınca taze bir yedek alır. Hesabın faturalama askısı yüzünden durmuş bir instance, askı kalkınca kendiliğinden geri açılır.
 
