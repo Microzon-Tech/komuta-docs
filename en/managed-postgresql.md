@@ -22,11 +22,11 @@ An instance can optionally be attached to a **project**.
 |---|---|
 | **Provisioning** | Setup is in progress; connection info isn't ready yet. |
 | **Active** | Running and accepting connections. |
-| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place. |
+| **Suspended** / **Fully Suspended** | Manually suspended; data stays in place. Only the disk is billed while suspended — see [Suspending](#suspending). |
 | **Upgrading** | A plan change is being applied. |
 | **Upgrade Failed** | The plan change couldn't complete; the instance is **live** on its old plan and its data is intact. |
 | **Restoring** | A restore operation is in progress. |
-| **Pending Deletion** | Deletion has been scheduled; it can still be canceled before the window expires. |
+| **Pending Deletion** | Deletion has been scheduled; it can still be canceled before the window expires. Only the disk is billed until then. |
 | **Error** | An instance whose setup couldn't complete. Instances in this state are automatically cleaned up by the platform; their backups remain in place for the retention period. |
 
 ![PostgreSQL list](https://cdn.komuta.io/docs/tr/images/postgresql/postgresql-home-page.png)
@@ -96,29 +96,42 @@ If the instance has a private network path, a **Connection String (private netwo
 
 Server parameters are computed from the plan's resources; they can't be tuned by hand.
 
-| Parameter | Calculation | Bounds |
-|---|---|---|
-| Database connections | vCPU × 100 | min 100, max 1,000 |
-| Client connections | 5× database connections | 500 – 5,000 |
-| `shared_buffers` | RAM × 0.25 | — |
-| `effective_cache_size` | RAM × 0.75 | — |
+| Parameter | Value |
+|---|---|
+| Database connections | 512 MB: 50 · 1 GB: 60 · 2 GB and up: 100 |
+| Client connections | 512 MB and 1 GB: 200 · other plans: vCPU × 1,000 (1,000 – 10,000) |
+| `shared_buffers` | RAM × 0.25 |
+| `effective_cache_size` | RAM × 0.75 |
 
-Because a connection pool sits in front, the number of client-side connections can be higher than the actual number of database-side connections. Even so, the application's pool size should stay under the client limit in the table.
+The application doesn't connect to the database directly but through a connection pool in front of it (PgBouncer, transaction mode). That's why the number of client-side connections can be much higher than the actual number of database-side connections; even so, the application's pool size should stay under the client limit in the table.
 
-When more concurrent connections are needed, the only way is to move to a plan with a higher vCPU count; this limit can't be raised separately.
+Because the pool runs in transaction mode, the server connection passes to another client when a transaction ends. A session-level `SET` therefore doesn't carry over to the next transaction: set it inside the transaction with `SET LOCAL`, or make it the user's default with `ALTER ROLE ... SET` (it applies to the connections the pool opens afterwards).
+
+Client connections grow with the plan's vCPU, while the database's own limit stops at 100 from 2 GB up: a larger plan adds client connections, CPU and memory rather than concurrent database connections. Neither limit can be raised separately.
 
 ### Query Timeouts
 
-Automatic timeouts are applied based on the plan to keep a query or an open transaction from locking up the database. These values aren't user-configurable.
+Automatic timeouts are applied based on the plan to keep a query or an open transaction from locking up the database.
 
-| Plan RAM | Query duration | Idle transaction | Lock wait | Temp file |
-|---|---|---|---|---|
-| ≤ 4 GB | 30s | 30s | 10s | 512 MB – 1 GB |
-| ≤ 8 GB | 60s | 60s | 15s | 2 GB |
-| ≤ 16 GB | 120s | 120s | 30s | unlimited |
-| > 16 GB | unlimited | 300s | 60s | unlimited |
+| Plan RAM | Query duration | Idle transaction | Lock wait | Temp file | Ceiling |
+|---|---|---|---|---|---|
+| 512 MB – 1 GB | 30s | 5 min | 10s | 512 MB | 30 min |
+| 2 – 4 GB | 30s | 5 min | 10s | 512 MB – 1 GB | 1 h |
+| ≤ 8 GB | 60s | 5 min | 15s | 2 GB | 1 h |
+| ≤ 16 GB | 120s | 5 min | 30s | unlimited | 2 h |
+| > 16 GB | unlimited | 5 min | 60s | unlimited | 2 h |
 
-A query that exceeds its duration is canceled and the application gets an error. In addition, a check that runs every 5 minutes on every instance terminates queries and idle transactions that have exceeded roughly 5x these limits.
+A query that exceeds its duration is canceled and the application gets error `57014` (`query_canceled`); the connection stays open. A session that exceeds the idle-transaction limit is closed.
+
+In addition, a platform check runs every 5 minutes on every instance. It **cancels** a query that has run past roughly 5× the query limit (at least 1 minute, 1 hour when there's no limit, never more than the plan ceiling), and closes the connection of a query still running 5 minutes after that point — one that ignored the cancel, or one first found that late, for example right after a maintenance window ends. It closes a session that has stayed idle in a transaction for 5× the idle limit. The check also catches sessions that lift the limit themselves, e.g. with `SET statement_timeout = 0`. Every action it takes is written to the database log as a line starting with `Komuta guardrail:` and shows up on the **Logs** tab.
+
+#### Changing the limits
+
+The query duration and idle-transaction limits can be changed from the **Query limits** card on the **Operations** tab, anywhere between 1 second and the plan ceiling. The change applies without a restart; **Back to plan values** returns to the plan's own values. A plan change keeps the chosen value, lowered to the new plan's ceiling if it's above it.
+
+#### Maintenance window
+
+For a long migration, a large index build or a `pg_dump`, the same card opens a 1–4 hour **maintenance window**. During the window the platform check leaves the instance alone, and the window closes by itself when it ends; **Close now** ends it early. A job still running past the limits when the window closes is stopped at the next check. The database's own limits still apply during the window, and a session-level `SET` doesn't survive the connection pool — not even the `SET statement_timeout = 0` that `pg_dump` sends itself. So raise the limits on the card before a long job (up to the plan ceiling). A statement that has to run longer than the ceiling can lift its limit inside its own transaction: `BEGIN; SET LOCAL statement_timeout = 0; …; COMMIT;`. `pg_dump -j` keeps its main connection idle in a transaction until the parallel connections finish, so raise the idle-transaction limit too, or dump without `-j`.
 
 > **Warning:** Bulk data loads, large index builds, and reporting queries hit timeouts on smaller plans. Work like this should be split into chunks, run during off-peak hours, or run on a higher plan.
 
@@ -126,7 +139,7 @@ A query that exceeds its duration is canceled and the application gets an error.
 
 Data files and the WAL share the same disk; roughly 10% of the disk is reserved for WAL, and the rest goes to data.
 
-**When disk usage passes 80%, the database switches to read-only mode**: queries keep running, but write attempts fail. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
+**The database switches to read-only mode when the disk fills up to its threshold: about 85% on 10 GB disks, 87% on 40 GB, 93% on 80 GB and 95% from 160 GB up** (at 95%, or earlier if less than 5 GB would be left free; on disks under 15 GB, a tenth of the disk plus 512 MB). Queries keep running, but write attempts fail. The disk alerts fire a few points before the threshold. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
 
 ---
 
@@ -137,6 +150,8 @@ Data files and the WAL share the same disk; roughly 10% of the disk is reserved 
 Every new database comes with the following extensions already installed; no extra action is needed:
 
 `pgcrypto` · `citext` · `pg_trgm` · `unaccent` · `pgaudit` · `hstore` · `uuid-ossp` · `dblink` · `postgres_fdw`
+
+`dblink` and `postgres_fdw` reach other databases on the same instance; connections to other servers are closed by default. If one is needed, open a support ticket.
 
 If the server image supports them, vector search extensions (`vector` / `pgvector` and `vectorscale`) are also installed. `pg_stat_statements`, used for query statistics, kicks in the first time the **Insights** tab is opened.
 
@@ -299,6 +314,13 @@ Restarting, credential rotation, and deletion are all gathered on the **Operatio
 
 **Restart** restarts servers one at a time; plans with a replica see no downtime. It's only available on instances that are running or whose upgrade has failed.
 
+### Suspending
+
+- **Soft suspend** cuts incoming connections but keeps the server running; resuming takes seconds.
+- **Hard suspend** stops the server; the disk and backups are kept, and resuming takes a few minutes.
+
+Either way, **only the disk is billed** while suspended, and the SQL console isn't available. A soft suspension that lasts more than 7 days turns into a full suspension by itself. **Resume** checks that the compute it brings back fits the spending limit (the disk is already counted); a fully suspended instance takes a few minutes to come back and takes a fresh backup when it does. An instance that the account's billing suspension stopped comes back by itself when that suspension is lifted.
+
 ### Password Rotation
 
 **Rotate database password** generates a new password for the application user and **drops all existing connections.** The application gets errors until it reconnects with the new password.
@@ -313,7 +335,7 @@ This operation should be done during a maintenance window, with the new password
 
 There are two paths, with different outcomes:
 
-- **Schedule deletion** flags the instance for deletion at the end of a 7-day grace period. It can be reversed with **Cancel scheduled deletion** before the period ends; the instance keeps running and being billed throughout.
+- **Schedule deletion** takes the instance offline (connections are cut, as with a soft suspension) and deletes it at the end of a 7-day grace period; only the disk is billed meanwhile. **Cancel scheduled deletion** before the period ends brings it back suspended, and **Resume** brings it online. An instance suspended for more than 7 days is fully suspended even while its deletion is pending. It can't be scheduled while the instance is being set up, changed or restored.
 - **Permanent deletion** instantly destroys the instance and **all of its data, including backups.**
 
 > **Warning:** Permanent deletion can't be undone, and since backups are deleted too, the data can't be recovered through support either. If the data needs to stick around a bit longer, scheduled deletion is the right choice.
@@ -396,7 +418,7 @@ No. The user provided has full privileges on the database, but the server's admi
 
 ### Can the connection limit be raised separately?
 
-No. The connection count is computed from the plan's vCPU; the only way to raise it is to move to a plan with a higher vCPU count.
+No. The database connection limit is fixed per plan (512 MB: 50, 1 GB: 60, 2 GB and up: 100); thanks to the connection pool the application can open far more connections than that. From 2 GB up a larger plan adds client connections, CPU and memory, not database connections.
 
 ### Does restoring break the existing instance?
 
