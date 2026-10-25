@@ -41,7 +41,7 @@ Git reponuzdaki bir uygulamayı build edip canlıya almanın yolu budur. Akış 
 
 ## Job ve CronJob
 
-Job bir kez çalışıp biten iştir; CronJob aynı işi takvime bağlar. İkisi de [**Job ve CronJob'lar**](https://console.komuta.io/jobs) sayfasından oluşturulur ve akışları yalnızca zamanlama kısmında ayrılır: Job'da **Elle çalıştıracağım**, CronJob'da **Takvime bağla** seçilir.
+Job bir kez çalışıp biten iştir; CronJob aynı işi takvime bağlar. İkisi de [**Job ve CronJob'lar**](https://console.komuta.io/jobs) sayfasından oluşturulur ve akışları yalnızca zamanlama kısmında ayrılır: Job'da **Elle çalıştıracağım**, CronJob'da **Takvime bağla** seçilir. CronJob ayrıca `komuta.yaml` içinde de tanımlanabilir (`workload: cronjob`, `schedule.cron` ve bir `execution` bloğu) ve uygulamanın geri kalanıyla birlikte [Stack](stacks.md) olarak yayınlanır; Stack bir işe port, replika, rollout stratejisi ya da herkese açık adres vermez, doğrulama böyle bir alanı adıyla reddeder.
 
 İşin ne çalıştıracağı üç kaynaktan seçilir — repodaki bir proje (build edilir), doğrudan yazılan kısa bir betik (Bash, Python veya Node) ya da hazır bir container imajı. Yayınlanan Job istenen anda elle tetiklenir; CronJob zamanlamasına göre kendi çalışır ve çalıştırma geçmişi aynı sayfada tutulur.
 

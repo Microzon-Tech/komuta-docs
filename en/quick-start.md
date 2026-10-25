@@ -41,7 +41,7 @@ This is how you build and deploy an app from your Git repo. The flow starts with
 
 ## Jobs and CronJobs
 
-A Job is a one-off task that runs once and finishes; a CronJob ties the same task to a schedule. Both are created from the [**Jobs & CronJobs**](https://console.komuta.io/jobs) page, and their flows only diverge at the scheduling step: Job selects **I'll run it myself**, CronJob selects **On a schedule**.
+A Job is a one-off task that runs once and finishes; a CronJob ties the same task to a schedule. Both are created from the [**Jobs & CronJobs**](https://console.komuta.io/jobs) page, and their flows only diverge at the scheduling step: Job selects **I'll run it myself**, CronJob selects **On a schedule**. A CronJob can also be declared in `komuta.yaml` (`workload: cronjob` with `schedule.cron` and an `execution` block) and published together with the rest of the app as a [Stack](stacks.md); a Stack never gives a job ports, replicas, a rollout strategy or a public address, and validation names any such field.
 
 What the job runs is chosen from three sources — a project in the repo (which gets built), a short script written directly (Bash, Python, or Node), or a ready-made container image. A published Job is triggered manually whenever needed; a CronJob runs on its own according to its schedule, and run history is kept on the same page.
 
