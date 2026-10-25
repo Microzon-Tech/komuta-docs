@@ -134,7 +134,7 @@ Her öğe bir servis, Job ya da CronJob'dur.
 | Alan | Varsayılan | Anlamı |
 |---|---|---|
 | `plan` | — | Zorunlu. Paket adı: `dz-nano` (ücretsiz paket), `dz-dev`, `dz-standard`, `dz-premium`, `dz-enterprise`. Adı küçük harfle, konsoldaki gibi yazın. |
-| `replicas.mode` | `fixed` | `fixed` ya da otomatik ölçekleme için `autoscaling` (`hpa` da kabul edilir). |
+| `replicas.mode` | `fixed` | `fixed` ya da otomatik ölçekleme için `autoscale` (`autoscaling` ve `hpa` da kabul edilir). Bilinmeyen mod `REPLICAS_MODE_INVALID` ile reddedilir; otomatik ölçekleme `1 <= min <= max` ister (`REPLICAS_RANGE_INVALID`). |
 | `replicas.count` | `1` | `fixed` modunda replika sayısı. |
 | `replicas.min`, `replicas.max` | — | Otomatik ölçeklemenin alt ve üst sınırı. |
 | `replicas.cpuTargetPercent`, `replicas.memoryTargetPercent` | `80` | Otomatik ölçekleme hedefleri. |
@@ -268,15 +268,15 @@ Plan, bu ayarlardan izin gevşetenleri **Güvenlik gevşetmeleri** kartında gö
 
 ### Job ve CronJob alanları
 
-`workload: job` ya da `workload: cronjob` için. Bu iş yüklerinde `ports`, `network`, `storage`, `health` ve `compute.replicas` kullanılmaz.
+`workload: job` ya da `workload: cronjob` için. Bu iş yükleri trafik almaz ve replika ölçeklemez; doğrulama `ports`, `compute.replicas`, `rollout`, `network.public: true`, rotalar, `access`, `storage` ve `health` alanlarını alan adıyla reddeder (`PORTS_WORKLOAD_UNSUPPORTED`, `REPLICAS_WORKLOAD_UNSUPPORTED`, `ROLLOUT_WORKLOAD_UNSUPPORTED`, `PUBLIC_NETWORK_WORKLOAD_UNSUPPORTED`). `autoDeploy` kullanılabilir: push iş imajını yeniden build eder. `service` türünde `schedule` ve `execution` bloğu, `job` türünde `schedule` bulunmaz.
 
 | Alan | Varsayılan | Anlamı |
 |---|---|---|
-| `schedule.cron` | — | CronJob için zorunlu; beş alanlı cron ifadesi, ör. `0 3 * * *`. |
+| `schedule.cron` | — | CronJob için zorunlu (`SCHEDULE_REQUIRED`); beş alanlı cron ifadesi, ör. `0 3 * * *`. |
 | `schedule.timeZone` | — | IANA saat dilimi, ör. `Europe/Istanbul`. |
 | `schedule.suspended` | `false` | Zamanlamayı duraklatır. |
-| `schedule.concurrencyPolicy` | — | Kabul edilir ama plan reddeder. |
-| `execution.restartPolicy` | `OnFailure` | Yalnızca `OnFailure` uygulanabilir. |
+| `schedule.concurrencyPolicy` | `Forbid` | `Forbid` aktif çalışma varken yeni çalışmayı atlar, `Replace` aktif çalışmayı önce iptal eder. `Allow` kullanılamaz. |
+| `execution.restartPolicy` | `OnFailure` | `OnFailure` ya da `Never`. |
 | `execution.backoffLimit` | — | Yeniden deneme sayısı; 0 ya da daha büyük. |
 | `execution.activeDeadlineSeconds` | — | En uzun çalışma süresi; 0'dan büyük. |
 | `execution.ttlSecondsAfterFinished` | — | Bitmiş çalıştırmanın saklanma süresi; 0 ya da daha büyük. |
@@ -284,7 +284,7 @@ Plan, bu ayarlardan izin gevşetenleri **Güvenlik gevşetmeleri** kartında gö
 
 Cron, saat dilimi ve süre değerleri plan sırasında değil, Job oluşturulurken denetlenir; uymayan bir değer o adımı durdurur.
 
-> **Uyarı:** Şu an Stack ile oluşturulan Job ve CronJob'ların adımı uygulama sırasında başarısız olmaktadır. Job ve CronJob'larınızı [Job ve CronJob'lar](jobs-cronjobs.md) sayfasından oluşturun.
+Stack ile oluşturulan Job ve CronJob'lar diğerleri gibi [Job ve CronJob'lar](jobs-cronjobs.md) sayfasında görünür; çalıştırmaları oradan başlatılır, askıya alınır ve izlenir.
 
 ### Henüz uygulanamayan alanlar
 
@@ -297,7 +297,8 @@ Cron, saat dilimi ve süre değerleri plan sırasında değil, Job oluşturulurk
 | `autoDeploy.cooldownSeconds`, `autoDeploy.skipCommitPatterns` | Auto-deploy cooldown and skip patterns are not enabled on this target. |
 | `storage[].active: false` | Creating inactive storage attachments is not enabled on this target. |
 | `security.policyGuardMode` (`audit` dışında) | Non-default Policy Guard modes require the correlated transition adapter on this target. |
-| `schedule.concurrencyPolicy`, `execution.restartPolicy` (`OnFailure` dışında) | The requested job execution policy is not enabled on this target. |
+| `schedule.concurrencyPolicy: Allow` | schedule.concurrencyPolicy must be Forbid or Replace; overlapping runs (Allow) are not available. |
+| `execution.restartPolicy` (`OnFailure` ya da `Never` dışında) | execution.restartPolicy must be OnFailure or Never. |
 | `addons[].backups` | Declarative addon backup configuration is not enabled on this target. |
 | `addons[].type: opensearch` | OpenSearch is not provisionable on Komuta yet. |
 
@@ -410,6 +411,17 @@ Alan adı, servisi hazır olduktan sonra eklenir. DNS doğrulamasını [Özel Al
 | `BANDWIDTH_PLAN_REQUIRED` | Bandwidth plan is required. |
 | `STORAGE_WORKLOAD_UNSUPPORTED` | Persistent storage is supported only for service workloads. |
 | `HEALTH_WORKLOAD_UNSUPPORTED` | Health probes are supported only for service workloads. |
+| `PORTS_WORKLOAD_UNSUPPORTED` | Ports apply only to service workloads; a job or cron job serves no traffic. |
+| `REPLICAS_WORKLOAD_UNSUPPORTED` | Replicas and autoscaling apply only to service workloads; a job or cron job runs one pod per run. |
+| `ROLLOUT_WORKLOAD_UNSUPPORTED` | Rollout strategies apply only to service workloads. |
+| `PUBLIC_NETWORK_WORKLOAD_UNSUPPORTED` | A job or cron job has no public address; remove network.public. |
+| `SCHEDULE_WORKLOAD_UNSUPPORTED` | A schedule applies only to a cronjob workload. |
+| `EXECUTION_WORKLOAD_UNSUPPORTED` | Execution settings (restart policy, command, args) apply only to job and cronjob workloads. |
+| `SCHEDULE_REQUIRED` | A cronjob needs schedule.cron. |
+| `REPLICAS_MODE_INVALID` | Replicas mode must be fixed or autoscale. |
+| `REPLICAS_RANGE_INVALID` | Autoscaling needs min and max replicas with 1 <= min <= max. |
+| `DOMAIN_REQUIRES_PUBLIC_SERVICE` | Service '…' has no public address (network.public is not true), so a custom domain cannot point at it. |
+| `SERVICE_REFERENCE_NOT_PUBLIC` | Service '…' has no public address (network.public is not true); declare network.public: true on it or set the value literally. |
 | `ROUTING_WORKLOAD_UNSUPPORTED` | Routing is supported only for service workloads. |
 | `FRAMEWORK_KEYS_WORKLOAD_UNSUPPORTED` | Framework key persistence is supported only for service workloads. |
 | `STORAGE_NAME_INVALID` | Storage name must be a DNS-1123 label of at most 63 characters. |

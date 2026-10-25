@@ -134,7 +134,7 @@ Each entry is a service, a Job or a CronJob.
 | Field | Default | Meaning |
 |---|---|---|
 | `plan` | — | Required. The package name: `dz-nano` (the free package), `dz-dev`, `dz-standard`, `dz-premium`, `dz-enterprise`. Write it in lowercase, as in the console. |
-| `replicas.mode` | `fixed` | `fixed`, or `autoscaling` for autoscaling (`hpa` is accepted too). |
+| `replicas.mode` | `fixed` | `fixed`, or `autoscale` for autoscaling (`autoscaling` and `hpa` are accepted too). An unknown mode is refused with `REPLICAS_MODE_INVALID`; autoscaling needs `1 <= min <= max` (`REPLICAS_RANGE_INVALID`). |
 | `replicas.count` | `1` | The replica count in `fixed` mode. |
 | `replicas.min`, `replicas.max` | — | The lower and upper bounds for autoscaling. |
 | `replicas.cpuTargetPercent`, `replicas.memoryTargetPercent` | `80` | Autoscaling targets. |
@@ -268,15 +268,15 @@ The plan shows the settings that relax restrictions on the **Security relaxation
 
 ### Job and CronJob fields
 
-For `workload: job` or `workload: cronjob`. These workloads don't use `ports`, `network`, `storage`, `health` or `compute.replicas`.
+For `workload: job` or `workload: cronjob`. These workloads serve no traffic and scale no replicas, so validation refuses `ports`, `compute.replicas`, `rollout`, `network.public: true`, routes, `access`, `storage` and `health` on them, naming the field (`PORTS_WORKLOAD_UNSUPPORTED`, `REPLICAS_WORKLOAD_UNSUPPORTED`, `ROLLOUT_WORKLOAD_UNSUPPORTED`, `PUBLIC_NETWORK_WORKLOAD_UNSUPPORTED`). `autoDeploy` is allowed: a push rebuilds the job image. A `service` carries no `schedule` or `execution` block, and a `job` no `schedule`.
 
 | Field | Default | Meaning |
 |---|---|---|
-| `schedule.cron` | — | Required for a CronJob; a five-field cron expression, for example `0 3 * * *`. |
+| `schedule.cron` | — | Required for a CronJob (`SCHEDULE_REQUIRED`); a five-field cron expression, for example `0 3 * * *`. |
 | `schedule.timeZone` | — | An IANA time zone, for example `Europe/Istanbul`. |
 | `schedule.suspended` | `false` | Pauses the schedule. |
-| `schedule.concurrencyPolicy` | — | Accepted, but the plan refuses it. |
-| `execution.restartPolicy` | `OnFailure` | Only `OnFailure` can be applied. |
+| `schedule.concurrencyPolicy` | `Forbid` | `Forbid` skips a run while one is active, `Replace` cancels the active run first. `Allow` is not available. |
+| `execution.restartPolicy` | `OnFailure` | `OnFailure` or `Never`. |
 | `execution.backoffLimit` | — | The retry count; 0 or more. |
 | `execution.activeDeadlineSeconds` | — | The longest run time; more than 0. |
 | `execution.ttlSecondsAfterFinished` | — | How long a finished run is kept; 0 or more. |
@@ -284,7 +284,7 @@ For `workload: job` or `workload: cronjob`. These workloads don't use `ports`, `
 
 The cron, time zone and duration values aren't checked during planning but when the Job is created; a value that doesn't fit stops that step.
 
-> **Warning:** At the moment, the step for a Job or CronJob created through a Stack fails during the run. Create your Jobs and CronJobs from the [Jobs & CronJobs](jobs-cronjobs.md) page.
+A Job or CronJob created through a Stack appears on the [Jobs & CronJobs](jobs-cronjobs.md) page like any other, where its runs are started, suspended and inspected.
 
 ### Fields not available yet
 
@@ -297,7 +297,8 @@ These fields are accepted in the file, but the plan is blocked with `CAPABILITY_
 | `autoDeploy.cooldownSeconds`, `autoDeploy.skipCommitPatterns` | Auto-deploy cooldown and skip patterns are not enabled on this target. |
 | `storage[].active: false` | Creating inactive storage attachments is not enabled on this target. |
 | `security.policyGuardMode` (other than `audit`) | Non-default Policy Guard modes require the correlated transition adapter on this target. |
-| `schedule.concurrencyPolicy`, `execution.restartPolicy` (other than `OnFailure`) | The requested job execution policy is not enabled on this target. |
+| `schedule.concurrencyPolicy: Allow` | schedule.concurrencyPolicy must be Forbid or Replace; overlapping runs (Allow) are not available. |
+| `execution.restartPolicy` (other than `OnFailure` or `Never`) | execution.restartPolicy must be OnFailure or Never. |
 | `addons[].backups` | Declarative addon backup configuration is not enabled on this target. |
 | `addons[].type: opensearch` | OpenSearch is not provisionable on Komuta yet. |
 
@@ -410,6 +411,17 @@ The domain is added once its service is ready. Complete the DNS verification as 
 | `BANDWIDTH_PLAN_REQUIRED` | Bandwidth plan is required. |
 | `STORAGE_WORKLOAD_UNSUPPORTED` | Persistent storage is supported only for service workloads. |
 | `HEALTH_WORKLOAD_UNSUPPORTED` | Health probes are supported only for service workloads. |
+| `PORTS_WORKLOAD_UNSUPPORTED` | Ports apply only to service workloads; a job or cron job serves no traffic. |
+| `REPLICAS_WORKLOAD_UNSUPPORTED` | Replicas and autoscaling apply only to service workloads; a job or cron job runs one pod per run. |
+| `ROLLOUT_WORKLOAD_UNSUPPORTED` | Rollout strategies apply only to service workloads. |
+| `PUBLIC_NETWORK_WORKLOAD_UNSUPPORTED` | A job or cron job has no public address; remove network.public. |
+| `SCHEDULE_WORKLOAD_UNSUPPORTED` | A schedule applies only to a cronjob workload. |
+| `EXECUTION_WORKLOAD_UNSUPPORTED` | Execution settings (restart policy, command, args) apply only to job and cronjob workloads. |
+| `SCHEDULE_REQUIRED` | A cronjob needs schedule.cron. |
+| `REPLICAS_MODE_INVALID` | Replicas mode must be fixed or autoscale. |
+| `REPLICAS_RANGE_INVALID` | Autoscaling needs min and max replicas with 1 <= min <= max. |
+| `DOMAIN_REQUIRES_PUBLIC_SERVICE` | Service '…' has no public address (network.public is not true), so a custom domain cannot point at it. |
+| `SERVICE_REFERENCE_NOT_PUBLIC` | Service '…' has no public address (network.public is not true); declare network.public: true on it or set the value literally. |
 | `ROUTING_WORKLOAD_UNSUPPORTED` | Routing is supported only for service workloads. |
 | `FRAMEWORK_KEYS_WORKLOAD_UNSUPPORTED` | Framework key persistence is supported only for service workloads. |
 | `STORAGE_NAME_INVALID` | Storage name must be a DNS-1123 label of at most 63 characters. |
