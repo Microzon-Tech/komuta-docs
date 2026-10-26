@@ -139,7 +139,7 @@ For a long migration, a large index build or a `pg_dump`, the same card opens a 
 
 Data files and the WAL share the same disk; roughly 10% of the disk is reserved for WAL, and the rest goes to data.
 
-**The database switches to read-only mode when the disk fills up to its threshold: about 85% on 10 GB disks, 87% on 40 GB, 93% on 80 GB and 95% from 160 GB up** (at 95%, or earlier if less than 5 GB would be left free; on disks under 15 GB, a tenth of the disk plus 512 MB). Queries keep running, but write attempts fail. The disk alerts fire a few points before the threshold. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
+**The database switches to read-only mode when the disk fills up to its threshold: about 80% on 5 GB disks, 85% on 10 GB, 87% on 40 GB, 93% on 80 GB and 95% from 160 GB up** (at 95%, or earlier if less than 5 GB would be left free; on disks under 15 GB, a tenth of the disk plus 512 MB). Queries keep running, but write attempts fail. The disk alerts fire a few points before the threshold. Writes only come back once space is freed up or the instance moves to a plan with a bigger disk — which is why a disk-fill alert shouldn't be left unattended.
 
 ---
 
