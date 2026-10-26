@@ -205,7 +205,7 @@ Rules:
 | Field | Default | Accepted |
 |---|---|---|
 | `name` | — | A name under `addons` or `uses.addons`. |
-| `property` | — | `host`, `port`, `database`, `user`, `password`, `connectionString`. For `password` and `connectionString` the variable must have `sensitive: true`. |
+| `property` | — | `host`, `port`, `database`, `user`, `password`, `connectionString`, `caCert`. For `password` and `connectionString` the variable must have `sensitive: true`. `caCert` is the PEM of a Valkey instance's own certificate authority; it is offered only for Valkey and only on the private endpoint. |
 | `endpoint` | `private` | `private` or `public`. `public` needs the managed service's public access to be on. RabbitMQ can only use `public`. |
 
 `connectionString` format: `postgresql://user:password@host:port/database?sslmode=require` for PostgreSQL, `rediss://user:password@host:port` for Valkey, `amqps://user:password@host:port/%2F` for RabbitMQ. For Valkey the `database` value is `0`; for RabbitMQ it is the virtual host.
@@ -449,10 +449,12 @@ The domain is added once its service is ready. Complete the DNS verification as 
 | `SECRET_REFERENCE_NOT_FOUND` | Secret '…' does not exist. |
 | `SECRET_REFERENCE_CASE_MISMATCH` | Secret '…' does not exist; secret names are case-sensitive and the declared name is '…'. |
 | `ADDON_REFERENCE_NOT_FOUND` | Addon '…' is not declared under addons or uses.addons. |
-| `ADDON_REFERENCE_PROPERTY_INVALID` | Addon property must be host, port, database, user, password or connectionString. |
+| `ADDON_REFERENCE_PROPERTY_INVALID` | Addon property must be host, port, database, user, password, connectionString or caCert. |
 | `ADDON_REFERENCE_ENDPOINT_INVALID` | Addon endpoint must be private or public. |
 | `ADDON_PUBLIC_ENDPOINT_NOT_DECLARED` | Addon '…' does not declare public network access. |
 | `ADDON_PASSWORD_MUST_BE_SENSITIVE` | An addon password or connectionString binding must declare sensitive: true. |
+| `ADDON_CA_NOT_OFFERED` | Addon '…' is a … addon; caCert is offered for valkey addons only. |
+| `ADDON_CA_PRIVATE_ENDPOINT_ONLY` | caCert is the CA of the instance's own certificate, which only the private endpoint presents; bind it with endpoint: private. |
 | `SERVICE_REFERENCE_NOT_FOUND` | Service '…' does not exist. |
 | `SERVICE_REFERENCE_PROPERTY_INVALID` | Service property must be host or url. |
 | `SERVICE_DEPENDENCY_CYCLE` | Service dependencies must not contain a cycle. |
