@@ -139,7 +139,7 @@ Uzun bir migration, büyük bir index oluşturma ya da `pg_dump` için aynı kar
 
 Veri dosyaları ve işlem günlüğü aynı diski paylaşır; işlem günlüğü için diskin yaklaşık %10'u ayrılır, kalanı veriye kalır.
 
-**Disk doluluğu eşiğe ulaştığında veritabanı salt-okunur moda geçer: 10 GB'lık disklerde yaklaşık %85, 40 GB'ta %87, 80 GB'ta %93, 160 GB ve üstünde %95** (%95'te ya da boş alan 5 GB'ın altına inecekse daha önce; 15 GB'tan küçük disklerde diskin onda biri artı 512 MB). Sorgular çalışmaya devam eder, yazma denemeleri hata alır. Disk uyarıları eşikten birkaç puan önce tetiklenir. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
+**Disk doluluğu eşiğe ulaştığında veritabanı salt-okunur moda geçer: 5 GB'lık disklerde yaklaşık %80, 10 GB'ta %85, 40 GB'ta %87, 80 GB'ta %93, 160 GB ve üstünde %95** (%95'te ya da boş alan 5 GB'ın altına inecekse daha önce; 15 GB'tan küçük disklerde diskin onda biri artı 512 MB). Sorgular çalışmaya devam eder, yazma denemeleri hata alır. Disk uyarıları eşikten birkaç puan önce tetiklenir. Yazma ancak yer açıldığında ya da daha büyük diskli bir plana geçildiğinde geri gelir — disk doluluk uyarısı bu yüzden beklemeye alınmamalıdır.
 
 ---
 
