@@ -149,7 +149,25 @@ Valkey has no credential rotation operation; if the password needs to change, a 
 
 ### Private Network Address
 
-Instances with a private network path get a private address alongside the public one. This address is reachable from services in the cluster and **is independent of the access mode** — it's the path that stays up even when the public address is removed. The private address presents the instance's own certificate and doesn't expect server verification from the client.
+Instances with a private network path get a private address alongside the public one. This address is reachable from services in the cluster and **is independent of the access mode** — it's the path that stays up even when the public address is removed.
+
+The private address presents the instance's own certificate, not a publicly trusted one. To verify the server instead of turning verification off, give the client the instance's certificate authority:
+
+- **Connection details:** the connection-info API and the Komuta MCP connection-info tool return it as `privateCaCertificatePem`, next to the private address.
+- **Stack:** bind it to an environment variable with `valueFrom.addon` and `property: caCert` on the private endpoint. The value is public material and needs no `sensitive: true`.
+
+```yaml
+env:
+  - name: VALKEY_URL
+    sensitive: true
+    valueFrom:
+      addon: { name: cache, property: connectionString }
+  - name: VALKEY_CA
+    valueFrom:
+      addon: { name: cache, property: caCert }
+```
+
+Most clients take the PEM as their trusted CA, for example `tls: { ca: process.env.VALKEY_CA }` in ioredis or `ssl_ca_data=os.environ["VALKEY_CA"]` in redis-py. A service keeps the value it was created with. If the instance's certificate is ever reissued, recreate the service so it picks up the new value.
 
 ![Overview tab](https://cdn.komuta.io/docs/tr/images/valkey/dashboard.png)
 

@@ -149,7 +149,25 @@ Valkey'de kimlik bilgisi yenileme (rotate) işlemi bulunmaz; parolanın değişm
 
 ### Özel ağ adresi
 
-Özel ağ yolu olan instance'lar genel adresin yanında bir de özel adres alır. Bu adres kümedeki servislerden erişilir ve **erişim modundan bağımsızdır** — genel adres kapatıldığında ayakta kalan yol budur. Özel adres instance'ın kendi sertifikasını sunar; istemciden sunucu doğrulaması beklemez.
+Özel ağ yolu olan instance'lar genel adresin yanında bir de özel adres alır. Bu adres kümedeki servislerden erişilir ve **erişim modundan bağımsızdır** — genel adres kapatıldığında ayakta kalan yol budur.
+
+Özel adres, genel olarak güvenilen bir sertifika değil, instance'ın kendi sertifikasını sunar. Doğrulamayı kapatmak yerine sunucuyu doğrulamak için istemciye instance'ın sertifika otoritesini verin:
+
+- **Bağlantı bilgileri:** bağlantı bilgisi API'si ve Komuta MCP bağlantı bilgisi aracı, özel adresin yanında `privateCaCertificatePem` alanında döndürür.
+- **Stack:** özel uç noktada `valueFrom.addon` ve `property: caCert` ile bir ortam değişkenine bağlayın. Değer gizli değildir, `sensitive: true` gerekmez.
+
+```yaml
+env:
+  - name: VALKEY_URL
+    sensitive: true
+    valueFrom:
+      addon: { name: cache, property: connectionString }
+  - name: VALKEY_CA
+    valueFrom:
+      addon: { name: cache, property: caCert }
+```
+
+Çoğu istemci PEM'i güvenilen CA olarak alır; örneğin ioredis'te `tls: { ca: process.env.VALKEY_CA }`, redis-py'de `ssl_ca_data=os.environ["VALKEY_CA"]`. Servis oluşturulduğu andaki değeri korur. Instance'ın sertifikası yeniden üretilirse yeni değeri alması için servisi yeniden oluşturun.
 
 ![Genel Bakış sekmesi](https://cdn.komuta.io/docs/tr/images/valkey/dashboard.png)
 
