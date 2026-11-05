@@ -14,9 +14,9 @@ Bu kadar aracın hepsi aynı anda kullanılmaz. Asistan önce isteğinizin hangi
 
 ---
 
-## Workflow & Onboarding Tools (6)
+## İş Akışı ve Başlangıç Araçları (6)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_select_workflow` | İsteğin hangi işe ait olduğunu belirler; diğer tüm araçlardan önce çağrılır. |
 | `komuta_end_workflow` | İş bittiğinde veya bırakıldığında aktif iş akışını kapatır. |
@@ -25,20 +25,20 @@ Bu kadar aracın hepsi aynı anda kullanılmaz. Asistan önce isteğinizin hangi
 | `komuta_get_local_service_context` | Çalışma klasörünüz için kaydedilmiş varsayılan proje/servisi okur. |
 | `komuta_set_local_service_context` | Çalışma klasörünüz için varsayılan proje/servis çiftini kaydeder. |
 
-## Project Tools (4)
+## Proje Araçları (4)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_regions` | PaaS bölgelerini listeler. |
 | `komuta_list_projects` | Kullanıcının projelerini listeler. |
 | `komuta_create_project` | Yeni proje oluşturur. |
 | `komuta_check_repo_connected` | Bir repo'nun zaten bir projeye bağlı olup olmadığını kontrol eder. |
 
-## Stack Tools (14)
+## Stack Araçları (14)
 
 Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulanır, bir plan çıkarılır ve onayınızla uygulanır. Ayrıntılar: [Stack](stacks.md).
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_verify_stack_manifest_file` | Yerel `komuta.yaml` dosyasının doğrulamaya hazır olduğunu kontrol eder. |
 | `komuta_get_stack_publish_context` | Yayın için gereken hesap, hedef, bağlantı ve fiyat seçeneklerini getirir. |
@@ -55,9 +55,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_get_stack_drift` | Canlı kaynakların Stack'in son uyguladığı hâlle eşleşip eşleşmediğini raporlar. |
 | `komuta_export_stack` | Aktif Stack'i `komuta.yaml` olarak dışa aktarır. |
 
-## Service Tools (16)
+## Servis Araçları (16)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_discover_repo_services` | Bir repo branch'indeki deploy edilebilir servisleri keşfeder. |
 | `komuta_list_services` | Servisleri listeler. |
@@ -76,9 +76,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_start_service_maintenance` | Servisi bakım moduna alır; ziyaretçiler bakım sayfası görür. |
 | `komuta_end_service_maintenance` | Bakım modunu kapatır ve servisi yeniden başlatır. |
 
-## Rollout Tools (10)
+## Rollout Araçları (10)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_service_rollouts` | Servisin rollout'larını listeler. |
 | `komuta_get_service_rollout_status` | Rollout durumunu getirir. |
@@ -91,9 +91,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_rollback_service_rollout` | Önceki sürüme geri döner. |
 | `komuta_restart_service_rollout` | Rollout'u yeniden başlatır. |
 
-## Sleep & Always On Tools (9)
+## Uyku ve Her Zaman Açık Araçları (9)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_service_sleep_state` | Servisin çalışıyor mu uyuyor mu olduğunu ve nedenini getirir. |
 | `komuta_get_service_sleep_history` | Uyku, uyanma ve Always on olaylarını listeler. |
@@ -105,9 +105,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_purchase_service_keep_awake` | Servis için Always on eklentisini satın alır. |
 | `komuta_cancel_service_keep_awake` | Always on eklentisini kapatır. |
 
-## Service Doctor Tools (8)
+## Service Doctor Araçları (8)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_assess_service` | Service Doctor ile servisi değerlendirir ve öneriler üretir. |
 | `komuta_accept_critical_recommendation` | Bir öneriyi kabul eder. |
@@ -118,26 +118,26 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_record_recommendation_applied` | Elle uygulanan planı tamamlandı olarak kaydeder. |
 | `komuta_verify_recommendation_action` | Uygulanan önerinin sonucunu yeniden değerlendirerek doğrular. |
 
-## Dockerfile Tools (3)
+## Dockerfile Araçları (3)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_generate_dockerfile` | Dockerfile üretimi için prompt + platform build kurallarını getirir (Dockerfile yazmadan/düzenlemeden ÖNCE zorunlu). |
 | `komuta_validate_dockerfile` | Dockerfile'ı platform kurallarına karşı doğrular (yazdıktan/düzenledikten SONRA zorunlu). |
 | `komuta_validate_dockerfile_location` | Dockerfile'ın, seçilen servisin kendi dizininde olduğunu doğrular (monorepo senaryoları için zorunlu). |
 
-## Environment Variable Tools (4)
+## Ortam Değişkeni Araçları (4)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_service_env_vars` | Servisin ortam değişkenlerini listeler. |
 | `komuta_set_service_env_vars` | Bir veya birden çok ortam değişkenini tek seferde ekler/günceller. |
 | `komuta_copy_service_secrets` | Gizli değerleri, değerleri göstermeden başka bir servisten kopyalar. |
 | `komuta_apply_service_env_vars` | Kaydedilen ortam değişkenlerini çalışan servise uygular. |
 
-## Environment Group Tools (7)
+## Ortam Değişkeni Grubu Araçları (7)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_env_groups` | Ortam gruplarını listeler. |
 | `komuta_get_env_group` | Bir grubun değişkenlerini ve hangi servislerde kullanıldığını getirir. |
@@ -147,23 +147,23 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_import_env_group` | Grubun seçilen değişkenlerini servise aktarır. |
 | `komuta_push_env_group` | Grubun güncel değerlerini seçilen servislere gönderir. |
 
-## Autodeploy Tools (2)
+## Otomatik Dağıtım Araçları (2)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_service_auto_deploy` | Servisin auto-deploy konfigürasyonunu getirir. |
 | `komuta_set_service_auto_deploy` | Servisin auto-deploy konfigürasyonunu uygular. |
 
-## Scaling Tools (2)
+## Ölçekleme Araçları (2)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_service_hpa` | Servisin otomatik ölçeklendirme (HPA) ayarlarını getirir. |
 | `komuta_set_service_hpa` | Servisin otomatik ölçeklendirme (HPA) ayarlarını uygular. |
 
-## Domain Tools (5)
+## Alan Adı Araçları (5)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_domains` | Servislere bağlı özel domain'leri ve DNS/TLS durumlarını listeler. |
 | `komuta_list_attachable_services` | Domain bağlanabilecek servisleri listeler. |
@@ -171,9 +171,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_refresh_domain_validation` | DNS ve sertifika doğrulamasını yeniden çalıştırır. |
 | `komuta_delete_domain` | Domain bağlantısını kalıcı olarak kaldırır. |
 
-## Storage Tools (6)
+## Depolama Araçları (6)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_storage_attachments` | Servise bağlı kalıcı depolama alanlarını listeler. |
 | `komuta_list_storage_packages` | Depolama planlarını listeler. |
@@ -182,9 +182,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_update_storage_attachment` | Depolama alanının planını veya ayarlarını değiştirir. |
 | `komuta_delete_storage_attachment` | Depolama alanını ve içindeki veriyi kalıcı olarak siler. |
 
-## Access Protection Tools (18)
+## Erişim Koruması Araçları (18)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_service_access_policy` | Servise kimlerin erişebildiğini gösterir. |
 | `komuta_preview_service_access_change` | Bir erişim değişikliğinin etkisini uygulamadan gösterir. |
@@ -205,9 +205,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_list_organization_access_identity_providers` | Organizasyonun kimlik sağlayıcılarını listeler. |
 | `komuta_get_access_identity_keys` | Uygulamanın ziyaretçi kimliğini doğrulamak için kullanacağı anahtarları getirir. |
 
-## Job Tools (8)
+## Job Araçları (8)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_job_configuration` | Job yapılandırmasını getirir. |
 | `komuta_get_cronjob_state` | CronJob durumunu getirir. |
@@ -218,9 +218,9 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_suspend_cronjob` | Zamanlanmış çalışmaları durdurur. |
 | `komuta_resume_cronjob` | Zamanlanmış çalışmaları yeniden başlatır. |
 
-## Addon Tools (7)
+## Addon Araçları (7)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_create_database` | Yönetilen Postgres instance'ı oluşturur. |
 | `komuta_create_rabbitmq` | Yönetilen RabbitMQ instance'ı oluşturur. |
@@ -230,11 +230,11 @@ Yeni servisler Stack ile yayınlanır: repo kökündeki `komuta.yaml` doğrulan�
 | `komuta_get_addon_connection_info` | Addon bağlantı bilgilerini getirir. |
 | `komuta_list_addon_plans` | Yönetilen addon planlarını listeler. |
 
-## Addon Lifecycle Tools (28)
+## Addon Yaşam Döngüsü Araçları (28)
 
 Postgres, Valkey ve RabbitMQ için aynı işlemler ayrı araçlarla yapılır.
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_restart_postgres` / `_valkey` / `_rabbitmq` | Instance'ı yeniden başlatır. |
 | `komuta_backup_postgres` / `_valkey` / `_rabbitmq` | Yedek almayı başlatır. |
@@ -253,9 +253,9 @@ Postgres, Valkey ve RabbitMQ için aynı işlemler ayrı araçlarla yapılır.
 | `komuta_refresh_addon_backup_status` | Addon yedek durumunu yeniler. |
 | `komuta_list_addon_alerts` | Addon alarm kurallarını listeler. |
 
-## Connection Tools (6)
+## Bağlantı Araçları (6)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_git_connections` | Git servis bağlantılarını listeler. |
 | `komuta_list_registry_connections` | Container registry bağlantılarını listeler. |
@@ -264,9 +264,9 @@ Postgres, Valkey ve RabbitMQ için aynı işlemler ayrı araçlarla yapılır.
 | `komuta_list_connection_branches` | Bir repo'nun branch'lerini bağlantı üzerinden listeler. |
 | `komuta_create_registry_connection` | Yeni container registry bağlantısı oluşturur. |
 
-## API Gateway Tools (19)
+## API Gateway Araçları (19)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_api_gateways` | API Gateway'leri listeler. |
 | `komuta_get_api_gateway` | Gateway detaylarını getirir. |
@@ -288,9 +288,9 @@ Postgres, Valkey ve RabbitMQ için aynı işlemler ayrı araçlarla yapılır.
 | `komuta_set_gateway_bandwidth_plan` | Bant genişliği planını değiştirir. |
 | `komuta_delete_api_gateway` | Gateway'i siler. |
 
-## Alert Tools (12)
+## Uyarı Araçları (12)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_list_alert_rules` | Alarm kurallarını listeler. |
 | `komuta_get_alert_rule` | Bir alarm kuralını getirir. |
@@ -305,18 +305,18 @@ Postgres, Valkey ve RabbitMQ için aynı işlemler ayrı araçlarla yapılır.
 | `komuta_list_notification_channels` | Bildirim kanallarını listeler. |
 | `komuta_set_notification_channel_active` | Bildirim kanalını açar veya kapatır. |
 
-## Observability & Audit Tools (4)
+## Gözlemlenebilirlik ve Denetim Araçları (4)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_query_service_logs` | Servisin pod loglarını sorgular. |
 | `komuta_query_service_traces` | Servisin trace'lerini arar. |
 | `komuta_get_trace_detail` | Bir trace'in detayını getirir. |
 | `komuta_query_security_audit` | Güvenlik denetim olaylarını getirir. |
 
-## Billing & Pricing Tools (12)
+## Faturalandırma ve Fiyatlandırma Araçları (12)
 
-| Tool | Açıklama |
+| Araç | Açıklama |
 |---|---|
 | `komuta_get_service_invoices` | Servisin güncel dönem ücretlerini ve fatura geçmişini getirir. |
 | `komuta_get_account_cost` | Hesabın güncel dönem maliyetini getirir. |
