@@ -190,7 +190,7 @@ Her öğe bir ortam değişkenidir. Değer ya `value` ile doğrudan yazılır ya
 | `sensitive` | `false` | Değer gizli saklanır. |
 | `buildTime` | `false` | Değer build sırasında da verilir. |
 | `valueFrom.secret` | — | `secrets` altındaki bir adın değeri. Her zaman gizli saklanır. |
-| `valueFrom.addon` | — | Bir yönetilen servisin bağlantı bilgisi: `name`, `property`, `endpoint`. |
+| `valueFrom.addon` | — | Bir yönetilen servisin bağlantı bilgisi: `name`, `property`, `endpoint`, `database`. |
 | `valueFrom.service` | — | Stack'teki bir servisin adresi: `name`, `property`. |
 
 Kurallar:
@@ -207,6 +207,7 @@ Kurallar:
 | `name` | — | `addons` ya da `uses.addons` altındaki bir ad. |
 | `property` | — | `host`, `port`, `database`, `user`, `password`, `connectionString`, `caCert`. `password` ve `connectionString` için değişkende `sensitive: true` zorunludur. `caCert`, Valkey instance'ının kendi sertifika otoritesinin PEM'idir; yalnız Valkey'de ve yalnız özel uç noktada verilir. |
 | `endpoint` | `private` | `private` ya da `public`. `public` için yönetilen servisin genel erişimi açık olmalıdır. RabbitMQ'da yalnızca `public` kullanılabilir. |
+| `database` | ana veritabanı | Yalnız PostgreSQL. Değerlerin hangi veritabanından geleceğini seçer. Yazılmazsa ya da ana veritabanının adı yazılırsa ana veritabanı bağlanır. Yönetilen serviste konsoldan açılmış bir ek veritabanının adı yazılırsa `database`, `user`, `password` ve `connectionString` o veritabanından ve onun kullanıcısından gelir; `host` ve `port` değişmez. Stack veritabanı açmaz. Bkz. [Stack'ten bağlanma](managed-postgresql-databases.md#stackten-bağlanma). |
 
 `connectionString` biçimi: PostgreSQL için `postgresql://kullanıcı:şifre@host:port/veritabanı?sslmode=require`, Valkey için `rediss://kullanıcı:şifre@host:port`, RabbitMQ için `amqps://kullanıcı:şifre@host:port/%2F`. Valkey'de `database` değeri `0`, RabbitMQ'da sanal sunucudur.
 
@@ -341,6 +342,8 @@ Stack'in yönetmeden kullandığı mevcut yönetilen servisler. Plan bunları **
 
 Kullanılan servis **Active** durumda olmalı ve silinmek üzere işaretlenmemiş olmalıdır. Aynı ad hem `addons` hem `uses.addons` altında olamaz.
 
+Kullanılan bir servise bağlanan değişkenler o servisin mevcut bağlantı bilgisini, yani sahibinin ve konsolun kullandığı kullanıcıyı ve veritabanını alır. Uygulamanın kendi verisi ve kullanıcısı olması gerekiyorsa PostgreSQL'de konsoldan ek bir veritabanı açılır ve değişken ona `valueFrom.addon.database` ile bağlanır (bkz. [Stack'ten bağlanma](managed-postgresql-databases.md#stackten-bağlanma)).
+
 ---
 
 ## domains
@@ -455,6 +458,8 @@ Alan adı, servisi hazır olduktan sonra eklenir. DNS doğrulamasını [Özel Al
 | `ADDON_PASSWORD_MUST_BE_SENSITIVE` | An addon password or connectionString binding must declare sensitive: true. |
 | `ADDON_CA_NOT_OFFERED` | Addon '…' is a … addon; caCert is offered for valkey addons only. |
 | `ADDON_CA_PRIVATE_ENDPOINT_ONLY` | caCert is the CA of the instance's own certificate, which only the private endpoint presents; bind it with endpoint: private. |
+| `ADDON_DATABASE_UNSUPPORTED` | Addon '…' is a … addon; a database can be chosen on postgres addons only. |
+| `ADDON_DATABASE_INVALID` | Database '…' is neither the main database of addon '…' ('…') nor a name an extra database can have: 2 to 31 lowercase letters, digits and underscores, starting with a letter and ending with a letter or digit; some names are reserved. (`uses.addons` altındaki bir serviste ana veritabanının adı dosyada olmadığından yalnız biçim denetlenir: A database name is lowercase letters, digits and underscores, starts with a letter and has at most 63 characters.) |
 | `SERVICE_REFERENCE_NOT_FOUND` | Service '…' does not exist. |
 | `SERVICE_REFERENCE_PROPERTY_INVALID` | Service property must be host or url. |
 | `SERVICE_DEPENDENCY_CYCLE` | Service dependencies must not contain a cycle. |
@@ -487,6 +492,7 @@ Dosya geçerliyse plan, hesabınızdaki kaynaklarla karşılaştırma yaparken �
 | `USE_ADDON_NOT_FOUND` | No addon named '…' exists in the target project or among the shared addons. |
 | `USE_OUTSIDE_TARGET` | Addon '…' belongs to project '…', not the target project; … |
 | `USE_ADDON_NOT_ACTIVE` | Addon '…' is …; it must be Active before a service can use it. |
+| `ADDON_DATABASE_NOT_OPENED` | Addon '…' is created by this apply, so it has no database '…' yet; a Stack binds an extra database but does not open one. Bind the main database, or apply the addon first, open the database on it, then add the service that binds it. |
 | `DOMAIN_HOSTNAME_INVALID` | Hostname '…' is not a valid domain name. |
 | `CAPABILITY_NOT_AVAILABLE` | Bkz. [Henüz uygulanamayan alanlar](#henüz-uygulanamayan-alanlar). Var olan bir kaynağın desteklenmeyen bir alanı değiştiğinde: In-place updates for Stack-managed … resources are not enabled on this target. |
 

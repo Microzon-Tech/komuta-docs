@@ -12,6 +12,8 @@ Bir instance oluşturulduğunda Komuta seçilen bölgede bir PostgreSQL kümesi 
 
 Bir **instance**, kendi diski, kendi kullanıcısı ve kendi yedek zinciriyle çalışan bağımsız bir veritabanı sunucusudur. CPU, bellek, disk ve sunucu (replika) sayısı bağlı olduğu **plandan** gelir; sunucu parametreleri de plandan hesaplanır ve elle ayarlanamaz (bkz. [Otomatik uygulanan sınırlar](#otomatik-uygulanan-sınırlar)).
 
+Instance oluşturulurken açılan ana veritabanının yanında, her biri kendi kullanıcısıyla başka veritabanları da açılabilir (bkz. [PostgreSQL'de Birden Çok Veritabanı](managed-postgresql-databases.md)).
+
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance oluşturup veriyi aktarmaktır.
 
 Instance isteğe bağlı olarak bir **projeye** bağlanabilir.
@@ -350,6 +352,8 @@ Konsol **varsayılan olarak salt-okunurdur.** **Yazma modu** açıldığında `I
 
 Sonuçlar 1.000 satırla sınırlıdır; sınıra takılan sonuç **Kırpıldı** olarak işaretlenir. Tam sonuç kümesine ihtiyaç varsa sorgu `LIMIT`/`OFFSET` ile bölünmeli ya da sonuç CSV olarak indirilmelidir.
 
+Instance'ta ek veritabanı varsa sorgunun çalışacağı veritabanı **Veritabanı** seçicisinden seçilir (bkz. [Veritabanı Seçimi](managed-postgresql-databases.md#veritabanı-seçimi)).
+
 ![Sorgu sekmesi](https://cdn.komuta.io/docs/tr/images/postgresql/select-query-response.png)
 
 ---
@@ -381,7 +385,7 @@ Sağlık snapshot'ında veritabanı boyutu, cache hit oranı, bağlantı sayıs�
 
 ## Dump Dosyasından İçe Aktarma
 
-**İşlemler** sekmesindeki **URL'den içeri al**, bir `pg_dump` çıktısını bu instance'a geri yükler. Bu bir birleştirme işlemi değildir.
+**İşlemler** sekmesindeki **URL'den içeri al**, bir `pg_dump` çıktısını bu instance'a geri yükler. Bu bir birleştirme işlemi değildir. Instance'ta ek veritabanı varsa hedef veritabanı **Veritabanı** seçicisinden seçilir (bkz. [Ek veritabanına içe aktarma](managed-postgresql-databases.md#ek-veritabanına-içe-aktarma)).
 
 > **Uyarı:** İçe aktarma onaylandığında hedefteki uygulama veritabanı düşürülür ve dump'tan yeniden oluşturulur. Mevcut tüm veriler kalıcı olarak silinir ve bu işlem geri alınamaz. Hedef veritabanı boş değilse onay için instance adının yazılması istenir.
 
@@ -406,7 +410,7 @@ Dump'ta geçen ve hedefte bulunmayan bazı eklentiler geri yüklemeden çıkarı
 
 Onaydan sonra geri yükleme sürer ve ilerlemesi izlenebilir; devam eden bir işlem iptal edilebilir, başarısız olan bir işlem aynı kaynakla yeniden denenebilir. Aynı instance'a yapılan önceki içe aktarmalar **İşlemler** sekmesindeki geçmiş listesinde durur ve buradan tekrar açılabilir.
 
-İçe aktarma tamamlandıktan sonra veritabanının yeni hâli, bir sonraki planlı yedekle koruma altına girer. Aynı gün içinde bir koruma noktası isteniyorsa **Şimdi yedekle** ile elle yedek alınmalıdır.
+İçe aktarma başarıyla tamamlanınca Komuta hemen yeni bir tam yedek başlatır; veritabanının yeni hâli bu yedek tamamlandığında koruma altına girer.
 
 ---
 
