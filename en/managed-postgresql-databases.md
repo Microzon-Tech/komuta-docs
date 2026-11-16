@@ -126,7 +126,7 @@ While the instance has an extra database, a **Database** picker appears on the s
 | Screen | What the choice does |
 |---|---|
 | **Query** tab | Queries and the schema list run in the chosen database. The console is still read-only by default; while **Write mode** is on, statements run as the chosen database's own user (see [SQL Console](managed-postgresql.md#sql-console)). |
-| **Insights** tab | The health snapshot, slow queries, **Reset statistics** and the query plan belong to the chosen database. The **Active queries** list shows the whole instance; its **Database** column says which database each query runs in. |
+| **Insights** tab | The health snapshot, slow queries, **Reset stats** and the query plan belong to the chosen database. The **Active queries** list shows the whole instance; its **Database** column says which database each query runs in. |
 | **Overview** → **Read-only access** | A user created with **Create user** reads only the chosen database. At most 3 read-only users can be open on an instance at once; this count is the total across all databases. |
 | **Operations** → **Import from URL** | The dump is imported into the chosen database (see [Importing into an extra database](#importing-into-an-extra-database)). |
 
