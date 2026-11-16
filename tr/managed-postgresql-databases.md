@@ -15,7 +15,7 @@ Veritabanları birbirine kapalıdır:
 - Ek bir veritabanının kullanıcısı yalnız kendi veritabanına bağlanabilir; ana veritabanına da öteki ek veritabanlarına da bağlanamaz.
 - Ana veritabanının kullanıcısı ek veritabanlarına bağlanamaz.
 
-Ek veritabanının kullanıcısı, ana veritabanının kullanıcısı gibi kendi veritabanında tam yetkili bir uygulama kullanıcısıdır; sunucunun yönetici hesabı değildir (bkz. [Size verilen kullanıcı](managed-postgresql.md#size-verilen-kullanıcı)). [Hazır kurulu eklentiler](managed-postgresql.md#hazır-kurulu-eklentiler) ek veritabanlarında da kurulu gelir.
+Ek veritabanının kullanıcısı kendi veritabanının sahibidir: şema, tablo, index, view, fonksiyon ve trigger oluşturabilir, her türlü veri işlemini yapabilir ve hazır kurulu eklentileri kullanabilir. Yeni rol ya da veritabanı oluşturamaz ve sunucunun yönetici hesabı değildir. [Hazır kurulu eklentiler](managed-postgresql.md#hazır-kurulu-eklentiler) ek veritabanlarında da kurulu gelir.
 
 ### Ayrı olanlar, ortak olanlar
 
@@ -32,19 +32,21 @@ Bir instance ana veritabanı dahil en fazla **5** veritabanı taşır. **Veritab
 
 ### Bağlantıların paylaşımı
 
-Tek veritabanı varken instance'ın sunucu bağlantıları olduğu gibi ana veritabanına aittir (bkz. [Bağlantı ve bellek sınırları](managed-postgresql.md#bağlantı-ve-bellek-sınırları)). İkinci veritabanı açıldığında Komuta bu bağlantıları veritabanları arasında eşit böler ve her veritabanının bağlantı havuzuna aynı üst sınırı koyar. Yoğun bir veritabanı böylece ötekilerin bağlantılarını tüketemez: sınırına ulaşan veritabanının yeni işlemleri, kendi bağlantılarından biri boşalana kadar havuzda bekler.
+Uygulamalar veritabanına bir bağlantı havuzu üzerinden bağlanır (bkz. [Bağlantı ve bellek sınırları](managed-postgresql.md#bağlantı-ve-bellek-sınırları)). Tek veritabanı varken havuz bölünmez ve ana veritabanı havuzun tamamını kullanır. İkinci veritabanı açıldığında Komuta havuzun sunucu bağlantılarını veritabanları arasında eşit böler ve her veritabanına aynı üst sınırı koyar. Yoğun bir veritabanı böylece ötekilerin bağlantılarını tüketemez: sınırına ulaşan veritabanının yeni işlemleri, kendi bağlantılarından biri boşalana kadar havuzda bekler.
 
-Her veritabanının payı veritabanı açıldıkça küçülür, silindikçe büyür. Kart her veritabanının şu anki payını, veritabanı açma penceresi de yeni veritabanıyla birlikte payın kaça düşeceğini gösterir. Tek sunuculu planlarda bir veritabanının aynı anda kullanabileceği en fazla sunucu bağlantısı:
+Her veritabanının payı veritabanı açıldıkça küçülür, silindikçe büyür. Kart her veritabanının şu anki payını, veritabanı açma penceresi de şu anki payı ve yeni veritabanıyla birlikte payın kaça düşeceğini gösterir. Tek sunuculu planlarda bir veritabanının aynı anda kullanabileceği en fazla sunucu bağlantısı:
 
-| Plan RAM | 2 veritabanı | 3 veritabanı | 4 veritabanı | 5 veritabanı |
-|---|---|---|---|---|
-| 512 MB | 18 | 12 | 9 | 7 |
-| 1 GB | 23 | 15 | 11 | 9 |
-| 2 GB ve üstü | 43 | 28 | 21 | 17 |
+| Plan RAM | 1 veritabanı | 2 veritabanı | 3 veritabanı | 4 veritabanı | 5 veritabanı |
+|---|---|---|---|---|---|
+| 512 MB | 20 | 18 | 12 | 9 | 7 |
+| 1 GB | 30 | 23 | 15 | 11 | 9 |
+| 2 GB ve üstü | 55–86 | 43 | 28 | 21 | 17 |
 
-Yüksek erişilebilirlikli planlarda bağlantı havuzu iki sunucuya bölündüğü için değerler en fazla iki bağlantı daha düşük olabilir; kesin sayı kartta yazar. Tablodaki sayılar veritabanı tarafındaki bağlantılardır. Uygulamaların açabileceği istemci bağlantısı sınırı bölünmez; bütün veritabanlarının istemcileri bu sınırı birlikte kullanır. Plan değiştiğinde paylar yeni planın bağlantılarına göre yeniden hesaplanır.
+2 GB ve üstünde tek veritabanının payı planın vCPU sayısına göre 55 ile 86 arasındadır. Bu sayılar [Bağlantı ve bellek sınırları](managed-postgresql.md#bağlantı-ve-bellek-sınırları) tablosundaki veritabanı bağlantısı sınırından küçüktür, çünkü o sınırın bir kısmı yönetici hesabına ve platformun kendi bağlantılarına ayrılır. Yüksek erişilebilirlikli planlarda havuz iki sunucuya bölündüğü için değerler farklıdır (iki ve daha fazla veritabanında en fazla iki bağlantı daha düşük); kesin sayıyı kart ve veritabanı açma penceresi gösterir.
 
-> **Uyarı:** İlk ek veritabanı açıldığı anda ana veritabanının payı da küçülür; örneğin 2 GB'lık tek sunuculu bir planda ana veritabanı aynı anda en fazla 43 sunucu bağlantısı kullanabilir hâle gelir. Ana veritabanı aynı anda çok sayıda işlem çalıştırıyorsa ilk ek veritabanını açmadan önce bunu hesaba katın.
+Uygulamaların açabileceği istemci bağlantısı sınırı bölünmez; bütün veritabanlarının istemcileri bu sınırı birlikte kullanır. Plan değiştiğinde paylar yeni planın bağlantılarına göre yeniden hesaplanır.
+
+> **Uyarı:** İlk ek veritabanı açıldığı anda ana veritabanının payı da küçülür; örneğin 2 GB'lık tek sunuculu bir planda 55–86'dan 43 sunucu bağlantısına iner. Veritabanı açma penceresi açmadan önce iki sayıyı da gösterir. Ana veritabanı aynı anda çok sayıda işlem çalıştırıyorsa ilk ek veritabanını açmadan önce bunu hesaba katın.
 
 ---
 
@@ -66,7 +68,7 @@ Veritabanı açmak için:
 
 - 2–31 karakterdir; yalnız küçük harf, rakam ve alt çizgi (`_`) içerir.
 - İlk karakter harf, son karakter harf ya da rakam olmalıdır.
-- Instance'ta aynı adla bir veritabanı ya da kullanıcı varsa ad kullanılamaz; ana veritabanının adı ve kullanıcı adı da buna dahildir: "Bu instance'ta bu adla bir veritabanı ya da kullanıcı zaten var. Başka bir ad seçin."
+- Instance'ta aynı adla bir veritabanı ya da kullanıcı varsa ad kullanılamaz; ana veritabanının adı ve kullanıcı adı da buna dahildir. Listedeki bir veritabanının adını yazarsanız pencere "Bu serviste bu adla bir veritabanı zaten var." der ve **Oluştur** açılmaz. Ad bir kullanıcıya aitse (ör. ana veritabanının kullanıcısı) **Oluştur**'dan sonra "Bu instance'ta bu adla bir veritabanı ya da kullanıcı zaten var. Başka bir ad seçin." çıkar.
 - PostgreSQL'in ve platformun kendi adları kullanılamaz: `postgres`, `template0`, `template1`, `app`, `public`, `all`, `user`, `none`, `replication`, `samerole`, `samegroup`, `sameuser`, `current_user`, `current_role`, `session_user`, `streaming_replica`; `pg_`, `cnpg_`, `komuta_` ve `documentdb` gibi platform önekleriyle başlayan adlar da. Pencere bu durumda "Bu ad platforma ayrılmış. Başka bir ad seçin." der.
 
 Bu kurallar ana veritabanının ad kuralından dardır (bkz. [Ad, Sürüm ve Veritabanı](managed-postgresql.md#2-ad-sürüm-ve-veritabanı)).
@@ -85,11 +87,11 @@ Ek veritabanının parolası saklanır; bağlantı bilgileri listeden istendiği
 
 Veritabanının satırındaki **Parolayı sıfırla**, kullanıcıya yeni bir parola üretir ve yeni bağlantı bilgilerini gösterir.
 
-- Eski parolayla bağlanan uygulamalar yeni parolayı alana kadar yeni bağlantı açamaz. Açık bağlantılar açık kalır.
+- Eski parolayla bağlanan uygulamalar yeni parolayı alana kadar yeni bağlantı açamaz. Açık bağlantılar hemen kopmaz; yine de uygulamaları hemen yeni parolaya geçirin.
 - Bir Stack'in servisleri bu veritabanını kullanıyorsa sıfırlama reddedilir (bkz. [Stack'ten bağlanma](#stackten-bağlanma)).
 - Instance'ta dump içe aktarma sürerken sıfırlama yapılamaz.
 
-Ana veritabanının **Veritabanı parolasını rotate et** işlemi ek veritabanlarının parolalarını değiştirmez; her ek veritabanının parolası kendi satırından sıfırlanır. Ancak bu işlem bağlantı havuzunu yeniden başlattığı için ek veritabanlarının açık bağlantıları da kopar; bu veritabanlarına bağlanan uygulamalar parolaları değişmediği için kendi parolalarıyla yeniden bağlanabilir (bkz. [Parola yenileme](managed-postgresql.md#parola-yenileme)).
+Ana veritabanının **Veritabanı parolasını rotate et** işlemi ek veritabanlarının parolalarını değiştirmez; her ek veritabanının parolası kendi satırından sıfırlanır. Ancak bu işlem bağlantı havuzunu yeniden başlattığı için ek veritabanlarının açık bağlantıları da kopar; bu veritabanlarına bağlanan uygulamalar parolaları değişmediği için kendi parolalarıyla yeniden bağlanabilir (bkz. [Parola yenileme](managed-postgresql.md#parola-yenileme)). Bir Stack servisi instance'ın herhangi bir veritabanına bağlıyken ana parolanın yenilenmesi de reddedilir.
 
 ---
 
@@ -115,7 +117,7 @@ Yedekler instance düzeyindedir: günlük tam yedek ve sürekli işlem günlüğ
 
 [Geri yükleme](managed-postgresql.md#geri-yükleme) yeni bir instance oluşturur ve seçilen andaki bütün veritabanlarını verileri ve kullanıcılarıyla birlikte getirir. Kopyanın adresi kaynağınkinden farklıdır; ek veritabanlarının bağlantı bilgisini kopyanın kendi **Veritabanları** kartından alın.
 
-Ek veritabanlarının parolaları kopyaya kaynaktan taşınır. Kaynakta artık bulunmayan, yani sonradan silinmiş bir veritabanının ya da parolası geri dönülen andan sonra sıfırlanmış bir veritabanının parolası kopyada bilinmez. Bu veritabanının bağlantı bilgisi "Bu veritabanının şifresi kayıtlı değil (örneğin bir geri yüklemeden sonra). Yeni şifre almak için şifreyi sıfırlayın." hatasını verir; kopyada **Parolayı sıfırla** ile yeni parola alın.
+Ek veritabanlarının parolaları kopyaya kaynaktan taşınır. Kaynakta artık bulunmayan, yani sonradan silinmiş bir veritabanının ya da parolası geri dönülen andan sonra sıfırlanmış bir veritabanının parolası kopyada bilinmez. Bu veritabanının bağlantı bilgisi "Bu veritabanının şifresi kayıtlı değil (örneğin bir geri yüklemeden sonra). Yeni şifre almak için şifreyi sıfırlayın." hatasını verir; parola sıfırlanana kadar bu veritabanında konsolun yazma modu, **İçgörü** sekmesindeki sorgu planı ve içe aktarma da aynı hatayla durur. Kopyada **Parolayı sıfırla** ile yeni parola alın.
 
 ---
 
@@ -164,7 +166,7 @@ services:
 - Stack veritabanı açmaz: veritabanı önceden konsoldan açılmış olmalıdır. Aynı planda oluşturulan bir yönetilen servisin ek veritabanına bağlanılamaz; plan bunu `ADDON_DATABASE_NOT_OPENED` ile reddeder. Önce yönetilen servisi uygulayın, veritabanını konsoldan açın, sonra servisi ekleyin.
 - Stack'in zaten çalıştırdığı bir serviste bu bağlantıyı eklemek, değiştirmek ya da kaldırmak yerinde uygulanamaz ve planı engeller; veritabanı servis ilk oluşturulurken seçilir.
 
-Bir Stack servisi ek bir veritabanına bağlandıktan sonra o veritabanı, hiçbir Stack servisi onu kullanmayana kadar silinemez ve parolası sıfırlanamaz; konsol hangi servislerin kullandığını söyler: "Bu veritabanını bir Stack üzerinden şu servisler kullanıyor: … Veritabanını silmek ya da şifresini sıfırlamak bağlantılarını koparır; önce bu servislerden ilgili ortam değişkenlerini kaldırın ya da servisleri silin. Hiçbir şey değiştirilmedi." Bu koruma, servisin adımı bittiğinde başlar; uygulama sürerken bağlanılan veritabanını silmeyin ve parolasını sıfırlamayın.
+Bir Stack servisi ek bir veritabanına bağlandıktan sonra o veritabanı, hiçbir Stack servisi onu kullanmayana kadar silinemez ve parolası sıfırlanamaz; konsol hangi servislerin kullandığını söyler: "Bu veritabanını bir Stack üzerinden şu servisler kullanıyor: …. Veritabanını silmek ya da şifresini sıfırlamak bağlantılarını koparır; önce bu servislerden ilgili ortam değişkenlerini kaldırın ya da servisleri silin. Hiçbir şey değiştirilmedi." Bu süre boyunca ana veritabanının parolası da yenilenemez. Koruma, servisin adımı bittiğinde başlar; uygulama sürerken bağlanılan veritabanını silmeyin ve parolasını sıfırlamayın.
 
 Uygulama sırasında servisin adımı şu hatalarla durabilir:
 

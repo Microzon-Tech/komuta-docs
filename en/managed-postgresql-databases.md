@@ -15,7 +15,7 @@ The databases are closed to each other:
 - An extra database's user can connect only to its own database; it can connect neither to the main database nor to the other extra databases.
 - The main database's user can't connect to the extra databases.
 
-Like the main database's user, an extra database's user is a fully privileged application user in its own database, not the server's superuser (see [The User You're Given](managed-postgresql.md#the-user-youre-given)). The [pre-installed extensions](managed-postgresql.md#pre-installed-extensions) come installed in extra databases too.
+An extra database's user owns its database: it can create schemas, tables, indexes, views, functions and triggers, run any data operation and use the pre-installed extensions. It can't create roles or databases, and it isn't the server's superuser. The [pre-installed extensions](managed-postgresql.md#pre-installed-extensions) come installed in extra databases too.
 
 ### What's separate, what's shared
 
@@ -32,19 +32,21 @@ An instance holds at most **5** databases, the main one included. The counter in
 
 ### How connections are shared
 
-While there's only one database, the instance's server connections belong entirely to the main database (see [Connection and Memory Limits](managed-postgresql.md#connection-and-memory-limits)). When a second database is opened, Komuta splits these connections evenly between the databases and gives every database's connection pool the same upper limit. A busy database can't use up the others' connections this way: once a database reaches its limit, its new transactions wait in the pool until one of its own connections frees up.
+Applications reach the database through a connection pool (see [Connection and Memory Limits](managed-postgresql.md#connection-and-memory-limits)). While there's only one database, the pool isn't split and the main database uses all of it. When a second database is opened, Komuta splits the pool's server connections evenly between the databases and gives every database the same upper limit. A busy database can't use up the others' connections this way: once a database reaches its limit, its new transactions wait in the pool until one of its own connections frees up.
 
-Each database's share gets smaller as databases are opened and larger as they're deleted. The card shows each database's current share, and the create dialog shows what the share drops to with the new database. On single-server plans, the most server connections one database can use at once:
+Each database's share gets smaller as databases are opened and larger as they're deleted. The card shows each database's current share, and the create dialog shows the current share and what it drops to with the new database. On single-server plans, the most server connections one database can use at once:
 
-| Plan RAM | 2 databases | 3 databases | 4 databases | 5 databases |
-|---|---|---|---|---|
-| 512 MB | 18 | 12 | 9 | 7 |
-| 1 GB | 23 | 15 | 11 | 9 |
-| 2 GB and above | 43 | 28 | 21 | 17 |
+| Plan RAM | 1 database | 2 databases | 3 databases | 4 databases | 5 databases |
+|---|---|---|---|---|---|
+| 512 MB | 20 | 18 | 12 | 9 | 7 |
+| 1 GB | 30 | 23 | 15 | 11 | 9 |
+| 2 GB and above | 55–86 | 43 | 28 | 21 | 17 |
 
-On high-availability plans the connection pool is split across two servers, so the values can be up to two connections lower; the card shows the exact number. The numbers in the table are connections on the database side. The limit on client connections that applications can open isn't split; the clients of all databases share it. When the plan changes, the shares are worked out again from the new plan's connections.
+At 2 GB and above, a single database's share is between 55 and 86 depending on the plan's vCPU count. These numbers are lower than the database connection limit in the [Connection and Memory Limits](managed-postgresql.md#connection-and-memory-limits) table, because part of that limit is set aside for the superuser and the platform's own connections. On high-availability plans the pool is split across two servers, so the values differ (with two or more databases, up to two connections lower); the card and the create dialog show the exact number.
 
-> **Warning:** The moment the first extra database is opened, the main database's share gets smaller too; on a 2 GB single-server plan, for example, the main database can then use at most 43 server connections at once. If the main database runs many transactions at the same time, take this into account before opening the first extra database.
+The limit on client connections that applications can open isn't split; the clients of all databases share it. When the plan changes, the shares are worked out again from the new plan's connections.
+
+> **Warning:** The moment the first extra database is opened, the main database's share gets smaller too; on a 2 GB single-server plan, for example, it drops from 55–86 to 43 server connections. The create dialog shows both numbers before you open the database. If the main database runs many transactions at the same time, take this into account before opening the first extra database.
 
 ---
 
@@ -66,7 +68,7 @@ To open a database:
 
 - 2–31 characters; only lowercase letters, digits and underscores (`_`).
 - The first character must be a letter, the last a letter or a digit.
-- A name can't be used if a database or user with that name already exists on the instance, the main database's name and username included: "A database or user with this name already exists on this instance. Choose another name."
+- A name can't be used if a database or user with that name already exists on the instance, the main database's name and username included. If you type the name of a database in the list, the dialog says "This service already has a database with this name." and **Create** stays disabled. If the name belongs to a user (the main database's user, for example), "A database or user with this name already exists on this instance. Choose another name." appears after **Create**.
 - PostgreSQL's and the platform's own names can't be used: `postgres`, `template0`, `template1`, `app`, `public`, `all`, `user`, `none`, `replication`, `samerole`, `samegroup`, `sameuser`, `current_user`, `current_role`, `session_user`, `streaming_replica`, nor names that start with a platform prefix such as `pg_`, `cnpg_`, `komuta_` and `documentdb`. The dialog then says "This name is reserved by the platform. Choose another one."
 
 These rules are narrower than the main database's naming rule (see [Name, Version, and Database](managed-postgresql.md#2-name-version-and-database)).
@@ -85,11 +87,11 @@ An extra database's password is stored, so its connection details can be shown a
 
 **Reset password** on the database's row generates a new password for its user and shows the new connection details.
 
-- Applications that connect with the old password can't open new connections until they get the new one. Connections that are already open stay open.
+- Applications that connect with the old password can't open new connections until they get the new one. Open connections aren't cut at once; still move the applications to the new password right away.
 - The reset is refused if a Stack's services use this database (see [Connecting from a Stack](#connecting-from-a-stack)).
 - The password can't be reset while a dump import is running on the instance.
 
-The main database's **Rotate database password** doesn't change the extra databases' passwords; each extra database's password is reset from its own row. That operation restarts the connection pool, though, so the extra databases' open connections drop as well; since their passwords haven't changed, the applications connected to them can reconnect with their own passwords (see [Password Rotation](managed-postgresql.md#password-rotation)).
+The main database's **Rotate database password** doesn't change the extra databases' passwords; each extra database's password is reset from its own row. That operation restarts the connection pool, though, so the extra databases' open connections drop as well; since their passwords haven't changed, the applications connected to them can reconnect with their own passwords (see [Password Rotation](managed-postgresql.md#password-rotation)). While a Stack service is bound to any of the instance's databases, rotating the main password is refused as well.
 
 ---
 
@@ -99,7 +101,7 @@ Click **Delete** on the database's row, type the database's name in the dialog a
 
 To delete:
 
-- The instance must have a backup completed within the last 26 hours. The only way to bring a deleted database back is restoring from a backup taken before the deletion. Without one, the message "No backup has completed in the last day, so this database could not be brought back after deletion. Take a backup and try again." appears: take a backup with **Back up now** on the **Operations** tab and try again once it completes.
+- The instance must have a backup completed within the last 26 hours. The only way to bring a deleted database back is restoring from a backup taken before the deletion. Without one, the message "No backup has completed in the last day, so this database could not be brought back after deletion. Take a backup and try again." appears: take a backup with **Backup now** on the **Operations** tab and try again once it completes.
 - No Stack's services may be using this database (see [Connecting from a Stack](#connecting-from-a-stack)).
 - The instance must be **Active**, **Suspended** or **Upgrade Failed**. A database can't be deleted while a plan change, restore or setup is in progress, or while a dump import is running.
 
@@ -115,7 +117,7 @@ Backups are per instance: the daily full backup and the continuous WAL archive c
 
 A [restore](managed-postgresql.md#restoring) creates a new instance and brings back all databases as they were at the chosen point, with their data and users. The copy's address differs from the source's; take the extra databases' connection details from the copy's own **Databases** card.
 
-The extra databases' passwords are carried over to the copy from the source. The copy doesn't know the password of a database that no longer exists on the source, because it was deleted later, or of one whose password was reset after the point you go back to. That database's connection details fail with "The password of this database is not stored, for example after a restore. Reset the password to get a new one."; get a new password on the copy with **Reset password**.
+The extra databases' passwords are carried over to the copy from the source. The copy doesn't know the password of a database that no longer exists on the source, because it was deleted later, or of one whose password was reset after the point you go back to. That database's connection details fail with "The password of this database is not stored, for example after a restore. Reset the password to get a new one."; until the password is reset, the console's write mode, the query plan on the **Insights** tab and imports into that database stop with the same error. Get a new password on the copy with **Reset password**.
 
 ---
 
@@ -164,7 +166,7 @@ services:
 - A Stack doesn't open databases: the database must already be open in the console. An extra database of a managed service created in the same plan can't be bound; the plan refuses it with `ADDON_DATABASE_NOT_OPENED`. Apply the managed service first, open the database in the console, then add the service.
 - On a service the Stack already runs, adding, changing or removing this binding can't be applied in place and blocks the plan; the database is chosen when the service is first created.
 
-Once a Stack service is bound to an extra database, that database can't be deleted and its password can't be reset until no Stack service uses it; the console says which services use it: "Services read this database through a Stack: … Deleting it or giving it a new password would disconnect them; remove those variables from the services, or delete the services, first. Nothing was changed." This protection starts when the service's step finishes; don't delete a database or reset its password while an apply that binds it is running.
+Once a Stack service is bound to an extra database, that database can't be deleted and its password can't be reset until no Stack service uses it; the console says which services use it: "Services read this database through a Stack: …. Deleting it or giving it a new password would disconnect them; remove those variables from the services, or delete the services, first. Nothing was changed." Meanwhile the main database's password can't be rotated either. The protection starts when the service's step finishes; don't delete a database or reset its password while an apply that binds it is running.
 
 During the apply, the service's step can stop with these errors:
 

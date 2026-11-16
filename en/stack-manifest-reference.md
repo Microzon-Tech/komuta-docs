@@ -459,7 +459,7 @@ The domain is added once its service is ready. Complete the DNS verification as 
 | `ADDON_CA_NOT_OFFERED` | Addon '…' is a … addon; caCert is offered for valkey addons only. |
 | `ADDON_CA_PRIVATE_ENDPOINT_ONLY` | caCert is the CA of the instance's own certificate, which only the private endpoint presents; bind it with endpoint: private. |
 | `ADDON_DATABASE_UNSUPPORTED` | Addon '…' is a … addon; a database can be chosen on postgres addons only. |
-| `ADDON_DATABASE_INVALID` | Database '…' is neither the main database of addon '…' ('…') nor a name an extra database can have: 2 to 31 lowercase letters, digits and underscores, starting with a letter and ending with a letter or digit; some names are reserved. (For a service under `uses.addons` the main database's name isn't in the file, so only the shape is checked: A database name is lowercase letters, digits and underscores, starts with a letter and has at most 63 characters.) |
+| `ADDON_DATABASE_INVALID` | Database '…' is neither the main database of addon '…' ('…') nor a name an extra database can have: 2 to 31 lowercase letters, digits and underscores, starting with a letter and ending with a letter or digit; some names are reserved. (For a managed service under `uses.addons` the main database's name isn't in the file, so only the shape is checked: A database name is lowercase letters, digits and underscores, starts with a letter and has at most 63 characters.) |
 | `SERVICE_REFERENCE_NOT_FOUND` | Service '…' does not exist. |
 | `SERVICE_REFERENCE_PROPERTY_INVALID` | Service property must be host or url. |
 | `SERVICE_DEPENDENCY_CYCLE` | Service dependencies must not contain a cycle. |
