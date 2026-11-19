@@ -190,7 +190,7 @@ Each entry is an environment variable. The value is either written directly with
 | `sensitive` | `false` | The value is stored as secret. |
 | `buildTime` | `false` | The value is also provided during the build. |
 | `valueFrom.secret` | — | The value of a name under `secrets`. Always stored as secret. |
-| `valueFrom.addon` | — | Connection details of a managed service: `name`, `property`, `endpoint`. |
+| `valueFrom.addon` | — | Connection details of a managed service: `name`, `property`, `endpoint`, `database`. |
 | `valueFrom.service` | — | The address of a service in the Stack: `name`, `property`. |
 
 Rules:
@@ -207,6 +207,7 @@ Rules:
 | `name` | — | A name under `addons` or `uses.addons`. |
 | `property` | — | `host`, `port`, `database`, `user`, `password`, `connectionString`, `caCert`. For `password` and `connectionString` the variable must have `sensitive: true`. `caCert` is the PEM of a Valkey instance's own certificate authority; it is offered only for Valkey and only on the private endpoint. |
 | `endpoint` | `private` | `private` or `public`. `public` needs the managed service's public access to be on. RabbitMQ can only use `public`. |
+| `database` | the main database | PostgreSQL only. Picks which database the values come from. Without it, or with the main database's name, the main database is bound. With the name of an extra database opened on the managed service in the console, `database`, `user`, `password` and `connectionString` come from that database and its user; `host` and `port` stay the same. A Stack doesn't open databases. See [Connecting from a Stack](managed-postgresql-databases.md#connecting-from-a-stack). |
 
 `connectionString` format: `postgresql://user:password@host:port/database?sslmode=require` for PostgreSQL, `rediss://user:password@host:port` for Valkey, `amqps://user:password@host:port/%2F` for RabbitMQ. For Valkey the `database` value is `0`; for RabbitMQ it is the virtual host.
 
@@ -341,6 +342,8 @@ Existing managed services the Stack uses without managing them. The plan lists t
 
 The used service must be **Active** and must not be scheduled for deletion. The same name can't be under both `addons` and `uses.addons`.
 
+Variables bound to a used service get its existing connection details: the same user and database its owner and the console use. If the application needs data and a user of its own, an extra database is opened on a PostgreSQL in the console and the variable binds it with `valueFrom.addon.database` (see [Connecting from a Stack](managed-postgresql-databases.md#connecting-from-a-stack)).
+
 ---
 
 ## domains
@@ -455,6 +458,8 @@ The domain is added once its service is ready. Complete the DNS verification as 
 | `ADDON_PASSWORD_MUST_BE_SENSITIVE` | An addon password or connectionString binding must declare sensitive: true. |
 | `ADDON_CA_NOT_OFFERED` | Addon '…' is a … addon; caCert is offered for valkey addons only. |
 | `ADDON_CA_PRIVATE_ENDPOINT_ONLY` | caCert is the CA of the instance's own certificate, which only the private endpoint presents; bind it with endpoint: private. |
+| `ADDON_DATABASE_UNSUPPORTED` | Addon '…' is a … addon; a database can be chosen on postgres addons only. |
+| `ADDON_DATABASE_INVALID` | Database '…' is neither the main database of addon '…' ('…') nor a name an extra database can have: 2 to 31 lowercase letters, digits and underscores, starting with a letter and ending with a letter or digit; some names are reserved. (For a managed service under `uses.addons` the main database's name isn't in the file, so only the shape is checked: A database name is lowercase letters, digits and underscores, starts with a letter and has at most 63 characters.) |
 | `SERVICE_REFERENCE_NOT_FOUND` | Service '…' does not exist. |
 | `SERVICE_REFERENCE_PROPERTY_INVALID` | Service property must be host or url. |
 | `SERVICE_DEPENDENCY_CYCLE` | Service dependencies must not contain a cycle. |
@@ -487,6 +492,7 @@ If the file is valid, the plan compares it with the resources in your account an
 | `USE_ADDON_NOT_FOUND` | No addon named '…' exists in the target project or among the shared addons. |
 | `USE_OUTSIDE_TARGET` | Addon '…' belongs to project '…', not the target project; … |
 | `USE_ADDON_NOT_ACTIVE` | Addon '…' is …; it must be Active before a service can use it. |
+| `ADDON_DATABASE_NOT_OPENED` | Addon '…' is created by this apply, so it has no database '…' yet; a Stack binds an extra database but does not open one. Bind the main database, or apply the addon first, open the database on it, then add the service that binds it. |
 | `DOMAIN_HOSTNAME_INVALID` | Hostname '…' is not a valid domain name. |
 | `CAPABILITY_NOT_AVAILABLE` | See [Fields not available yet](#fields-not-available-yet). When an unsupported field of an existing resource changes: In-place updates for Stack-managed … resources are not enabled on this target. |
 

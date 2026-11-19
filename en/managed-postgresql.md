@@ -12,6 +12,8 @@ When an instance is created, Komuta provisions a PostgreSQL cluster in the selec
 
 An **instance** is an independent database server with its own disk, its own user, and its own backup chain. CPU, memory, disk, and server (replica) count all come from the **plan** it's on; server parameters are also computed from the plan and can't be tuned by hand (see [Automatically applied limits](#automatically-applied-limits)).
 
+Next to the main database the instance is created with, more databases can be opened, each with its own user (see [Multiple Databases in PostgreSQL](managed-postgresql-databases.md)).
+
 The **region** is where the instance physically runs, and it can't be changed after creation. Moving to another region means creating a new instance and migrating the data.
 
 An instance can optionally be attached to a **project**.
@@ -350,6 +352,8 @@ The console is **read-only by default.** Once **Write mode** is turned on, `INSE
 
 Results are capped at 1,000 rows; a result that hits the cap is marked **Truncated**. If the full result set is needed, the query should be split with `LIMIT`/`OFFSET`, or the result should be downloaded as CSV.
 
+If the instance has extra databases, the database a query runs in is chosen with the **Database** picker (see [Choosing the Database](managed-postgresql-databases.md#choosing-the-database)).
+
 ![Query tab](https://cdn.komuta.io/docs/tr/images/postgresql/select-query-response.png)
 
 ---
@@ -381,7 +385,7 @@ Monitoring rules are set up automatically when the instance is created; no addit
 
 ## Importing from a Dump File
 
-**Import from URL** on the **Operations** tab restores a `pg_dump` output into this instance. This is not a merge operation.
+**Import from URL** on the **Operations** tab restores a `pg_dump` output into this instance. This is not a merge operation. If the instance has extra databases, the target database is chosen with the **Database** picker (see [Importing into an extra database](managed-postgresql-databases.md#importing-into-an-extra-database)).
 
 > **Warning:** Once the import is confirmed, the target application database is dropped and rebuilt from the dump. All existing data is permanently deleted, and this can't be undone. If the target database isn't empty, confirmation requires typing the instance name.
 
@@ -406,7 +410,7 @@ Some extensions referenced in the dump but missing from the target can be exclud
 
 After confirmation, the restore runs and its progress can be tracked; an in-progress operation can be canceled, and a failed one can be retried with the same source. Previous imports into the same instance sit in the history list on the **Operations** tab and can be reopened from there.
 
-Once the import completes, the new state of the database is protected by the next scheduled backup. If a protection point is needed the same day, a manual backup should be taken with **Back up now**.
+Once the import completes successfully, Komuta starts a new full backup right away; the new state of the database is protected once that backup completes.
 
 ---
 
