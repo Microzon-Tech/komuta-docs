@@ -2,7 +2,7 @@
 
 Inside a PostgreSQL instance, more databases can be opened next to the main database the instance was created with. Each extra database has its own user and password, and that user can reach only its own database. Extra databases share the instance's plan, backups and connections, so applications that should be kept apart can each get a database of their own without a new instance for each.
 
-> **Note:** Extra databases are a feature turned on per organization. If the **Databases** card doesn't appear on the **Overview** tab while the instance is running, the feature isn't on for your organization; open a [support ticket](support-tickets.md) to have it turned on. If the feature is turned off later, the databases already opened keep working; only new ones can't be opened. The card then says "Creating more databases is not available for your organization. The existing ones keep working."
+> **Note:** Extra databases are available to every organization. If the **Databases** card says "Creating more databases is not available for your organization. The existing ones keep working.", opening new databases has been turned off for your organization: the databases already opened keep working, and you can open a [support ticket](support-tickets.md) to ask about it.
 
 ---
 

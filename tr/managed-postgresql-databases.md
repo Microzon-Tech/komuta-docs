@@ -2,7 +2,7 @@
 
 Bir PostgreSQL instance'ının içinde, instance oluşturulurken açılan ana veritabanının yanında başka veritabanları da açılabilir. Her ek veritabanının kendi kullanıcısı ve parolası vardır ve bu kullanıcı yalnız kendi veritabanına girebilir. Ek veritabanları instance'ın planını, yedeklerini ve bağlantılarını paylaşır; birbirinden ayrı tutulması gereken uygulamalara, her biri için yeni bir instance açmadan ayrı bir veritabanı verilebilir.
 
-> **Not:** Ek veritabanları organizasyon başına açılan bir özelliktir. Instance çalışırken **Genel Bakış** sekmesinde **Veritabanları** kartı görünmüyorsa özellik organizasyonunuzda açık değildir; açtırmak için [destek talebi](support-tickets.md) açın. Özellik sonradan kapatılırsa açılmış veritabanları çalışmaya devam eder, yalnız yenisi açılamaz. Kart bu durumda "Organizasyonunuz için yeni veritabanı oluşturma açık değil. Var olanlar çalışmaya devam eder." der.
+> **Not:** Ek veritabanları her organizasyona açıktır. **Veritabanları** kartı "Organizasyonunuz için yeni veritabanı oluşturma açık değil. Var olanlar çalışmaya devam eder." diyorsa organizasyonunuzda yeni veritabanı açma kapatılmıştır: açılmış veritabanları çalışmaya devam eder, bilgi almak için [destek talebi](support-tickets.md) açabilirsiniz.
 
 ---
 
