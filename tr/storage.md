@@ -12,6 +12,7 @@ Hacimler servis sayfasındaki **Depolama** sekmesinden yönetilir: **Uygulamalar
 |---|---|
 | Kullanıcıların yüklediği dosyalar, uygulamanın ürettiği raporlar, dosya tabanlı indeks veya önbellek | Kalıcı hacim |
 | İlişkisel veritabanı | [PostgreSQL](managed-postgresql.md). Yedek alma ve geri yükleme hazır gelir. |
+| Doküman veritabanı (MongoDB uyumlu) | [DocumentDB](managed-documentdb.md). Yedek alma ve geri yükleme hazır gelir. |
 | Oturum verisi, anahtar-değer önbelleği | [Valkey](managed-valkey.md) |
 | Kuyruk ve mesajlaşma | [RabbitMQ](managed-rabbitmq.md) |
 | Yalnızca istek süresince gereken geçici dosyalar | Hacim gerekmez, container'ın kendi diski yeterlidir |

@@ -14,6 +14,8 @@ An **instance** is an independent database server with its own disk, its own use
 
 Next to the main database the instance is created with, more databases can be opened, each with its own user (see [Multiple Databases in PostgreSQL](managed-postgresql-databases.md)).
 
+If the data is kept in documents rather than tables and the application uses a MongoDB driver, the right service is [DocumentDB](managed-documentdb.md).
+
 The **region** is where the instance physically runs, and it can't be changed after creation. Moving to another region means creating a new instance and migrating the data.
 
 An instance can optionally be attached to a **project**.

@@ -182,15 +182,16 @@ Erişim korumasının sınırları (IP listesi, yol kuralları, paylaşımlar, s
 
 ## Yönetilen Servisler
 
-PostgreSQL, Valkey ve RabbitMQ'da CPU, bellek, disk ve sunucu sayısını plan belirler; planlar ve güncel boyutları oluşturma sihirbazında listelenir. Plana bağlı bağlantı, bellek ve sorgu sınırları servisin kendi sayfasında anlatılır.
+PostgreSQL, DocumentDB, Valkey ve RabbitMQ'da CPU, bellek, disk ve sunucu sayısını plan belirler; planlar ve güncel boyutları oluşturma sihirbazında listelenir. Plana bağlı bağlantı, bellek ve sorgu sınırları servisin kendi sayfasında anlatılır.
 
 | Sınır | Değer | Not |
 |---|---|---|
 | 512 MB ve 1 GB planlı PostgreSQL veritabanı | Organizasyon başına 5 | Askıda ve silinmeyi bekleyenler dahil her durumda sayılır. Daha büyük planlarda böyle bir sınır yoktur. |
-| Yedek saklama süresi | 2–365 gün, varsayılan 7 gün | Üç serviste aynı. Süreyi kısaltmak geri alınamaz: yeni pencerenin dışında kalan yedekler silinir. |
-| Planlı silme | 7 gün | Süre dolmadan iptal edilebilir. Valkey ve RabbitMQ bu sürede çalışmaya ve faturalanmaya devam eder; PostgreSQL erişime kapanır ve yalnız diski faturalanır. |
+| 1 GB planlı DocumentDB instance'ı | Organizasyon başına 5 | Silinmeyi bekleyenler dahil her durumda sayılır; PostgreSQL'den ayrı sayılır. Daha büyük planlarda böyle bir sınır yoktur. |
+| Yedek saklama süresi | 2–365 gün, varsayılan 7 gün | Dört serviste aynı. Süreyi kısaltmak geri alınamaz: yeni pencerenin dışında kalan yedekler silinir. |
+| Planlı silme | 7 gün | Süre dolmadan iptal edilebilir. Valkey ve RabbitMQ bu sürede çalışmaya ve faturalanmaya devam eder; PostgreSQL ve DocumentDB erişime kapanır ve yalnız diski faturalanır. |
 
-Ayrıntılar: [PostgreSQL](managed-postgresql.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md).
+Ayrıntılar: [PostgreSQL](managed-postgresql.md), [DocumentDB](managed-documentdb.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md).
 
 ---
 

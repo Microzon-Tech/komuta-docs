@@ -32,7 +32,7 @@ Billing pages are open to **organization admins** only. Members do not see these
 | What is billed | Price |
 |---|---|
 | Services and jobs | By the resource package you choose; the price is shown in the creation wizard. Service packages: 0.5 vCPU / 1 GB USD 9, 1 vCPU / 2 GB USD 18, 2 vCPU / 4 GB USD 36, 4 vCPU / 8 GB USD 72 (per month). A service running more than one replica is metered for each replica. |
-| Managed services (PostgreSQL, Valkey, RabbitMQ) | On the plan's CPU limit, memory limit and disk: USD 12.85 per vCPU per month, USD 5.14 per GiB of memory per month, USD 0.1447 per GiB of disk per month. |
+| Managed services (PostgreSQL, DocumentDB, Valkey, RabbitMQ) | On the plan's CPU limit, memory limit and disk: USD 12.85 per vCPU per month, USD 5.14 per GiB of memory per month, USD 0.1447 per GiB of disk per month. |
 | API Gateway | USD 9 per month (USD 0.0125 per hour) plus the compute the gateway uses. |
 | Build minutes | 2,000 minutes included in every billing cycle, then USD 0.008 per minute. Time waiting in the queue is not billed. |
 | Bandwidth plans | Starter free (default), Growth USD 4.99, Business USD 14.99, Enterprise USD 49.99, Scale USD 149.99 (per month). The plan fee accrues hourly even without traffic. |
