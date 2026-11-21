@@ -32,7 +32,7 @@ Faturalandırma sayfaları yalnızca **organizasyon yöneticilerine** açıktır
 | Ne faturalanır | Fiyat |
 |---|---|
 | Servisler ve işler | Seçtiğiniz kaynak paketine göre; fiyat oluşturma sihirbazında gösterilir. Servis paketleri: 0,5 vCPU / 1 GB 9 USD, 1 vCPU / 2 GB 18 USD, 2 vCPU / 4 GB 36 USD, 4 vCPU / 8 GB 72 USD (aylık). Birden fazla replikayla çalışan servisin her replikası ayrı ölçülür. |
-| Yönetilen servisler (PostgreSQL, Valkey, RabbitMQ) | Planın CPU limiti, bellek limiti ve diski üzerinden: vCPU başına aylık 12,85 USD, GiB bellek başına aylık 5,14 USD, GiB disk başına aylık 0,1447 USD. |
+| Yönetilen servisler (PostgreSQL, DocumentDB, Valkey, RabbitMQ) | Planın CPU limiti, bellek limiti ve diski üzerinden: vCPU başına aylık 12,85 USD, GiB bellek başına aylık 5,14 USD, GiB disk başına aylık 0,1447 USD. |
 | API Gateway | Aylık 9 USD (saatlik 0,0125 USD) + gateway'in kullandığı işlem kaynakları. |
 | Build dakikaları | Her fatura döneminde 2.000 dakika ücretsiz; sonrası dakika başına 0,008 USD. Kuyrukta beklenen süre faturalanmaz. |
 | Bant genişliği planları | Starter ücretsiz (varsayılan), Growth 4,99 USD, Business 14,99 USD, Enterprise 49,99 USD, Scale 149,99 USD (aylık). Plan ücreti trafik olmasa da saatlik işler. |

@@ -16,7 +16,7 @@ Komuta bir platform hizmetidir (PaaS). Kodunuzu Git'e gönderirsiniz; Komuta onu
 - **Korur.** Erişim koruması, servisinizin adresini kimin açabileceğini belirler. Güvenlik Merkezi bulguları ve çalışan servislerin davranışını tek yerde toplar.
 - **İzler.** Loglar, metrikler ve trace'ler **Gözlemlenebilirlik** ekranındadır. Uyarı kuralları e-posta, Slack ya da Microsoft Teams'e bildirim gönderir.
 
-Kod ve build gerektirmeyen **yönetilen servisler** de sunar: PostgreSQL, Valkey, RabbitMQ ve API Gateway. Kurulumu, yedeği ve izlemeyi Komuta yapar.
+Kod ve build gerektirmeyen **yönetilen servisler** de sunar: PostgreSQL, DocumentDB, Valkey, RabbitMQ ve API Gateway. Kurulumu, yedeği ve izlemeyi Komuta yapar.
 
 Komuta'yı yapay zekâ asistanınızdan da yönetebilirsiniz. Komuta MCP sunucusuna bağlanan bir asistan (Claude, Codex) proje açmak, deploy etmek, veritabanı kurmak ve log incelemek gibi işleri sizin yerinize yapar.
 
@@ -87,7 +87,7 @@ Job bir kez çalışıp biten iştir; CronJob aynı işi bir takvime bağlar. Ve
 
 **Yönetilen Servisler** menüsünde iki tür ürün vardır:
 
-- **PostgreSQL, Valkey ve RabbitMQ** — İlişkisel veritabanı, bellek içi anahtar-değer deposu ve mesaj kuyruğu. Her biri bir **örnek** olarak oluşturulur; CPU, bellek ve disk seçtiğiniz **plandan** gelir.
+- **PostgreSQL, DocumentDB, Valkey ve RabbitMQ** — İlişkisel veritabanı, MongoDB uyumlu doküman veritabanı, bellek içi anahtar-değer deposu ve mesaj kuyruğu. Her biri bir **örnek** olarak oluşturulur; CPU, bellek ve disk seçtiğiniz **plandan** gelir.
 - **API Gateway** — API'lerinizin önünde tek bir adres. Anahtarları ve hız limitlerini konsoldan yönetirsiniz. Bir projenin altında oluşturulur.
 
 ### Stack
@@ -118,7 +118,7 @@ Sol menü dört başlık altında toplanır:
 
 | Başlık | İçindekiler |
 |---|---|
-| **İş Yükleri** | **Uygulamalar**, **Job ve CronJob'lar**, **Stack'ler**, **Yönetilen Servisler** (PostgreSQL, Valkey, RabbitMQ, **API Gateway'ler**) |
+| **İş Yükleri** | **Uygulamalar**, **Job ve CronJob'lar**, **Stack'ler**, **Yönetilen Servisler** (PostgreSQL, DocumentDB, Valkey, RabbitMQ, **API Gateway'ler**) |
 | **İzleme** | **Gözlemlenebilirlik**, **Uyarılar**, **Güvenlik** |
 | **Yapılandırma** | **Entegrasyonlar**, **Alan Adları**, **Ortam Değişkeni Grupları** |
 | **Yönetim** | **Erişim Yönetimi**, **Hesap** |
@@ -139,7 +139,7 @@ Konsol Türkçe ve İngilizce kullanılabilir; aşağıda her terimin iki dildek
 | **Proje** / Project | Organizasyon içinde ilgili repoları, uygulamaları, Job'ları, gateway'leri ve Stack'leri gruplayan klasör. Aynı zamanda yetki sınırı. | [Yeni Servis Oluşturma](new-service-guide.md) |
 | **Uygulamalar** / Apps (servis) | Git reposundan build edilip sürekli çalışan uygulama. Dokümanlarda "servis" olarak geçer. | [Yeni Servis Oluşturma](new-service-guide.md), [Servis Dashboard](service-dashboard.md) |
 | **Job ve CronJob'lar** / Jobs & CronJobs | Bir kez çalışıp biten (Job) ya da takvime bağlı (CronJob) iş. | [Job ve CronJob'lar](jobs-cronjobs.md) |
-| **Yönetilen Servisler** / Managed Services | Komuta'nın kurup işlettiği PostgreSQL, Valkey, RabbitMQ ve API Gateway. | [PostgreSQL](managed-postgresql.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md) |
+| **Yönetilen Servisler** / Managed Services | Komuta'nın kurup işlettiği PostgreSQL, DocumentDB, Valkey, RabbitMQ ve API Gateway. | [PostgreSQL](managed-postgresql.md), [DocumentDB](managed-documentdb.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md) |
 | Örnek / Instance (**Yeni örnek** / New instance) | Bir yönetilen servisin kendi diski, kullanıcısı ve yedekleri olan tek kopyası. | [PostgreSQL](managed-postgresql.md) |
 | **Plan** / Plan | Yönetilen servis örneğinin CPU, bellek ve disk boyutu. Sonradan yükseltilebilir. | [PostgreSQL](managed-postgresql.md) |
 | **Paylaşılan** / Shared | Hiçbir projeye bağlanmamış yönetilen servis örneği. | [PostgreSQL](managed-postgresql.md) |

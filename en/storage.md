@@ -12,6 +12,7 @@ Volumes are managed from the **Storage** tab on the service page: **Apps** → s
 |---|---|
 | Files your users upload, reports the app generates, a file-based index or cache | Persistent volume |
 | Relational database | [PostgreSQL](managed-postgresql.md). Backups and restore come built in. |
+| Document database (MongoDB-compatible) | [DocumentDB](managed-documentdb.md). Backups and restore come built in. |
 | Session data, key-value cache | [Valkey](managed-valkey.md) |
 | Queues and messaging | [RabbitMQ](managed-rabbitmq.md) |
 | Temporary files needed only during a request | No volume needed, the container's own disk is enough |

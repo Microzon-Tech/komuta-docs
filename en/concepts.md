@@ -16,7 +16,7 @@ Komuta is a platform as a service (PaaS). You push your code to Git; Komuta buil
 - **Protects.** Access protection decides who can open your service's address. The Security Center brings findings and the behavior of running services together in one place.
 - **Watches.** Logs, metrics and traces are on the **Observability** screen. Alert rules send notifications to email, Slack or Microsoft Teams.
 
-It also offers **managed services** that need no code and no build: PostgreSQL, Valkey, RabbitMQ and API Gateway. Komuta handles their setup, backups and monitoring.
+It also offers **managed services** that need no code and no build: PostgreSQL, DocumentDB, Valkey, RabbitMQ and API Gateway. Komuta handles their setup, backups and monitoring.
 
 You can also run Komuta from your AI assistant. An assistant connected to the Komuta MCP server (Claude, Codex) can create projects, deploy, set up databases and read logs for you.
 
@@ -87,7 +87,7 @@ A Job is a task that runs once and finishes; a CronJob ties the same task to a s
 
 The **Managed Services** menu has two kinds of product:
 
-- **PostgreSQL, Valkey and RabbitMQ**: a relational database, an in-memory key-value store and a message queue. Each one is created as an **instance**; its CPU, memory and disk come from the **plan** you choose.
+- **PostgreSQL, DocumentDB, Valkey and RabbitMQ**: a relational database, a MongoDB-compatible document database, an in-memory key-value store and a message queue. Each one is created as an **instance**; its CPU, memory and disk come from the **plan** you choose.
 - **API Gateway**: one address in front of your APIs. You manage its keys and rate limits from the console. It is created under a project.
 
 ### Stack
@@ -118,7 +118,7 @@ The left menu is grouped under four headings:
 
 | Heading | What it holds |
 |---|---|
-| **Workloads** | **Apps**, **Jobs & CronJobs**, **Stacks**, **Managed Services** (PostgreSQL, Valkey, RabbitMQ, **API Gateways**) |
+| **Workloads** | **Apps**, **Jobs & CronJobs**, **Stacks**, **Managed Services** (PostgreSQL, DocumentDB, Valkey, RabbitMQ, **API Gateways**) |
 | **Monitoring** | **Observability**, **Alerts**, **Security** |
 | **Configuration** | **Integrations**, **Domains**, **Environment Groups** |
 | **Administration** | **Access Control**, **Account** |
@@ -139,7 +139,7 @@ The console is available in English and Turkish; the names below are the English
 | **Project** | A folder inside an organization that groups related repos, apps, Jobs, gateways and Stacks. Also a permission boundary. | [Creating a New Service](new-service-guide.md) |
 | **Apps** (service) | An application built from a Git repo that runs all the time. These documents call it a "service". | [Creating a New Service](new-service-guide.md), [Service Dashboard](service-dashboard.md) |
 | **Jobs & CronJobs** | Work that runs once and finishes (Job) or runs on a schedule (CronJob). | [Jobs and CronJobs](jobs-cronjobs.md) |
-| **Managed Services** | PostgreSQL, Valkey, RabbitMQ and API Gateway, set up and run by Komuta. | [PostgreSQL](managed-postgresql.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md) |
+| **Managed Services** | PostgreSQL, DocumentDB, Valkey, RabbitMQ and API Gateway, set up and run by Komuta. | [PostgreSQL](managed-postgresql.md), [DocumentDB](managed-documentdb.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md) |
 | Instance (**New instance**) | One copy of a managed service, with its own disk, user and backups. | [PostgreSQL](managed-postgresql.md) |
 | **Plan** | The CPU, memory and disk size of a managed service instance. It can be upgraded later. | [PostgreSQL](managed-postgresql.md) |
 | **Shared** | A managed service instance not attached to any project. | [PostgreSQL](managed-postgresql.md) |

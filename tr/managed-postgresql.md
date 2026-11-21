@@ -14,6 +14,8 @@ Bir **instance**, kendi diski, kendi kullanıcısı ve kendi yedek zinciriyle ç
 
 Instance oluşturulurken açılan ana veritabanının yanında, her biri kendi kullanıcısıyla başka veritabanları da açılabilir (bkz. [PostgreSQL'de Birden Çok Veritabanı](managed-postgresql-databases.md)).
 
+Veri tablolar yerine belgelerde tutulacaksa ve uygulama bir MongoDB sürücüsü kullanıyorsa doğru servis [DocumentDB](managed-documentdb.md)'dir.
+
 **Bölge**, instance'ın fiziksel olarak çalıştığı yerdir ve oluşturulduktan sonra değiştirilemez. Başka bir bölgeye taşımanın yolu yeni bir instance oluşturup veriyi aktarmaktır.
 
 Instance isteğe bağlı olarak bir **projeye** bağlanabilir.

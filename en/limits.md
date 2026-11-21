@@ -182,15 +182,16 @@ The limits of access protection (IP lists, path rules, shares, service tokens, s
 
 ## Managed Services
 
-For PostgreSQL, Valkey and RabbitMQ, the plan sets the CPU, memory, disk and server count; the plans and their current sizes are listed in the creation wizard. Plan-dependent connection, memory and query limits are described on each service's own page.
+For PostgreSQL, DocumentDB, Valkey and RabbitMQ, the plan sets the CPU, memory, disk and server count; the plans and their current sizes are listed in the creation wizard. Plan-dependent connection, memory and query limits are described on each service's own page.
 
 | Limit | Value | Notes |
 |---|---|---|
 | PostgreSQL databases on the 512 MB and 1 GB plans | 5 per organization | Counted in every state, suspended and pending deletion included. Larger plans have no such limit. |
-| Backup retention | 2–365 days, 7 days by default | The same for all three services. Shortening it cannot be undone: backups outside the new window are deleted. |
-| Scheduled deletion | 7 days | Can be cancelled before the period ends. Valkey and RabbitMQ keep running and being billed meanwhile; PostgreSQL is taken offline and only its disk is billed. |
+| DocumentDB instances on the 1 GB plan | 5 per organization | Counted in every state, pending deletion included, and separately from PostgreSQL. Larger plans have no such limit. |
+| Backup retention | 2–365 days, 7 days by default | The same for all four services. Shortening it cannot be undone: backups outside the new window are deleted. |
+| Scheduled deletion | 7 days | Can be cancelled before the period ends. Valkey and RabbitMQ keep running and being billed meanwhile; PostgreSQL and DocumentDB are taken offline and only their disk is billed. |
 
-Details: [PostgreSQL](managed-postgresql.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md).
+Details: [PostgreSQL](managed-postgresql.md), [DocumentDB](managed-documentdb.md), [Valkey](managed-valkey.md), [RabbitMQ](managed-rabbitmq.md).
 
 ---
 
