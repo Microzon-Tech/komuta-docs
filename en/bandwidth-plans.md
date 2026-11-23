@@ -23,11 +23,12 @@ The plan does not limit the number of requests your service receives. Only the s
 
 | Plan | Monthly fee | Egress speed (per pod) |
 |---|---|---|
-| **Starter** (default) | Free | 5 Mbps |
-| **Growth** | USD 4.99 | 25 Mbps |
-| **Business** | USD 14.99 | 100 Mbps |
-| **Enterprise** | USD 49.99 | 500 Mbps |
-| **Scale** | USD 149.99 | 2 Gbps |
+| **Starter** (default) | Free | 25 Mbps |
+| **Growth** | USD 4.99 | 100 Mbps |
+| **Business** | USD 14.99 | 300 Mbps |
+| **Enterprise** | USD 49.99 | 1 Gbps |
+
+There is no traffic quota and no per-GB charge: a plan sets only the speed and a flat monthly fee. The **Scale** plan is no longer offered to new services; services already on it keep its speed and price.
 
 Prices are in USD and exclude tax. You can see the current values on the plan cards in the **Bandwidth** tab and on the [Pricing](https://www.komuta.io/pricing) page.
 

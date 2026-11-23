@@ -99,11 +99,10 @@ Her servisin bir bant genişliği planı vardır. Plan, servisin her pod'unun gi
 
 | Plan | Aylık | Pod başına çıkış hızı |
 |---|---|---|
-| Starter (varsayılan) | Ücretsiz | 5 Mbit/s |
-| Growth | 4,99 USD | 25 Mbit/s |
-| Business | 14,99 USD | 100 Mbit/s |
-| Enterprise | 49,99 USD | 500 Mbit/s |
-| Scale | 149,99 USD | 2 Gbit/s |
+| Starter (varsayılan) | Ücretsiz | 25 Mbit/s |
+| Growth | 4,99 USD | 100 Mbit/s |
+| Business | 14,99 USD | 300 Mbit/s |
+| Enterprise | 49,99 USD | 1 Gbit/s |
 
 Ayrıntılar: [Bant Genişliği Planları](bandwidth-plans.md).
 
