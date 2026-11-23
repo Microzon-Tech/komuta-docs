@@ -23,11 +23,12 @@ Plan, servisin aldığı istek sayısını sınırlamaz. Saniyede kaç istek gel
 
 | Plan | Aylık ücret | Çıkış hızı (pod başına) |
 |---|---|---|
-| **Starter** (varsayılan) | Ücretsiz | 5 Mbps |
-| **Growth** | 4,99 USD | 25 Mbps |
-| **Business** | 14,99 USD | 100 Mbps |
-| **Enterprise** | 49,99 USD | 500 Mbps |
-| **Scale** | 149,99 USD | 2 Gbps |
+| **Starter** (varsayılan) | Ücretsiz | 25 Mbps |
+| **Growth** | 4,99 USD | 100 Mbps |
+| **Business** | 14,99 USD | 300 Mbps |
+| **Enterprise** | 49,99 USD | 1 Gbps |
+
+Trafik kotası ve GB başına ücret yoktur: plan yalnız hızı ve sabit aylık ücreti belirler. **Scale** planı artık yeni servislere sunulmuyor; üzerindeki servisler mevcut hız ve ücretiyle çalışmaya devam eder.
 
 Fiyatlar USD cinsindendir ve vergi hariçtir. Güncel değerleri **Bant genişliği** sekmesindeki plan kartlarında ve [Fiyatlandırma](https://www.komuta.io/pricing) sayfasında görürsünüz.
 

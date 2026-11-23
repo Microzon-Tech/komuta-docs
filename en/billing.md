@@ -35,7 +35,7 @@ Billing pages are open to **organization admins** only. Members do not see these
 | Managed services (PostgreSQL, DocumentDB, Valkey, RabbitMQ) | On the plan's CPU limit, memory limit and disk: USD 12.85 per vCPU per month, USD 5.14 per GiB of memory per month, USD 0.1447 per GiB of disk per month. |
 | API Gateway | USD 9 per month (USD 0.0125 per hour) plus the compute the gateway uses. |
 | Build minutes | 2,000 minutes included in every billing cycle, then USD 0.008 per minute. Time waiting in the queue is not billed. |
-| Bandwidth plans | Starter free (default), Growth USD 4.99, Business USD 14.99, Enterprise USD 49.99, Scale USD 149.99 (per month). The plan fee accrues hourly even without traffic. |
+| Bandwidth plans | Starter free (default), Growth USD 4.99, Business USD 14.99, Enterprise USD 49.99 (per month); no traffic quota or per-GB charge. The plan fee accrues hourly even without traffic. |
 | Observability storage | USD 0.000342 per GB-hour (about USD 0.25 per GB per month). |
 | Always on add-on | USD 3 per billing cycle + tax, for only the part of the cycle it is on. |
 

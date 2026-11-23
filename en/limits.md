@@ -99,11 +99,10 @@ Every service has a bandwidth plan. The plan limits the outbound (egress) speed 
 
 | Plan | Monthly | Outbound speed per pod |
 |---|---|---|
-| Starter (default) | Free | 5 Mbit/s |
-| Growth | USD 4.99 | 25 Mbit/s |
-| Business | USD 14.99 | 100 Mbit/s |
-| Enterprise | USD 49.99 | 500 Mbit/s |
-| Scale | USD 149.99 | 2 Gbit/s |
+| Starter (default) | Free | 25 Mbit/s |
+| Growth | USD 4.99 | 100 Mbit/s |
+| Business | USD 14.99 | 300 Mbit/s |
+| Enterprise | USD 49.99 | 1 Gbit/s |
 
 Details: [Bandwidth Plans](bandwidth-plans.md).
 

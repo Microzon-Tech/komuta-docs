@@ -35,7 +35,7 @@ Faturalandırma sayfaları yalnızca **organizasyon yöneticilerine** açıktır
 | Yönetilen servisler (PostgreSQL, DocumentDB, Valkey, RabbitMQ) | Planın CPU limiti, bellek limiti ve diski üzerinden: vCPU başına aylık 12,85 USD, GiB bellek başına aylık 5,14 USD, GiB disk başına aylık 0,1447 USD. |
 | API Gateway | Aylık 9 USD (saatlik 0,0125 USD) + gateway'in kullandığı işlem kaynakları. |
 | Build dakikaları | Her fatura döneminde 2.000 dakika ücretsiz; sonrası dakika başına 0,008 USD. Kuyrukta beklenen süre faturalanmaz. |
-| Bant genişliği planları | Starter ücretsiz (varsayılan), Growth 4,99 USD, Business 14,99 USD, Enterprise 49,99 USD, Scale 149,99 USD (aylık). Plan ücreti trafik olmasa da saatlik işler. |
+| Bant genişliği planları | Starter ücretsiz (varsayılan), Growth 4,99 USD, Business 14,99 USD, Enterprise 49,99 USD (aylık); trafik kotası ve GB başına ücret yoktur. Plan ücreti trafik olmasa da saatlik işler. |
 | Observability depolama | GB-saat başına 0,000342 USD (GB başına aylık yaklaşık 0,25 USD). |
 | Her zaman açık eklentisi | Fatura dönemi başına 3 USD + vergi; dönemin yalnızca açık kaldığı kısmı kadar. |
 

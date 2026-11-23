@@ -166,11 +166,10 @@ To change the plan, choose a new plan from the list and confirm. The change take
 
 | Plan | Monthly price | Outbound speed limit |
 |---|---|---|
-| Starter (default) | Free | 5 Mbit/s |
-| Growth | USD 4.99 | 25 Mbit/s |
-| Business | USD 14.99 | 100 Mbit/s |
-| Enterprise | USD 49.99 | 500 Mbit/s |
-| Scale | USD 149.99 | 2 Gbit/s |
+| Starter (default) | Free | 25 Mbit/s |
+| Growth | USD 4.99 | 100 Mbit/s |
+| Business | USD 14.99 | 300 Mbit/s |
+| Enterprise | USD 49.99 | 1 Gbit/s |
 
 See [Bandwidth Plans](bandwidth-plans.md) for details.
 
