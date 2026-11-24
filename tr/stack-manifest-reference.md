@@ -265,7 +265,7 @@ Plan, bu ayarlardan izin gevşetenleri **Güvenlik gevşetmeleri** kartında gö
 
 | Alan | Anlamı |
 |---|---|
-| `plan` | Bant genişliği planının adı: `Starter`, `Growth`, `Business`, `Enterprise`, `Scale`. Yazılmazsa servis varsayılan planla başlar. Bkz. [Bant Genişliği Planları](bandwidth-plans.md). |
+| `plan` | Bant genişliği planının adı: `Starter`, `Growth`, `Business`, `Enterprise`. Yazılmazsa servis varsayılan planla başlar. `Scale` artık yeni servislere sunulmuyor: Stack'in oluşturacağı serviste plan bunu `BANDWIDTH_PLAN_RETIRED` ile reddeder; zaten Scale'de olan servis planını korur. Bkz. [Bant Genişliği Planları](bandwidth-plans.md). |
 
 ### Job ve CronJob alanları
 
@@ -481,6 +481,7 @@ Dosya geçerliyse plan, hesabınızdaki kaynaklarla karşılaştırma yaparken �
 | `SOURCE_REVISION_VERIFICATION_FAILED` | The remote source revision could not be verified. |
 | `STORAGE_PLAN_NOT_FOUND` | Storage plan '…' is unavailable. |
 | `BANDWIDTH_PLAN_NOT_FOUND` | Bandwidth plan '…' is unavailable. |
+| `BANDWIDTH_PLAN_RETIRED` | Bandwidth plan '…' is no longer offered to new services. Choose one of: … |
 | `PRICE_UNAVAILABLE` | A required resource price is unavailable. Refresh pricing and create a new plan; unknown cost is not free. |
 | `PERMISSION_REQUIRED` | Permission '…' is required for this action. |
 | `Komuta:Sleep:FreePlanSingleReplica` | The free compute plan runs a single replica without autoscaling; choose a paid plan to scale out. |

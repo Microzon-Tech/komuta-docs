@@ -265,7 +265,7 @@ The plan shows the settings that relax restrictions on the **Security relaxation
 
 | Field | Meaning |
 |---|---|
-| `plan` | The bandwidth plan's name: `Starter`, `Growth`, `Business`, `Enterprise`, `Scale`. If left out, the service starts on the default plan. See [Bandwidth Plans](bandwidth-plans.md). |
+| `plan` | The bandwidth plan's name: `Starter`, `Growth`, `Business`, `Enterprise`. If left out, the service starts on the default plan. `Scale` is no longer offered to new services: for a service the Stack creates, the plan refuses it with `BANDWIDTH_PLAN_RETIRED`; a service already on Scale keeps it. See [Bandwidth Plans](bandwidth-plans.md). |
 
 ### Job and CronJob fields
 
@@ -481,6 +481,7 @@ If the file is valid, the plan compares it with the resources in your account an
 | `SOURCE_REVISION_VERIFICATION_FAILED` | The remote source revision could not be verified. |
 | `STORAGE_PLAN_NOT_FOUND` | Storage plan '…' is unavailable. |
 | `BANDWIDTH_PLAN_NOT_FOUND` | Bandwidth plan '…' is unavailable. |
+| `BANDWIDTH_PLAN_RETIRED` | Bandwidth plan '…' is no longer offered to new services. Choose one of: … |
 | `PRICE_UNAVAILABLE` | A required resource price is unavailable. Refresh pricing and create a new plan; unknown cost is not free. |
 | `PERMISSION_REQUIRED` | Permission '…' is required for this action. |
 | `Komuta:Sleep:FreePlanSingleReplica` | The free compute plan runs a single replica without autoscaling; choose a paid plan to scale out. |
